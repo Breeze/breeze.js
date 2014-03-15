@@ -1,0 +1,20 @@
+
+// set defaults
+// will no longer fail at initialization time if jQuery is not found.
+breeze.config.initializeAdapterInstances( { dataService: "webApi", ajax: "jQuery" });
+
+var ko = __requireLibCore("ko");
+
+if (ko) {
+    breeze.config.initializeAdapterInstance("modelLibrary", "ko");
+} else {
+    breeze.config.initializeAdapterInstance("modelLibrary", "backingStore");
+}
+
+if (this.window) {
+    this.window.breeze = breeze;
+}
+
+
+return breeze;
+});

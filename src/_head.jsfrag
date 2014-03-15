@@ -1,0 +1,29 @@
+/*
+ * Copyright 2014 IdeaBlade, Inc.  All Rights Reserved.  
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and 
+ * conditions of the IdeaBlade Breeze license, available at http://www.breezejs.com/license
+ *
+ * Author: Jay Traband
+ */
+
+(function (definition) {
+
+    // CommonJS
+    if (typeof exports === "object" && typeof module === "object") {
+        module.exports = definition();
+        // RequireJS
+    } else if (typeof define === "function" && define["amd"]) {
+        define(definition);
+        // <script>
+    } else {
+        breeze = definition();
+    }
+
+})(function () {  
+    var breeze = {
+        version: "1.4.11",
+        metadataVersion: "1.0.5"
+    };
+
+
+    
