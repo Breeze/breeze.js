@@ -21,17 +21,3 @@ GetFtpCredential.ps1
 
 breeze-*.zip
 breeze*.nupkg
-
-Samples/*.mdf
-Samples_Unpublished/*.mdf
-Samples/*.ldf
-Samples_Unpublished/*.ldf
-
-Breeze.intellisense/iisNode/
-Breeze.intellisense/node_modules
-Breeze.intellisense/*.js.debug/
-
-_Internal/Sample_WebApi/Scripts/
-_Internal/Sample_OData/Scripts/
-
-Breeze.Learn/Breeze.Learn/App_Data/NorthwindIB.sdf
