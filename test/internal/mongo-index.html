@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"/>
+        <title id="title">Breeze Node/Mongo Test Suite</title>
+       
+        <link rel="stylesheet" href="breeze.js.tests/libs/qunit-1.11.0.css" type="text/css" media="screen"/>
+        <script src="breeze.js.tests/libs/modernizr-2.0.6-development-only.js" ></script>
+        
+    </head>
+
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div id="test-dev"></div>
+    </body>
+    
+    <!-- load 3rd party libs -->
+    <script src="breeze.js.tests/libs/qunit-1.11.0.js"></script>
+    <script src="breeze.js.tests/libs/q.min.js"></script>
+    <script src="breeze.js.tests/libs/knockout-2.3.0.debug.js"></script>
+    <script src="breeze.js.tests/libs/underscore.js"></script>
+    <script src="breeze.js.tests/libs/backbone.js"></script>
+    <script src="breeze.js.tests/libs/jquery-2.0.3.js"></script>
+    <script src="breeze.js.tests/libs/angular.js"></script>
+    <script src="breeze.js.tests/breeze/breeze.debug.js"></script>
+    <script src="breeze.js.tests/breeze/breeze.dataService.mongo.js"></script> 
+
+    <!-- Test helper scripts  --> 
+    <!-- These must come first -->    
+    <script src="testFns.js"></script>
+    
+    <script>
+        // -- Initialize Test vars
+        // breezeTestFns.DEBUG_MONGO = true;
+        breezeTestFns.setDataService("mongo");
+    </script>
+
+    <script src="breeze.js.tests/tests/attachTests.js"></script>
+    <script src="breeze.js.tests/tests/classRewriteTests.js"></script>
+    <script src="breeze.js.tests/tests/complexTypeTests.js"></script>
+    <script src="breeze.js.tests/tests/entityManagerTests.js"></script>
+    <script src="breeze.js.tests/tests/entityTests.js"></script>
+    <script src="breeze.js.tests/tests/inheritBillingTests.js"></script>
+    <script src="breeze.js.tests/tests/inheritProduceTests.js"></script>
+    <script src="breeze.js.tests/tests/metadataTests.js"></script>
+    <script src="breeze.js.tests/tests/miscTests.js"></script>
+    <script src="breeze.js.tests/tests/paramTests.js"></script>
+    <script src="breeze.js.tests/tests/queryTests.js"></script>
+    <script src="breeze.js.tests/tests/queryCtorTests.js"></script>
+    <script src="breeze.js.tests/tests/queryDatatypeTests.js"></script>
+    <script src="breeze.js.tests/tests/queryLocalTests.js"></script>
+    <script src="breeze.js.tests/tests/queryNamedTests.js"></script>
+    <script src="breeze.js.tests/tests/queryNonEFTests.js"></script>
+    <script src="breeze.js.tests/tests/queryRawOdataTests.js"></script>
+    <script src="breeze.js.tests/tests/querySelectTests.js"></script>
+    <script src="breeze.js.tests/tests/queryAnyAllTests.js"></script>
+    <script src="breeze.js.tests/tests/saveTests.js"></script>
+    <script src="breeze.js.tests/tests/validateTests.js"></script>
+    <script src="breeze.js.tests/tests/validateEntityTests.js"></script>
+
+    <script src="breeze.js.tests/tests/mongoSpecificTests.js"></script>
+    <script src="breeze.js.tests/tests/mongoAnyAllTests.js"></script>
+    <script src="breeze.js.tests/tests/koSpecificTests.js"></script>
+
+    <!-- Tests are loaded; let's go! -->
+    <script>
+    
+        document.getElementById("title").innerHTML += " -> " + breezeTestFns.title;
+
+        if (QUnit.urlParams.canStart) {
+            QUnit.start(); // run tests
+        }
+
+    </script>
+</html>
