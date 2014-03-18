@@ -1,4 +1,4 @@
-﻿// Generated on: Mon Mar 17 2014 19:49:44 GMT-0700 (Pacific Daylight Time)
+﻿// Generated on: Tue Mar 18 2014 14:57:29 GMT-0700 (Pacific Daylight Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -8,7 +8,6 @@ intellisense.annotate(breeze.core, {
     ///   Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc. }
     ///   A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'. }
     ///   Unlike enums in some other environments, each 'symbol' can have both methods and properties. }
-    ///   See the example below: }
     ///   </summary>
     ///   <param name="name" type="String" optional="true"></param>
     ///   <param name="methodObj" type="Object" optional="true"></param>
@@ -1343,7 +1342,7 @@ intellisense.annotate(breeze.breeze.MetadataStore.prototype, {
   'setQ': function() {
     /// <signature>
     ///   <summary>
-    ///   (Re)set Q with a promises implementation suitable for Breeze internal use }
+    ///   (Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change. }
     ///   </summary>
     ///   <param name="q" type="Object" optional="true">- a  'thenable' promises implementation like Q.js with the API that Breeze requires internally.</param>
     

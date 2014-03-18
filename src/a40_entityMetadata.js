@@ -21,7 +21,7 @@ if (!Q) {
     
 
 /**
-(Re)set Q with a promises implementation suitable for Breeze internal use  
+(Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.
 @method setQ
 @param q {Object} - a  "thenable" promises implementation like Q.js with the API that Breeze requires internally.
 @param [q.defer] {Function} A function returning a deferred.

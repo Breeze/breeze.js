@@ -38,6 +38,8 @@ module.exports = function(grunt) {
     },
     yuidoc: {
       compile: {
+        // 'src' here only for the newer task to pick up - not needed for yuidoc.
+        src:       srcDir,
         options: {
           paths:     srcDir,
           themedir:  '../../docs/api-docs-theme',
@@ -47,6 +49,8 @@ module.exports = function(grunt) {
     },
 	exec: {
 	  buildIntellisense: {
+      // 'src' here only for the newer task to pick up - not needed for buildIntellisense
+      src: srcDir,
 	    cwd: '../intellisense',
 		  cmd: 'node server.js'
 	  }
@@ -56,12 +60,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
+  grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-exec');
   
   // No intellisense.
-  grunt.registerTask('basic', ['concat', 'uglify', 'yuidoc']);
+  grunt.registerTask('basic', ['newer:concat', 'newer:uglify', 'newer:yuidoc']);
   // Default task(s).
-  grunt.registerTask('default', ['concat', 'uglify', 'yuidoc', 'exec']);
+  grunt.registerTask('default', ['newer:concat', 'newer:uglify', 'newer:yuidoc', 'newer:exec']);
   
   function log(err, stdout, stderr, cb) {
 	if (err) {

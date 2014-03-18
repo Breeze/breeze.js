@@ -979,6 +979,7 @@ var Enum = (function() {
     Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
     A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.
     Unlike enums in some other environments, each 'symbol' can have both methods and properties.
+
     See the example below:
 
         // Example of creating a new Enum
@@ -4778,16 +4779,6 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
         if (Array.isArray(newValue) && !property.isScalar) {
             newValue = newValue.map(function(nv) { return dataType.parse(nv, typeof nv); });
         } else {
-            // angular keystroke hack
-            // test if string ends with "." or ".0" or ".00" - or ".030" or ".0300" etc.
-            if (dataType.isFloat && (typeof newValue == "string") && /[.](\d*0|)$/.test(newValue)) {
-                rawAccessorFn(newValue);
-                setTimeout(function () {
-                    newValue = dataType.parse(newValue, typeof newValue);
-                    defaultPropertyInterceptor(property, newValue, rawAccessorFn);
-                }, 0);
-                return;
-            }
             newValue = dataType.parse(newValue, typeof newValue);
         }
     }
@@ -5934,7 +5925,7 @@ if (!Q) {
     
 
 /**
-(Re)set Q with a promises implementation suitable for Breeze internal use  
+(Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.
 @method setQ
 @param q {Object} - a  "thenable" promises implementation like Q.js with the API that Breeze requires internally.
 @param [q.defer] {Function} A function returning a deferred.

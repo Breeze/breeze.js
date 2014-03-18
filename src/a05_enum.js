@@ -10,6 +10,7 @@ var Enum = (function() {
     Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
     A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.
     Unlike enums in some other environments, each 'symbol' can have both methods and properties.
+
     See the example below:
 
         // Example of creating a new Enum
