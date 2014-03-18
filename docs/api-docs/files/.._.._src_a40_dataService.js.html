@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\a55_saveOptions.js</title>
+    <title>..\..\src\a40_dataService.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,112 +201,269 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\a55_saveOptions.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a40_dataService.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
 @module breeze
 **/
-   
-var SaveOptions = (function () {
-    /**
-    A SaveOptions instance is used to specify the &#x27;options&#x27; under which a save will occur.
 
-    @class SaveOptions
-    **/
+var DataService = (function () {
         
     /**
-    @method &lt;ctor&gt; SaveOptions
-    @param config {Object}
-    @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
-    @param [config.resourceName] {String} Resource name to be used during the save - this defaults to &quot;SaveChanges&quot;
-    @param [config.dataService] {DataService} The DataService to be used for this save.
-    @param [config.tag] {Object} Free form value that will be sent to the server during the save. 
+    A DataService instance is used to encapsulate the details of a single &#x27;service&#x27;; this includes a serviceName, a dataService adapterInstance, 
+    and whether the service has server side metadata.  
+
+    You can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService 
+    is constructed for you.  (It can also be set via the EntityManager.setProperties method).
+
+    The same applies to the MetadataStore.fetchMetadata method, i.e. it takes either a serviceName or a DataService instance.
+
+    Each metadataStore contains a list of DataServices, each accessible via its ‘serviceName’. 
+    ( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally 
+    anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or service name).
+    @class DataService
     **/
+
+    /**
+    DataService constructor
+
+    @example
+        // 
+        var dataService = new DataService({
+            serviceName: altServiceName,
+            hasServerMetadata: false
+        });
+
+        var metadataStore = new MetadataStore({
+            namingConvention: NamingConvention.camelCase
+        });
+
+        return new EntityManager({
+            dataService: dataService,
+            metadataStore: metadataStore
+        });
+            
+    @method &lt;ctor&gt; DataService
+    @param config {Object}
+    @param config.serviceName {String} The name of the service. 
+    @param [config.adapterName] {String} The name of the dataServiceAdapter to be used with this service. 
+    @param [config.hasServerMetadata] {bool} Whether the server can provide metadata for this service.
+    @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
+    @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a &#x27;get&#x27; request against this service.
+    **/
+        
     var ctor = function (config) {
         updateWithConfig(this, config);
     };
-    
     var proto = ctor.prototype;
-    proto._$typeName = &quot;SaveOptions&quot;;
+    proto._$typeName = &quot;DataService&quot;;
         
     /**
-    Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @chainable
-    **/
-    proto.setAsDefault = function() {
-        return __setAsDefault(this, ctor);
-    };
-    
-    /**
-    Whether another save can be occuring at the same time as this one - default is false.
+    The serviceName for this DataService.
 
     __readOnly__
-    @property allowConcurrentSaves {Boolean}
+    @property serviceName {String}
     **/
-    
+        
     /**
-    A {{#crossLink &quot;DataService&quot;}}{{/crossLink}}. 
-    __readOnly__
-    @property dataService {DataService}
-    **/
-
-    /**
-    The resource name to call to perform the save.
-    __readOnly__
-    @property resourceName {String}
-    **/
-
-    /**
-    A free form value that will be sent to the server.
+    The adapter name for the dataServiceAdapter to be used with this service.
 
     __readOnly__
-    @property tag {Object}
+    @property adapterName {String}
+    **/
+        
+    /**
+    The &quot;dataService&quot; adapter implementation instance associated with this EntityManager.
+
+    __readOnly__
+    @property adapterInstance {an instance of the &quot;dataService&quot; adapter interface}
     **/
 
     /**
-    The default value whenever SaveOptions are not specified.
-    @property defaultInstance {SaveOptions}
-    @static
+    Whether the server can provide metadata for this service.
+
+    __readOnly__
+    @property hasServerMetadata {Boolean}
     **/
-    
+        
     /**
-    Returns a copy of this SaveOptions with the specified config options applied.
-    @example
-        var saveOptions = em1.saveOptions.using( {resourceName: &quot;anotherResource&quot; });
+    The JsonResultsAdapter used to process the results of any query against this DataService.
+
+    __readOnly__
+    @property jsonResultsAdapter {JsonResultsAdapter}
+    **/
+
+    /**
+    Whether to use JSONP when performing a &#x27;GET&#x27; request against this service.
     
+    __readOnly__
+    @property useJsonP {Boolean}
+    **/
+
+    /**
+    Returns a copy of this DataService with the specified properties applied.
     @method using
-    @param config {Configuration Object|} The object to apply to create a new SaveOptions.
-    @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
-    @param [config.resourceName] {String} Resource name to be used during the save - this defaults to &quot;SaveChanges&quot;
-    @param [config.dataService] {DataService} The DataService to be used for this save.
-    @param [config.tag] {Object} Free form value that will be sent to the server during the save. 
+    @param config {Configuration Object} The object to apply to create a new DataService.
+    @return {DataService}
     @chainable
     **/
     proto.using = function (config) {
-        return updateWithConfig(this, config);
+        if (!config) return this;
+        var result = new DataService(this);
+        return updateWithConfig(result, config);
+    };
+
+    ctor.resolve = function (dataServices) {
+        // final defaults
+        dataServices.push({
+            hasServerMetadata: true,
+            useJsonp: false
+        });
+        var ds = new DataService(__resolveProperties(dataServices,
+            [&quot;serviceName&quot;, &quot;adapterName&quot;, &quot;hasServerMetadata&quot;, &quot;jsonResultsAdapter&quot;, &quot;useJsonp&quot;]));
+
+        if (!ds.serviceName) {
+            throw new Error(&quot;Unable to resolve a &#x27;serviceName&#x27; for this dataService&quot;);
+        }
+        ds.adapterInstance = ds.adapterInstance || __config.getAdapterInstance(&quot;dataService&quot;, ds.adapterName);
+        ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
+
+        return ds;
     };
 
     function updateWithConfig(obj, config) {
         if (config) {
             assertConfig(config)
-              .whereParam(&quot;resourceName&quot;).isOptional().isString()
-              .whereParam(&quot;dataService&quot;).isOptional().isInstanceOf(DataService)
-              .whereParam(&quot;allowConcurrentSaves&quot;).isBoolean().isOptional()
-              .whereParam(&quot;tag&quot;).isOptional()
-              .applyAll(obj);
+                .whereParam(&quot;serviceName&quot;).isOptional()
+                .whereParam(&quot;adapterName&quot;).isString().isOptional()
+                .whereParam(&quot;hasServerMetadata&quot;).isBoolean().isOptional()
+                .whereParam(&quot;jsonResultsAdapter&quot;).isInstanceOf(JsonResultsAdapter).isOptional()
+                .whereParam(&quot;useJsonp&quot;).isBoolean().isOptional()
+                .applyAll(obj);
+            obj.serviceName = obj.serviceName &amp;&amp; DataService._normalizeServiceName(obj.serviceName);
+            obj.adapterInstance = obj.adapterName &amp;&amp; __config.getAdapterInstance(&quot;dataService&quot;, obj.adapterName);
         }
         return obj;
     }
+        
+    ctor._normalizeServiceName = function(serviceName) {
+        serviceName = serviceName.trim();
+        if (serviceName.substr(-1) !== &quot;/&quot;) {
+            return serviceName + &#x27;/&#x27;;
+        } else {
+            return serviceName;
+        }
+    };
+        
+    proto.toJSON = function () {
+        // don&#x27;t use default value here - because we want to be able to distinguish undefined props for inheritence purposes.
+        return __toJson(this, {
+            serviceName: null,
+            adapterName: null,
+            hasServerMetadata: null,
+            jsonResultsAdapter: function (v) { return v &amp;&amp; v.name; },
+            useJsonp: null
+        });       
+    };
 
-    ctor.defaultInstance = new ctor({ allowConcurrentSaves: false});
+    ctor.fromJSON = function(json) {
+        json.jsonResultsAdapter = __config._fetchObject(JsonResultsAdapter, json.jsonResultsAdapter);
+        return new DataService(json);
+    };
+
+    proto.makeUrl = function(suffix) {
+        var url = this.serviceName;
+        // remove any trailing &quot;/&quot;
+        if (core.stringEndsWith(url, &quot;/&quot;)) {
+            url = url.substr(0, url.length - 1);
+        }
+        // ensure that it ends with &quot;/&quot; + suffix
+        suffix = &quot;/&quot; + suffix;
+        if (!core.stringEndsWith(url, suffix)) {
+            url = url + suffix;
+        }
+        return url;
+    };
+
+    return ctor;
+})();
+    
+var JsonResultsAdapter = (function () {
+
+    /**
+    A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service. 
+    This facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class &#x27;breeze&#x27; citizens. 
+
+    @class JsonResultsAdapter
+    **/
+
+    /**
+    JsonResultsAdapter constructor
+
+    @example
+        // 
+        var jsonResultsAdapter = new JsonResultsAdapter({
+            name: &quot;test1e&quot;,
+            extractResults: function(json) {
+                return json.results;
+            },
+            visitNode: function(node, mappingContext, nodeContext) {
+                var entityType = normalizeTypeName(node.$type);
+                var propertyName = nodeContext.propertyName;
+                var ignore = propertyName &amp;&amp; propertyName.substr(0, 1) === &quot;$&quot;;
+
+                return {
+                    entityType: entityType,
+                    nodeId: node.$id,
+                    nodeRefId: node.$ref,
+                    ignore: ignore
+                };
+            }
+        });
+
+        var dataService = new DataService( {
+                serviceName: &quot;breeze/foo&quot;,
+                jsonResultsAdapter: jsonResultsAdapter
+        });
+
+        var entityManager = new EntityManager( {
+            dataService: dataService
+        });
+            
+    @method &lt;ctor&gt; JsonResultsAdapter
+    @param config {Object}
+    @param config.name {String} The name of this adapter.  This name is used to uniquely identify and locate this instance when an &#x27;exported&#x27; JsonResultsAdapter is later imported.
+    @param [config.extractResults] {Function} Called once per service operation to extract the &#x27;payload&#x27; from any json received over the wire. 
+    This method has a default implementation which to simply return the &quot;results&quot; property from any json returned as a result of executing the query.
+    @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload. 
+    **/
+    var ctor = function (config) {
+        if (arguments.length !== 1) {
+            throw new Error(&quot;The JsonResultsAdapter ctor should be called with a single argument that is a configuration object.&quot;);
+        }
+
+        assertConfig(config)
+            .whereParam(&quot;name&quot;).isNonEmptyString()
+            .whereParam(&quot;extractResults&quot;).isFunction().isOptional().withDefault(extractResultsDefault)
+            .whereParam(&quot;visitNode&quot;).isFunction()
+            .applyAll(this);
+        __config._storeObject(this, proto._$typeName, this.name);
+    };
+        
+    var proto = ctor.prototype;
+    proto._$typeName = &quot;JsonResultsAdapter&quot;;
+        
+    function extractResultsDefault(data) {
+        return data.results;
+    }
+        
     return ctor;
 })();
 
-breeze.SaveOptions= SaveOptions;
+breeze.DataService= DataService;
+breeze.JsonResultsAdapter = JsonResultsAdapter;
 
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\iface.ajaxInterface.js</title>
+    <title>..\..\src\a30_entityAction.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,65 +201,146 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\iface.ajaxInterface.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a30_entityAction.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
-@module breeze
+@module breeze   
 **/
 
-/**
-This is an interface description. Any class that implements the methods and properties defined here is considered a valid
-implementation of this interface.
+    
+var EntityAction = (function () {
+    /**
+    EntityAction is an &#x27;Enum&#x27; containing all of the valid actions that can occur to an &#x27;Entity&#x27;.
 
-@class ↈ_ajax_interface
-**/
+    @class EntityAction
+    @static
+    **/
+    var entityActionMethods = {
+        isAttach: function () { return !!this.isAttach; },
+        isDetach: function () { return !!this.isDetach; },
+        isModification: function () { return !!this.isModification; }
+    };
 
-/**
-Performs an ajax request. This method takes a single argument — a configuration object — that is used to generate an HTTP request. The config object has two callback methods:  
-&#x27;success&#x27; and &#x27;error&#x27; in addition to a number of properties that may be used to configure the request itself. Higher level Breeze constructs will wrap calls to the ajax adapter 
-into Promises. Individual adapters may add additional properties to the basic config object described below.  
+    var EntityAction = new Enum(&quot;EntityAction&quot;, entityActionMethods);
+        
+    /**
+    Attach - Entity was attached via an AttachEntity call.
 
-@method ajax
-@param config {Object}
-@param config.url {String} Absolute or relative URL of the resource that is being requested.
-@param config.type {String} HTTP method (e.g. &#x27;GET&#x27;, &#x27;POST&#x27;, etc)
-@param [config.data] {Object|String} Data to be sent as the request message data
-@param [config.params]  Map of strings or objects which will be sent to the server in the query string in a form encoded format - url?key1=value1&amp;key2=value2 
-@param [config.crossDomain=false]
-@param config.success {Function} Function called on success.
-        successFunction(httpResponse)
-@param config.error {Function} Function called on failure.
-        errorFunction(httpResponse)
-**/
+    @property Attach {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.Attach = EntityAction.addSymbol({ isAttach: true});
+        
+    /**
+    AttachOnQuery - Entity was attached as a result of a query.
 
-/**
-A generic wrapper for any Http response returned by a server. 
+    @property AttachOnQuery {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.AttachOnQuery = EntityAction.addSymbol({ isAttach: true});
+        
+    /**
+    AttachOnImport - Entity was attached as a result of an import.
 
-@class HttpResponse
-**/
+    @property AttachOnImport {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.AttachOnImport = EntityAction.addSymbol({ isAttach: true});
+        
+        
+    /**
+    Detach - Entity was detached.
 
-/**
-The response body.
-@property data {Object} 
-**/
+    @property Detach {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.Detach = EntityAction.addSymbol( { isDetach: true });
+        
+    /**
+    MergeOnQuery - Properties on the entity were merged as a result of a query.
 
-/**
-HTTP status code of the response.   		
-@property status {Number} 
-**/
+    @property MergeOnQuery {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.MergeOnQuery = EntityAction.addSymbol( { isModification: true });
+        
+    /**
+    MergeOnImport - Properties on the entity were merged as a result of an import.
 
-/**
-The configuration object that was used to generate the request.
-@property config {Object} 
-**/
+    @property MergeOnImport {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.MergeOnImport = EntityAction.addSymbol( { isModification: true });
+        
+    /**
+    MergeOnSave - Properties on the entity were merged as a result of a save
 
-/**
-A function to retrieve headers - a null headerName will return all headers. 
-@method getHeader 
-@param [headerName] {String}
-**/
+    @property MergeOnSave {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.MergeOnSave = EntityAction.addSymbol( { isModification: true });
+        
+    /**
+    PropertyChange - A property on the entity was changed.
+
+    @property PropertyChange {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.PropertyChange = EntityAction.addSymbol({ isModification: true});
+        
+    /**
+    EntityStateChange - The EntityState of the entity was changed.
+
+    @property EntityStateChange {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.EntityStateChange = EntityAction.addSymbol();
+        
+        
+    /**
+    AcceptChanges - AcceptChanges was called on the entity, or its entityState was set to Unmodified.
+
+    @property AcceptChanges {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.AcceptChanges = EntityAction.addSymbol();
+
+    /**
+    RejectChanges - RejectChanges was called on the entity.
+
+    @property RejectChanges {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.RejectChanges = EntityAction.addSymbol({ isModification: true});
+        
+    /**
+    Clear - The EntityManager was cleared.  All entities detached.
+
+    @property Clear {EntityAction}
+    @final
+    @static
+    **/
+    EntityAction.Clear = EntityAction.addSymbol({ isDetach: true});
+        
+    EntityAction.seal();
+    return EntityAction;
+})();
+
+breeze.EntityAction= EntityAction;
+
 
     </pre>
 </div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\a30_entityAction.js</title>
+    <title>..\..\src\a50_entityGroup.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,145 +201,178 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\a30_entityAction.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a50_entityGroup.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
-@module breeze   
+@module breeze
 **/
 
-    
-var EntityAction = (function () {
-    /**
-    EntityAction is an &#x27;Enum&#x27; containing all of the valid actions that can occur to an &#x27;Entity&#x27;.
+var EntityGroup = (function () {
 
-    @class EntityAction
-    @static
-    **/
-    var entityActionMethods = {
-        isAttach: function () { return !!this.isAttach; },
-        isDetach: function () { return !!this.isDetach; },
-        isModification: function () { return !!this.isModification; }
+    var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
+        
+    var ctor = function (entityManager, entityType) {
+        this.entityManager = entityManager;
+        this.entityType = entityType;
+        this._indexMap = {};
+        this._entities = [];
+        this._emptyIndexes = [];
+    };
+    var proto = ctor.prototype;
+
+    proto.attachEntity = function (entity, entityState, mergeStrategy) {
+        // entity should already have an aspect.
+        var aspect = entity.entityAspect;
+
+        if (!aspect._initialized) {
+            this.entityType._initializeInstance(entity);
+        }
+        delete aspect._initialized;
+
+        var keyInGroup = aspect.getKey()._keyInGroup;
+        var ix = this._indexMap[keyInGroup];
+        if (ix &gt;= 0) {
+            var targetEntity = this._entities[ix];
+            var wasUnchanged = targetEntity.entityAspect.entityState.isUnchanged();
+            if (targetEntity === entity) {
+                aspect.entityState = entityState;
+            } else if (mergeStrategy === MergeStrategy.Disallowed) {
+                throw new Error(&quot;A MergeStrategy of &#x27;Disallowed&#x27; does not allow you to attach an entity when an entity with the same key is already attached: &quot; + aspect.getKey());
+            } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges &amp;&amp; wasUnchanged)) {
+                this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
+                this.entityManager._checkStateChange(targetEntity, wasUnchanged, entityState.isUnchanged());
+            }
+            return targetEntity;
+        } else {
+            if (this._emptyIndexes.length === 0) {
+                ix = this._entities.push(entity) - 1;
+            } else {
+                ix = this._emptyIndexes.pop();
+                this._entities[ix] = entity;
+            }
+            this._indexMap[keyInGroup] = ix;
+            aspect.entityState = entityState;
+            aspect.entityGroup = this;
+            aspect.entityManager = this.entityManager;
+            return entity;
+        }
     };
 
-    var EntityAction = new Enum(&quot;EntityAction&quot;, entityActionMethods);
+    proto.detachEntity = function (entity) {
+        // by this point we have already determined that this entity 
+        // belongs to this group.
+        var aspect = entity.entityAspect;
+        var keyInGroup = aspect.getKey()._keyInGroup;
+        var ix = this._indexMap[keyInGroup];
+        if (ix === undefined) {
+            // shouldn&#x27;t happen.
+            throw new Error(&quot;internal error - entity cannot be found in group&quot;);
+        }
+        delete this._indexMap[keyInGroup];
+        this._emptyIndexes.push(ix);
+        this._entities[ix] = null;
+        return entity;
+    };
         
-    /**
-    Attach - Entity was attached via an AttachEntity call.
 
-    @property Attach {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Attach = EntityAction.addSymbol({ isAttach: true});
-        
-    /**
-    AttachOnQuery - Entity was attached as a result of a query.
 
-    @property AttachOnQuery {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AttachOnQuery = EntityAction.addSymbol({ isAttach: true});
-        
-    /**
-    AttachOnImport - Entity was attached as a result of an import.
+    // returns entity based on an entity key defined either as an array of key values or an EntityKey
+    proto.findEntityByKey = function (entityKey) {
+        var keyInGroup;
+        if (entityKey instanceof EntityKey) {
+            keyInGroup = entityKey._keyInGroup;
+        } else {
+            keyInGroup = EntityKey.createKeyString(entityKey);
+        }
+        var ix = this._indexMap[keyInGroup];
+        // can&#x27;t use just (ix) below because 0 is valid
+        return (ix !== undefined) ? this._entities[ix] : null;
+    };
 
-    @property AttachOnImport {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AttachOnImport = EntityAction.addSymbol({ isAttach: true});
-        
-        
-    /**
-    Detach - Entity was detached.
+    proto.hasChanges = function() {
+        return this._entities.some(__changedFilter);
+    };
 
-    @property Detach {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Detach = EntityAction.addSymbol( { isDetach: true });
+    proto.getEntities = function (entityStates) {
+        var filter = getFilter(entityStates);
+        return this._entities.filter(filter);
+    };
         
-    /**
-    MergeOnQuery - Properties on the entity were merged as a result of a query.
+    // do not expose this method. It is doing a special purpose INCOMPLETE fast detach operation
+    // just for the entityManager clear method - the entityGroup will be in an inconsistent state
+    // after this op, which is ok because it will be thrown away.
+    proto._clear = function() {
+        this._entities.forEach(function (entity) {
+            if (entity != null) {
+                entity.entityAspect._detach();
+            }
+        });
+        this._entities = null;
+        this._indexMap = null;
+        this._emptyIndexes = null;
+    };
 
-    @property MergeOnQuery {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnQuery = EntityAction.addSymbol( { isModification: true });
+    proto._updateFkVal = function (fkProp, oldValue, newValue) {
+        var fkPropName = fkProp.name;
+        this._entities.forEach(function (entity) {
+            if (entity != null) {
+                if (entity.getProperty(fkPropName) == oldValue) {
+                    entity.setProperty(fkPropName, newValue);
+                }
+            }
+        });
+    }
+
+    proto._fixupKey = function (tempValue, realValue) {
+        // single part keys appear directly in map
+        var ix = this._indexMap[tempValue];
+        if (ix === undefined) {
+            throw new Error(&quot;Internal Error in key fixup - unable to locate entity&quot;);
+        }
+        var entity = this._entities[ix];
+        var keyPropName = entity.entityType.keyProperties[0].name;
+        // fks on related entities will automatically get updated by this as well
+        entity.setProperty(keyPropName, realValue);
+        delete entity.entityAspect.hasTempKey;
+        delete this._indexMap[tempValue];
+        this._indexMap[realValue] = ix;
+    };
+
+    proto._replaceKey = function(oldKey, newKey) {
+        var ix = this._indexMap[oldKey._keyInGroup];
+        delete this._indexMap[oldKey._keyInGroup];
+        this._indexMap[newKey._keyInGroup] = ix;
+    };
         
-    /**
-    MergeOnImport - Properties on the entity were merged as a result of an import.
+    function getFilter(entityStates) {
+        if (!entityStates) {
+            return function (e) {
+                return !!e;
+            };
+        } else if (entityStates.length === 1) {
+            var entityState = entityStates[0];
+            return function (e) {
+                if (!e) return false;
+                return e.entityAspect.entityState === entityState;
+            };
+        } else {
+            return function (e) {
+                if (!e) return false;
+                return entityStates.some(function (es) {
+                    return e.entityAspect.entityState === es;
+                });
+            };
+        }
+    }
 
-    @property MergeOnImport {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnImport = EntityAction.addSymbol( { isModification: true });
-        
-    /**
-    MergeOnSave - Properties on the entity were merged as a result of a save
+    return ctor;
 
-    @property MergeOnSave {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnSave = EntityAction.addSymbol( { isModification: true });
-        
-    /**
-    PropertyChange - A property on the entity was changed.
-
-    @property PropertyChange {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.PropertyChange = EntityAction.addSymbol({ isModification: true});
-        
-    /**
-    EntityStateChange - The EntityState of the entity was changed.
-
-    @property EntityStateChange {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.EntityStateChange = EntityAction.addSymbol();
-        
-        
-    /**
-    AcceptChanges - AcceptChanges was called on the entity, or its entityState was set to Unmodified.
-
-    @property AcceptChanges {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AcceptChanges = EntityAction.addSymbol();
-
-    /**
-    RejectChanges - RejectChanges was called on the entity.
-
-    @property RejectChanges {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.RejectChanges = EntityAction.addSymbol({ isModification: true});
-        
-    /**
-    Clear - The EntityManager was cleared.  All entities detached.
-
-    @property Clear {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Clear = EntityAction.addSymbol({ isDetach: true});
-        
-    EntityAction.seal();
-    return EntityAction;
 })();
+   
+// do not expose EntityGroup - internal only
 
-breeze.EntityAction= EntityAction;
 
 
     </pre>

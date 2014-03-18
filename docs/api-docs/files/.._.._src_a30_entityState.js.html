@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\a30_complexArray.js</title>
+    <title>..\..\src\a30_entityState.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,139 +201,154 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\a30_complexArray.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a30_entityState.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-﻿
-breeze.makeComplexArray = (function() {
-    var complexArrayMixin = {};
+﻿/**
+@module breeze   
+**/
 
-    // complexArray will have the following props
-    //    parent
-    //    propertyPath
-    //    parentProperty
-    //    addedItems  - only if modified
-    //    removedItems  - only if modified
-    //  each complexAspect of any entity within a complexArray
-    //  will have its own _complexState = &quot;A/M&quot;;
-
+var EntityState = (function () {
     /**
-    Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of 
-    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
-    This collection looks like an array in that the basic methods on arrays such as &#x27;push&#x27;, &#x27;pop&#x27;, &#x27;shift&#x27;, &#x27;unshift&#x27;, &#x27;splice&#x27;
-    are all provided as well as several special purpose methods. 
-    @class ↈ_complexArray_
-    **/
+    EntityState is an &#x27;Enum&#x27; containing all of the valid states for an &#x27;Entity&#x27;.
 
+    @class EntityState
+    @static
+    **/
+    var entityStateMethods = {
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isUnchanged();
+        is the same as
+        @example
+            return es === EntityState.Unchanged;
+        @method isUnchanged
+        @return {Boolean} Whether an entityState instance is EntityState.Unchanged.
+        **/
+        isUnchanged: function () { return this === EntityState.Unchanged; },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isAdded();
+        is the same as
+        @example
+            return es === EntityState.Added;
+        @method isAdded
+        @return {Boolean} Whether an entityState instance is EntityState.Added.
+        **/
+        isAdded: function () { return this === EntityState.Added; },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isModified();
+        is the same as
+        @example
+            return es === EntityState.Modified;
+        @method isModified
+        @return {Boolean} Whether an entityState instance is EntityState.Modified.
+        **/
+        isModified: function () { return this === EntityState.Modified; },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isDeleted();
+        is the same as
+        @example
+            return es === EntityState.Deleted;
+        @method isDeleted
+        @return  {Boolean} Whether an entityState instance is EntityState.Deleted.
+        **/
+        isDeleted: function () { return this === EntityState.Deleted; },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isDetached();
+        is the same as
+        @example
+            return es === EntityState.Detached;
+        @method isDetached
+        @return  {Boolean} Whether an entityState instance is EntityState.Detached.
+        **/
+        isDetached: function () { return this === EntityState.Detached; },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isUnchangedOrModified();
+        is the same as
+        @example
+            return es === EntityState.Unchanged || es === EntityState.Modified
+        @method isUnchangedOrModified
+        @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified.
+        **/
+        isUnchangedOrModified: function () {
+            return this === EntityState.Unchanged || this === EntityState.Modified;
+        },
+        /**
+        @example
+            var es = anEntity.entityAspect.entityState;
+            return es.isAddedModifiedOrDeleted();
+        is the same as
+        @example
+            return es === EntityState.Added || es === EntityState.Modified || es === EntityState.Deleted
+        @method isAddedModifiedOrDeleted
+        @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.
+        **/
+        isAddedModifiedOrDeleted: function () {
+            return this === EntityState.Added ||
+                this === EntityState.Modified ||
+                this === EntityState.Deleted;
+        }
+    };
+
+    var EntityState = new Enum(&quot;EntityState&quot;, entityStateMethods);
     /**
-    An {{#crossLink &quot;Event&quot;}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
-    is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-    Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-    collections are collected into a single notification event for each relation array.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        orders.arrayChanged.subscribe(
-            function (arrayChangedArgs) {
-                var addedEntities = arrayChangedArgs.added;
-                var removedEntities = arrayChanged.removed;
-            });
-    @event arrayChanged 
-    @param added {Array of Entity} An array of all of the entities added to this collection.
-    @param removed {Array of Entity} An array of all of the removed from this collection.
-    @readOnly
+    The &#x27;Unchanged&#x27; state.
+
+    @property Unchanged {EntityState}
+    @final
+    @static
     **/
+    EntityState.Unchanged = EntityState.addSymbol();
+    /**
+    The &#x27;Added&#x27; state.
 
-    // virtual impls 
-    complexArrayMixin._getGoodAdds = function (adds) {
-        return getGoodAdds(this, adds);
-    };
+    @property Added {EntityState}
+    @final
+    @static
+    **/
+    EntityState.Added = EntityState.addSymbol();
+    /**
+    The &#x27;Modified&#x27; state.
 
-    complexArrayMixin._beforeChange = function() {
-        observableArray.updateEntityState(this);
-    };
+    @property Modified {EntityState}
+    @final
+    @static
+    **/
+    EntityState.Modified = EntityState.addSymbol();
+    /**
+    The &#x27;Deleted&#x27; state.
 
-    complexArrayMixin._processAdds = function (adds) {
-        processAdds(this, adds);
-    };
+    @property Deleted {EntityState}
+    @final
+    @static
+    **/
+    EntityState.Deleted = EntityState.addSymbol();
+    /**
+    The &#x27;Detached&#x27; state.
 
-    complexArrayMixin._processRemoves = function (removes) {
-        processRemoves(this, removes);
-    };
-    //
-
-    complexArrayMixin._rejectChanges = function() {
-        if (!this._origValues) return;
-        var that = this;
-        this.forEach(function(co) {
-            clearAspect(co, that);
-        });
-        this.length = 0;
-        this._origValues.forEach(function(co) {
-            that.push(co);
-        });
-        Array.prototype.push.apply(this, this._origValues);
-    };
-
-    complexArrayMixin._acceptChanges = function() {
-        this._origValues = null;
-    } ;
-
-    // local functions
-
-
-    function getGoodAdds(complexArray, adds) {
-        // remove any that are already added here
-        return adds.filter(function (a) {
-            return a.parent !== complexArray.parent;
-        });
-    }
-
-    function processAdds(complexArray, adds) {
-        adds.forEach(function (a) {
-            if (a.parent != null) {
-                throw new Error(&quot;The complexObject is already attached. Either clone it or remove it from its current owner&quot;);
-            }
-            setAspect(a, complexArray);
-        });
-    }
-
-    function processRemoves(complexArray, removes) {
-        removes.forEach(function (a) {
-            clearAspect(a, complexArray);
-        });
-    }
-
-    function clearAspect(co, arr) {
-        var coAspect = co.complexAspect;
-        // if not already attached - exit
-        if (coAspect.parent !== arr.parent) return null;
-
-        coAspect.parent = null;
-        coAspect.parentProperty = null;
-        return coAspect;
-    }
-
-    function setAspect(co, arr) {
-        var coAspect = co.complexAspect;
-        // if already attached - exit
-        if (coAspect.parent === arr.parent) return null;
-        coAspect.parent = arr.parent;
-        coAspect.parentProperty = arr.parentProperty;
-
-        return coAspect;
-    }
-
-    function makeComplexArray(arr, parent, parentProperty) {
-
-        observableArray.initializeParent(arr, parent, parentProperty);
-        arr.arrayChanged = new Event(&quot;arrayChanged&quot;, arr);
-        __extend(arr, observableArray.mixin);
-        return __extend(arr, complexArrayMixin);
-    }
-
-    return makeComplexArray;
+    @property Detached {EntityState}
+    @final
+    @static
+    **/
+    EntityState.Detached = EntityState.addSymbol();
+    EntityState.seal();
+    return EntityState;
 })();
+   
+breeze.EntityState= EntityState;
+
     </pre>
 </div>
 

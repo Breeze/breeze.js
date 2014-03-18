@@ -47,7 +47,7 @@ function runInServer() {
 
 function readWrite(callback) {
     log("reading file...");
-    var filename = "..\\apidocs\\data.json";
+    var filename = "..\\..\\docs\\api-docs\\data.json";
     if (!fs.existsSync(filename)) {
         throw new Error("Unable to locate file: " + fileName);
     }
@@ -59,7 +59,7 @@ function readWrite(callback) {
     log("formatting with template...");
     var output = outputUsingTemplate(api);
     fs.writeFileSync("breeze.intellisense.js", output, "utf8");
-    fs.writeFileSync("..\\Scripts\\breeze.intellisense.js", output, "utf8");
+    fs.writeFileSync("..\\breeze.intellisense.js", output, "utf8");
     log("done");
     // console.log(output);
     callback(api);

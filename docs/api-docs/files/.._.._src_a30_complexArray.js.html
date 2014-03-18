@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\a30_entityKey.js</title>
+    <title>..\..\src\a30_complexArray.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,164 +201,139 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\a30_entityKey.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a30_complexArray.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-﻿/**
-@module breeze   
-**/
-    
-var EntityKey = (function () {
+﻿
+breeze.makeComplexArray = (function() {
+    var complexArrayMixin = {};
 
-    var ENTITY_KEY_DELIMITER = &quot;:::&quot;;
+    // complexArray will have the following props
+    //    parent
+    //    propertyPath
+    //    parentProperty
+    //    addedItems  - only if modified
+    //    removedItems  - only if modified
+    //  each complexAspect of any entity within a complexArray
+    //  will have its own _complexState = &quot;A/M&quot;;
 
     /**
-    An EntityKey is an object that represents the unique identity of an entity.  EntityKey&#x27;s are immutable. 
+    Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of 
+    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
+    This collection looks like an array in that the basic methods on arrays such as &#x27;push&#x27;, &#x27;pop&#x27;, &#x27;shift&#x27;, &#x27;unshift&#x27;, &#x27;splice&#x27;
+    are all provided as well as several special purpose methods. 
+    @class ↈ_complexArray_
+    **/
 
-    @class EntityKey
+    /**
+    An {{#crossLink &quot;Event&quot;}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
+    is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+    Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+    collections are collected into a single notification event for each relation array.
+    @example
+        // assume order is an order entity attached to an EntityManager.
+        orders.arrayChanged.subscribe(
+            function (arrayChangedArgs) {
+                var addedEntities = arrayChangedArgs.added;
+                var removedEntities = arrayChanged.removed;
+            });
+    @event arrayChanged 
+    @param added {Array of Entity} An array of all of the entities added to this collection.
+    @param removed {Array of Entity} An array of all of the removed from this collection.
+    @readOnly
     **/
-        
-    /** 
-    Constructs a new EntityKey.  Each entity within an EntityManager will have a unique EntityKey. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
-        var entityKey = new EntityKey(empType, 1);
-    EntityKey&#x27;s may also be found by calling EntityAspect.getKey()
-    @example
-        // assume employee1 is an existing Employee entity
-        var empKey = employee1.entityAspect.getKey();
-    Multipart keys are created by passing an array as the &#x27;keyValues&#x27; parameter
-    @example
-        var empTerrType = em1.metadataStore.getEntityType(&quot;EmployeeTerritory&quot;);            
-        var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
-        // The order of the properties in the &#x27;keyValues&#x27; array must be the same as that 
-        // returned by empTerrType.keyProperties
-    @method &lt;ctor&gt; EntityKey
-    @param entityType {EntityType} The {{#crossLink &quot;EntityType&quot;}}{{/crossLink}} of the entity.
-    @param keyValues {value|Array of values} A single value or an array of values.
-    **/
-    var ctor = function (entityType, keyValues) {
-        assertParam(entityType, &quot;entityType&quot;).isInstanceOf(EntityType).check();
-        var subtypes = entityType.getSelfAndSubtypes();
-        if (subtypes.length &gt; 1) {
-            this._subtypes = subtypes.filter(function (st) { return st.isAbstract === false; });
-        }
-       
-        if (!Array.isArray(keyValues)) {
-            keyValues = __arraySlice(arguments, 1);
-        }
-        
-        this.entityType = entityType;
-        entityType.keyProperties.forEach(function (kp, i) {
-            // insure that guid keys are comparable.
-            if (kp.dataType === DataType.Guid) {
-                keyValues[i] = keyValues[i] &amp;&amp; keyValues[i].toLowerCase();
-            }
+
+    // virtual impls 
+    complexArrayMixin._getGoodAdds = function (adds) {
+        return getGoodAdds(this, adds);
+    };
+
+    complexArrayMixin._beforeChange = function() {
+        observableArray.updateEntityState(this);
+    };
+
+    complexArrayMixin._processAdds = function (adds) {
+        processAdds(this, adds);
+    };
+
+    complexArrayMixin._processRemoves = function (removes) {
+        processRemoves(this, removes);
+    };
+    //
+
+    complexArrayMixin._rejectChanges = function() {
+        if (!this._origValues) return;
+        var that = this;
+        this.forEach(function(co) {
+            clearAspect(co, that);
         });
-        
-        this.values = keyValues;
-        this._keyInGroup = createKeyString(keyValues);        
-
-    };
-    
-    ctor._$typeName = &quot;EntityKey&quot;;
-    var proto = ctor.prototype;
-    
-    /**
-    The &#x27;EntityType&#x27; that this is a key for. 
-
-    __readOnly__
-    @property entityType {EntityType} 
-    **/
-    
-    /**
-    An array of the values for this key. This will usually only have a single element, unless the entity type has a multipart key.
-
-    __readOnly__
-    @property values {Array} 
-    **/
-
-    proto.toJSON = function () {
-        return {
-            entityType: this.entityType.name,
-            values: this.values
-        };
+        this.length = 0;
+        this._origValues.forEach(function(co) {
+            that.push(co);
+        });
+        Array.prototype.push.apply(this, this._origValues);
     };
 
-    ctor.fromJSON = function (json, metadataStore) {
-        var et = metadataStore._getEntityType(json.entityType, true);
-        return new EntityKey(et, json.values);
-    };
+    complexArrayMixin._acceptChanges = function() {
+        this._origValues = null;
+    } ;
 
-    /**
-    Used to compare EntityKeys are determine if they refer to the same Entity.
-    There is also an static version of &#x27;equals&#x27; with the same functionality. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
-        var empKey1 = new EntityKey(empType, 1);
-        // assume employee1 is an existing Employee entity
-        var empKey2 = employee1.entityAspect.getKey();
-        if (empKey1.equals(empKey2)) {
-            // do something  ...
-        }
-    @method equals
-    @param entityKey {EntityKey}
-    **/
-    proto.equals = function (entityKey) {
-        if (!(entityKey instanceof EntityKey)) return false;
-        return (this.entityType === entityKey.entityType) &amp;&amp;
-            __arrayEquals(this.values, entityKey.values);
-    };
+    // local functions
 
-    /*
-    Returns a human readable representation of this EntityKey.
-    @method toString
-    */
-    proto.toString = function () {
-        return this.entityType.name + &#x27;-&#x27; + this._keyInGroup;
-    };
 
-    /**
-    Used to compare EntityKeys are determine if they refer to the same Entity. 
-    There is also an instance version of &#x27;equals&#x27; with the same functionality. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
-        var empKey1 = new EntityKey(empType, 1);
-        // assume employee1 is an existing Employee entity
-        var empKey2 = employee1.entityAspect.getKey();
-        if (EntityKey.equals(empKey1, empKey2)) {
-            // do something  ...
-        }
-    @method equals
-    @static
-    @param k1 {EntityKey}
-    @param k2 {EntityKey}
-    **/
-    ctor.equals = function (k1, k2) {
-        if (!(k1 instanceof EntityKey)) return false;
-        return k1.equals(k2);
-    };
-
-    // TODO: we may want to compare to default values later.
-    proto._isEmpty = function () {
-        return this.values.join(&quot;&quot;).length === 0;
-    };
-
-    ctor.createKeyString = createKeyString;
-
-    function createKeyString(keyValues) {
-        return keyValues.join(ENTITY_KEY_DELIMITER);
+    function getGoodAdds(complexArray, adds) {
+        // remove any that are already added here
+        return adds.filter(function (a) {
+            return a.parent !== complexArray.parent;
+        });
     }
 
-    return ctor;
+    function processAdds(complexArray, adds) {
+        adds.forEach(function (a) {
+            if (a.parent != null) {
+                throw new Error(&quot;The complexObject is already attached. Either clone it or remove it from its current owner&quot;);
+            }
+            setAspect(a, complexArray);
+        });
+    }
+
+    function processRemoves(complexArray, removes) {
+        removes.forEach(function (a) {
+            clearAspect(a, complexArray);
+        });
+    }
+
+    function clearAspect(co, arr) {
+        var coAspect = co.complexAspect;
+        // if not already attached - exit
+        if (coAspect.parent !== arr.parent) return null;
+
+        coAspect.parent = null;
+        coAspect.parentProperty = null;
+        return coAspect;
+    }
+
+    function setAspect(co, arr) {
+        var coAspect = co.complexAspect;
+        // if already attached - exit
+        if (coAspect.parent === arr.parent) return null;
+        coAspect.parent = arr.parent;
+        coAspect.parentProperty = arr.parentProperty;
+
+        return coAspect;
+    }
+
+    function makeComplexArray(arr, parent, parentProperty) {
+
+        observableArray.initializeParent(arr, parent, parentProperty);
+        arr.arrayChanged = new Event(&quot;arrayChanged&quot;, arr);
+        __extend(arr, observableArray.mixin);
+        return __extend(arr, complexArrayMixin);
+    }
+
+    return makeComplexArray;
 })();
-
-breeze.EntityKey = EntityKey;
-
     </pre>
 </div>
 

@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 
   var path = require('path');
 
-  var srcDir = '../../src';
+  var srcDir = '../../src/';
   var destDir = '../';
   var baseFileNames = [ '_head.jsfrag', 'a??_*.js', '_tail.jsfrag'];
   var fileNames = [ '_head.jsfrag', 'a??_*.js', 'b??_*.js', '_tail.jsfrag'];
@@ -28,12 +28,12 @@ module.exports = function(grunt) {
         report: 'min',
       },
       base: {
-		src: [destDir+'breeze.debug.js'],
+		    src: [destDir+'breeze.debug.js'],
         dest: destDir+'breeze.min.js'
       },
       def: {
         src: [destDir+'breeze.base.debug.js'],
-		dest: destDir+'breeze.base.min.js'
+		    dest: destDir+'breeze.base.min.js'
       },
     },
     yuidoc: {
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
         options: {
           paths:     srcDir,
           themedir:  '../../docs/api-docs-theme',
-          outdir:    '.../../docs/api-docs'
+          outdir:    '../../docs/api-docs'
         }
       }
     },

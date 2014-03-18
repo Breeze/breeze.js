@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\Scripts\IBlade\a25_validationOptions.js</title>
+    <title>..\..\src\a40_namingConvention.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,135 +201,139 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\Scripts\IBlade\a25_validationOptions.js</h1>
+                        <h1 class="file-heading">File: ..\..\src\a40_namingConvention.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
 @module breeze
 **/
-   
-var ValidationOptions = (function () {
-
+    
+var NamingConvention = (function () {
     /**
-    A ValidationOptions instance is used to specify the conditions under which validation will be executed.
-
-    @class ValidationOptions
+    A NamingConvention instance is used to specify the naming conventions under which a MetadataStore 
+    will translate property names between the server and the javascript client. 
+    
+    The default NamingConvention does not perform any translation, it simply passes property names thru unchanged.
+    
+    @class NamingConvention
     **/
         
     /**
-    ValidationOptions constructor
+    NamingConvention constructor
+
     @example
-        var newVo = new ValidationOptions( { validateOnSave: false, validateOnAttach: false });
-        // assume em1 is a preexisting EntityManager
-        em1.setProperties( { validationOptions: newVo });
-    @method &lt;ctor&gt; ValidationOptions
-    @param [config] {Object}
-    @param [config.validateOnAttach=true] {Boolean}
-    @param [config.validateOnSave=true] {Boolean}
-    @param [config.validateOnQuery=false] {Boolean}
-    @param [config.validateOnPropertyChange=true] {Boolean}
+        // A naming convention that converts the first character of every property name to uppercase on the server
+        // and lowercase on the client.
+        var namingConv = new NamingConvention({
+            serverPropertyNameToClient: function(serverPropertyName) {
+                return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+            },
+            clientPropertyNameToServer: function(clientPropertyName) {
+                return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+            }            
+        });
+    var ms = new MetadataStore({ namingConvention: namingConv });
+    var em = new EntityManager( { metadataStore: ms });
+    @method &lt;ctor&gt; NamingConvention
+    @param config {Object}
+    @param config.serverPropertyNameToClient {Function} Function that takes a server property name add converts it into a client side property name.  
+    @param config.clientPropertyNameToServer {Function} Function that takes a client property name add converts it into a server side property name.  
     **/
-    var ctor = function (config) {
-        updateWithConfig(this, config);
+    var ctor = function(config) {
+        assertConfig(config || {})
+            .whereParam(&quot;name&quot;).isOptional().isString()
+            .whereParam(&quot;serverPropertyNameToClient&quot;).isFunction()
+            .whereParam(&quot;clientPropertyNameToServer&quot;).isFunction()
+            .applyAll(this);
+        if (!this.name) {
+            this.name = __getUuid();
+        }
+        __config._storeObject(this, proto._$typeName, this.name);
     };
     var proto = ctor.prototype;
-
-    /**
-    Whether entity and property level validation should occur when entities are attached to the EntityManager other than via a query.
-
-    __readOnly__
-    @property validateOnAttach {Boolean}
-    **/
-
-    /**
-    Whether entity and property level validation should occur before entities are saved. A failed validation will force the save to fail early.
-
-    __readOnly__
-    @property validateOnSave {Boolean}
-    **/
-
-    /**
-    Whether entity and property level validation should occur after entities are queried from a remote server.
-
-    __readOnly__
-    @property validateOnQuery {Boolean}
-    **/
-
-    /**
-    Whether property level validation should occur after entities are modified.
-
-    __readOnly__
-    @property validateOnPropertyChange {Boolean}
-    **/
-
-    proto._$typeName = &quot;ValidationOptions&quot;;
+    proto._$typeName = &quot;NamingConvention&quot;;
         
     /**
-    Returns a copy of this ValidationOptions with changes to the specified config properties.
-    @example
-        var validationOptions = new ValidationOptions();
-        var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
-    @method using
-    @param config {Object} The object to apply to create a new QueryOptions.
-    @param [config.validateOnAttach] {Boolean}
-    @param [config.validateOnSave] {Boolean}
-    @param [config.validateOnQuery] {Boolean}
-    @param [config.validateOnPropertyChange] {Boolean}
-    @return {ValidationOptions}
-    @chainable
-    **/
-    proto.using = function (config) {
-        if (!config) return this;
-        var result = new ValidationOptions(this);
-        updateWithConfig(result, config);
-        return result;
-    };
+    The function used to convert server side property names to client side property names.
 
+    @method serverPropertyNameToClient
+    @param serverPropertyName {String}
+    @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
+    @return {String} The client side property name.
+    **/
+
+    /**
+    The function used to convert client side property names to server side property names.
+
+    @method clientPropertyNameToServer
+    @param clientPropertyName {String}
+    @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
+    @return {String} The server side property name.
+    **/
+        
+    /**
+    A noop naming convention - This is the default unless another is specified.
+    @property none {NamingConvention}
+    @static
+    **/
+    ctor.none = new ctor({
+        name: &quot;noChange&quot;,
+        serverPropertyNameToClient: function(serverPropertyName) {
+            return serverPropertyName;
+        },
+        clientPropertyNameToServer: function(clientPropertyName) {
+            return clientPropertyName;
+        }
+    });
+        
+    /**
+    The &quot;camelCase&quot; naming convention - This implementation only lowercases the first character of the server property name
+    but leaves the rest of the property name intact.  If a more complicated version is needed then one should be created via the ctor.
+    @property camelCase {NamingConvention}
+    @static
+    **/
+    ctor.camelCase = new ctor({
+        name: &quot;camelCase&quot;,
+        serverPropertyNameToClient: function (serverPropertyName) {
+            return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+        },
+        clientPropertyNameToServer: function (clientPropertyName) {
+            return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+        }
+    });
+        
+    /**
+    The default value whenever NamingConventions are not specified.
+    @property defaultInstance {NamingConvention}
+    @static
+    **/
+    ctor.defaultInstance = new ctor(ctor.none);
+        
     /**
     Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance. 
     The current instance is returned unchanged.
-    @example
-        var validationOptions = new ValidationOptions()
-        var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
-        var newOptions.setAsDefault();
     @method setAsDefault
+    @example
+        var namingConv = new NamingConvention({
+            serverPropertyNameToClient: function(serverPropertyName) {
+                return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+            },
+            clientPropertyNameToServer: function(clientPropertyName) {
+                return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+            }            
+        });
+        namingConv.setAsDefault();
     @chainable
     **/
-    proto.setAsDefault = function() {
+    proto.setAsDefault = function () {
         return __setAsDefault(this, ctor);
     };
-
-    /**
-    The default value whenever ValidationOptions are not specified.
-    @property defaultInstance {ValidationOptions}
-    @static
-    **/
-    ctor.defaultInstance = new ctor({
-            validateOnAttach: true,
-            validateOnSave: true,
-            validateOnQuery: false,
-            validateOnPropertyChange: true
-    });
         
-    function updateWithConfig( obj, config ) {
-        if (config) {
-            assertConfig(config)
-            .whereParam(&quot;validateOnAttach&quot;).isBoolean().isOptional()
-            .whereParam(&quot;validateOnSave&quot;).isBoolean().isOptional()
-            .whereParam(&quot;validateOnQuery&quot;).isBoolean().isOptional()
-            .whereParam(&quot;validateOnPropertyChange&quot;).isBoolean().isOptional()
-            .applyAll(obj);
-        }
-        return obj;
-    }
     return ctor;
 })();
     
-// expose
-
-breeze.ValidationOptions = ValidationOptions;
-
+breeze.NamingConvention = NamingConvention;
 
 
 
