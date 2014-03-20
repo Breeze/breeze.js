@@ -68,23 +68,21 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', ['newer:concat', 'newer:uglify', 'newer:yuidoc', 'newer:exec']);
   
-  function log(err, stdout, stderr, cb) {
-	if (err) {
-	  grunt.log.write(err);
-	  grunt.log.write(stderr);
-	  throw new Error("Failed");
-	}
-
-	grunt.log.write(stdout);
-
-    cb();
-  }
-
   function mapPath(dir, fileNames) {
     return fileNames.map(function(fileName) {
     	return dir + fileName;
     });
   };
+  
+  function log(err, stdout, stderr, cb) {
+    if (err) {
+      grunt.log.write(err);
+      grunt.log.write(stderr);
+      throw new Error("Failed");
+    }
 
+    grunt.log.write(stdout);
+    cb();
+  }
 
 };
