@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+  // Note: nuget packaging of the Breeze.client nuget is done in breeze.server.net ( not here).
+  
   var path = require('path');
 
   var srcDir = '../../src/';
