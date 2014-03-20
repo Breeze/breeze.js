@@ -10,6 +10,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    
     concat: {
       options: {
         separator: ';',
@@ -23,6 +24,7 @@ module.exports = function(grunt) {
         dest: destDir+'breeze.debug.js',
       }
     },
+    
     uglify: {
       options: {
         report: 'min',
@@ -36,6 +38,7 @@ module.exports = function(grunt) {
 		    dest: destDir+'breeze.base.min.js'
       },
     },
+    
     yuidoc: {
       compile: {
         // 'src' here only for the newer task to pick up - not needed for yuidoc.
@@ -47,14 +50,15 @@ module.exports = function(grunt) {
         }
       }
     },
-	exec: {
-	  buildIntellisense: {
-      // 'src' here only for the newer task to pick up - not needed for buildIntellisense
-      src: srcDir + '*.*',
-	    cwd: '../intellisense',
-		  cmd: 'node server.js'
-	  }
-	},
+    
+    exec: {
+      buildIntellisense: {
+        // 'src' here only for the newer task to pick up - not needed for buildIntellisense
+        src: srcDir + '*.*',
+        cwd: '../intellisense',
+        cmd: 'node server.js'
+      }
+    },
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
