@@ -21,7 +21,8 @@ var KeyGenerator = (function () {
     because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
     the EntityManager with temporary keys will have them regenerated and remapped on import.
 
-        The return value of this method must be of the correct type as determined by the 
+    The return value of this method must be of the correct type as determined by the keyProperties of the 
+    specified EntityType
     @example
         // Assume em1 is a preexisting EntityManager
         var custType = em1.metadataStore.getEntityType("Customer");

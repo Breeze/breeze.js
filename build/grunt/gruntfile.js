@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     yuidoc: {
       compile: {
         // 'src' here only for the newer task to pick up - not needed for yuidoc.
-        src:       srcDir,
+        src:       srcDir + '*.*',
         options: {
           paths:     srcDir,
           themedir:  '../../docs/api-docs-theme',
@@ -50,7 +50,7 @@ module.exports = function(grunt) {
 	exec: {
 	  buildIntellisense: {
       // 'src' here only for the newer task to pick up - not needed for buildIntellisense
-      src: srcDir,
+      src: srcDir + '*.*',
 	    cwd: '../intellisense',
 		  cmd: 'node server.js'
 	  }
