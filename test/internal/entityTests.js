@@ -92,11 +92,12 @@
             em.attachEntity(cust1);
             ok(cust1.getProperty("city") === "zzz", "city should be zzz");
         } else if (testFns.modelLibrary = "ko") {
+            // before we attach it we can treat it just like a regular js object.
             var cust1 = new Customer();
             cust1.city = "zzz";
             var city = cust1.city;
             ok(city === "zzz", "city should be 'zzz'");
-            cust1.setProperty(testFns.customerKeyName, breeze.core.getUuid());
+            cust1[testFns.customerKeyName] = breeze.core.getUuid();
             em.attachEntity(cust1);
             ok(cust1.getProperty("city") === "zzz", "city should be zzz");
         } else if (testFns.modelLibrary === "backbone") {
@@ -1040,6 +1041,7 @@
     });
 
     test("category default rowversion value", function () {
+        
         if (testFns.DEBUG_MONGO) {
             ok(true, "NA for MONGO - no default values");
             return true;
@@ -1047,7 +1049,7 @@
         em = newEm();
         var catType = em.metadataStore.getEntityType("Category");
         var cat = em.createEntity("Category");
-        ok(cat.getProperty("rowVersion") === 2, "This test is expected to fail with a CodeFirst model but succeed with DatabaseFirst model");
+        ok(cat.getProperty("rowVersion") === 2, "Expected failure (with CodeFirst) - This test is expected to fail with a CodeFirst model but succeed with DatabaseFirst model");
     });
 
     test("propertyChanged", function () {

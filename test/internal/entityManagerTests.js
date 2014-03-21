@@ -30,8 +30,10 @@
     });
 
     test("reject changes reverts an unmapped property - only unmapped property changed", 1, function () {
+        ok(false, "Expected failure - for now at least one mapped property must be changed for rejectChanges to work.")
+        return true;
         var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
-
+        
         var originalTime = new Date(2013, 0, 1);
         var Customer = function () {
             this.lastTouched = originalTime;
