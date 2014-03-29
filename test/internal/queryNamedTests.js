@@ -335,6 +335,21 @@
             ok(results[0][testFns.customerKeyName], results[0][testFns.customerKeyName]);
         }).fail(testFns.handleFail).fin(start);
     });
+
+    test("project primitive objects as DTO", function () {
+        var em = newEm();
+
+        var query = EntityQuery.from("CompanyNamesAndIdsAsDTO")
+            .take(5)
+            .using(em);
+        stop();
+        query.execute().then(function (data) {
+            var results = data.results;
+            ok(results.length === 5);
+            ok(results[0].companyName, results[0].companyName);
+            ok(results[0][testFns.customerKeyName], results[0][testFns.customerKeyName]);
+        }).fail(testFns.handleFail).fin(start);
+    });
     
 
     test("project enumerables", function() {
