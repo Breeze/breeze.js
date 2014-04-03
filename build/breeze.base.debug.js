@@ -4788,29 +4788,26 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
         return;
     }
 
-
-    var localAspect;
     // CANNOT DO NEXT LINE because it has the possibility of creating a new property
     // 'entityAspect' on 'this'.  - Not permitted by IE inside of a defined property on a prototype.
     // var entityAspect = new EntityAspect(this);
 
+    var propPath;
     var entityAspect = this.entityAspect;
     if (entityAspect) {
-        localAspect = entityAspect;
+        propPath = property.name;
     } else {
-        localAspect = this.complexAspect;
+        var localAspect = this.complexAspect;
         if (localAspect) {
             entityAspect = localAspect.getEntityAspect();
+            propPath = localAspect.getPropertyPath(property.name);
         } else {
             // does not yet have an EntityAspect so just set the prop
             rawAccessorFn(newValue);
             return;
         }
     }
-    // need 2 propNames here because of complexTypes;
-    var propName = property.name;
-    var propPath = localAspect.getPropertyPath(propName);
-        
+
     // Note that we need to handle multiple properties in process, not just one in order to avoid recursion. 
     // ( except in the case of null propagation with fks where null -> 0 in some cases.)
     // (this may not be needed because of the newValue === oldValue test above)
@@ -4820,33 +4817,26 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
         if (inProcess.indexOf(property) >= 0) return;
         inProcess.push(property);
     } else {
-        inProcess =  [property];
+        inProcess = [property];
         entityAspect._inProcess = inProcess;
     }
 
+    var entityManager = entityAspect.entityManager;
+
+    var context = {
+        instance: this,
+        property: property,
+        propPath: propPath,
+        entityAspect: entityAspect,
+        entityManager: entityManager,
+        rawAccessorFn: rawAccessorFn,
+    }
+    
 
     // We could use __using here but decided not to for perf reasons - this method runs a lot.
     // i.e __using(entityAspect, "_inProcess", property, function() {...        
     try {
-
-        var entityManager = entityAspect.entityManager;
-        // store an original value for this property if not already set
-        if (entityAspect.entityState.isUnchangedOrModified()) {
-            if (localAspect.originalValues[propName]===undefined && property.isDataProperty && !property.isComplexProperty) {
-                // otherwise this entry will be skipped during serialization
-                localAspect.originalValues[propName] = oldValue !== undefined ? oldValue : property.defaultValue;
-            }
-        }
-
-        var context = {
-            instance: this,
-            property: property,
-            propPath: propPath,
-            entityAspect: entityAspect,
-            entityManager: entityManager,
-            rawAccessorFn: rawAccessorFn,
-        }
-
+        
         if (property.isComplexProperty) {
             setDpValueComplex(context, newValue, oldValue);
         } else if (property.isDataProperty) {
@@ -4888,6 +4878,16 @@ function setDpValueSimple(context, newValue, oldValue) {
 
     if (!property.isScalar) {
         throw new Error("Nonscalar data properties are readonly - items may be added or removed but the collection may not be changed.");
+    }
+
+    // store an original value for this property if not already set
+    if (entityAspect.entityState.isUnchangedOrModified()) {
+        var propName = property.name;
+        var localAspect = instance.entityAspect || instance.complexAspect;
+        if (localAspect.originalValues[propName] === undefined) {
+            // otherwise this entry will be skipped during serialization
+            localAspect.originalValues[propName] = oldValue !== undefined ? oldValue : property.defaultValue;
+        }
     }
 
     // if we are changing the key update our internal entityGroup indexes.
@@ -5203,7 +5203,8 @@ function updateStateAndValidate(context, newValue, oldValue) {
         entityAspect._validateProperty(newValue,
             { entity: entityAspect.entity, property: property, propertyName: context.propPath, oldValue: oldValue });
     }
-};/**
+}
+;/**
   @module breeze
   **/
 
