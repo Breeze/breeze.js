@@ -4787,12 +4787,9 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
     if (newValue === oldValue || (dataType && dataType.isDate && newValue && oldValue && newValue.valueOf() === oldValue.valueOf())) {
         return;
     }
-        
-    var that = this;
-    // need 2 propNames here because of complexTypes;
-    var propName = property.name;
 
-    var localAspect, key, relatedEntity;
+
+    var localAspect;
     // CANNOT DO NEXT LINE because it has the possibility of creating a new property
     // 'entityAspect' on 'this'.  - Not permitted by IE inside of a defined property on a prototype.
     // var entityAspect = new EntityAspect(this);
@@ -4810,6 +4807,8 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
             return;
         }
     }
+    // need 2 propNames here because of complexTypes;
+    var propName = property.name;
     var propPath = localAspect.getPropertyPath(propName);
         
     // Note that we need to handle multiple properties in process, not just one in order to avoid recursion. 
@@ -4824,7 +4823,6 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
         inProcess =  [property];
         entityAspect._inProcess = inProcess;
     }
-        
 
 
     // We could use __using here but decided not to for perf reasons - this method runs a lot.
@@ -4844,9 +4842,9 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
             instance: this,
             property: property,
             propPath: propPath,
-            rawAccessorFn: rawAccessorFn,
-            entityManager: entityManager,
             entityAspect: entityAspect,
+            entityManager: entityManager,
+            rawAccessorFn: rawAccessorFn,
         }
 
         if (property.isComplexProperty) {
@@ -4994,17 +4992,8 @@ function setDpValueSimple(context, newValue, oldValue) {
 
     context.rawAccessorFn(newValue);
 
-    // NOTE: next few lines are the same as above but not refactored for perf reasons.
-    if (entityManager && !entityManager.isLoading) {
-        if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
-            entityAspect.setModified();
-        }
-        if (entityManager.validationOptions.validateOnPropertyChange) {
-            // entityAspect.entity is NOT the same as instance in the code below. It's use is deliberate.
-            entityAspect._validateProperty(newValue,
-                { entity: entityAspect.entity, property: property, propertyName: context.propPath, oldValue: oldValue });
-        }
-    }
+    updateStateAndValidate(context, newValue, oldValue);
+    
 
     // if (property.isPartOfKey && (!this.complexAspect)) {
     if (property.isPartOfKey ) {
@@ -5178,16 +5167,7 @@ function setNpValue(context, newValue, oldValue) {
 
     context.rawAccessorFn(newValue);
 
-    if (entityManager && !entityManager.isLoading) {
-        
-        if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
-            entityAspect.setModified();
-        }
-        if (entityManager.validationOptions.validateOnPropertyChange) {
-            entityAspect._validateProperty(newValue,
-                { entity: instance, property: property, propertyName: context.propPath, oldValue: oldValue });
-        }
-    }
+    updateStateAndValidate(context, newValue, oldValue);
 
     // update fk data property - this can only occur if this navProperty has
     // a corresponding fk on this entity.
@@ -5204,6 +5184,24 @@ function setNpValue(context, newValue, oldValue) {
                 }
             });
         }
+    }
+}
+
+function updateStateAndValidate(context, newValue, oldValue) {
+    var entityManager = context.entityManager;
+    if (entityManager == null || entityManager.isLoading) return;
+
+    var property = context.property;
+    var entityAspect = context.entityAspect;
+
+    if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
+        entityAspect.setModified();
+    }
+
+    if (entityManager.validationOptions.validateOnPropertyChange) {
+        // entityAspect.entity is NOT the same as instance in the code below. It's use is deliberate.
+        entityAspect._validateProperty(newValue,
+            { entity: entityAspect.entity, property: property, propertyName: context.propPath, oldValue: oldValue });
     }
 };/**
   @module breeze
