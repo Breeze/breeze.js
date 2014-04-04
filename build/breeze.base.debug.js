@@ -266,7 +266,7 @@ function __arrayRemoveItem(array, predicateOrItem, shouldRemoveMultiple) {
             array.splice(i, 1);
             removed = true;
             if (!shouldRemoveMultiple) {
-                return removed;
+                return true;
             }
         }
     }
@@ -3676,9 +3676,11 @@ var EntityAspect = (function() {
         }
         var entity = this.entity;
         group.detachEntity(entity);
+        this.entityState = EntityState.Detached;
         removeFromRelations(entity, EntityState.Detached);
-        this.entityManager.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+        var em = this.entityManager;
         this._detach();
+        em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
         return true;
     }
 
@@ -4001,7 +4003,7 @@ var EntityAspect = (function() {
             removeFromRelationsCore(entity, true);
         } else {
             __using(entity.entityAspect.entityManager, "isLoading", true, function () {
-                removeFromRelationsCore(entity, false)
+                removeFromRelationsCore(entity, false);
             });
         }
     }
@@ -4022,7 +4024,8 @@ var EntityAspect = (function() {
                             }
                         }
                     }
-                    entity.setProperty(np.name, null);
+                    // entity.setProperty(np.name, null);
+                    clearNp(entity, np, isDeleted);
                 }
             } else {
                 if (inverseNp) {
@@ -5155,18 +5158,18 @@ function setNpValue(context, rawAccessorFn) {
     // update fk data property - this can only occur if this navProperty has
     // a corresponding fk on this entity.
     if (property.relatedDataProperties) {
-        if (!entityAspect.entityState.isDeleted()) {
-            // if (entityAspect.entityState != EntityState.Deleted && entityAspect.entityState != EntityState.Detached) {
-            var inverseKeyProps = property.entityType.keyProperties;
-            inverseKeyProps.forEach(function (keyProp, i) {
-                var relatedDataProp = property.relatedDataProperties[i];
-                // Do not trash related property if it is part of that entity's key
-                if (newValue || !relatedDataProp.isPartOfKey) {
-                    var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
-                    parent.setProperty(relatedDataProp.name, relatedValue);
-                }
-            });
-        }
+        var entityState = entityAspect.entityState;
+        if (entityState.isDetached() && newValue == null) return;
+        if (entityState.isDeleted()) return;
+        var inverseKeyProps = property.entityType.keyProperties;
+        inverseKeyProps.forEach(function (keyProp, i) {
+            var relatedDataProp = property.relatedDataProperties[i];
+            // Do not trash related property if it is part of that entity's key
+            if (newValue || !relatedDataProp.isPartOfKey) {
+                var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
+                parent.setProperty(relatedDataProp.name, relatedValue);
+            }
+        });
     }
 }
 

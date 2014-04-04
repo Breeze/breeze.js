@@ -37,6 +37,40 @@
 
     });
 
+    test("detached entity retains its foreign keys", 9, function () {
+        var em = newEm();
+        var cust = em.createEntity("Customer", { companyName: "TestXXX" });
+        var emp = em.createEntity("Employee", { firstName: "John", lastName: "Smith" });
+        var order = em.createEntity('Order', {
+            orderID: 1,
+            customer: cust,
+            employee: emp
+        }); 
+
+        // Pre-detach asserts
+        equal(order.getProperty('customerID'), cust.getProperty('customerID'), "pre-detached order has CustomerID");
+        equal(order.getProperty('employeeID'), emp.getProperty('employeeID'), "pre-detached order has EmployeeID");
+        equal(order.getProperty('customer'), cust, "pre-detached order has a Customer");
+        equal(order.getProperty('employee'), emp, "pre-detached order has an Employee");
+
+        order.entityAspect.setDetached();
+
+        // Post-detach asserts
+        equal(order.getProperty('customerID'), cust.getProperty('customerID'), "post-detached order has CustomerID");
+        equal(order.getProperty('employeeID'), emp.getProperty('employeeID'), "post-detached order has EmployeeID");
+        equal(order.getProperty('customer'), null, "post-detached order no longer has a Customer");
+        equal(order.getProperty('employee'), null, "post-detached order no longer has an Employee");
+        deepEqual(order.entityAspect.originalValues, {}, "detaching does not add to 'originalValues'");
+    });
+
+    function createCustomer(em) {
+        var custType = em.metadataStore.getEntityType("Customer");
+        var cust = custType.createEntity();
+        em.addEntity(cust);
+        cust.setProperty("companyName", "TestXXX");
+        return cust;
+    }
+
     test("createEntity", function() {
         var em = newEm();
         var emp1 = em.createEntity("Employee");

@@ -349,9 +349,11 @@ var EntityAspect = (function() {
         }
         var entity = this.entity;
         group.detachEntity(entity);
+        this.entityState = EntityState.Detached;
         removeFromRelations(entity, EntityState.Detached);
-        this.entityManager.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+        var em = this.entityManager;
         this._detach();
+        em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
         return true;
     }
 
@@ -674,7 +676,7 @@ var EntityAspect = (function() {
             removeFromRelationsCore(entity, true);
         } else {
             __using(entity.entityAspect.entityManager, "isLoading", true, function () {
-                removeFromRelationsCore(entity, false)
+                removeFromRelationsCore(entity, false);
             });
         }
     }
@@ -695,7 +697,8 @@ var EntityAspect = (function() {
                             }
                         }
                     }
-                    entity.setProperty(np.name, null);
+                    // entity.setProperty(np.name, null);
+                    clearNp(entity, np, isDeleted);
                 }
             } else {
                 if (inverseNp) {

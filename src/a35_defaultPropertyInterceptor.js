@@ -387,18 +387,18 @@ function setNpValue(context, rawAccessorFn) {
     // update fk data property - this can only occur if this navProperty has
     // a corresponding fk on this entity.
     if (property.relatedDataProperties) {
-        if (!entityAspect.entityState.isDeleted()) {
-            // if (entityAspect.entityState != EntityState.Deleted && entityAspect.entityState != EntityState.Detached) {
-            var inverseKeyProps = property.entityType.keyProperties;
-            inverseKeyProps.forEach(function (keyProp, i) {
-                var relatedDataProp = property.relatedDataProperties[i];
-                // Do not trash related property if it is part of that entity's key
-                if (newValue || !relatedDataProp.isPartOfKey) {
-                    var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
-                    parent.setProperty(relatedDataProp.name, relatedValue);
-                }
-            });
-        }
+        var entityState = entityAspect.entityState;
+        if (entityState.isDetached() && newValue == null) return;
+        if (entityState.isDeleted()) return;
+        var inverseKeyProps = property.entityType.keyProperties;
+        inverseKeyProps.forEach(function (keyProp, i) {
+            var relatedDataProp = property.relatedDataProperties[i];
+            // Do not trash related property if it is part of that entity's key
+            if (newValue || !relatedDataProp.isPartOfKey) {
+                var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
+                parent.setProperty(relatedDataProp.name, relatedValue);
+            }
+        });
     }
 }
 
