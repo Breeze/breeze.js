@@ -265,7 +265,8 @@ var EntityAspect = (function() {
             // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
     @method setUnchanged
     **/
-    proto.setUnchanged = function() {
+    proto.setUnchanged = function () {
+        checkStateChange(this);
         clearOriginalValues(this.entity);
         delete this.hasTempKey;
         this.entityState = EntityState.Unchanged;
@@ -304,7 +305,8 @@ var EntityAspect = (function() {
         // The 'order' entity will now be in a 'Modified' state. 
     @method setModified
     **/
-    proto.setModified = function() {
+    proto.setModified = function () {
+        checkStateChange(this);
         this.entityState = EntityState.Modified;
         this.entityManager._notifyStateChange(this.entity, true);
     };
@@ -318,7 +320,8 @@ var EntityAspect = (function() {
         // The 'order' entity will now be in a 'Deleted' state and it will no longer have any 'related' entities. 
     @method setDeleted
     **/
-    proto.setDeleted = function() {
+    proto.setDeleted = function () {
+        checkStateChange(this);
         var em = this.entityManager;
         var entity = this.entity;
         if (this.entityState.isAdded()) {
@@ -332,6 +335,11 @@ var EntityAspect = (function() {
         // TODO: think about cascade deletes
     };
 
+    function checkStateChange(aspect) {
+        if (aspect.entityState.isDetached()) {
+            throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
+        }
+    }
 
     /**
     Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
@@ -342,6 +350,7 @@ var EntityAspect = (function() {
     @method setDetached
     **/
     proto.setDetached = function () {
+        if (this.entityState.isDetached()) return true;
         var group = this.entityGroup;
         if (!group) {
             // no group === already detached.

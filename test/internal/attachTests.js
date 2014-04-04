@@ -22,6 +22,57 @@
 
         }
     });
+
+
+    test("setting another EntityState on a detached entity throws exception", 4,
+       function () {
+           var em = newEm(); // new empty EntityManager
+           var order = em.createEntity('Order', { OrderID: 1 });
+
+           var aspect = order.entityAspect;
+
+           aspect.setDetached();
+           ok(aspect.entityState.isDetached(),
+               "'order' should be detached after setDetached()");
+
+           try {
+               aspect.setDeleted();
+               fail('Deleted');
+           } catch (e) { threwWhenSet(e, 'Deleted'); }
+
+           try {
+               aspect.setModified();
+               fail('Modified');
+           } catch (e) { threwWhenSet(e, 'Modified'); }
+
+           try {
+               aspect.setUnchanged();
+               fail('Unchanged');
+           } catch (e) { threwWhenSet(e, 'Unchanged'); }
+
+           // helpers
+           function fail(method) {
+
+               ok(false, "should not get here: " + method);
+           }
+
+           function threwWhenSet(error, method) {
+               ok(error.message.indexOf("detached") >= 0, "Breeze error should have mentioned being detached when setting state to: " + method);
+           }
+
+       });
+
+    test("infer unmapped boolean datatype", function() {
+        var em = newEm();
+        var Customer = function() {
+            this.isBeingEdited = false;
+        };
+        em.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+        var customerType = em.metadataStore.getEntityType("Customer");
+        var unmapped = customerType.unmappedProperties[0];
+        ok(unmapped.dataType == breeze.DataType.Boolean, "should be a boolean datatype");
+    });
     
     test("boolean reject changes", function () {
         var em = newEm();

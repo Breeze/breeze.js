@@ -2250,9 +2250,10 @@ var EntityType = (function () {
         var trackablePropNames = __modelLibraryDef.getDefaultInstance().getTrackablePropertyNames(instance);
         trackablePropNames.forEach(function (pn) {
             if (metadataPropNames.indexOf(pn) === -1) {
+                var dt = DataType.fromValue(instance[pn]);
                 var newProp = new DataProperty({
                     name: pn,
-                    dataType: DataType.Undefined,
+                    dataType: dt,
                     isNullable: true,
                     isUnmapped: true
                 });
