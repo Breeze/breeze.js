@@ -43,15 +43,10 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
     // Note that we need to handle multiple properties in process, not just one in order to avoid recursion. 
     // ( except in the case of null propagation with fks where null -> 0 in some cases.)
     // (this may not be needed because of the newValue === oldValue test above)
-    var inProcess = entityAspect._inProcess;
-    if (inProcess) {
-        // check for recursion
-        if (inProcess.indexOf(property) >= 0) return;
-        inProcess.push(property);
-    } else {
-        inProcess = [property];
-        entityAspect._inProcess = inProcess;
-    }
+    var inProcess = entityAspect._inProcess = entityAspect._inProcess || [];
+    // check for recursion
+    if (inProcess.indexOf(property) >= 0) return;
+    inProcess.push(property);
     
     try {
 
@@ -61,7 +56,6 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
             newValue: newValue,
             oldValue: oldValue,
             propertyName: propertyName,
-            entity: entityAspect.entity,
             entityAspect: entityAspect
         }
         
