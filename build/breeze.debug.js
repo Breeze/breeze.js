@@ -4792,22 +4792,22 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
     // 'entityAspect' on 'this'.  - Not permitted by IE inside of a defined property on a prototype.
     // var entityAspect = new EntityAspect(this);
 
-    var propPath;
+    var propertyName;
     var entityAspect = this.entityAspect;
     if (entityAspect) {
-        propPath = property.name;
+        propertyName = property.name;
     } else {
         var localAspect = this.complexAspect;
         if (localAspect) {
             entityAspect = localAspect.getEntityAspect();
-            propPath = localAspect.getPropertyPath(property.name);
+            propertyName = localAspect.getPropertyPath(property.name);
         } else {
             // does not yet have an EntityAspect so just set the prop
             rawAccessorFn(newValue);
             return;
         }
     }
-
+    
     // Note that we need to handle multiple properties in process, not just one in order to avoid recursion. 
     // ( except in the case of null propagation with fks where null -> 0 in some cases.)
     // (this may not be needed because of the newValue === oldValue test above)
@@ -4820,61 +4820,45 @@ function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
         inProcess = [property];
         entityAspect._inProcess = inProcess;
     }
-
-    var entityManager = entityAspect.entityManager;
-
-    var context = {
-        instance: this,
-        property: property,
-        propPath: propPath,
-        entityAspect: entityAspect,
-        entityManager: entityManager,
-        rawAccessorFn: rawAccessorFn,
-    }
     
-
-    // We could use __using here but decided not to for perf reasons - this method runs a lot.
-    // i.e __using(entityAspect, "_inProcess", property, function() {...        
     try {
+
+        var context = {
+            parent: this,
+            property: property,
+            newValue: newValue,
+            oldValue: oldValue,
+            propertyName: propertyName,
+            entity: entityAspect.entity,
+            entityAspect: entityAspect
+        }
         
         if (property.isComplexProperty) {
-            setDpValueComplex(context, newValue, oldValue);
+            setDpValueComplex(context, rawAccessorFn);
         } else if (property.isDataProperty) {
-            setDpValueSimple(context, newValue, oldValue);
+            setDpValueSimple(context, rawAccessorFn);
         } else {
-            setNpValue(context, newValue, oldValue);
+            setNpValue(context, rawAccessorFn);
         }
-            
-        // entityAspect.entity used because of complexTypes    
-        // 'this' != entity when 'this' is a complexObject; in that case 'this' is a complexObject and 'entity' is an entity
 
-        var entity = entityAspect.entity;
-        var propChangedArgs = { entity: entity, parent: this, property: property, propertyName: propPath, oldValue: oldValue, newValue: newValue };
-        if (entityManager) {
-            // propertyChanged will be fired during loading but we only want to fire it once per entity, not once per property.
-            // so propertyChanged is fired in the entityManager mergeEntity method if not fired here.
-            if ( (!entityManager.isLoading) && (!entityManager.isRejectingChanges)) {
-                entityAspect.propertyChanged.publish(propChangedArgs);
-                // don't fire entityChanged event if propertyChanged is suppressed.
-                entityManager.entityChanged.publish({ entityAction: EntityAction.PropertyChange, entity: entity, args: propChangedArgs });
-            }
-        } else {
-            entityAspect.propertyChanged.publish(propChangedArgs);
-        }
+        postChangeEvents(context);
+
     } finally {
         inProcess.pop();
     }
 }
 
-function setDpValueSimple(context, newValue, oldValue) {
-    var instance = context.instance;
+function setDpValueSimple(context, rawAccessorFn) {
+    var parent = context.parent;
     var property = context.property;
     var entityAspect = context.entityAspect;
-    var entityManager = context.entityManager;
+    var oldValue = context.oldValue;
+    var newValue = context.newValue;
 
+    var entityManager = entityAspect.entityManager;
     // 'entityType' on the next line be null for complex properties but it will only be ref'd within this
     // fn when the property is part of the key
-    var entityType = instance.entityType;
+    var entityType = parent.entityType;
 
     if (!property.isScalar) {
         throw new Error("Nonscalar data properties are readonly - items may be added or removed but the collection may not be changed.");
@@ -4883,7 +4867,8 @@ function setDpValueSimple(context, newValue, oldValue) {
     // store an original value for this property if not already set
     if (entityAspect.entityState.isUnchangedOrModified()) {
         var propName = property.name;
-        var localAspect = instance.entityAspect || instance.complexAspect;
+        // localAspect is not the same as entityAspect for complex props
+        var localAspect = parent.entityAspect || parent.complexAspect;
         if (localAspect.originalValues[propName] === undefined) {
             // otherwise this entry will be skipped during serialization
             localAspect.originalValues[propName] = oldValue !== undefined ? oldValue : property.defaultValue;
@@ -4898,14 +4883,14 @@ function setDpValueSimple(context, newValue, oldValue) {
             if (p === property) {
                 return newValue;
             } else {
-                return instance.getProperty(p.name);
+                return parent.getProperty(p.name);
             }
         });
         var newKey = new EntityKey(entityType, values);
         if (entityManager.findEntityByKey(newKey)) {
             throw new Error("An entity with this key is already in the cache: " + newKey.toString());
         }
-        var oldKey = instance.entityAspect.getKey();
+        var oldKey = parent.entityAspect.getKey();
         var eg = entityManager._findEntityGroup(entityType);
         eg._replaceKey(oldKey, newKey);
     }
@@ -4930,13 +4915,13 @@ function setDpValueSimple(context, newValue, oldValue) {
             var relatedEntity = entityManager.findEntityByKey(key);
 
             if (relatedEntity) {
-                instance.setProperty(relatedNavProp.name, relatedEntity);
+                parent.setProperty(relatedNavProp.name, relatedEntity);
             } else {
                 // it may not have been fetched yet in which case we want to add it as an unattachedChild.    
-                entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, instance);
+                entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent);
             }
         } else {
-            instance.setProperty(relatedNavProp.name, null);
+            parent.setProperty(relatedNavProp.name, null);
         }
     } else if (property.inverseNavigationProperty && entityManager && !entityManager._inKeyFixup) {
         // Example: unidirectional fkDataProperty: 1->n: region -> territories
@@ -4967,7 +4952,7 @@ function setDpValueSimple(context, newValue, oldValue) {
                     // remove 'this' from old related nav prop
                     var relatedArray = relatedEntity.getProperty(invNavProp.name);
                     // arr.splice(arr.indexOf(value_to_remove), 1);
-                    relatedArray.splice(relatedArray.indexOf(instance), 1);
+                    relatedArray.splice(relatedArray.indexOf(parent), 1);
                 }
             }
         }
@@ -4978,23 +4963,22 @@ function setDpValueSimple(context, newValue, oldValue) {
 
             if (relatedEntity) {
                 if (invNavProp.isScalar) {
-                    relatedEntity.setProperty(invNavProp.name, instance);
+                    relatedEntity.setProperty(invNavProp.name, parent);
                 } else {
-                    relatedEntity.getProperty(invNavProp.name).push(instance);
+                    relatedEntity.getProperty(invNavProp.name).push(parent);
                 }
             } else {
                 // it may not have been fetched yet in which case we want to add it as an unattachedChild.    
-                entityManager._unattachedChildrenMap.addChild(key, invNavProp, instance);
+                entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent);
             }
         }
 
     }
 
-    context.rawAccessorFn(newValue);
+    rawAccessorFn(newValue);
 
-    updateStateAndValidate(context, newValue, oldValue);
+    updateStateAndValidate(context);
     
-
     // if (property.isPartOfKey && (!this.complexAspect)) {
     if (property.isPartOfKey ) {
         // propogate pk change to all related entities;
@@ -5008,7 +4992,7 @@ function setDpValueSimple(context, newValue, oldValue) {
             var fkNames = inverseNp ? inverseNp.foreignKeyNames : np.invForeignKeyNames;
 
             if (fkNames.length === 0) return;
-            var npValue = instance.getProperty(np.name);
+            var npValue = parent.getProperty(np.name);
             var fkName = fkNames[propertyIx];
             if (np.isScalar) {
                 if (!npValue) return;
@@ -5035,8 +5019,11 @@ function setDpValueSimple(context, newValue, oldValue) {
     }
 }
 
-function setDpValueComplex(context, newValue, oldValue) {
+function setDpValueComplex(context, rawAccessorFn) {
     var property = context.property;
+    var oldValue = context.oldValue;
+    var newValue = context.newValue;
+
     var dataType = property.dataType;
     if (property.isScalar) {
         if (!newValue) {
@@ -5047,7 +5034,7 @@ function setDpValueComplex(context, newValue, oldValue) {
         if (!oldValue) {
             var ctor = dataType.getCtor();
             oldValue = new ctor();
-            context.rawAccessorFn(oldValue);
+            rawAccessorFn(oldValue);
         }
         dataType.dataProperties.forEach(function(dp) {
             var pn = dp.name;
@@ -5061,17 +5048,19 @@ function setDpValueComplex(context, newValue, oldValue) {
     }
 }
 
-function setNpValue(context, newValue, oldValue) {
+function setNpValue(context, rawAccessorFn) {
 
-    var instance = context.instance;
+    var parent = context.parent;
     var property = context.property;
     var entityAspect = context.entityAspect;
-    var entityManager = context.entityManager;
+    var oldValue = context.oldValue;
+    var newValue = context.newValue;
 
     if (!property.isScalar) {
         throw new Error("Nonscalar navigation properties are readonly - entities can be added or removed but the collection may not be changed.");
     }
 
+    var entityManager = entityAspect.entityManager;
     var inverseProp = property.inverse;
 
     // manage attachment -
@@ -5111,7 +5100,7 @@ function setNpValue(context, newValue, oldValue) {
                 oldValue.setProperty(inverseProp.name, null);
             }
             if (newValue != null) {
-                newValue.setProperty(inverseProp.name, instance);
+                newValue.setProperty(inverseProp.name, parent);
             }
         } else {
             // Example: bidirectional navProperty: 1->n: order -> orderDetails
@@ -5120,7 +5109,7 @@ function setNpValue(context, newValue, oldValue) {
             //    ==> order.orderDetails.push(newOrder)
             if (oldValue != null) {
                 var oldSiblings = oldValue.getProperty(inverseProp.name);
-                var ix = oldSiblings.indexOf(instance);
+                var ix = oldSiblings.indexOf(parent);
                 if (ix !== -1) {
                     oldSiblings.splice(ix, 1);
                 }
@@ -5128,7 +5117,7 @@ function setNpValue(context, newValue, oldValue) {
             if (newValue != null) {
                 var siblings = newValue.getProperty(inverseProp.name);
                 // recursion check if already in the collection is performed by the relationArray
-                siblings.push(instance);
+                siblings.push(parent);
             }
         }
     } else if (property.invForeignKeyNames && entityManager && !entityManager._inKeyFixup) {
@@ -5141,7 +5130,7 @@ function setNpValue(context, newValue, oldValue) {
             // Example: unidirectional navProperty: 1->n: order -> orderDetails
             // orderDetail.order <-xxx newOrder
             //    ==> CAN'T HAPPEN because if unidirectional because orderDetail will not have an order prop
-            var pkValues = instance.entityAspect.getKey().values;
+            var pkValues = parent.entityAspect.getKey().values;
             invForeignKeyNames.forEach(function (fkName, i) {
                 newValue.setProperty(fkName, pkValues[i]);
             });
@@ -5165,9 +5154,9 @@ function setNpValue(context, newValue, oldValue) {
         }
     }
 
-    context.rawAccessorFn(newValue);
+    rawAccessorFn(newValue);
 
-    updateStateAndValidate(context, newValue, oldValue);
+    updateStateAndValidate(context);
 
     // update fk data property - this can only occur if this navProperty has
     // a corresponding fk on this entity.
@@ -5180,28 +5169,47 @@ function setNpValue(context, newValue, oldValue) {
                 // Do not trash related property if it is part of that entity's key
                 if (newValue || !relatedDataProp.isPartOfKey) {
                     var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
-                    instance.setProperty(relatedDataProp.name, relatedValue);
+                    parent.setProperty(relatedDataProp.name, relatedValue);
                 }
             });
         }
     }
 }
 
-function updateStateAndValidate(context, newValue, oldValue) {
-    var entityManager = context.entityManager;
-    if (entityManager == null || entityManager.isLoading) return;
-
-    var property = context.property;
+function postChangeEvents(context) {
     var entityAspect = context.entityAspect;
+
+    var entityManager = entityAspect.entityManager;
+    var entity = entityAspect.entity;
+
+    var propChangedArgs = { entity: entity, parent: context.parent, property: context.property, propertyName: context.propertyName, oldValue: context.oldValue, newValue: context.newValue };
+    if (entityManager) {
+        // propertyChanged will be fired during loading but we only want to fire it once per entity, not once per property.
+        // so propertyChanged is fired in the entityManager mergeEntity method if not fired here.
+        if ((!entityManager.isLoading) && (!entityManager.isRejectingChanges)) {
+            entityAspect.propertyChanged.publish(propChangedArgs);
+            // don't fire entityChanged event if propertyChanged is suppressed.
+            entityManager.entityChanged.publish({ entityAction: EntityAction.PropertyChange, entity: entity, args: propChangedArgs });
+        }
+    } else {
+        entityAspect.propertyChanged.publish(propChangedArgs);
+    }
+}
+
+function updateStateAndValidate(context) {
+    var entityAspect = context.entityAspect;
+    var entityManager = entityAspect.entityManager;
+    if (entityManager == null || entityManager.isLoading) return;
+    var property = context.property;
 
     if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
         entityAspect.setModified();
     }
 
     if (entityManager.validationOptions.validateOnPropertyChange) {
-        // entityAspect.entity is NOT the same as instance in the code below. It's use is deliberate.
-        entityAspect._validateProperty(newValue,
-            { entity: entityAspect.entity, property: property, propertyName: context.propPath, oldValue: oldValue });
+        // entityAspect.entity is NOT the same as parent in the code below. It's use is deliberate.
+        entityAspect._validateProperty(context.newValue,
+            { entity: entityAspect.entity, property: property, propertyName: context.propertyName, oldValue: context.oldValue });
     }
 }
 ;/**
