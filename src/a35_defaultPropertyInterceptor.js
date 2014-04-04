@@ -388,7 +388,8 @@ function setNpValue(context, rawAccessorFn) {
     // a corresponding fk on this entity.
     if (property.relatedDataProperties) {
         var entityState = entityAspect.entityState;
-        if (entityState.isDetached() && newValue == null) return;
+        // if either side of nav prop is detached don't clear fks. Note: oldValue in next line cannot be null so no check is needed.
+        if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
         if (entityState.isDeleted()) return;
         var inverseKeyProps = property.entityType.keyProperties;
         inverseKeyProps.forEach(function (keyProp, i) {

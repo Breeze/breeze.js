@@ -4000,15 +4000,15 @@ var EntityAspect = (function() {
 
         var isDeleted = entityState.isDeleted();
         if (isDeleted) {
-            removeFromRelationsCore(entity, true);
+            removeFromRelationsCore(entity);
         } else {
             __using(entity.entityAspect.entityManager, "isLoading", true, function () {
-                removeFromRelationsCore(entity, false);
+                removeFromRelationsCore(entity);
             });
         }
     }
 
-    function removeFromRelationsCore(entity, isDeleted) {
+    function removeFromRelationsCore(entity) {
         entity.entityType.navigationProperties.forEach(function (np) {
             var inverseNp = np.inverse;
             var npValue = entity.getProperty(np.name);
@@ -4016,7 +4016,7 @@ var EntityAspect = (function() {
                 if (npValue) {
                     if (inverseNp) {
                         if (inverseNp.isScalar) {
-                            clearNp(npValue, inverseNp, isDeleted);
+                            npValue.setProperty(inverseNp.name, null);
                         } else {
                             var collection = npValue.getProperty(inverseNp.name);
                             if (collection.length) {
@@ -4024,15 +4024,14 @@ var EntityAspect = (function() {
                             }
                         }
                     }
-                    // entity.setProperty(np.name, null);
-                    clearNp(entity, np, isDeleted);
+                    entity.setProperty(np.name, null);
                 }
             } else {
                 if (inverseNp) {
                     // npValue is a live list so we need to copy it first.
                     npValue.slice(0).forEach(function (v) {
                         if (inverseNp.isScalar) {
-                            clearNp(v, inverseNp, isDeleted);
+                            v.setProperty(inverseNp.name, null);
                         } else {
                             // TODO: many to many - not yet handled.
                         }
@@ -4045,30 +4044,7 @@ var EntityAspect = (function() {
 
     };
 
-    function clearNp(entity, np, relatedIsDeleted) {
-        if (relatedIsDeleted) {
-            entity.setProperty(np.name, null);
-        } else {
-            // relatedEntity was detached.
-            // need to clear child np without clearing child fk or changing the entityState of the child
-            var em = entity.entityAspect.entityManager;
-
-            var fkNames = np.foreignKeyNames;
-            if (fkNames) {
-                var fkVals = fkNames.map(function (fkName) {
-                    return entity.getProperty(fkName);
-                });
-            }
-            entity.setProperty(np.name, null);
-            if (fkNames) {
-                fkNames.forEach(function (fkName, i) {
-                    entity.setProperty(fkName, fkVals[i])
-                });
-            }
-
-        }
-    }
-
+    
     function validate(aspect, validator, value, context) {
         var ve = validator.validate(value, context);
         if (ve) {
@@ -5159,7 +5135,8 @@ function setNpValue(context, rawAccessorFn) {
     // a corresponding fk on this entity.
     if (property.relatedDataProperties) {
         var entityState = entityAspect.entityState;
-        if (entityState.isDetached() && newValue == null) return;
+        // if either side of nav prop is detached don't clear fks. Note: oldValue in next line cannot be null so no check is needed.
+        if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
         if (entityState.isDeleted()) return;
         var inverseKeyProps = property.entityType.keyProperties;
         inverseKeyProps.forEach(function (keyProp, i) {
