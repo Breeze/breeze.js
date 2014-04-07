@@ -24,6 +24,21 @@
         }
     });
 
+    test("startsWith empty string", function() {
+        var em = newEm();
+        var q0 = EntityQuery.from("Customers").where("companyName", "startsWith", "C");
+        var q1 = EntityQuery.from("Customers").where("companyName", "startsWith", "");
+        stop();
+        em.executeQuery(q0).then(function(data) {
+            ok(data.results.length > 0, "should be some results");
+            return em.executeQuery(q1);
+        }).then(function(d1) {
+            ok(d1.results.length > 0, "should be some results");
+            var r2 = em.executeQueryLocally(q1);
+            ok(r2.length == d1.results.length);
+        }).fail(testFns.handleFail).fin(start);
+    });
+
     test("query property inference error", function () {
         var em = newEm();
         var q1 = EntityQuery.from("Orders")

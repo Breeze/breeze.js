@@ -21,7 +21,7 @@
 
 })(function () {  
     var breeze = {
-        version: "1.4.11",
+        version: "1.4.12",
         metadataVersion: "1.0.5"
     };
 
@@ -520,14 +520,16 @@ function __isNumeric(n) {
 // string functions
 
 function __stringStartsWith(str, prefix) {
-    // returns false for empty strings too
-    if ((!str) || !prefix) return false;
+    // returns true for empty string or null prefix
+    if ((!str)) return false;
+    if (prefix == "" || prefix == null) return true;
     return str.indexOf(prefix, 0) === 0;
 }
 
 function __stringEndsWith(str, suffix) {
-    // returns false for empty strings too
-    if ((!str) || !suffix) return false;
+    // returns true for empty string or null suffix
+    if ((!str)) return false;
+    if (suffix == "" || suffix == null) return true;
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
