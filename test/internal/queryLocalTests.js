@@ -24,6 +24,15 @@
         }
     });
 
+    test("local query with added entities", function () {
+        var em = newEm();
+        var newEntity = em.createEntity('Customer');
+        var query = EntityQuery.from('Customers');
+        // Returns zero results
+        var result = em.executeQueryLocally(query);
+        ok(result.length == 1, "should have returned one entity");
+    });
+
     test("startsWith empty string", function() {
         var em = newEm();
         var q0 = EntityQuery.from("Customers").where("companyName", "startsWith", "C");
