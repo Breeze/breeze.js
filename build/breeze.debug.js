@@ -347,7 +347,7 @@ function __requireLib(libNames, errMessage) {
         if (lib) return lib;
     }
     if (errMessage) {
-        throw new Error("Unable to initialize " + libNames + ".  " + errMessage || "");
+        throw new Error("Unable to initialize " + libNames + ".  " + errMessage );
     }
 }
 
@@ -14945,7 +14945,7 @@ breeze.SaveOptions= SaveOptions;
 
     function encodeParams(obj) {
         var query = '';
-        var  key, subValue, innerObj;
+        var key, subValue, innerObj, fullSubName;
 
         for (var name in obj) {
             var value = obj[name];

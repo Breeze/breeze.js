@@ -95,7 +95,7 @@
 
     function encodeParams(obj) {
         var query = '';
-        var  key, subValue, innerObj;
+        var key, subValue, innerObj, fullSubName;
 
         for (var name in obj) {
             var value = obj[name];

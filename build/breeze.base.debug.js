@@ -347,7 +347,7 @@ function __requireLib(libNames, errMessage) {
         if (lib) return lib;
     }
     if (errMessage) {
-        throw new Error("Unable to initialize " + libNames + ".  " + errMessage || "");
+        throw new Error("Unable to initialize " + libNames + ".  " + errMessage );
     }
 }
 
