@@ -1789,7 +1789,7 @@ var EntityType = (function () {
         // if merging from an import then raw will have an entityAspect or a complexAspect
         var rawAspect = raw.entityAspect || raw.complexAspect;
         if (rawAspect && rawAspect.originalValuesMap) {
-            targetAspect = target.entityAspect || target.complexAspect;
+            var targetAspect = target.entityAspect || target.complexAspect;
             targetAspect.originalValues = rawAspect.originalValuesMap;
         }
 

@@ -262,7 +262,7 @@
             return pending.entity === instance;
         });
         if (pending) return pending.backingStore;
-        bs = {};
+        var bs = {};
         pendingStores.push({ entity: instance, backingStore: bs });
         return bs;
     }

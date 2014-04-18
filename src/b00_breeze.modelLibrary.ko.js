@@ -95,9 +95,9 @@
     function isolateES5Props(proto) {
         
         var stype = proto.entityType || proto.complexType;
-        es5Descriptors = {};
+        var es5Descriptors = {};
         stype.getProperties().forEach(function (prop) {
-            propDescr = getES5PropDescriptor(proto, prop.name);
+            var propDescr = getES5PropDescriptor(proto, prop.name);
             if (propDescr) {
                 es5Descriptors[prop.name] = propDescr;
             }

@@ -2116,7 +2116,7 @@ var EntityManager = (function () {
     proto.helper = {
         unwrapInstance: unwrapInstance,
         unwrapOriginalValues: unwrapOriginalValues,
-        unwrapChangedValues: unwrapChangedValues,
+        unwrapChangedValues: unwrapChangedValues
     };
     
    
