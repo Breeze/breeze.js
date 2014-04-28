@@ -2192,7 +2192,7 @@ var EntityManager = (function () {
             var val = target.getProperty(propName);
             val = transformFn ? transformFn(prop, val) : val;
             if (val === undefined) return;
-            val = serializerFn ? serializerFn(dp, val) : val;
+            val = serializerFn ? serializerFn(prop, val) : val;
             if (val !== undefined) {
                 result[fn(propName, prop)] = val;
             }
