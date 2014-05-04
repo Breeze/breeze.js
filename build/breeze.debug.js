@@ -15073,9 +15073,9 @@ breeze.SaveOptions= SaveOptions;
         }
 
         if (requestInfo.config){
-            jQuery.ajax(requestInfo.config)
+            requestInfo.jqXHR = jQuery.ajax(requestInfo.config)
             .done(requestInfo.success)
-            .fail(requestInfo.error);        
+            .fail(requestInfo.error); 
         }
 
         function successFn(data, textStatus, jqXHR) {
