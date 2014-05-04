@@ -1,4 +1,5 @@
-﻿// needs JQuery
+﻿// needs JQuery v.>=1.5
+// see https://api.jquery.com/jQuery.ajax/
 (function(factory) {
     // Module systems magic dance.
     if (breeze) {
@@ -18,11 +19,11 @@
     var ctor = function () {
         this.name = "jQuery";
         this.defaultSettings = { };
+        this.requestInterceptor = null; // s
     };
 
     ctor.prototype.initialize = function () {
-        // jQuery = core.requireLib("jQuery", "needed for 'ajax_jQuery' pluggin", true);
-        // for the time being don't fail if not found
+        // look for the jQuery lib but don't fail immediately if not found
         jQuery = core.requireLib("jQuery");
     };
 
@@ -47,44 +48,78 @@
             jqConfig.headers = core.extend(this.defaultSettings.headers, jqConfig.headers);
         }
         
-        jqConfig.success = function (data, textStatus, XHR) {
+        var requestInfo = {
+            adapter: this,      // this adapter
+            config: jqConfig,   // jQuery's ajax 'settings' object
+            zConfig: config,    // the config arg from the calling Breeze data service adapter
+            success: successFn, // adapter's success callback
+            error: errorFn      // adapter's error callback
+        }
+
+        if (core.isFunction(this.requestInterceptor)){
+            this.requestInterceptor(requestInfo);
+            if (this.requestInterceptor.oneTime){
+                this.requestInterceptor = null;
+            }
+        }
+
+        if (requestInfo.config){
+            jQuery.ajax(requestInfo.config)
+            .done(requestInfo.success)
+            .fail(requestInfo.error);        
+        }
+
+        function successFn(data, textStatus, jqXHR) {
             var httpResponse = {
                 data: data,
-                status: XHR.status,
-                getHeaders: getHeadersFn(XHR),
+                status: jqXHR.status,
+                getHeaders: getHeadersFn(jqXHR ),
                 config: config
             };
             config.success(httpResponse);
-            XHR.onreadystatechange = null;
-            XHR.abort = null;
-        };
-        jqConfig.error = function (XHR, textStatus, errorThrown) {
+            jqXHR.onreadystatechange = null;
+            jqXHR.abort = null;               
+        }
+
+        function errorFn(jqXHR, textStatus, errorThrown) {
+            var responseText, status;
+            /* jqXHR could be in invalid state e.g., after timeout */
+            try {
+             responseText = jqXHR.responseText;
+             status = jqXHR.status;
+             jqXHR.onreadystatechange = null;
+             jqXHR.abort = null;               
+            } catch(e){ /* ignore errors */ }  
+
             var httpResponse = {
-                data: XHR.responseText,
-                status: XHR.status,
-                getHeaders: getHeadersFn(XHR),
+                data: responseText,
+                status: status,
+                getHeaders: getHeadersFn(jqXHR ),
                 error: errorThrown,
                 config: config
             };
             config.error(httpResponse);
-            XHR.onreadystatechange = null;
-            XHR.abort = null;
-        };
-        jQuery.ajax(jqConfig);
-
+        }
     };
-
     
-    function getHeadersFn(XHR) {
+    function getHeadersFn(jqXHR) {
         return function (headerName) {
+            // XHR can be bad so wrap in try/catch
             if (headerName && headerName.length > 0) {
-                return XHR.getResponseHeader(headerName);
+                try {
+                    return jqXHR.getResponseHeader(headerName);
+                } catch (e){
+                    return null;
+                }                
             } else {
-                return XHR.getAllResponseHeaders();
+                try {
+                    return jqXHR.getAllResponseHeaders();                    
+                } catch (e){
+                    return {}
+                }
             };
         };
     }
-    
 
     breeze.config.registerAdapter("ajax", ctor);
     
