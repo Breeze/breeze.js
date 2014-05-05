@@ -14848,7 +14848,8 @@ breeze.SaveOptions= SaveOptions;
     return ctor;
 
 })();
-;// needs Angular
+// Angular ajax adapter
+// See https://docs.angularjs.org/api/ng/service/$http
 (function(factory) {
     // Module systems magic dance.
     if (breeze) {
@@ -14948,10 +14949,11 @@ breeze.SaveOptions= SaveOptions;
             // HACK: because $http returns a server side null as a string containing "null" - this is WRONG. 
             if (data === "null") data = null;
             var httpResponse = {
+                config: config,
                 data: data,
-                status: status,
                 getHeaders: headers,
-                config: config
+                status: status,
+                statusText: statusText
             };
             config.success(httpResponse);
         }
@@ -14963,10 +14965,11 @@ breeze.SaveOptions= SaveOptions;
                 data = 'timeout';
             }
             var httpResponse = {
+                config: config,
                 data: data,
-                status: status,
                 getHeaders: headers,
-                config: config
+                status: status,
+                statusText: statusText
             };
             config.error(httpResponse);
         }
@@ -15006,7 +15009,7 @@ breeze.SaveOptions= SaveOptions;
     breeze.config.registerAdapter("ajax", ctor);
     
 }));
-;// needs JQuery v.>=1.5
+;// jQuery ajax adapter ( JQuery v.>=1.5 )
 // see https://api.jquery.com/jQuery.ajax/
 (function(factory) {
     // Module systems magic dance.
@@ -15077,56 +15080,46 @@ breeze.SaveOptions= SaveOptions;
             .fail(requestInfo.error); 
         }
 
-        function successFn(data, textStatus, jqXHR) {
+        function successFn(data, statusText, jqXHR) {
             var httpResponse = {
+                config: config,
                 data: data,
+                getHeaders: getHeadersFn(jqXHR),
                 status: jqXHR.status,
-                getHeaders: getHeadersFn(jqXHR ),
-                config: config
+                statusText: statusText
             };
             config.success(httpResponse);
             jqXHR.onreadystatechange = null;
             jqXHR.abort = null;               
         }
 
-        function errorFn(jqXHR, textStatus, errorThrown) {
-            var responseText, status;
-            /* jqXHR could be in invalid state e.g., after timeout */
-            try {
-             responseText = jqXHR.responseText;
-             status = jqXHR.status;
-             jqXHR.onreadystatechange = null;
-             jqXHR.abort = null;               
-            } catch(e){ /* ignore errors */ }  
-
+        function errorFn(jqXHR, statusText, errorThrown) {
             var httpResponse = {
-                data: responseText,
-                status: status,
-                getHeaders: getHeadersFn(jqXHR ),
+                config: config,
+                data: jqXHR.responseText,
                 error: errorThrown,
-                config: config
+                getHeaders: getHeadersFn(jqXHR),
+                status: jqXHR.status,
+                statusText: statusText
             };
             config.error(httpResponse);
+            jqXHR.onreadystatechange = null;
+            jqXHR.abort = null;               
         }
     };
     
     function getHeadersFn(jqXHR) {
-        return function (headerName) {
-            // XHR can be bad so wrap in try/catch
-            if (headerName && headerName.length > 0) {
-                try {
-                    return jqXHR.getResponseHeader(headerName);
-                } catch (e){
-                    return null;
-                }                
-            } else {
-                try {
-                    return jqXHR.getAllResponseHeaders();                    
-                } catch (e){
-                    return {}
-                }
+        if (jqXHR.status === 0) { // timeout or abort; no headers
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ? "" : {};
             };
-        };
+        } else { // jqXHR should have header functions          
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ?
+                    jqXHR.getResponseHeader(headerName) :
+                    jqXHR.getAllResponseHeaders();
+            };
+        } 
     }
 
     breeze.config.registerAdapter("ajax", ctor);

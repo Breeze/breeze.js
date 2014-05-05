@@ -1,4 +1,5 @@
-﻿// needs Angular
+﻿// Angular ajax adapter
+// See https://docs.angularjs.org/api/ng/service/$http
 (function(factory) {
     // Module systems magic dance.
     if (breeze) {
@@ -98,10 +99,11 @@
             // HACK: because $http returns a server side null as a string containing "null" - this is WRONG. 
             if (data === "null") data = null;
             var httpResponse = {
+                config: config,
                 data: data,
-                status: status,
                 getHeaders: headers,
-                config: config
+                status: status,
+                statusText: statusText
             };
             config.success(httpResponse);
         }
@@ -113,10 +115,11 @@
                 data = 'timeout';
             }
             var httpResponse = {
+                config: config,
                 data: data,
-                status: status,
                 getHeaders: headers,
-                config: config
+                status: status,
+                statusText: statusText
             };
             config.error(httpResponse);
         }

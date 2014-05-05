@@ -1,4 +1,4 @@
-﻿// needs JQuery v.>=1.5
+﻿// jQuery ajax adapter ( JQuery v.>=1.5 )
 // see https://api.jquery.com/jQuery.ajax/
 (function(factory) {
     // Module systems magic dance.
@@ -69,56 +69,46 @@
             .fail(requestInfo.error); 
         }
 
-        function successFn(data, textStatus, jqXHR) {
+        function successFn(data, statusText, jqXHR) {
             var httpResponse = {
+                config: config,
                 data: data,
+                getHeaders: getHeadersFn(jqXHR),
                 status: jqXHR.status,
-                getHeaders: getHeadersFn(jqXHR ),
-                config: config
+                statusText: statusText
             };
             config.success(httpResponse);
             jqXHR.onreadystatechange = null;
             jqXHR.abort = null;               
         }
 
-        function errorFn(jqXHR, textStatus, errorThrown) {
-            var responseText, status;
-            /* jqXHR could be in invalid state e.g., after timeout */
-            try {
-             responseText = jqXHR.responseText;
-             status = jqXHR.status;
-             jqXHR.onreadystatechange = null;
-             jqXHR.abort = null;               
-            } catch(e){ /* ignore errors */ }  
-
+        function errorFn(jqXHR, statusText, errorThrown) {
             var httpResponse = {
-                data: responseText,
-                status: status,
-                getHeaders: getHeadersFn(jqXHR ),
+                config: config,
+                data: jqXHR.responseText,
                 error: errorThrown,
-                config: config
+                getHeaders: getHeadersFn(jqXHR),
+                status: jqXHR.status,
+                statusText: statusText
             };
             config.error(httpResponse);
+            jqXHR.onreadystatechange = null;
+            jqXHR.abort = null;               
         }
     };
     
     function getHeadersFn(jqXHR) {
-        return function (headerName) {
-            // XHR can be bad so wrap in try/catch
-            if (headerName && headerName.length > 0) {
-                try {
-                    return jqXHR.getResponseHeader(headerName);
-                } catch (e){
-                    return null;
-                }                
-            } else {
-                try {
-                    return jqXHR.getAllResponseHeaders();                    
-                } catch (e){
-                    return {}
-                }
+        if (jqXHR.status === 0) { // timeout or abort; no headers
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ? "" : {};
             };
-        };
+        } else { // jqXHR should have header functions          
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ?
+                    jqXHR.getResponseHeader(headerName) :
+                    jqXHR.getAllResponseHeaders();
+            };
+        } 
     }
 
     breeze.config.registerAdapter("ajax", ctor);
