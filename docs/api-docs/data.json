@@ -346,7 +346,7 @@
             "namespace": "",
             "file": "..\\..\\src\\a05_enum.js",
             "line": 9,
-            "description": "Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.\nA Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.\nUnlike enums in some other environments, each 'symbol' can have both methods and properties.\n\nSee the example below:\n\n    // Example of creating a new Enum\n    var prototype = {\n        nextDay: function () {\n            var nextIndex = (this.dayIndex+1) % 7;\n            return DayOfWeek.getSymbols()[nextIndex];\n        }\n    };\n\n    var DayOfWeek = new Enum(\"DayOfWeek\", prototype);\n    DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });\n    DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });\n    DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });\n    DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });\n    DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });\n    DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });\n    DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });\n    DayOfWeek.seal();\n\n    // custom methods\n    ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);\n    ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);\n    // custom properties\n    ok(DayOfWeek.Tuesday.isWeekend === undefined);\n    ok(DayOfWeek.Saturday.isWeekend == true);\n    // Standard enum capabilities\n    ok(DayOfWeek instanceof Enum);\n    ok(Enum.isSymbol(DayOfWeek.Wednesday));\n    ok(DayOfWeek.contains(DayOfWeek.Thursday));\n    ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);\n    ok(DayOfWeek.getSymbols().length === 7);\n    ok(DayOfWeek.Friday.toString() === \"Friday\");"
+            "description": "Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.\nA Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.\nUnlike enums in some other environments, each 'symbol' can have both methods and properties.\n\nSee the example below:\n\n    // Example of creating a new Enum\n    var prototype = {\n        nextDay: function () {\n            var nextIndex = (this.dayIndex+1) % 7;\n            return DayOfWeek.getSymbols()[nextIndex];\n        }\n    };\n\n    var DayOfWeek = new Enum(\"DayOfWeek\", prototype);\n    DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });\n    DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });\n    DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });\n    DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });\n    DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });\n    DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });\n    DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });\n    DayOfWeek.resolveSymbols();\n\n    // custom methods\n    ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);\n    ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);\n    // custom properties\n    ok(DayOfWeek.Tuesday.isWeekend === undefined);\n    ok(DayOfWeek.Saturday.isWeekend == true);\n    // Standard enum capabilities\n    ok(DayOfWeek instanceof Enum);\n    ok(Enum.isSymbol(DayOfWeek.Wednesday));\n    ok(DayOfWeek.contains(DayOfWeek.Thursday));\n    ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);\n    ok(DayOfWeek.getSymbols().length === 7);\n    ok(DayOfWeek.Friday.toString() === \"Friday\");"
         },
         "EnumSymbol": {
             "name": "EnumSymbol",
@@ -970,7 +970,7 @@
             "line": 130,
             "description": "Seals this enum so that no more symbols may be added to it. This should only be called after all symbols\nhave already been added to the Enum.",
             "example": [
-                "\n    DayOfWeek.seal();"
+                "\n    DayOfWeek.resolveSymbols();"
             ],
             "itemtype": "method",
             "name": "seal",
@@ -2977,30 +2977,43 @@
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
             "line": 824,
-            "description": "The EntityAspect for the top level entity tht contains this complex object.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "entityAspect",
-            "type": "String",
-            "class": "ComplexAspect",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 831,
-            "description": "The 'property path' from the top level entity that contains this complex object to this object.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "propertyPath",
-            "type": "String",
-            "class": "ComplexAspect",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 838,
             "description": "The 'original values' of this complex object where they are different from the 'current values'. \nThis is a map where the key is a property name and the value is the 'original value' of the property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "originalValues",
             "type": "Object",
+            "class": "ComplexAspect",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\..\\src\\a30_entityAspect.js",
+            "line": 832,
+            "description": "Returns the EntityAspect for the top level entity tht contains this complex object.",
+            "itemtype": "method",
+            "name": "getEntityAspect",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "ComplexAspect",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\..\\src\\a30_entityAspect.js",
+            "line": 849,
+            "description": "Executes the specified query against this EntityManager's local cache.",
+            "itemtype": "method",
+            "name": "getPropertyPath",
+            "params": [
+                {
+                    "name": "propName",
+                    "description": "The property name of a property on this complex aspect for which we want the full path.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The 'property path' from the top level entity that contains this complex object to this object.",
+                "type": "String"
+            },
             "class": "ComplexAspect",
             "module": "breeze"
         },

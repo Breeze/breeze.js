@@ -1504,7 +1504,7 @@ var FilterQueryOp = (function () {
 
     aEnum.IsTypeOf = aEnum.addSymbol({ operator: &quot;isof&quot;, isFunction: true, aliases: [&quot;isTypeOf&quot;] });
     
-    aEnum.seal();
+    aEnum.resolveSymbols();
     aEnum._map = function () {
         var map = {};
         aEnum.getSymbols().forEach(function (s) {
@@ -1534,7 +1534,7 @@ var BooleanQueryOp = (function () {
     aEnum.Or = aEnum.addSymbol({ operator: &quot;or&quot;, aliases: [&quot;||&quot;] });
     aEnum.Not = aEnum.addSymbol({ operator: &quot;not&quot;, aliases: [&quot;~&quot;, &quot;!&quot;] });
 
-    aEnum.seal();
+    aEnum.resolveSymbols();
     aEnum._map = (function () {
         var map = {};
         aEnum.getSymbols().forEach(function (s) {

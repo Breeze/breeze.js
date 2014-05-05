@@ -822,20 +822,6 @@ var ComplexAspect = (function() {
     **/
         
     /**
-    The EntityAspect for the top level entity tht contains this complex object.
-
-    __readOnly__
-    @property entityAspect {String}
-    **/
-        
-    /**
-    The 'property path' from the top level entity that contains this complex object to this object.
-
-    __readOnly__
-    @property propertyPath {String}
-    **/
-        
-    /**
     The 'original values' of this complex object where they are different from the 'current values'. 
     This is a map where the key is a property name and the value is the 'original value' of the property.
 
@@ -843,6 +829,12 @@ var ComplexAspect = (function() {
     @property originalValues {Object}
     **/
 
+    /**
+    Returns the EntityAspect for the top level entity tht contains this complex object.
+
+    @method getEntityAspect
+    @return  {String}  
+    **/
     proto.getEntityAspect = function() {
         var parent = this.parent;
         if (!parent) return new EntityAspect(null);
@@ -854,6 +846,13 @@ var ComplexAspect = (function() {
         return entityAspect || new EntityAspect(null);
     }
 
+    /**
+    Executes the specified query against this EntityManager's local cache.
+
+    @method getPropertyPath
+    @param propName {String}  The property name of a property on this complex aspect for which we want the full path.
+    @return  {String}    The 'property path' from the top level entity that contains this complex object to this object.
+    **/
     proto.getPropertyPath = function(propName) {
         var parent = this.parent;
         if (!parent) return null;

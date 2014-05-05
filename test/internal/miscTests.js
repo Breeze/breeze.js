@@ -10806,8 +10806,8 @@
             "metadataVersion": "1.0.5"
         };
 
-        var entities = manager.importEntities(JSON.stringify(data));
-        ok(entities.length > 0, "length should be  > 0");
+        var r= manager.importEntities(JSON.stringify(data));
+        ok(r.entities.length > 0, "length should be  > 0");
     });
 
 
@@ -11460,7 +11460,7 @@
         DayOfWeek.Friday = DayOfWeek.addSymbol( { dayIndex: 4 });
         DayOfWeek.Saturday = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });
         DayOfWeek.Sunday = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });
-        DayOfWeek.seal();
+        DayOfWeek.resolveSymbols();
 
       // custom methods
         ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);

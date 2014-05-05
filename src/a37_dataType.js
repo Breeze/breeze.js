@@ -323,7 +323,7 @@ var DataType = (function () {
     @static
     **/
     DataType.Undefined = DataType.addSymbol({ defaultValue: undefined , fmtOData: fmtUndefined});
-    DataType.seal();
+    DataType.resolveSymbols();
 
     /**
     Returns the DataType for a specified EDM type name.

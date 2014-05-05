@@ -1,4 +1,4 @@
-﻿// Generated on: Mon Apr 28 2014 20:40:10 GMT-0700 (Pacific Daylight Time)
+﻿// Generated on: Mon May 05 2014 16:41:51 GMT-0700 (Pacific Daylight Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -1089,6 +1089,23 @@ intellisense.annotate(breeze.breeze.EntityAspect, {
 
 intellisense.annotate(breeze.breeze.ComplexAspect.prototype, {
   
+  'getEntityAspect': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Returns the EntityAspect for the top level entity tht contains this complex object. }
+    ///   </summary>
+    ///   <returns type="String" ></returns>
+    /// </signature>
+  },
+  'getPropertyPath': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Executes the specified query against this EntityManager's local cache. }
+    ///   </summary>
+    ///   <param name="propName" type="String" optional="true">The property name of a property on this complex aspect for which we want the full path.</param>
+    ///   <returns type="String" >The 'property path' from the top level entity that contains this complex object to this object.</returns>
+    /// </signature>
+  },
   
   /// <field name="complexObject" type="Entity" >The complex object that this aspect is associated with.</field>
   'complexObject': null,
@@ -1098,12 +1115,6 @@ intellisense.annotate(breeze.breeze.ComplexAspect.prototype, {
   
   /// <field name="parentProperty" type="breeze.breeze.DataProperty" >The  'DataProperty' on the 'parent' that contains this complex object.</field>
   'parentProperty': null,
-  
-  /// <field name="entityAspect" type="String" >The EntityAspect for the top level entity tht contains this complex object.</field>
-  'entityAspect': null,
-  
-  /// <field name="propertyPath" type="String" >The 'property path' from the top level entity that contains this complex object to this object.</field>
-  'propertyPath': null,
   
   /// <field name="originalValues" type="Object" >The 'original values' of this complex object where they are different from the 'current values'.  This is a map where the key is a property name and the value is the 'original value' of the property.</field>
   'originalValues': null,

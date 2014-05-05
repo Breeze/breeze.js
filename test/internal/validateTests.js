@@ -80,19 +80,6 @@
 
     });
 
-    test("required validation", function () {
-        var v0 = Validator.required();
-        var r0 = v0.validate("asdf");
-        ok(r0 === null);
-        var r0a = v0.validate("");
-        ok(r0a.errorMessage.indexOf("required"), v0.getMessage());
-        var data = {};
-        var r0b = v0.validate(data.notThere);
-        ok(r0b.errorMessage.indexOf("required") >= 0, v0.getMessage());
-
-    });
-
-
     test("required validation allow empty strings", function () {
         var v0 = Validator.required({ allowEmptyStrings: true });
         var r0 = v0.validate("asdf");
@@ -159,7 +146,18 @@
         r = v0.validate(new Date(2001, 9, 11));
         ok(r == null, "should be null");
     });
- 
+
+    test("custom validation message", function() {
+        breeze.Validator.min = function(context) {
+            var fn = function(val, ctx) { return min <= ctx.min; }
+            return new breeze.Validator('min', fn, context);
+        }
+        breeze.Validator.messageTemplates.min = "Insert value >= %min%";
+        var v0 = breeze.Validator.min({ min: 0 });
+        var r = v0.validate(-3);
+        ok(r != null, "should have an error");
+
+    });
 
     test("creditCard validation", function() {
         var v0 = Validator.creditCard();
@@ -214,10 +212,8 @@
         valFail(v0, "1234567");
         valFail(v0, "traband.contoso.com"); // missing protocol
 
-        // This passes but shouldn't (won't in .NET). 
-        // A JS/.NET regex diff? Need to fix
-        valGood(v0, "http://traband"); // SHOULD make this test fail
-        
+
+        valGood(v0, "http://traband"); 
         valGood(v0, null);
         valGood(v0, "http://traband.contoso.com");
         valGood(v0, "https://traband.contoso.com");

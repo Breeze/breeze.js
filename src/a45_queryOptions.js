@@ -53,7 +53,7 @@ var MergeStrategy = (function() {
     @static
     **/
     MergeStrategy.Disallowed = MergeStrategy.addSymbol();
-    MergeStrategy.seal();
+    MergeStrategy.resolveSymbols();
     return MergeStrategy;
 })();
 
@@ -79,7 +79,7 @@ var FetchStrategy = (function() {
     @static
     **/
     FetchStrategy.FromLocalCache = FetchStrategy.addSymbol();
-    FetchStrategy.seal();
+    FetchStrategy.resolveSymbols();
     return FetchStrategy;
 })();
 
