@@ -1,4 +1,4 @@
-﻿// Generated on: Mon May 05 2014 16:41:51 GMT-0700 (Pacific Daylight Time)
+﻿// Generated on: Mon May 05 2014 16:52:51 GMT-0700 (Pacific Daylight Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -56,7 +56,7 @@ intellisense.annotate(breeze.core.Enum.prototype, {
     ///   <returns type="breeze.core.EnumSymbol" >The new symbol</returns>
     /// </signature>
   },
-  'seal': function() {
+  'resolveSymbols': function() {
     /// <signature>
     ///   <summary>
     ///   Seals this enum so that no more symbols may be added to it. This should only be called after all symbols }

@@ -164,7 +164,7 @@
                 var orders = emp.getProperty("orders");
                 var isOk = orders.some(function (order) {
                     var cust = order.getProperty("customer");
-                    return cust.getProperty("companyName").indexOf("Lazy") >= 0;
+                    return cust && cust.getProperty("companyName").indexOf("Lazy") >= 0;
                 });
                 ok(isOk, "should be some order with the right company name");
             });

@@ -973,7 +973,7 @@
                 "\n    DayOfWeek.resolveSymbols();"
             ],
             "itemtype": "method",
-            "name": "seal",
+            "name": "resolveSymbols",
             "class": "Enum",
             "module": "core"
         },

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\..\src\a05_enum.js</title>
+    <title>MergeStrategy</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,287 +201,323 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\..\src\a05_enum.js</h1>
+                        <h1>MergeStrategy Class</h1>
+<div class="box meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-﻿/**
- @module core
- **/
+    
 
-var Enum = (function() {
+    
+        <div class="foundat">
+            Defined in: <a href="../files/.._.._src_a45_queryOptions.js.html#l6"><code>..\..\src\a45_queryOptions.js:6</code></a>
+        </div>
+    
 
-    // TODO: think about CompositeEnum (flags impl).
+    
+        
+            Module: <a href="../modules/breeze.html">breeze</a>
+        
+    
 
-    /**
-    Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
-    A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called &#x27;symbols&#x27;.
-    Unlike enums in some other environments, each &#x27;symbol&#x27; can have both methods and properties.
-
-    See the example below:
-
-        // Example of creating a new Enum
-        var prototype = {
-            nextDay: function () {
-                var nextIndex = (this.dayIndex+1) % 7;
-                return DayOfWeek.getSymbols()[nextIndex];
-            }
-        };
-
-        var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
-        DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
-        DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });
-        DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });
-        DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });
-        DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });
-        DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });
-        DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });
-        DayOfWeek.resolveSymbols();
-
-        // custom methods
-        ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
-        ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
-        // custom properties
-        ok(DayOfWeek.Tuesday.isWeekend === undefined);
-        ok(DayOfWeek.Saturday.isWeekend == true);
-        // Standard enum capabilities
-        ok(DayOfWeek instanceof Enum);
-        ok(Enum.isSymbol(DayOfWeek.Wednesday));
-        ok(DayOfWeek.contains(DayOfWeek.Thursday));
-        ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
-        ok(DayOfWeek.getSymbols().length === 7);
-        ok(DayOfWeek.Friday.toString() === &quot;Friday&quot;);
-
-
-    @class Enum
-    **/
-
-    /**
-    Enum constructor - may be used to create new Enums.
-    @example
-        var prototype = {
-            nextDay: function () {
-                var nextIndex = (this.dayIndex+1) % 7;
-                return DayOfWeek.getSymbols()[nextIndex];
-            }
-        };
-
-        var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
-    @method &lt;ctor&gt; Enum
-    @param name {String}
-    @param [methodObj] {Object}
-    **/
-
-    var ctor = function(name, methodObj) {
-        this.name = name;
-        var prototype = new EnumSymbol(methodObj);
-        prototype.parentEnum = this;
-        this._symbolPrototype = prototype;
-        if (methodObj) {
-            Object.keys(methodObj).forEach(function(key) {
-                prototype[key] = methodObj[key];
-            });
-        }
-    };
-    var proto = ctor.prototype;
-
-    /**
-    Checks if an object is an Enum &#x27;symbol&#x27;.
-    @example
-         if (Enum.isSymbol(DayOfWeek.Wednesday)) {
-            // do something ...
-         };
-    @method isSymbol
-    @return {Boolean}
-    @static
-    **/
-    ctor.isSymbol = function(obj) {
-        return obj instanceof EnumSymbol;
-    };
-
-    /**
-    Returns an Enum symbol given its name.
-    @example
-         var dayOfWeek = DayOfWeek.from(&quot;Thursday&quot;);
-         // nowdayOfWeek === DayOfWeek.Thursday            
-    @method fromName
-    @param name {String} Name for which an enum symbol should be returned.
-    @return {EnumSymbol} The symbol that matches the name or &#x27;undefined&#x27; if not found.
-    **/
-    proto.fromName = function(name) {
-        return this[name];
-    };
-
-    /**
-    Adds a new symbol to an Enum.
-    @example
-        var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
-        DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
-    @method addSymbol
-    @param [propertiesObj] {Object} A collection of properties that should be added to the new symbol.
-    In other words, the &#x27;propertiesObj&#x27; is any state that should be held by the symbol.
-    @return {EnumSymbol} The new symbol
-    **/
-    proto.addSymbol = function(propertiesObj) {
-        // TODO: check if sealed.
-        var newSymbol = Object.create(this._symbolPrototype);
-        if (propertiesObj) {
-            Object.keys(propertiesObj).forEach(function(key) {
-                newSymbol[key] = propertiesObj[key];
-            });
-        }
-        setTimeout(function() { newSymbol.getName(); }, 0);
-        return newSymbol;
-    };
-
-    /**
-    Seals this enum so that no more symbols may be added to it. This should only be called after all symbols
-    have already been added to the Enum.
-    @example
-        DayOfWeek.resolveSymbols();
-    @method resolveSymbols
-    **/
-    proto.resolveSymbols = function() {
-        this.getSymbols().forEach(function(sym) { return sym.getName(); });
-    };
-
-    //// TODO: remove or rethink this.
-    //Enum.prototype.combineSymbols = function () {
-    //    var proto = this._symbolPrototype;
-    //    var newSymbol = Object.create(proto);
-    //    newSymbol._symbols = __arraySlice(arguments);
-
-    //    Object.keys(proto).forEach(function (key) {
-    //        var result;
-    //        var oldMethod = proto[key];
-    //        if (__isFunction(oldMethod)) {
-    //            var newMethod = function () {
-
-    //                if (this._symbols) {
-    //                    result = this._symbols.map(function (sym) {
-    //                        return oldMethod.apply(sym);
-    //                    });
-    //                } else {
-    //                    result = oldMethod.apply(this);
-    //                }
-    //                return result;
-    //            };
-    //            proto[key] = newMethod;
-    //        }
-    //    });
-    //    return newSymbol;
-    //};
-
-    /**
-    Returns all of the symbols contained within this Enum.
-    @example
-        var symbols = DayOfWeek.getSymbols();
-    @method getSymbols
-    @return {Array of EnumSymbol} All of the symbols contained within this Enum.
-    **/
-    proto.getSymbols = function() {
-        return this.getNames().map(function(key) {
-            return this[key];
-        }, this);
-    };
-
-    /**
-    Returns the names of all of the symbols contained within this Enum.
-    @example
-        var symbols = DayOfWeek.getNames();
-    @method getNames
-    @return {Array of String} All of the names of the symbols contained within this Enum.
-    **/
-    proto.getNames = function() {
-        var result = [];
-        for (var key in this) {
-            if (this.hasOwnProperty(key)) {
-                if (key !== &quot;name&quot; &amp;&amp; key.substr(0, 1) !== &quot;_&quot; &amp;&amp; !__isFunction(this[key])) {
-                    result.push(key);
-                }
-            }
-        }
-        return result;
-    };
-
-    /**
-    Returns whether an Enum contains a specified symbol. 
-    @example
-        var symbol = DayOfWeek.Friday;
-        if (DayOfWeek.contains(symbol)) {
-            // do something
-        }
-    @method contains
-    @param {Object} Object or symbol to test.
-    @return {Boolean} Whether this Enum contains the specified symbol.
-    **/
-    proto.contains = function(sym) {
-        if (!(sym instanceof EnumSymbol)) {
-            return false;
-        }
-        return this[sym.getName()] === sym;
-    };
-
-    /**
-    One of the constant values that is generated by the {{#crossLink &quot;Enum&quot;}}{{/crossLink}} &quot;addSymbol&quot; method.  EnumSymbols should ONLY be created via
-    the Enum.addSymbol method.
-
-         var DayOfWeek = new Enum(&quot;DayOfWeek&quot;);
-         DayOfWeek.Monday    = DayOfWeek.addSymbol();
-    @class EnumSymbol
-    **/
-
-    function EnumSymbol() {
-    }
-
-    /**
-    The {{#crossLink &quot;Enum&quot;}}{{/crossLink}} to which this symbol belongs.
-    __readOnly__
-    @property parentEnum {Enum}
-    **/
-
-    /**
-    Returns the name of this symbol.
-    @example
-        var name = DayOfWeek.Monday.getName();
-        // name === &quot;Monday&quot;
-    @method getName
-    **/
-    EnumSymbol.prototype.getName = function() {
-        if (!this.name) {
-            var that = this;
-            this.name = __arrayFirst(this.parentEnum.getNames(), function(name) {
-                return that.parentEnum[name] === that;
-            });
-        }
-        return this.name;
-    };
-
-    /**
-    Same as the getName method. Returns the name of this symbol.
-    @example
-        var name = DayOfWeek.Monday.toString();
-        // name === &quot;Monday&quot;
-    @method toString
-    **/
-    EnumSymbol.prototype.toString = function() {
-        return this.getName();
-    };
-
-    EnumSymbol.prototype.toJSON = function() {
-        return {
-            _$typeName: this.parentEnum.name,
-            name: this.name
-        };
-    };
-
-    return ctor;
-})();
-core.Enum = Enum;
+    
+</div>
 
 
 
-    </pre>
+<div class="box intro">
+    <p>MergeStrategy is an &#39;Enum&#39; that determines how entities are merged into an EntityManager.</p>
+
+</div>
+
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                        
+                            <li class="index-item property">
+                                <a href="#property_Disallowed">Disallowed</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_OverwriteChanges">OverwriteChanges</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_PreserveChanges">PreserveChanges</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
+                                <a href="#property_SkipMerge">SkipMerge</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+        </div>
+
+        
+
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_Disallowed" class="property item">
+    <h3 class="name"><code>Disallowed</code></h3>
+    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l46"><code>..\..\src\a45_queryOptions.js:46</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.<br>Use this strategy when you want to be sure that the incoming entity is not already in cache. 
+This is the default strategy for EntityManager.attachEntity.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_OverwriteChanges" class="property item">
+    <h3 class="name"><code>OverwriteChanges</code></h3>
+    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l24"><code>..\..\src\a45_queryOptions.js:24</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
+a changed state (added, modified, deleted). After the merge, the pending changes are lost. 
+The new EntityState will be  EntityState/Unchanged unless you’re importing entities 
+in which case the new EntityState will be that of the imported entities.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_PreserveChanges" class="property item">
+    <h3 class="name"><code>PreserveChanges</code></h3>
+    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l13"><code>..\..\src\a45_queryOptions.js:13</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed 
+state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
+remain EntityState/Unchanged unless you’re importing entities in which case the new EntityState will 
+be that of the imported entities.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_SkipMerge" class="property item">
+    <h3 class="name"><code>SkipMerge</code></h3>
+    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+
+    
+
+    
+
+    
+        <span class="flag final">final</span>
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l36"><code>..\..\src\a45_queryOptions.js:36</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key. 
+This is the fastest merge strategy but your existing cached data will remain “stale”.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+    </div>
 </div>
 
                     </div>
