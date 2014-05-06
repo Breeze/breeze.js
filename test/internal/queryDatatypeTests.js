@@ -293,7 +293,7 @@
             var ents = sr.entities;
             ok(ents.length === 2);
             var maxTime = tlimit.getProperty("maxTime");
-            sMaxTime = core.durationToSeconds(maxTime);
+            var sMaxTime = core.durationToSeconds(maxTime);
             ok(sMaxTime === sDuration, "maxTime should = " + sDuration);
             zeroTime = tlimit2.getProperty("maxTime");
             var q2 = EntityQuery.fromEntities([tlimit, tlimit2]).orderBy("minTime");

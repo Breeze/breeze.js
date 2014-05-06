@@ -80,9 +80,9 @@
             exported = em.exportEntities(null, false);
             var em2 = newEm();
             em2.importEntities(exported);
-            cust0x = em2.findEntityByKey(custs[0].entityAspect.getKey());
+            var cust0x = em2.findEntityByKey(custs[0].entityAspect.getKey());
             ok(cust0x.getProperty("companyName") === null, "orig export companyName should be null");
-            cust1x = em2.findEntityByKey(custs[1].entityAspect.getKey());
+            var cust1x = em2.findEntityByKey(custs[1].entityAspect.getKey());
             ok(cust1x.getProperty("city") === null, "orig export city should be null");
             cust0x.setProperty("companyName", "Foo");
             cust1x.setProperty("city", "Foo");
@@ -352,7 +352,7 @@
             .where(testFns.customerKeyName, "==", alfredsID);
         var entityChangedArgs = [];
         var hasChangesChangedArgs = [];
-
+        var lastArgs, lastAction, lastEntity;
         em.entityChanged.subscribe(function (args) {
             entityChangedArgs.push(args);
             lastArgs = args;
@@ -509,7 +509,7 @@
         
         stop();
         em.saveChanges().then(function (saveResult) {
-            orderId = o1.getProperty(testFns.orderKeyName);
+            var orderId = o1.getProperty(testFns.orderKeyName);
             ok(orderId !== tempOrderId);
             var keyMappings = saveResult.keyMappings;
             ok(keyMappings.length === 1);

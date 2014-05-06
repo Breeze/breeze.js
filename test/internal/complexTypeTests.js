@@ -48,7 +48,7 @@
             ok(location.getProperty("city") === "LA", "location.city should be 'LA'");
             return em.fetchEntityByKey(supplier.entityAspect.getKey());
         }).then(function (fr) {
-            supplier2 = fr.entity;
+            var supplier2 = fr.entity;
             ok(supplier === supplier2, "should be the same supplier");
             location = supplier.getProperty("location");
             location.setProperty("city", "FOOO");

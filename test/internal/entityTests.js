@@ -1046,7 +1046,7 @@
             ok(true, "NA for MONGO - no default values");
             return true;
         }
-        em = newEm();
+        var em = newEm();
         var catType = em.metadataStore.getEntityType("Category");
         var cat = em.createEntity("Category");
         ok(cat.getProperty("rowVersion") === 2, "Expected failure (with CodeFirst) - This test is expected to fail with a CodeFirst model but succeed with DatabaseFirst model");

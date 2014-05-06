@@ -248,7 +248,7 @@
 
         var queryUrl = q2._toUri(em.metadataStore);
         stop();
-        var custs, l0;
+        var custs, l0, l2;
         em.executeQuery(q1).then(function (data) {
             custs = data.results;
             l0 = custs.length;

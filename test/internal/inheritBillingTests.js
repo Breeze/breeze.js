@@ -250,7 +250,7 @@
             // forces refresh
             // subtype.getCtor(true);
             //em.metadataStore.registerEntityTypeCtor(subtype.name, subCtor);
-            newCtor = function () { };
+            var newCtor = function () { };
             newCtor.prototype = new baseCtor();
             em.metadataStore.registerEntityTypeCtor(subtype.name, newCtor);
         });

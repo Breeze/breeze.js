@@ -476,7 +476,7 @@
     function registerSelfAndSubtypes(em, baseType, baseCtor) {
         em.metadataStore.registerEntityTypeCtor(baseType.name, baseCtor, entityInitializeFn(baseType.name));
         baseType.subtypes.forEach(function (subtype) {
-            newCtor = function () { };
+            var newCtor = function () { };
             newCtor.prototype = new baseCtor();
             registerSelfAndSubtypes(em, subtype, newCtor);
         });

@@ -27,7 +27,7 @@
     });
 
     test("query by entity key without preexisting metadata", function() {
-        manager = new breeze.EntityManager(testFns.serviceName);
+        var manager = new breeze.EntityManager(testFns.serviceName);
         stop();
         manager.fetchMetadata().then(function () { 
             var empType = manager.metadataStore.getEntityType("Employee");
@@ -191,8 +191,8 @@
         manager.executeQuery(query).then(function (data) {
             ok(data.results.length > 0, "there should be records returned");
             data.results.forEach(function (e) {
-                firstName = e.getProperty("firstName");
-                lastName = e.getProperty("lastName");
+                var firstName = e.getProperty("firstName");
+                var lastName = e.getProperty("lastName");
                 var ok1 = firstName && firstName.indexOf("A") === 0;
                 var ok2 = lastName && lastName.indexOf("D") === 0;
                 ok(ok1 || ok2, "predicate should be satisfied");

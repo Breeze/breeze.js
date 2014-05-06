@@ -89,7 +89,7 @@
         var s = "long value long value";
         s = s + s + s + s + s + s + s + s + s + s + s + s;
         cust1.setProperty("companyName", s);
-        errors = cust1.entityAspect.getValidationErrors();
+        var errors = cust1.entityAspect.getValidationErrors();
         ok(errors[0].errorMessage.indexOf("xxx Company name xxx") != -1, "should have a custom error message");
 
     });
@@ -278,6 +278,7 @@
             lastNotification = args;
             notificationCount++;
         });
+        var emLastNotification;
         em.validationErrorsChanged.subscribe(function (args) {
             emLastNotification = args;
             emNotificationCount++;

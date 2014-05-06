@@ -123,8 +123,8 @@
             var rawEmps = data.results;
             ok(rawEmps.length > 0);
             emps = rawEmps.map(function (rawEmp) {
-                emp = empType.createEntity(rawEmp);
-                empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
+                var emp = empType.createEntity(rawEmp);
+                var empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
                 return empx;
             });
             ok(emps.length = rawEmps.length);
@@ -166,7 +166,7 @@
             var rawEmps = data.results;
             ok(rawEmps.length > 0);
             emps = rawEmps.map(function (rawEmp) {
-                emp = em.createEntity(empType, rawEmp, EntityState.Unchanged, MergeStrategy.SkipMerge);
+                var emp = em.createEntity(empType, rawEmp, EntityState.Unchanged, MergeStrategy.SkipMerge);
                 return emp;
             });
             ok(emps.length = rawEmps.length);
@@ -210,8 +210,8 @@
             var rawEmps = data.results;
             ok(rawEmps.length > 0);
             emps = rawEmps.map(function (rawEmp) {
-                emp = empType.createEntity(rawEmp);
-                empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
+                var emp = empType.createEntity(rawEmp);
+                var empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
                 return empx;
             });
             ok(emps.length = rawEmps.length);
@@ -274,7 +274,7 @@
                     ok(o.entityAspect.entityState === EntityState.Detached);
                 });
                 
-                empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
+                var empx = em.attachEntity(emp, EntityState.Unchanged, MergeStrategy.SkipMerge);
                 return empx;
             });
 

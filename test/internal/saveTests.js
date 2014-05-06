@@ -37,7 +37,7 @@
         var em = newEm();
         var product = createProduct(em);
         stop();
-        var order, orderDetail, productID, odOrderID, odProductID;
+        var order, orderID, orderDetail, productID, odOrderID, odProductID;
         em.saveChanges().then(function (sr0) {
             ok(sr0.entities.length == 1, "should have saved 1 entity");
             order = createOrder(em);
