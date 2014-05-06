@@ -149,13 +149,14 @@
 
     test("custom validation message", function() {
         breeze.Validator.min = function(context) {
-            var fn = function(val, ctx) { return min <= ctx.min; }
+            var fn = function(val, ctx) { return val >= ctx.min; }
             return new breeze.Validator('min', fn, context);
         }
         breeze.Validator.messageTemplates.min = "Insert value >= %min%";
         var v0 = breeze.Validator.min({ min: 0 });
         var r = v0.validate(-3);
         ok(r != null, "should have an error");
+        ok(r.errorMessage.indexOf(">= 0") >= 0, "should have the right message");
 
     });
 

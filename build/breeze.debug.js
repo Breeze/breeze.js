@@ -2789,7 +2789,7 @@ var Validator = (function () {
             } else {
                 valOrFn = vars[key];
             }
-            if (valOrFn) {
+            if (valOrFn != null) {
                 if (__isFunction(valOrFn)) {
                     return valOrFn(vars);
                 } else {
@@ -14848,7 +14848,7 @@ breeze.SaveOptions= SaveOptions;
     return ctor;
 
 })();
-// Angular ajax adapter
+;// Angular ajax adapter
 // See https://docs.angularjs.org/api/ng/service/$http
 (function(factory) {
     // Module systems magic dance.
