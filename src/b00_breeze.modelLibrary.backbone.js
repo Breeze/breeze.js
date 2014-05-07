@@ -1,5 +1,4 @@
-﻿"use strict";
-(function (factory) {
+﻿(function (factory) {
     if (breeze) {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -10,7 +9,7 @@
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    
+    "use strict";   
     var core = breeze.core;
     var ComplexAspect = breeze.ComplexAspect;
 
