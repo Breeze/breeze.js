@@ -6314,28 +6314,33 @@ var MetadataStore = (function () {
     @return {Promise} Promise
     **/
     proto.fetchMetadata = function (dataService, callback, errorCallback) {
-        assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
-        assertParam(callback, "callback").isFunction().isOptional().check();
-        assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+        try {
+            assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
+            assertParam(callback, "callback").isFunction().isOptional().check();
+            assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
             
-        if (typeof dataService === "string") {
-            // use the dataService with a matching name or create a new one.
-            dataService = this.getDataService(dataService) || new DataService({ serviceName: dataService });
-        }
+            if (typeof dataService === "string") {
+                // use the dataService with a matching name or create a new one.
+                dataService = this.getDataService(dataService) || new DataService({ serviceName: dataService });
+            }
 
-        dataService = DataService.resolve([dataService]);
-           
-        if (this.hasMetadataFor(dataService.serviceName)) {
-            throw new Error("Metadata for a specific serviceName may only be fetched once per MetadataStore. ServiceName: " + dataService.serviceName);
-        }
+            dataService = DataService.resolve([dataService]);
 
-        return dataService.adapterInstance.fetchMetadata(this, dataService).then(function (rawMetadata) {
-            if (callback) callback(rawMetadata);
-            return Q.resolve(rawMetadata);
-        }, function (error) {
-            if (errorCallback) errorCallback(error);
-            return Q.reject(error);
-        });
+        
+            if (this.hasMetadataFor(dataService.serviceName)) {
+                throw new Error("Metadata for a specific serviceName may only be fetched once per MetadataStore. ServiceName: " + dataService.serviceName);
+            }
+            
+            return dataService.adapterInstance.fetchMetadata(this, dataService).then(function(rawMetadata) {
+                if (callback) callback(rawMetadata);
+                return Q.resolve(rawMetadata);
+            }, function(error) {
+                if (errorCallback) errorCallback(error);
+                return Q.reject(error);
+            });
+        } catch (e) {
+            return Q.reject(e);
+        }
     };
 
 

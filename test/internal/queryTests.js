@@ -26,6 +26,54 @@
         }
     });
 
+    //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
+    //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
+    //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
+    //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
+
+    test("query nav prop change and expand", function() {
+        var em1 = newEm();
+        var em2 = newEm();
+        var p = Predicate.create("freight", ">", 100).and("customerID", "!=", null);
+        var query = new breeze.EntityQuery()
+            .from("Orders")
+            .where(p)
+            .expand("customer")
+            .take(1);
+        stop();
+        var oldCust, newCust1a, newCust1b, order1, order1a, order1b;
+        em1.executeQuery(query).then(function(data) {
+            order1 = data.results[0];
+            oldCust = order1.customer;
+            ok(oldCust != null, "oldCust should not be null");
+            return em2.executeQuery(EntityQuery.fromEntityKey(order1.entityAspect.getKey()));
+
+        }).then(function(data2) {
+            order1a = data2.results[0];
+            ok(order1.entityAspect.getKey().equals(order1a.entityAspect.getKey()), "order keys should be the same");
+            
+            var customerType = em2.metadataStore.getEntityType("Customer");
+            newCust1a = customerType.createEntity();
+            newCust1a.setProperty("companyName", "Test_compName");
+            order1a.setProperty("customer", newCust1a);
+            return em2.saveChanges();
+        }).then(function (sr) {
+            em1.entityChanged.subscribe(function(args) {
+                var entity = args.entity;
+                ok(entity != null, "entity should not be null");
+                ok(entity.entityAspect.entityState != EntityState.Detached, "entityState should not be detached");
+            });
+            return em1.executeQuery(query);
+        }).then(function(data3) {
+            order1b = data3.results[0];
+            ok(order1b == order1, "should be the same order");
+            newCust1b = order1b.customer;
+            ok(newCust1a.entityAspect.getKey().equals(newCust1b.entityAspect.getKey()), "customer keys should be the same");
+            ok(newCust1b != null, "newCust3 should not be null");
+            ok(newCust1b.entityAspect.entityState.isUnchanged(), "should be unchanged");
+        }).fail(testFns.handleFail).fin(start);
+    });
+
     test("query by entity key without preexisting metadata", function() {
         var manager = new breeze.EntityManager(testFns.serviceName);
         stop();
