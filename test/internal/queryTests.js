@@ -44,7 +44,7 @@
         var oldCust, newCust1a, newCust1b, order1, order1a, order1b;
         em1.executeQuery(query).then(function(data) {
             order1 = data.results[0];
-            oldCust = order1.customer;
+            oldCust = order1.getProperty("customer");
             ok(oldCust != null, "oldCust should not be null");
             return em2.executeQuery(EntityQuery.fromEntityKey(order1.entityAspect.getKey()));
 
@@ -67,7 +67,7 @@
         }).then(function(data3) {
             order1b = data3.results[0];
             ok(order1b == order1, "should be the same order");
-            newCust1b = order1b.customer;
+            newCust1b = order1b.getProperty("customer");
             ok(newCust1a.entityAspect.getKey().equals(newCust1b.entityAspect.getKey()), "customer keys should be the same");
             ok(newCust1b != null, "newCust3 should not be null");
             ok(newCust1b.entityAspect.entityState.isUnchanged(), "should be unchanged");
