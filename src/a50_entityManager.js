@@ -2208,13 +2208,39 @@ var EntityManager = (function () {
                     result[fn(cp.name, cp)] = unwrappedCo;
                 }
             } else {
-                var unwrappedCos = nextTarget.map(function (item) {
-                    return unwrapChangedValues(item, metadataStore, transformFn);
-                });
-                result[fn(cp.name, cp)] = unwrappedCos;
-            }
+                var unwrappedArr = unwrapChangedArray(nextTarget, metadataStore, transformFn);
+                if (!__isEmpty(unwrappedArr)) {
+                    result[fn(cp.name, cp)] = unwrappedArr;
+                }
+              }
         });
         return result;
+    }
+
+    function unwrapChangedArray(target, metadataStore, transformFn) {
+        var results = [], changed = false, changes = {};
+
+        for (var i = 0; i < target.length; i++) {
+
+            var itemTarget = target[i];
+            var origItem = target._origValues[0];
+
+            if ( itemTarget === origItem ) {
+                changes = unwrapChangedValues(itemTarget, metadataStore, transformFn);
+            } else {
+                changes = unwrapInstance(itemTarget, transformFn);
+            }
+            results[i] = changes;
+            if ( !__isEmpty(changes)) {
+                changed = true;
+            }
+        }
+
+        if ( changed ) {
+            return results;
+        } else {
+            return null;
+        }
     }
 
     function getSerializerFn(stype) {
