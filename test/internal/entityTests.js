@@ -1,4 +1,5 @@
 (function (testFns) {
+    "use strict";
     var breeze = testFns.breeze;
     var core = breeze.core;
 

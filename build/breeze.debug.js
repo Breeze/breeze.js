@@ -21,7 +21,7 @@
     }
 
 })(this, function (global) {
-    "use strict";
+    "use strict"; 
     var breeze = {
         version: "1.4.12",
         metadataVersion: "1.0.5"
@@ -32,6 +32,13 @@
 
 var __hasOwnProperty = uncurry(Object.prototype.hasOwnProperty);
 var __arraySlice = uncurry(Array.prototype.slice);
+var __isES5Supported = function () {
+    try {
+        return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+    } catch (e) {
+        return false;
+    }
+}();
 
 // iterate over object
 function __objectForEach(obj, kvFn) {
@@ -67,7 +74,23 @@ function __objectMapToArray(obj, kvFn) {
     return results;
 }
 
+function __isSettable(entity, propertyName) {
+    var pd = __getPropDescriptor(entity, propertyName);
+    if (pd == null) return true;
+    return !! (pd.writable || pd.set);
+}
 
+function __getPropDescriptor(obj, propertyName) {
+    if (!__isES5Supported) return null;
+
+    if (obj.hasOwnProperty(propertyName)) {
+        return Object.getOwnPropertyDescriptor(obj, propertyName);
+    } else {
+        var nextObj = Object.getPrototypeOf(obj);
+        if (nextObj == null) return null;
+        return __getPropDescriptor(nextObj, propertyName);
+    }
+} 
 
 // Functional extensions 
 
@@ -565,6 +588,10 @@ if (!Object.create) {
 }
 
 var core = {};
+
+
+
+core.__isES5Supported = __isES5Supported;
 
 // core.getOwnPropertyValues = __getOwnPropertyValues;
 core.objectForEach= __objectForEach;
@@ -3903,7 +3930,7 @@ var EntityAspect = (function() {
                     that._pendingValidationResult.removed.push(valError);
                 }
             });
-            that.hasValidationErrors = !__isEmpty(this._validationErrors);
+            that.hasValidationErrors = !__isEmpty(that._validationErrors);
         });
     };
 
@@ -7684,7 +7711,7 @@ var EntityType = (function () {
     proto._updateTargetFromRaw = function (target, raw, rawValueFn) {
         // called recursively for complex properties
         this.dataProperties.forEach(function (dp) {
-            
+            if (!dp.isSettable) return;
             var rawVal = rawValueFn(raw, dp);
             if (rawVal === undefined) return;
             var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
@@ -7980,6 +8007,7 @@ var EntityType = (function () {
     function calcUnmappedProperties(stype, instance) {
         var metadataPropNames = stype.getPropertyNames();
         var trackablePropNames = __modelLibraryDef.getDefaultInstance().getTrackablePropertyNames(instance);
+        
         trackablePropNames.forEach(function (pn) {
             if (metadataPropNames.indexOf(pn) === -1) {
                 var dt = DataType.fromValue(instance[pn]);
@@ -7989,6 +8017,7 @@ var EntityType = (function () {
                     isNullable: true,
                     isUnmapped: true
                 });
+                newProp.isSettable = __isSettable(instance, pn);
                 if (stype.subtypes) {
                     stype.getSelfAndSubtypes().forEach(function (st) {
                         st.addProperty(new DataProperty(newProp));
@@ -8270,6 +8299,7 @@ var DataProperty = (function () {
             .whereParam("defaultValue").isOptional()
             .whereParam("isPartOfKey").isBoolean().isOptional()
             .whereParam("isUnmapped").isBoolean().isOptional()
+            .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
             .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
@@ -8487,9 +8517,6 @@ var DataProperty = (function () {
             .applyAll(this);
     };
 
-    
-   
-
     proto.toJSON = function () {
         // do not serialize dataTypes that are complexTypes
         return __toJson(this, {
@@ -8500,6 +8527,7 @@ var DataProperty = (function () {
             defaultValue: null,
             isPartOfKey: false,
             isUnmapped: false,
+            isSettable: true,
             concurrencyMode: null,
             maxLength: null,
             validators: null,
@@ -14867,7 +14895,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict"; 
+    "use strict";
     var core = breeze.core;
     
     var httpService;
@@ -15029,7 +15057,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";     
+    "use strict";
     var core = breeze.core;
     
     var jQuery;
@@ -15143,7 +15171,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict"; 
+    "use strict";    
     var core = breeze.core;
  
     var MetadataStore = breeze.MetadataStore;
@@ -15474,7 +15502,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";     
+    "use strict";    
     var core = breeze.core;
 
     var MetadataStore = breeze.MetadataStore;
@@ -15554,8 +15582,7 @@ breeze.SaveOptions= SaveOptions;
     
     breeze.config.registerAdapter("dataService", ctor);
 
-}));
-(function (factory) {
+}));;(function (factory) {
     if (breeze) {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -15566,7 +15593,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";     
+    "use strict";   
     var core = breeze.core;
     var ComplexAspect = breeze.ComplexAspect;
 
@@ -15759,7 +15786,7 @@ breeze.SaveOptions= SaveOptions;
     // private methods
 
 }));
-(function (factory) {
+;(function (factory) {
     if (breeze) {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -15770,7 +15797,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";     
+    "use strict";  
     var core = breeze.core;
 
     var ctor = function() {
@@ -15825,9 +15852,11 @@ breeze.SaveOptions= SaveOptions;
 
         // assign default values to the entity
         var stype = entity.entityType || entity.complexType;
-        stype.getProperties().forEach(function(prop) {
+        stype.getProperties().forEach(function (prop) {
+            
             var propName = prop.name;
             var val = entity[propName];
+            
             if (prop.isDataProperty) {
                 if (prop.isComplexProperty) {
                     if (prop.isScalar) {
@@ -15858,7 +15887,9 @@ breeze.SaveOptions= SaveOptions;
             // otherwise we could just do 
             // entity[propName] = val 
             // after all of the interception logic had been injected.
-            bs[propName] = val;
+            if (prop.isSettable || prop.isNavigationProperty) {
+                bs[propName] = val;
+            }
         });
     };
 
@@ -16041,7 +16072,7 @@ breeze.SaveOptions= SaveOptions;
     breeze.config.registerAdapter("modelLibrary", ctor);
 
 }));
-(function (factory) {
+;(function (factory) {
     if (breeze) {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -16052,7 +16083,7 @@ breeze.SaveOptions= SaveOptions;
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";     
+    "use strict";  
     var core = breeze.core;
     var ko;
 

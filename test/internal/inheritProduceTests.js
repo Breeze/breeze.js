@@ -128,7 +128,7 @@
         var ek = new EntityKey(et, rdAppleId);
         stop();
         em.fetchEntityByKey(ek).then(function(data) {
-            item = data.entity;
+            var item = data.entity;
             ok(item, "item should have been found");
         
         }).fail(testFns.handleFail).fin(start);
