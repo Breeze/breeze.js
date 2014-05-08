@@ -11,8 +11,8 @@ if (ko) {
     breeze.config.initializeAdapterInstance("modelLibrary", "backingStore");
 }
 
-if (this.window) {
-    this.window.breeze = breeze;
+if (global.window) {
+    global.window.breeze = breeze;
 }
 
 

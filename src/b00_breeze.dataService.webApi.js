@@ -9,7 +9,7 @@
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    
+    "use strict";    
     var core = breeze.core;
 
     var MetadataStore = breeze.MetadataStore;
