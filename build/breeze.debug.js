@@ -26,9 +26,6 @@
         version: "1.4.12",
         metadataVersion: "1.0.5"
     };
-	"use strict";
-
-
     ;/**
  @module core
  **/
@@ -15557,7 +15554,7 @@ breeze.SaveOptions= SaveOptions;
     
     breeze.config.registerAdapter("dataService", ctor);
 
-}));;"use strict";
+}));
 (function (factory) {
     if (breeze) {
         factory(breeze);
@@ -15762,7 +15759,6 @@ breeze.SaveOptions= SaveOptions;
     // private methods
 
 }));
-;"use strict";
 (function (factory) {
     if (breeze) {
         factory(breeze);
@@ -16045,7 +16041,6 @@ breeze.SaveOptions= SaveOptions;
     breeze.config.registerAdapter("modelLibrary", ctor);
 
 }));
-;"use strict";
 (function (factory) {
     if (breeze) {
         factory(breeze);
