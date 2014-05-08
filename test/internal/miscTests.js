@@ -1,3 +1,133 @@
+/*********************
+ * ES 5 RO Property tests
+ * No Breeze. No dependencies.
+ **********************/
+(function() {
+    // DO NOT SET OPTION STRICT as we are trying to prove how it behaves with and w/o that
+
+    // Only run this module if defineProperty is supported
+    var definePropertyIsSupported;
+    try {
+        Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+        definePropertyIsSupported = true;
+    } catch (e) {
+        definePropertyIsSupported = false;
+    }
+    if (!definePropertyIsSupported) { return; } // don't bother with these tests
+
+    module("misc - ES5 Property tests", {
+        setup: setup
+    });
+    var obj, proto;
+
+    function setup() {
+        var ctor = function (name) { this.name = name || 'test'};
+        proto = ctor.prototype;
+        proto.setProperty = function (propertyName, value) {
+            'use strict'; // because setup intentionally defined where there is no 'use strict'
+            this[propertyName] = value;           
+            return this; // allow setProperty chaining.
+        };
+        Object.defineProperty(proto, 'foo', {
+            get: function() { return 42; },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(proto, 'bar', {
+            value: 84,
+            writable: false,
+            enumerable: true,
+            configurable: true
+        });
+        obj = new ctor();
+    }
+
+    test("'foo' property's 'writable' flag is undefined because test has a getter", function() {
+        var def = Object.getOwnPropertyDescriptor(proto, 'foo');
+        ok(def.writable === undefined);
+    });
+    test("'bar' property is not writable because is a value property wtesth that flag set to false", function() {
+        var def = Object.getOwnPropertyDescriptor(proto, 'bar');
+        ok(def.writable === false);
+    });
+    test("can set 'foo' property's 'writable' flag even though test has a getter", function() {
+        'use strict';
+        var def = Object.getOwnPropertyDescriptor(proto, 'foo');
+        def.writable = false;
+        ok(def.writable === false);
+    });
+    test("and NOT STRICT, foo reassignment is harmless", function() {
+        obj.foo = 100;
+        ok(obj.foo === 42);
+    });
+    test("and NOT STRICT, bar reassignment is harmless", function() {
+        obj.bar = 100;
+        ok(obj.bar === 84);
+    });
+    test("and USE STRICT, foo reassignment throws", function() {
+        'use strict';
+        throws(function() { obj.foo = 100; },
+            TypeError//("Cannot set property foo of #<Object> which has only a getter")
+        );
+    });
+
+    test("and USE STRICT, obj.foo=obj.foo throws", function () {
+        'use strict';
+        throws(function () { obj.foo = obj.foo; },
+            TypeError//("Cannot set property foo of #<Object> which has only a getter")
+        );
+    });
+    test("and USE STRICT, obj['foo']=obj.foo throws", function () {
+        'use strict';
+        throws(function () { obj['foo'] = obj.foo; }, 
+            TypeError//("Cannot set property foo of #<Object> which has only a getter")
+        );
+    });
+    ////////////////////////////////////////////
+    // IE11 bug: this['foo'] not same as this.foo
+    test("and USE STRICT, obj.setProperty('foo', obj.foo) throws", function () {
+        'use strict';
+        throws(function () { obj.setProperty('foo', obj.foo); }, // DOES NOT THROW IN IE11 !!!
+            TypeError//("Cannot set property foo of #<Object> which has only a getter")
+        );
+    });
+    ///////////////////
+    test("and USE STRICT, bar reassignment throws", function() {
+        'use strict';
+        throws(function() { obj.bar = 100; },
+            TypeError//("Cannot assign to read only property 'bar' of #<Object>")
+        );
+    });
+    test("and USE STRICT, foo reassignment within try/catch is harmless", function() {
+        /* Model for proposed Breeze change */
+        'use strict';
+        try {
+            obj.foo = 100;
+        } catch (e) {
+            if (!(e instanceof TypeError)) {
+                throw e; // unexpected error type
+            }
+        }
+        ok(obj.foo === 42);
+    });
+    test("and USE STRICT, bar reassignment within try/catch is harmless", function() {
+        /* Model for proposed Breeze change */
+        'use strict';
+        try {
+            obj.bar = 100;
+        } catch (e) {
+            if (!(e instanceof TypeError)) {
+                throw e; // unexpected error type
+            }
+        }
+        ok(obj.bar === 84);
+    });
+})();
+
+/*********************
+ * ORIGINAL MISC TESTS
+ **********************/
 (function (testFns) {
     var breeze = testFns.breeze;
     var core = breeze.core;
