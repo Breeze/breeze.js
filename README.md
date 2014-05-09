@@ -14,4 +14,4 @@ Please post your [**feature suggestions** to User Voice site](https://breezejs.u
 
 <a href="mailto:breeze@ideablade.com/?subject=Tell me about paid support" title="Paid Support">Learn about <strong>paid support</strong></a>.
 
-<a href="mailto:breeze@ideablade.com/?subject=Tell me about paid support" title="Professional Services">Learn about IdeaBlade's <strong>professional services</strong></a> from training through application development</a>.
+<a href="mailto:breeze@ideablade.com/?subject=Tell me about professional services" title="Professional Services">Learn about IdeaBlade's <strong>professional services</strong></a> from training through application development</a>.
