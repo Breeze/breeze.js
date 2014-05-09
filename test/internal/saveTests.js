@@ -770,6 +770,47 @@
         }).fail(testFns.handleFail).fin(start);
     });
 
+    // Test asserts will fail for OData until we fix #2574 
+    // "entityAspect.extraMetdata not preserved after export/import"  
+    test("save update after exporting and reimporting a customer", function () {
+        var cust,
+            em1 = newEm(testFns.newMs()),
+            extraMetadata;
+
+        stop();
+        new EntityQuery("Customers").take(1).using(em1).execute()
+        .then(function (data) {
+            cust = data.results[0];
+
+            if (testFns.DEBUG_ODATA) {
+                extraMetadata = cust.entityAspect.extraMetadata;
+                ok(extraMetadata,
+                    "has OData extraMetadata on the original customer before export");
+            };
+
+            var exported = em1.exportEntities([cust], false); // exclude metadata ... not important
+            cust.entityAspect.setDetached(); // remove from cache
+            cust = em1.importEntities(exported).entities[0]; // get reimported customer
+
+            if (testFns.DEBUG_ODATA) {
+                // these tests fail for OData until #2574 fixed
+                var xtra = cust.entityAspect.extraMetadata;
+                ok(xtra, "has extraMetadata on the imported customer");
+                equal(xtra.etag, extraMetadata.etag,
+                    "imported OData extraMetadata.etag matches original");
+            };
+
+            testFns.morphStringProp(cust, "contactName");
+            // this will fail for OData until #2574 fixed because no etag
+            return em1.saveChanges();
+        })
+        .then(function (sr) {
+            var e = sr.entities;
+            ok(e.length === 1, "1 record should have been saved");
+        })
+        .fail(testFns.handleFail).fin(start);
+    });
+
     test("save update with ES5 props and unmapped changes", function () {
         var em1 = newEm(testFns.newMs());
         var Customer = testFns.models.CustomerWithES5Props();
