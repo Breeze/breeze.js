@@ -966,11 +966,18 @@
         var zzz = createParentAndChildren(em);
         var cust1 = zzz.cust1;
         var so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
+        var order1ValErrorsChangedArgs = [];
+        zzz.order1.entityAspect.validationErrorsChanged.subscribe(function (e) {
+            order1ValErrorsChangedArgs.push(e);
+        });
         stop();
         em.saveChanges(null, so).then(function (sr) {
             ok(false, "should not get here");
 
         }).fail(function (e) {
+            ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
+            ok(order1ValErrorsChangedArgs[0].added.length == 1, "should have added 1");
+            ok(order1ValErrorsChangedArgs[0].removed.length == 0, "should have added 1");
             ok(e.entityErrors, "should have server errors");
             ok(e.entityErrors.length === 2, "2 order entities should have failed");
             ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
@@ -978,9 +985,14 @@
             ok(order2Errs.length === 1, "should be 1 error for order2");
             ok(order2Errs[0].propertyName === "orderID", "errant property should have been 'orderID'");
             // now save it properly
+            order1ValErrorsChangedArgs.length = 0;
+
             return em.saveChanges();
-        }).then(function(sr) {
+        }).then(function (sr) {
             ok(sr.entities.length === 4, "should have saved ok");
+            ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
+            ok(order1ValErrorsChangedArgs[0].added.length == 0, "should have removed 1");
+            ok(order1ValErrorsChangedArgs[0].removed.length == 1, "should have removed 1");
         }).fail(testFns.handleFail).fin(start);
 
     });
