@@ -251,6 +251,31 @@
             ok(r.indexOf(r3[0]) >= 0, "should have been in the original result set");
         }).fail(testFns.handleFail).fin(start);
     });
+
+    test("with parameter - null", function () {
+        var em = newEm();
+        var q = EntityQuery.from("CustomersStartingWith")
+            .withParameters({ companyName: null });
+
+        stop();
+        var r, q2;
+        em.executeQuery(q).then(function (data) {
+            r = data.results;
+            ok(r.length > 0, "should be some results");
+            
+            q2 = q.where("fax", "!=", null);
+            return em.executeQuery(q2);
+        }).then(function (data2) {
+            var r2 = data2.results;
+            ok(r2.length > 0, "should be some results again");
+            ok(r2.length < r.length, "should be fewer than returned by original query");
+            return em.executeQuery(q2.take(1));
+        }).then(function (data3) {
+            var r3 = data3.results;
+            ok(r3.length === 1, "should be only a single result");
+            ok(r.indexOf(r3[0]) >= 0, "should have been in the original result set");
+        }).fail(testFns.handleFail).fin(start);
+    });
     
     test("with two parameters", function () {
         var em = newEm();

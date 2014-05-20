@@ -149,6 +149,8 @@
                     innerObj[fullSubName] = subValue;
                     query += encodeParams(innerObj) + '&';
                 }
+            } else if (value === null) {
+                query += encodeURIComponent(name) + '=&';
             } else if (value !== undefined) {
                 query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
             }
