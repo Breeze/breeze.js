@@ -455,7 +455,9 @@ var EntityAspect = (function() {
                 if (p.isScalar) {
                     ok = validateTarget(value) && ok;
                 } else {
-                    // TODO: do we want to iterate over all of the complexObject in this property?
+                    value.forEach( function(valueTarget) {
+                        ok = validateTarget(valueTarget) && ok;
+                    });
                 }
             }
         });
@@ -463,7 +465,7 @@ var EntityAspect = (function() {
 
         // then entity level
         stype.validators.forEach(function (validator) {
-            ok = validate(entityAspect, validator, aspect.entity) && ok;
+            ok = validate(entityAspect, validator, target) && ok;
         });
         return ok;
     }
