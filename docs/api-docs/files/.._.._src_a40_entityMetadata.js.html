@@ -2205,6 +2205,9 @@ var EntityType = (function () {
             // unidirectional 1-n relationship
             np.invForeignKeyNames.forEach(function (invFkName) {
                 var fkProp = entityType.getDataProperty(invFkName);
+                if (!fkProp) {
+                    throw new Error(&quot;EntityType &#x27;&quot; + np.entityTypeName + &quot;&#x27; has no foreign key matching &#x27;&quot; + invFkName + &quot;&#x27;&quot;);
+                }
                 var invEntityType = np.parentType;
                 fkProp.inverseNavigationProperty = __arrayFirst(invEntityType.navigationProperties, function (np2) {
                     return np2.invForeignKeyNames &amp;&amp; np2.invForeignKeyNames.indexOf(fkProp.name) &gt;= 0 &amp;&amp; np2.entityType === fkProp.parentType;
