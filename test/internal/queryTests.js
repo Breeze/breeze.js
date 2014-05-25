@@ -2205,6 +2205,36 @@
             
     });
 
+    test("expand through null child object", function () {
+        if (testFns.DEBUG_MONGO) {
+            ok(true, "NA for Mongo - expand is not yet supported");
+            return;
+        }
+
+        var em = newEm();
+
+        var query = new EntityQuery()
+            .from("Orders")
+            .where("employeeID", "eq", null);
+
+        query = query.expand("Employee, Employee.Manager, Employee.DirectReports")
+            .take(5);
+        stop();
+        em.executeQuery(query).then(function (data) {
+            ok(!em.hasChanges(), "should not have any changes");
+            ok(em.getChanges().length === 0, "getChanges should return 0 results");
+            var orders = data.results;
+            ok(orders.length == 5, "should have 5 orders");
+            orders.map(function (order) {
+                var emp = order.getProperty("employee");
+                ok(emp == null, "employee should be null");
+            });
+        }).fail(testFns.handleFail).fin(start);
+
+
+    });
+
+
     test("orderBy nested", function () {
         if (testFns.DEBUG_MONGO) {
             ok(true, "NA for Mongo - expand is not yet supported");
