@@ -1,4 +1,6 @@
-﻿(function(factory) {
+﻿(function(definition, global) {
+    var factory = function(breeze){ return definition(breeze, global); };
+
     if (breeze) {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -8,7 +10,7 @@
         // AMD anonymous module with hard-coded dependency on "breeze"
         define(["breeze"], factory);
     }
-}(function(breeze) {
+}(function(breeze, global) {
     "use strict";       
     var core = breeze.core;
 
@@ -136,7 +138,7 @@
      * Javascript class that mimics how WCF serializes a object of type MongoDB.Bson.ObjectId
      * and converts between that format and the standard 24 character representation.
     */
-    if (this.document) {
+    if (global.document) {
         var ObjectId = (function () {
             var increment = 0;
             var pid = Math.floor(Math.random() * (32767));
@@ -221,4 +223,4 @@
     
     breeze.config.registerAdapter("dataService", ctor);
 
-}));
+}, this));
