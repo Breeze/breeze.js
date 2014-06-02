@@ -36,11 +36,12 @@
     test("insert multipart entity", function () {
         var em = newEm();
         var product = createProduct(em);
+        var order = createOrder(em);
         stop();
-        var order, orderID, orderDetail, productID, odOrderID, odProductID;
+        var orderID, orderDetail, productID, odOrderID, odProductID;
         em.saveChanges().then(function (sr0) {
-            ok(sr0.entities.length == 1, "should have saved 1 entity");
-            order = createOrder(em);
+            ok(sr0.entities.length == 2, "should have saved 2 entities");
+            
             orderDetail = createOrderDetail(em, order, product);
 
             orderID = order.getProperty("orderID");
@@ -55,10 +56,10 @@
                 var x = e;
             });
         }).then(function (sr) {
-            ok(sr.entities.length == 2, "should have saved 3 entities");
+            ok(sr.entities.length == 1, "should have saved 1 entity");
             var orderIDx = order.getProperty("orderID");
             var productIDx = product.getProperty("productID");
-            ok(orderID != orderIDx, "orderID should have changed");
+            // ok(orderID != orderIDx, "orderID should have changed");
             // ok(productID != productIDx, "productID should have changed");
             var odOrderIDx = orderDetail.getProperty("orderID");
             var odProductIDx = orderDetail.getProperty("productID");

@@ -17,7 +17,12 @@
     var MergeStrategy = breeze.MergeStrategy;
     var EntityState = breeze.EntityState;
 
-    var altServiceName = "breeze/Inheritance";
+    var altServiceName;
+    if (testFns.DEBUG_ODATA) {
+        altServiceName = "BillingInheritance_odata";
+    } else {
+        altServiceName = "breeze/Inheritance";
+    }
 
     var newEm = testFns.newEm;
     var newEmX = testFns.newEmX;

@@ -890,7 +890,8 @@ var CsdlMetadataParser = (function () {
     function parseCsdlDataProperty(parentType, csdlProperty, schema, keyNamesOnServer) {
         var dp;
         var typeParts = csdlProperty.type.split(".");
-        if (typeParts.length === 2) {
+        // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
+        if (typeParts[0] === "Edm" && typeParts.length === 2 ) {
             dp = parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
         } else {
             if (isEnumType(csdlProperty, schema)) {
@@ -1009,12 +1010,30 @@ var CsdlMetadataParser = (function () {
     }
 
     function isEnumType(csdlProperty, schema) {
-        if (!schema.enumType) return false;
+        if (schema.enumType) return isEdmxEnumType(csdlProperty, schema);
+        else if (schema.extensions) return isODataEnumType(csdlProperty, schema);
+        else return false;
+    }
+
+    function isEdmxEnumType(csdlProperty, schema) {
         var enumTypes = __toArray(schema.enumType);
         var typeParts = csdlProperty.type.split(".");
         var baseTypeName = typeParts[typeParts.length - 1];
         return enumTypes.some(function (enumType) {
             return enumType.name === baseTypeName;
+        });
+    }
+
+    function isODataEnumType(csdlProperty, schema) {
+        var enumTypes = schema.extensions.filter(function (ext) {
+            return ext.name === "EnumType";
+        });
+        var typeParts = csdlProperty.type.split(".");
+        var baseTypeName = typeParts[typeParts.length - 1];
+        return enumTypes.some(function (enumType) {
+            return enumType.attributes.some(function (attr) {
+                return attr.name === "Name" && attr.value === baseTypeName;
+            });
         });
     }
 
@@ -1793,10 +1812,16 @@ var EntityType = (function () {
 
         // if merging from an import then raw will have an entityAspect or a complexAspect
         var rawAspect = raw.entityAspect || raw.complexAspect;
-        if (rawAspect && rawAspect.originalValuesMap) {
+        if (rawAspect) {
             var targetAspect = target.entityAspect || target.complexAspect;
-            targetAspect.originalValues = rawAspect.originalValuesMap;
+            if (rawAspect.originalValuesMap) {
+                targetAspect.originalValues = rawAspect.originalValuesMap;
+            }
+            if (rawAspect.extraMetadata) {
+                targetAspect.extraMetadata = rawAspect.extraMetadata;
+            }
         }
+        
 
     }
 

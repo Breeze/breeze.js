@@ -16,7 +16,12 @@
     var FetchStrategy = breeze.FetchStrategy;
     var MergeStrategy = breeze.MergeStrategy;
 
-    var altServiceName = "breeze/ProduceTPH";
+    var altServiceName;
+    if (testFns.DEBUG_ODATA) {
+        altServiceName = "ProduceInheritance_odata";
+    } else {
+        altServiceName = "breeze/ProduceTPH";
+    }
 
     var newEm = testFns.newEm;
     var newEmX = testFns.newEmX;

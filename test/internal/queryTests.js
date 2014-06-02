@@ -582,7 +582,7 @@
             if (testFns.DEBUG_MONGO) {
                 ok(error.message.indexOf("Unable to locate") >= 0, "Bad error message");
             } else if (testFns.DEBUG_ODATA) {
-                ok(error.message.indexOf("Resource not found") >= 0, "Bad error message");
+                ok(error.message.indexOf("Not Found") >= 0, "Bad error message");
             } else {
                 ok(error.message.indexOf("No HTTP resource was found") >= 0, "Bad error message");
             }
@@ -689,7 +689,11 @@
         q.execute().then(function (data) {
             ok(false, "should not get here");
         }).fail(function (e) {
-            ok(e.message && e.message.toLowerCase().indexOf("entitythatdoesnotexist") >= 0, e.message);
+            if (testFns.DEBUG_ODATA) {
+                ok(e.message == "Not Found", e.Message);
+            } else {
+                ok(e.message && e.message.toLowerCase().indexOf("entitythatdoesnotexist") >= 0, e.message);
+            }
         }).fin(function(x) {
             start();
         });

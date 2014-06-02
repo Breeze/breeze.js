@@ -169,14 +169,23 @@
         visitNode: function (node, mappingContext, nodeContext) {
             var result = {};
             if (node == null) return result;
-            if (node.__metadata != null) {
+            var metadata = node.__metadata;
+            if (metadata != null) {
                 // TODO: may be able to make this more efficient by caching of the previous value.
-                var entityTypeName = MetadataStore.normalizeTypeName(node.__metadata.type);
+                var entityTypeName = MetadataStore.normalizeTypeName(metadata.type);
                 var et = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
                 // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) {
                 if (et && et._mappedPropertiesCount <= Object.keys(node).length - 1) {
                     result.entityType = et;
-                    result.extra = node.__metadata;
+                    var baseUri = mappingContext.dataService.serviceName;
+                    var uriKey = metadata.uri || metadata.id;
+                    if (core.stringStartsWith(uriKey, baseUri)) {
+                        uriKey = uriKey.substring(baseUri.length);
+                    }
+                    result.extraMetadata = {
+                        uriKey: uriKey,
+                        etag: metadata.etag
+                    }
                 }
             }
             // OData v3 - projection arrays will be enclosed in a results array
@@ -209,7 +218,6 @@
         var changeRequests = [];
         var tempKeys = [];
         var contentKeys = [];
-        var baseUri = saveContext.dataService.serviceName;
         var entityManager = saveContext.entityManager;
         var helper = entityManager.helper;
         var id = 0;
@@ -224,12 +232,12 @@
                 request.data = helper.unwrapInstance(entity, transformValue);
                 tempKeys[id] = aspect.getKey();
             } else if (aspect.entityState.isModified()) {
-                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                updateDeleteMergeRequest(request, aspect, routePrefix);
                 request.method = "MERGE";
                 request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, transformValue);
                 // should be a PATCH/MERGE
             } else if (aspect.entityState.isDeleted()) {
-                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                updateDeleteMergeRequest(request, aspect, routePrefix);
                 request.method = "DELETE";
             } else {
                 return;
@@ -246,16 +254,44 @@
 
     }
 
-    function updateDeleteMergeRequest(request, aspect, baseUri, routePrefix) {
+    function updateDeleteMergeRequest(request, aspect, routePrefix) {
+        var uriKey;
         var extraMetadata = aspect.extraMetadata;
-        var uri = extraMetadata.uri || extraMetadata.id;
-        if (core.stringStartsWith(uri, baseUri)) {
-            uri = routePrefix + uri.substring(baseUri.length);
+        if (extraMetadata == null) {
+            uriKey = getUriKey(aspect);
+            aspect.extraMetadata = {
+                uriKey: uriKey
+            }
+        } else {
+            uriKey = extraMetadata.uriKey;
+            if (extraMetadata.etag) {
+                request.headers["If-Match"] = extraMetadata.etag;
+            }
         }
-        request.requestUri = uri;
-        if (extraMetadata.etag) {
-            request.headers["If-Match"] = extraMetadata.etag;
+        request.requestUri = routePrefix + uriKey;
+
+    }
+
+    function getUriKey(aspect) {
+        var entityType = aspect.entity.entityType;
+        var resourceName = entityType.defaultResourceName;
+        var kps = entityType.keyProperties;
+        var uriKey = resourceName + "(";
+        if (kps.length === 1) {
+            uriKey = uriKey + fmtProperty(kps[0], aspect) + ")";
+        } else {
+            var delim = "";
+            kps.forEach(function(kp) {
+                uriKey = uriKey + delim + kp.nameOnServer + "=" + fmtProperty(kp, aspect);
+                delim = ",";
+            });
+            uriKey = uriKey + ")";
         }
+        return uriKey;
+    }
+
+    function fmtProperty(prop, aspect) {
+        return prop.dataType.fmtOData(aspect.getPropertyValue(prop.name));
     }
    
     function createError(error, url) {

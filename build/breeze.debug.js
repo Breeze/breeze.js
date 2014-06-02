@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.12",
+        version: "1.4.13 ",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -3645,6 +3645,9 @@ var EntityAspect = (function() {
     }
 
     // Dangerous method - see notes - talk to Jay - this is not a complete impl
+    // Another alternative is to detach the reattach if already attached - but this would have
+    // the side effect of firing validation which would be 'correct' but possibly not 
+    // anticipated.
     //        proto.setAdded = function () {
     //            this.originalValues = {};
     //            this.entityState = EntityState.Added;
@@ -6851,7 +6854,8 @@ var CsdlMetadataParser = (function () {
     function parseCsdlDataProperty(parentType, csdlProperty, schema, keyNamesOnServer) {
         var dp;
         var typeParts = csdlProperty.type.split(".");
-        if (typeParts.length === 2) {
+        // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
+        if (typeParts[0] === "Edm" && typeParts.length === 2 ) {
             dp = parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
         } else {
             if (isEnumType(csdlProperty, schema)) {
@@ -6970,12 +6974,30 @@ var CsdlMetadataParser = (function () {
     }
 
     function isEnumType(csdlProperty, schema) {
-        if (!schema.enumType) return false;
+        if (schema.enumType) return isEdmxEnumType(csdlProperty, schema);
+        else if (schema.extensions) return isODataEnumType(csdlProperty, schema);
+        else return false;
+    }
+
+    function isEdmxEnumType(csdlProperty, schema) {
         var enumTypes = __toArray(schema.enumType);
         var typeParts = csdlProperty.type.split(".");
         var baseTypeName = typeParts[typeParts.length - 1];
         return enumTypes.some(function (enumType) {
             return enumType.name === baseTypeName;
+        });
+    }
+
+    function isODataEnumType(csdlProperty, schema) {
+        var enumTypes = schema.extensions.filter(function (ext) {
+            return ext.name === "EnumType";
+        });
+        var typeParts = csdlProperty.type.split(".");
+        var baseTypeName = typeParts[typeParts.length - 1];
+        return enumTypes.some(function (enumType) {
+            return enumType.attributes.some(function (attr) {
+                return attr.name === "Name" && attr.value === baseTypeName;
+            });
         });
     }
 
@@ -7754,10 +7776,16 @@ var EntityType = (function () {
 
         // if merging from an import then raw will have an entityAspect or a complexAspect
         var rawAspect = raw.entityAspect || raw.complexAspect;
-        if (rawAspect && rawAspect.originalValuesMap) {
+        if (rawAspect) {
             var targetAspect = target.entityAspect || target.complexAspect;
-            targetAspect.originalValues = rawAspect.originalValuesMap;
+            if (rawAspect.originalValuesMap) {
+                targetAspect.originalValues = rawAspect.originalValuesMap;
+            }
+            if (rawAspect.extraMetadata) {
+                targetAspect.extraMetadata = rawAspect.extraMetadata;
+            }
         }
+        
 
     }
 
@@ -13640,8 +13668,11 @@ var EntityManager = (function () {
             var entityState = aspect.entityState;
             newAspect = {
                 tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
-                entityState: entityState.name
+                entityState: entityState.name,
             };
+            if (aspect.extraMetadata) {
+                newAspect.extraMetadata = aspect.extraMetadata;
+            }
             if (entityState.isModified() || entityState.isDeleted()) {
                 newAspect.originalValuesMap = aspect.originalValues;
             }
@@ -14390,8 +14421,8 @@ var MappingContext = (function () {
                         || targetEntityState.isUnchanged()) {
                     updateEntity(mc, targetEntity, node);
                     targetEntity.entityAspect.wasLoaded = true;
-                    if (meta.extra) {
-                        targetEntity.entityAspect.extraMetadata = meta.extra;
+                    if (meta.extraMetadata) {
+                        targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
                     }
                     targetEntity.entityAspect.entityState = EntityState.Unchanged;
                     targetEntity.entityAspect.originalValues = {};
@@ -14412,8 +14443,8 @@ var MappingContext = (function () {
           
             updateEntity(mc, targetEntity, node);
             
-            if (meta.extra) {
-                targetEntity.entityAspect.extraMetadata = meta.extra;
+            if (meta.extraMetadata) {
+                targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
             }
             em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
             targetEntity.entityAspect.wasLoaded = true;
@@ -15335,14 +15366,23 @@ breeze.SaveOptions= SaveOptions;
         visitNode: function (node, mappingContext, nodeContext) {
             var result = {};
             if (node == null) return result;
-            if (node.__metadata != null) {
+            var metadata = node.__metadata;
+            if (metadata != null) {
                 // TODO: may be able to make this more efficient by caching of the previous value.
-                var entityTypeName = MetadataStore.normalizeTypeName(node.__metadata.type);
+                var entityTypeName = MetadataStore.normalizeTypeName(metadata.type);
                 var et = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
                 // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) {
                 if (et && et._mappedPropertiesCount <= Object.keys(node).length - 1) {
                     result.entityType = et;
-                    result.extra = node.__metadata;
+                    var baseUri = mappingContext.dataService.serviceName;
+                    var uriKey = metadata.uri || metadata.id;
+                    if (core.stringStartsWith(uriKey, baseUri)) {
+                        uriKey = uriKey.substring(baseUri.length);
+                    }
+                    result.extraMetadata = {
+                        uriKey: uriKey,
+                        etag: metadata.etag
+                    }
                 }
             }
             // OData v3 - projection arrays will be enclosed in a results array
@@ -15375,7 +15415,6 @@ breeze.SaveOptions= SaveOptions;
         var changeRequests = [];
         var tempKeys = [];
         var contentKeys = [];
-        var baseUri = saveContext.dataService.serviceName;
         var entityManager = saveContext.entityManager;
         var helper = entityManager.helper;
         var id = 0;
@@ -15390,12 +15429,12 @@ breeze.SaveOptions= SaveOptions;
                 request.data = helper.unwrapInstance(entity, transformValue);
                 tempKeys[id] = aspect.getKey();
             } else if (aspect.entityState.isModified()) {
-                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                updateDeleteMergeRequest(request, aspect, routePrefix);
                 request.method = "MERGE";
                 request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, transformValue);
                 // should be a PATCH/MERGE
             } else if (aspect.entityState.isDeleted()) {
-                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                updateDeleteMergeRequest(request, aspect, routePrefix);
                 request.method = "DELETE";
             } else {
                 return;
@@ -15412,16 +15451,44 @@ breeze.SaveOptions= SaveOptions;
 
     }
 
-    function updateDeleteMergeRequest(request, aspect, baseUri, routePrefix) {
+    function updateDeleteMergeRequest(request, aspect, routePrefix) {
+        var uriKey;
         var extraMetadata = aspect.extraMetadata;
-        var uri = extraMetadata.uri || extraMetadata.id;
-        if (core.stringStartsWith(uri, baseUri)) {
-            uri = routePrefix + uri.substring(baseUri.length);
+        if (extraMetadata == null) {
+            uriKey = getUriKey(aspect);
+            aspect.extraMetadata = {
+                uriKey: uriKey
+            }
+        } else {
+            uriKey = extraMetadata.uriKey;
+            if (extraMetadata.etag) {
+                request.headers["If-Match"] = extraMetadata.etag;
+            }
         }
-        request.requestUri = uri;
-        if (extraMetadata.etag) {
-            request.headers["If-Match"] = extraMetadata.etag;
+        request.requestUri = routePrefix + uriKey;
+
+    }
+
+    function getUriKey(aspect) {
+        var entityType = aspect.entity.entityType;
+        var resourceName = entityType.defaultResourceName;
+        var kps = entityType.keyProperties;
+        var uriKey = resourceName + "(";
+        if (kps.length === 1) {
+            uriKey = uriKey + fmtProperty(kps[0], aspect) + ")";
+        } else {
+            var delim = "";
+            kps.forEach(function(kp) {
+                uriKey = uriKey + delim + kp.nameOnServer + "=" + fmtProperty(kp, aspect);
+                delim = ",";
+            });
+            uriKey = uriKey + ")";
         }
+        return uriKey;
+    }
+
+    function fmtProperty(prop, aspect) {
+        return prop.dataType.fmtOData(aspect.getPropertyValue(prop.name));
     }
    
     function createError(error, url) {

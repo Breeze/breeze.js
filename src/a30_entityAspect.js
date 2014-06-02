@@ -289,6 +289,9 @@ var EntityAspect = (function() {
     }
 
     // Dangerous method - see notes - talk to Jay - this is not a complete impl
+    // Another alternative is to detach the reattach if already attached - but this would have
+    // the side effect of firing validation which would be 'correct' but possibly not 
+    // anticipated.
     //        proto.setAdded = function () {
     //            this.originalValues = {};
     //            this.entityState = EntityState.Added;

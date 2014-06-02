@@ -380,6 +380,11 @@
             ok(true, "N/A for MONGO - this is a SQL Server specific Timestamp test.");
             return;
         }
+
+        //if (testFns.DEBUG_ODATA) {
+        //    ok(true, "Skipped tests - OData does not yet support enums - or types with enums");
+        //    return;
+        //};
         var em = newEm();
         var query = new EntityQuery("Roles").take(10);
         stop();

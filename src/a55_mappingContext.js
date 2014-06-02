@@ -210,8 +210,8 @@ var MappingContext = (function () {
                         || targetEntityState.isUnchanged()) {
                     updateEntity(mc, targetEntity, node);
                     targetEntity.entityAspect.wasLoaded = true;
-                    if (meta.extra) {
-                        targetEntity.entityAspect.extraMetadata = meta.extra;
+                    if (meta.extraMetadata) {
+                        targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
                     }
                     targetEntity.entityAspect.entityState = EntityState.Unchanged;
                     targetEntity.entityAspect.originalValues = {};
@@ -232,8 +232,8 @@ var MappingContext = (function () {
           
             updateEntity(mc, targetEntity, node);
             
-            if (meta.extra) {
-                targetEntity.entityAspect.extraMetadata = meta.extra;
+            if (meta.extraMetadata) {
+                targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
             }
             em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
             targetEntity.entityAspect.wasLoaded = true;
