@@ -1877,16 +1877,27 @@
         var q = new EntityQuery()
             .from("TimeGroups")
             .take(2);
-
+        var tg = "test";
         stop();
         em.executeQuery(q).then(function (data) {
-            var tg = data.results[0];
+            
+            if (data.results.length == 0) {
+                tg = em.createEntity("TimeGroup", { comment: "trigger" });
+            } else {
+                tg = data.results[0];
+                testFns.morphStringProp(tg, "comment");
+            }
+            return em.saveChanges();
+        }).then(function(sr) {
+            var tg1 = sr.entities[0];
+            ok(tg1 == tg, "should be the same");
+
             em.detachEntity(tg);
             tg.Id = -1;
             em.attachEntity(tg, breeze.EntityState.Added);
-            tg.Comment = "This was re-attached";
+            tg.setProperty("comment", "This was re-attached");
             return em.saveChanges();
-        }).then(function (sr) {
+        }).then(function (sr2) {
             ok(true, "save successful");
         }).fail(testFns.handleFail).fin(start);
     });

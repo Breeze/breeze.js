@@ -7407,11 +7407,11 @@ var EntityType = (function () {
     proto.addProperty = function(property) {
         assertParam(property, "property").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
         
-        // TODO: call np.resolve here if a navigation property.
-        return this._addPropertyCore(property);
+        // true is 2nd arg to force resolve of any navigation properties.
+        return this._addPropertyCore(property, true);
     };
 
-    proto._addPropertyCore = function(property) {
+    proto._addPropertyCore = function(property, shouldResolve) {
         if (this.isFrozen) {
             throw new Error("The '" + this.name + "' EntityType/ComplexType has been frozen. You can only add properties to an EntityType/ComplexType before any instances of that type have been created and attached to an entityManager.");
         }
@@ -7429,6 +7429,10 @@ var EntityType = (function () {
             this._addDataProperty(property);
         } else {
             this._addNavigationProperty(property);
+            // metadataStore can be undefined if this entityType has not yet been added to a MetadataStore.
+            if (shouldResolve && this.metadataStore) {
+                resolveNp(property, this.metadataStore);
+            }
         }
         return this;
     };
