@@ -1376,7 +1376,7 @@
     test("unmapped save", function() {
 
         // use a different metadata store for this em - so we don't polute other tests
-        var em1 = newEm();
+        var em1 = newEm(testFns.newMs());
         var Customer = testFns.models.CustomerWithMiscData();
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();

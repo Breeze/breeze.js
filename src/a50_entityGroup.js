@@ -9,6 +9,8 @@ var EntityGroup = (function () {
     var ctor = function (entityManager, entityType) {
         this.entityManager = entityManager;
         this.entityType = entityType;
+        // freeze the entityType after the first instance of this type is either created or queried. 
+        this.entityType.isFrozen = true;
         this._indexMap = {};
         this._entities = [];
         this._emptyIndexes = [];

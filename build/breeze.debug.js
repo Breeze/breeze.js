@@ -6666,17 +6666,17 @@ var MetadataStore = (function () {
             baseEntityType.dataProperties.forEach(function (dp) {
                 var newDp = new DataProperty(dp);
                 newDp.isInherited = true;
-                stype.addProperty(newDp);
+                stype._addPropertyCore(newDp);
             });
             baseEntityType.navigationProperties.forEach(function (np) {
                 var newNp = new NavigationProperty(np);
                 newNp.isInherited = true;
-                stype.addProperty(newNp);
+                stype._addPropertyCore(newNp);
             });
         }
         
         json.dataProperties.forEach(function(dp) {
-            stype.addProperty(DataProperty.fromJSON(dp));
+            stype._addPropertyCore(DataProperty.fromJSON(dp));
         });
         
         
@@ -6684,7 +6684,7 @@ var MetadataStore = (function () {
         if (isEntityType) {
             //noinspection JSHint
             json.navigationProperties && json.navigationProperties.forEach(function(np) {
-                stype.addProperty(NavigationProperty.fromJSON(np));
+                stype._addPropertyCore(NavigationProperty.fromJSON(np));
             });
         }
         
@@ -6801,12 +6801,12 @@ var CsdlMetadataParser = (function () {
             baseEntityType.dataProperties.forEach(function (dp) {
                 var newDp = new DataProperty(dp);
                 newDp.isInherited = true;
-                entityType.addProperty(newDp);
+                entityType._addPropertyCore(newDp);
             });
             baseEntityType.navigationProperties.forEach(function (np) {
                 var newNp = new NavigationProperty(np);
                 newNp.isInherited = true;
-                entityType.addProperty(newNp);
+                entityType._addPropertyCore(newNp);
             });
         }
 
@@ -6868,7 +6868,7 @@ var CsdlMetadataParser = (function () {
             }
         }
         if (dp) {
-            parentType.addProperty(dp);
+            parentType._addPropertyCore(dp);
             addValidators(dp);
         }
         return dp;
@@ -6969,7 +6969,7 @@ var CsdlMetadataParser = (function () {
         }
 
         var np = new NavigationProperty(cfg);
-        entityType.addProperty(np);
+        entityType._addPropertyCore(np);
         return np;
     }
 
@@ -7404,15 +7404,23 @@ var EntityType = (function () {
     @method addProperty
     @param property {DataProperty|NavigationProperty}
     **/
-    proto.addProperty = function (property) {
-        assertParam(property, "dataProperty").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
-        if (this.metadataStore && !property.isUnmapped) {
-            throw new Error("The '" + this.name + "' EntityType has already been added to a MetadataStore and therefore no additional properties may be added to it.");
+    proto.addProperty = function(property) {
+        assertParam(property, "property").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
+        
+        // TODO: call np.resolve here if a navigation property.
+        return this._addPropertyCore(property);
+    };
+
+    proto._addPropertyCore = function(property) {
+        if (this.isFrozen) {
+            throw new Error("The '" + this.name + "' EntityType/ComplexType has been frozen. You can only add properties to an EntityType/ComplexType before any instances of that type have been created and attached to an entityManager.");
         }
-        if (property.parentType) {
-            if (property.parentType !== this) {
-                throw new Error("This dataProperty has already been added to " + property.parentType.name);
+        var parentType = property.parentType;
+        if (parentType) {
+            if (parentType !== this) {
+                throw new Error("This property: " + property.name + " has already been added to " + property.parentType.name);
             } else {
+                // adding the same property more than once to the same entityType is just ignored. 
                 return this;
             }
         }
@@ -7976,7 +7984,7 @@ var EntityType = (function () {
         np.entityType = entityType;
         var invNp = __arrayFirst(entityType.navigationProperties, function( altNp) {
             // Can't do this because of possibility of comparing a base class np with a subclass altNp.
-            //return altNp.associationName === np.associationName
+            // return altNp.associationName === np.associationName
             //    && altNp !== np;
             // So use this instead.
             return altNp.associationName === np.associationName &&
@@ -8051,10 +8059,10 @@ var EntityType = (function () {
                 newProp.isSettable = __isSettable(instance, pn);
                 if (stype.subtypes) {
                     stype.getSelfAndSubtypes().forEach(function (st) {
-                        st.addProperty(new DataProperty(newProp));
+                        st._addPropertyCore(new DataProperty(newProp));
                     });
                 } else {
-                    stype.addProperty(newProp);
+                    stype._addPropertyCore(newProp);
                 }
             }
         });
@@ -8201,20 +8209,8 @@ var ComplexType = (function () {
         
 
     proto.addProperty = function (dataProperty) {
-        assertParam(dataProperty, "dataProperty").isInstanceOf(DataProperty).check();
-        if (this.metadataStore && ! dataProperty.isUnmapped) {
-            throw new Error("The '" + this.name + "' ComplexType has already been added to a MetadataStore and therefore no additional properties may be added to it.");
-        }
-        if (dataProperty.parentType) {
-            if (dataProperty.parentType !== this) {
-                throw new Error("This dataProperty has already been added to " + property.parentType.name);
-            } else {
-                return this;
-            }
-        }
-        this._addDataProperty(dataProperty);
-
-        return this;
+        assertParam(dataProperty, "dataProperty").isInstanceOf(DataProperty).check();       
+        return this._addPropertyCore(dataProperty);
     };
         
     proto.getProperties = function () {
@@ -8249,6 +8245,7 @@ var ComplexType = (function () {
         "addValidator",
         "getProperty",
         "getPropertyNames",
+        "_addPropertyCore",
         "_addDataProperty",
         "_updateNames",
         "_updateCps",
@@ -8878,14 +8875,14 @@ function addProperties(entityType, propObj, ctor) {
 
     if (!propObj) return;
     if (Array.isArray(propObj)) {
-        propObj.forEach(entityType.addProperty.bind(entityType));
+        propObj.forEach(entityType._addPropertyCore.bind(entityType));
     } else if (typeof (propObj) === 'object') {
         for (var key in propObj) {
             if (__hasOwnProperty(propObj, key)) {
                 var value = propObj[key];
                 value.name = key;
                 var prop = new ctor(value);
-                entityType.addProperty(prop);
+                entityType._addPropertyCore(prop);
             }
         }
     } else {
@@ -11771,6 +11768,8 @@ var EntityGroup = (function () {
     var ctor = function (entityManager, entityType) {
         this.entityManager = entityManager;
         this.entityType = entityType;
+        // freeze the entityType after the first instance of this type is either created or queried. 
+        this.entityType.isFrozen = true;
         this._indexMap = {};
         this._entities = [];
         this._emptyIndexes = [];
