@@ -2,17 +2,17 @@
     
     var ajaxImpl;
     
-    var ctor = function () {
-    
-    };
+    var ctor = function () { };
 
-    ctor.prototype.checkForRecomposition = function (interfaceInitializedArgs) {
+    var fn = ctor.prototype; // minifies better (as seen in jQuery)
+
+    fn.checkForRecomposition = function (interfaceInitializedArgs) {
         if (interfaceInitializedArgs.interfaceName === "ajax" && interfaceInitializedArgs.isDefault) {
             this.initialize();
         }
     };
     
-    ctor.prototype.initialize = function () {
+    fn.initialize = function () {
         ajaxImpl = breeze.config.getAdapterInstance("ajax");
 
         // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues. 
@@ -20,7 +20,7 @@
         throw new Error("Unable to find ajax adapter for dataservice adapter '"+(this.name||'')+"'.");
     };
 
-    ctor.prototype.fetchMetadata = function (metadataStore, dataService) {
+    fn.fetchMetadata = function (metadataStore, dataService) {
         var serviceName = dataService.serviceName;
         var url = dataService.makeUrl("Metadata");
         
@@ -61,7 +61,7 @@
         return deferred.promise;
     };
 
-    ctor.prototype.executeQuery = function (mappingContext) {
+    fn.executeQuery = function (mappingContext) {
 
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
@@ -104,10 +104,10 @@
         return deferred.promise;
     };
 
-    ctor.prototype.saveChanges = function (saveContext, saveBundle) {
+    fn.saveChanges = function (saveContext, saveBundle) {
         
         var deferred = Q.defer();
-        saveBundle = this._prepareSaveBundle(saveBundle, saveContext);
+        saveBundle = this._prepareSaveBundle(saveContext, saveBundle);
         var bundle = JSON.stringify(saveBundle);
         
         var url = saveContext.dataService.makeUrl(saveContext.resourceName);
@@ -141,18 +141,69 @@
         return deferred.promise;
     };
 
-
-
-
-    ctor.prototype._prepareSaveBundle = function(saveBundle, saveContext) {
+    fn._prepareSaveBundle = function(saveContext, saveBundle) {
+        // The implementor should create and call the concrete adapter's ChangeRequestInterceptor
         throw new Error("Need a concrete implementation of _prepareSaveBundle");
     };
 
-    ctor.prototype._prepareSaveResult = function (saveContext, data) {
+    // The default, no-op implementation of a "ChangeRequestInterceptor" ctor 
+    // that can tweak the bundle both as it is built and when it is completed
+    // by a concrete DataServiceAdapater.
+    //
+    // Applications can specify an alternative constructor with a different implementation
+    // enabling them to change aspects of the 'saveBundle' 
+    // without having to write their own DataService adapters.
+    // 
+    // Instantiated and called entirely within the _prepareSaveBundle method.
+    //
+    // Applications that define an overriding interceptor should follow this pattern.
+    // - accept the 'saveContext' and 'saveBundle' and as the first two parameters.
+    // - instantiate an object that implements the methods shown here.
+    // - use 'saveBundle' and 'saveContext' captures in those methods.
+    fn.ChangeRequestInterceptor = function (saveContext, saveBundle){
+        // Method: getRequest
+        // Prepare and return the save data for an entity-to-be-saved
+        // Called for each entity-to-be-saved
+        // Parameters:
+        //    'request' is the "raw entity data" as prepared before interception        
+        //    'entity' is the manager's cached entity-to-be-saved 
+        //    'index' is the index of this entity in the array of original entities-to-be-saved.
+        // This interceptor is free to do as it pleases with these inputs
+        // but it must return something.
+        this.getRequest = function (request, entity, index){return request;};
+
+        // Method: done
+        // Last chance to change anything about the 'requests' object
+        // after it has been built with requests for all of the entities-to-be-saved.        
+        // 'requests' is the same as 'saveBundle.entities' in many implementations
+        // Returns void.
+        // Called just before the saveBundle is serialized for posting to the server
+        this.done = function(requests) {};    
+    }
+
+    fn._createChangeRequestInterceptor = function(saveContext, saveBundle){
+        var isFn = __isFunction;
+        var CRI = this.ChangeRequestInterceptor;
+        var pre = this.name + " DataServiceAdapter's ChangeRequestInterceptor";
+        var post = " is missing or not a function.";
+        if (isFn(CRI)){
+            var interceptor = new CRI(saveContext, saveBundle);
+            if (!isFn(interceptor.getRequest)) {
+                throw new Error(pre + '.getRequest' + post);
+            }
+            if (!isFn(interceptor.done)) {
+                throw new Error(pre + '.done' + post);
+            }
+            return interceptor;
+        }
+        throw new Error(pre + post);
+    }
+
+    fn._prepareSaveResult = function (saveContext, data) {
         throw new Error("Need a concrete implementation of _prepareSaveResult");
     };
     
-    ctor.prototype.jsonResultsAdapter = new JsonResultsAdapter( {
+    fn.jsonResultsAdapter = new JsonResultsAdapter( {
         name: "noop",
         
         visitNode: function (node, mappingContext, nodeContext) {

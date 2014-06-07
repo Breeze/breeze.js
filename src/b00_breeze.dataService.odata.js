@@ -28,8 +28,59 @@
         OData = core.requireLib("OData", "Needed to support remote OData services");
         OData.jsonHandler.recognizeDates = true;
     };
-    
-    
+
+    // The default, no-op implementation of a "ChangeRequestInterceptor" ctor 
+    // that can tweak the 'requests' object both as it is built and when it is completed
+    // by a concrete DataServiceAdapater.
+    //
+    // Applications can specify an alternative constructor with a different implementation
+    // enabling them to change aspects of the 'requests' object 
+    // without having to write their own DataService adapters.
+    // 
+    // Instantiated and called entirely within the 'createChangeRequests' method.
+    //
+    // Applications that define an overriding interceptor should follow this pattern.
+    // - accept the 'saveContext' and 'saveBundle' and as the first two parameters.
+    // - instantiate an object that implements the methods shown here.
+    // - use 'saveBundle' and 'saveContext' captures in those methods.    
+    fn.ChangeRequestInterceptor = function (saveContext, saveBundle){
+        // Method: getRequest
+        // Prepare and return the change request for an entity-to-be-saved
+        // Called for each entity-to-be-saved
+        // Parameters:
+        //    'entity' is the manager's cached entity-to-be-saved 
+        //    'request' is the change request as prepared so far, before interception
+        //    'index' is the index of this entity in the array of original entities-to-be-saved.
+        // This interceptor is free to do as it pleases with these inputs
+        // but it must return something.
+        this.getRequest = function (request, entity, index){return request;};
+
+        // Method: done
+        // Last chance to change anything about the 'changeRequests' object
+        // after it has been built with requests for all of the entities-to-be-saved.
+        // Returns void.
+        // Called just before the changeRequests object is posted to the server
+        this.done = function(requests) {};  
+    }
+
+    fn._createChangeRequestInterceptor = function(saveContext, saveBundle){
+        var isFn = __isFunction;
+        var CRI = this.ChangeRequestInterceptor;
+        var pre = this.name + " DataServiceAdapter's ChangeRequestInterceptor";
+        var post = " is missing or not a function.";
+        if (isFn(CRI)){
+            var interceptor = new CRI(saveContext, saveBundle);
+            if (!isFn(interceptor.getRequest)) {
+                throw new Error(pre + '.getRequest' + post);
+            }
+            if (!isFn(interceptor.done)) {
+                throw new Error(pre + '.done' + post);
+            }
+            return interceptor;
+        }
+        throw new Error(pre + post);
+    }
+
     fn.executeQuery = function (mappingContext) {
     
         var deferred = Q.defer();
@@ -106,16 +157,16 @@
     fn.getRoutePrefix = function(dataService){ return ''; /* see webApiODataCtor */}
 
     fn.saveChanges = function (saveContext, saveBundle) {
-
+        var adapter = saveContext.adapter = this;
         var deferred = Q.defer();
-
         var helper = saveContext.entityManager.helper;
+        saveContext.routePrefix = this.getRoutePrefix(saveContext.dataService);
         var url = saveContext.dataService.makeUrl("$batch");
-        var routePrefix = this.getRoutePrefix(saveContext.dataService);
-        var requestData = createChangeRequests(saveContext, saveBundle, routePrefix);
+
+        var requestData = createChangeRequests(saveContext, saveBundle);
         var tempKeys = saveContext.tempKeys;
         var contentKeys = saveContext.contentKeys;
-        var that = this;
+
         OData.request({
             headers : { "DataServiceVersion": "2.0" } ,
             requestUri: url,
@@ -214,14 +265,17 @@
         return val;
     }
 
-    function createChangeRequests(saveContext, saveBundle, routePrefix) {
+    function createChangeRequests(saveContext, saveBundle) {
+        var changeRequestInterceptor = saveContext.adapter._createChangeRequestInterceptor(saveContext, saveBundle);
         var changeRequests = [];
         var tempKeys = [];
         var contentKeys = [];
         var entityManager = saveContext.entityManager;
         var helper = entityManager.helper;
         var id = 0;
-        saveBundle.entities.forEach(function (entity) {
+        var routePrefix = saveContext.routePrefix;
+
+        saveBundle.entities.forEach(function (entity, index) {
             var aspect = entity.entityAspect;
             id = id + 1; // we are deliberately skipping id=0 because Content-ID = 0 seems to be ignored.
             var request = { headers: { "Content-ID": id, "DataServiceVersion": "2.0" } };
@@ -242,10 +296,12 @@
             } else {
                 return;
             }
+            request = changeRequestInterceptor.getRequest(request, entity, index);
             changeRequests.push(request);
         });
         saveContext.contentKeys = contentKeys;
         saveContext.tempKeys = tempKeys;
+        changeRequestInterceptor.done(changeRequests);
         return {
             __batchRequests: [{
                 __changeRequests: changeRequests

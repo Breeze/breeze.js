@@ -40,13 +40,14 @@
 
     ctor.prototype = new AbstractDataServiceAdapter();
     
-    ctor.prototype._prepareSaveBundle = function(saveBundle, saveContext) {
+    ctor.prototype._prepareSaveBundle = function(saveContext, saveBundle) {
+        var changeRequestInterceptor = this._createChangeRequestInterceptor(saveContext, saveBundle);
         var em = saveContext.entityManager;
         var metadataStore = em.metadataStore;
         var helper = em.helper;
         var metadata = {};
         
-        saveBundle.entities = saveBundle.entities.map(function (e) {
+        saveBundle.entities = saveBundle.entities.map(function (e, ix) {
             var rawEntity = helper.unwrapInstance(e);
             var entityTypeName = e.entityType.name;
             var etInfo = metadata[entityTypeName];
@@ -79,12 +80,13 @@
                 entityState: e.entityAspect.entityState.name,
                 originalValuesMap: originalValuesOnServer
             };
+            rawEntity = changeRequestInterceptor.getRequest(rawEntity, e, ix);
             return rawEntity;
         });
 
         saveBundle.metadata = metadata;
         saveBundle.saveOptions = { tag: saveBundle.saveOptions.tag };
-
+        changeRequestInterceptor.done(saveBundle.entities);
         return saveBundle;
     };
 
