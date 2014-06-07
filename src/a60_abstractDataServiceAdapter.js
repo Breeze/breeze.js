@@ -105,14 +105,13 @@
     };
 
     fn.saveChanges = function (saveContext, saveBundle) {
-        
+        var adapter = saveContext.adapter = this;     
         var deferred = Q.defer();
-        saveBundle = this._prepareSaveBundle(saveContext, saveBundle);
+        saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
         var bundle = JSON.stringify(saveBundle);
         
         var url = saveContext.dataService.makeUrl(saveContext.resourceName);
 
-        var that = this;
         ajaxImpl.ajax({
             type: "POST",
             url: url,
@@ -126,7 +125,7 @@
                 if (entityErrors) {
                     handleHttpError(deferred, httpResponse);
                 } else {
-                    var saveResult = that._prepareSaveResult(saveContext, data);
+                    var saveResult = adapter._prepareSaveResult(saveContext, data);
                     saveResult.httpResponse = httpResponse;
                     deferred.resolve(saveResult);
                 }
@@ -147,14 +146,12 @@
     };
 
     // The default, no-op implementation of a "ChangeRequestInterceptor" ctor 
-    // that can tweak the bundle both as it is built and when it is completed
+    // that can tweak the saveBundle both as it is built and when it is completed
     // by a concrete DataServiceAdapater.
     //
     // Applications can specify an alternative constructor with a different implementation
-    // enabling them to change aspects of the 'saveBundle' 
+    // enabling them to change aspects of the 'saveBundle' or the individual change requests 
     // without having to write their own DataService adapters.
-    // 
-    // Instantiated and called entirely within the _prepareSaveBundle method.
     //
     // Applications that define an overriding interceptor should follow this pattern.
     // - accept the 'saveContext' and 'saveBundle' and as the first two parameters.
@@ -165,7 +162,7 @@
         // Prepare and return the save data for an entity-to-be-saved
         // Called for each entity-to-be-saved
         // Parameters:
-        //    'request' is the "raw entity data" as prepared before interception        
+        //    'request' is the entity save data as prepared by the adapter before interception        
         //    'entity' is the manager's cached entity-to-be-saved 
         //    'index' is the index of this entity in the array of original entities-to-be-saved.
         // This interceptor is free to do as it pleases with these inputs
@@ -182,9 +179,10 @@
     }
 
     fn._createChangeRequestInterceptor = function(saveContext, saveBundle){
+        var adapter = saveContext.adapter;
         var isFn = __isFunction;
-        var CRI = this.ChangeRequestInterceptor;
-        var pre = this.name + " DataServiceAdapter's ChangeRequestInterceptor";
+        var CRI = adapter.ChangeRequestInterceptor;
+        var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
         var post = " is missing or not a function.";
         if (isFn(CRI)){
             var interceptor = new CRI(saveContext, saveBundle);
