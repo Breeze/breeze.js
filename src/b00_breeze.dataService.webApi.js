@@ -9,14 +9,11 @@
         define(["breeze"], factory);
     }
 }(function(breeze) {
-    "use strict";    
-    var core = breeze.core;
-
+    "use strict";  
+      
     var MetadataStore = breeze.MetadataStore;
     var JsonResultsAdapter = breeze.JsonResultsAdapter;
     var AbstractDataServiceAdapter = breeze.AbstractDataServiceAdapter;
-    
-    var ajaxImpl;
     
     var ctor = function () {
         this.name = "webApi";

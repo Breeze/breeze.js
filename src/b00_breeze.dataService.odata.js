@@ -28,10 +28,11 @@
         OData = core.requireLib("OData", "Needed to support remote OData services");
         OData.jsonHandler.recognizeDates = true;
     };
-   
-    fn.ChangeRequestInterceptor = breeze.AbstractDataServiceAdapter.prototype.ChangeRequestInterceptor;
-
-    fn._createChangeRequestInterceptor = breeze.AbstractDataServiceAdapter.prototype._createChangeRequestInterceptor;
+    // borrow from AbstractDataServiceAdapter
+    var abstractDsaProto = breeze.AbstractDataServiceAdapter.prototype;
+    fn._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
+    fn.ChangeRequestInterceptor = abstractDsaProto.ChangeRequestInterceptor;
+    fn._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
 
     fn.executeQuery = function (mappingContext) {
     
@@ -106,12 +107,11 @@
 
     };
 
-    fn.getRoutePrefix = function(dataService){ return ''; /* see webApiODataCtor */}
+    fn.getRoutePrefix = function(/*dataService*/){ return ''; } // see webApiODataCtor
 
     fn.saveChanges = function (saveContext, saveBundle) {
         var adapter = saveContext.adapter = this;
         var deferred = Q.defer();
-        var helper = saveContext.entityManager.helper;
         saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
         var url = saveContext.dataService.makeUrl("$batch");
 
@@ -133,7 +133,8 @@
                     var response = cr.response || cr;
                     var statusCode = response.statusCode;
                     if ((!statusCode) || statusCode >= 400) {
-                        return deferred.reject(createError(cr, url));
+                        deferred.reject(createError(cr, url));
+                        return;
                     }
                     
                     var contentId = cr.headers["Content-ID"];
@@ -342,6 +343,7 @@
 
             }
         }
+        fn._catchNoConnectionError(result);
         return result;
     }
 
@@ -367,8 +369,7 @@
         var segments = dataService.serviceName.split('/');
         var last = segments.length-1 ;
         var routePrefix = segments[last] || segments[last-1];
-        routePrefix = routePrefix ? routePrefix += '/' : '';
-        return routePrefix;
+        return routePrefix ? routePrefix + '/' : '';
     };
 
     breeze.config.registerAdapter("dataService", webApiODataCtor);

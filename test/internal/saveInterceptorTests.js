@@ -12,12 +12,16 @@
     module("save interceptor", {
         setup: function () {
             testFns.setup();
+            // get active dataService adapter
+            // removing any lingering, instance-level ChangeRequestInterceptor
+            // left behind by some outside test that forgot to cleanup.
+            // The prototype-level interceptor is untouched.
             dsAdapter = breeze.config.getAdapterInstance('dataService');
-            // remove a lingering, instance-level ChangeRequestInterceptor,
-            // if such exists, leaving the prototype-level interceptor to rule
-            delete dsAdapter.ChangeRequestInterceptor; 
+            delete dsAdapter.ChangeRequestInterceptor;
         },
-        teardown: function () { }
+        teardown: function () {
+            delete dsAdapter.ChangeRequestInterceptor;
+        }
     });
 
     asyncTest('no interceptor, no harm', function(){
@@ -78,11 +82,7 @@
         .catch(handleFail)
         .finally(function() {
             // poison this adapter's interceptor to prove test module always clears it
-            dsAdapter.ChangeRequestInterceptor = function() {
-                this.getChangeRequest =
-                this.changeRequestCompleted =
-                    function() { throw new Error("Poison interceptor called."); };
-            };
+            dsAdapter.ChangeRequestInterceptor = PoisonInterceptor;
             start();
         });
     });
@@ -101,7 +101,7 @@
             order.entityAspect.setDeleted();
             return em.saveChanges();
         })
-        .then(function(result){
+        .then(function(/*result*/){
             ok(true, "removed the 2 added entities");
         })
         .fail(testFns.handleFail).fin(start);
@@ -126,6 +126,12 @@
             .using(em).execute().then(function(data) {
                 return data.results[0];
             });
+    }
+
+    function PoisonInterceptor() {
+        this.getRequest =
+        this.done =
+            function () { throw new Error("Poison interceptor called."); };
     }
 
     function tweakEmp(emp, baseToc){

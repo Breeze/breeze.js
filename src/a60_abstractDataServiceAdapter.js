@@ -26,7 +26,6 @@
         
         var deferred = Q.defer();
 
-        var that = this;
         ajaxImpl.ajax({
             type: "GET",
             url: url,
@@ -51,7 +50,7 @@
                     metadataStore.addDataService(dataService);
                 }
 
-                deferred.resolve(metadata);
+                return deferred.resolve(metadata);
                 
             },
             error: function (httpResponse) {
@@ -66,7 +65,6 @@
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
 
-        var that = this;
         var params = {
             type: "GET",
             url: url,
@@ -87,7 +85,7 @@
                     if (e instanceof Error) {
                         deferred.reject(e);
                     } else {
-                        handleHttpError(httpResponse)
+                        handleHttpError(httpResponse);
                     }
                 }
 
@@ -140,7 +138,7 @@
         return deferred.promise;
     };
 
-    fn._prepareSaveBundle = function(saveContext, saveBundle) {
+    fn._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
         // The implementor should create and call the concrete adapter's ChangeRequestInterceptor
         throw new Error("Need a concrete implementation of _prepareSaveBundle");
     };
@@ -197,14 +195,14 @@
         throw new Error(pre + post);
     }
 
-    fn._prepareSaveResult = function (saveContext, data) {
+    fn._prepareSaveResult = function (/* saveContext, data */) {
         throw new Error("Need a concrete implementation of _prepareSaveResult");
     };
     
     fn.jsonResultsAdapter = new JsonResultsAdapter( {
         name: "noop",
         
-        visitNode: function (node, mappingContext, nodeContext) {
+        visitNode: function (/* node, mappingContext, nodeContext */) {
             return {};
         }
 
@@ -236,14 +234,22 @@
             if (entityErrors && httpResponse.saveContext) {
                 processEntityErrors(err, entityErrors, httpResponse.saveContext);
             } else {
-                err.message = extractInnerMessage(errObj)
+                err.message = extractInnerMessage(errObj);
             }
         } else {
             err.message = httpResponse.error && httpResponse.error.toString();
         }
-        
+        fn._catchNoConnectionError(err);
         return err;
     };
+
+    // Put this at the bottom of your http error analysis
+    fn._catchNoConnectionError = function (err){
+        if (err.status == 0 && err.message == null){
+            err.message = "HTTP response status 0 and no message. " +
+            "Likely did not or could not reach server. Is the server running?";
+        }
+    }
 
     function extractInnerMessage(errObj) {
         while (errObj.InnerException) {
