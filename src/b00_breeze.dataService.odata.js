@@ -225,6 +225,10 @@
             var aspect = entity.entityAspect;
             id = id + 1; // we are deliberately skipping id=0 because Content-ID = 0 seems to be ignored.
             var request = { headers: { "Content-ID": id, "DataServiceVersion": "2.0" } };
+            // add etag to header if present in entity
+            if (entity.eTag !== undefined){
+                request.headers["If-Match"] = entity.eTag;
+            }
             contentKeys[id] = entity;
             if (aspect.entityState.isAdded()) {
                 request.requestUri = routePrefix + entity.entityType.defaultResourceName;
