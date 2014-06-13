@@ -178,8 +178,13 @@
                 // TODO: may be able to make this more efficient by caching of the previous value.
                 var entityTypeName = MetadataStore.normalizeTypeName(metadata.type);
                 var et = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
-                // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) {
+                // OData response doesn't distinguish a projection from a whole entity.
+                // We'll assume that whole-entity data would have at least as many properties  (<=)
+                // as the EntityType has mapped properties on the basis that
+                // most projections remove properties rather than add them.
+                // If not, assume it's a projection and do NOT treat as an entity
                 if (et && et._mappedPropertiesCount <= Object.keys(node).length - 1) {
+                // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) { // OLD
                     result.entityType = et;
                     var baseUri = mappingContext.dataService.serviceName;
                     var uriKey = metadata.uri || metadata.id;
