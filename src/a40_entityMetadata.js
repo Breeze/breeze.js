@@ -2415,7 +2415,13 @@ var DataProperty = (function () {
                     }
                 }
             }
+        } else if (this.dataType.isNumeric) {
+            // in case the defaultValue comes in as a string ( which it does in EF6).
+            if (typeof (this.defaultValue) === "string") {
+                this.defaultValue = parseFloat(this.defaultValue);
+            }
         }
+
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
