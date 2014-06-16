@@ -347,7 +347,7 @@ breezeTestFns = (function (breeze) {
         if (!str) {
             return "_X";
         }
-        if (str.length > 1 && core.stringEndsWith(str, "_X")) {
+        if (str.length > 1 && ( core.stringEndsWith(str, "_X") || core.stringEndsWith(str, "__"))) {
             return str.substr(0, str.length - 2);
         } else {
             return str + "_X";

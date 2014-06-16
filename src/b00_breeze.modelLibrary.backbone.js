@@ -23,6 +23,7 @@
     var ctor = function () {
         this.name = "backbone";
     };
+    // protoFn used instead of proto here to avoid naming collision with function params.
     var protoFn = ctor.prototype;
    
     protoFn.initialize = function() {

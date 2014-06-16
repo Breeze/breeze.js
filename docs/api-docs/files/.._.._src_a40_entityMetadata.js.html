@@ -2352,7 +2352,7 @@ var ComplexType = (function () {
             .whereParam(&quot;namespace&quot;).isString().isOptional().withDefault(&quot;&quot;)
             .whereParam(&quot;dataProperties&quot;).isOptional()
             .whereParam(&quot;isComplexType&quot;).isOptional().isBoolean()   // needed because this ctor can get called from the addEntityType method which needs the isComplexType prop
-            .whereParam(&quot;custom&quot;).isOptional().isBoolean()
+            .whereParam(&quot;custom&quot;).isOptional()
             .applyAll(this);
 
         this.name = qualifyTypeName(this.shortName, this.namespace);
