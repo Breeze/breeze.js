@@ -22,13 +22,14 @@
         this.defaultSettings = { };
         this.requestInterceptor = null; // s
     };
+    var proto = ctor.prototype;
 
-    ctor.prototype.initialize = function () {
+    proto.initialize = function () {
         // look for the jQuery lib but don't fail immediately if not found
         jQuery = core.requireLib("jQuery");
     };
 
-    ctor.prototype.ajax = function (config) {
+    proto.ajax = function (config) {
         if (!jQuery) {
             throw new Error("Unable to locate jQuery");
         }

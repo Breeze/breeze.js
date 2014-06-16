@@ -2167,21 +2167,37 @@
         var em = newEm();
         var p = breeze.Predicate.create("companyName", FilterQueryOp.StartsWith, "Test")
             .or("companyName", FilterQueryOp.StartsWith, "foo");
-        var q = EntityQuery.from("Customers").where(p).expand("orders")
+        var q = EntityQuery.from("Customers").where(p).expand("orders"); // .take(50);
         stop();
         em.executeQuery(q).then(function(data) {
+            // var promises = [];
+            em.saveOptions = new SaveOptions({ allowConcurrentSaves: true });
             data.results.forEach(function(cust) {
                 var orders = cust.getProperty("orders").slice(0);
                 orders.forEach(function(order) {
+                    //var details = order.getProperty("orderDetails");
+                    //details.forEach(function (detail) {
+                    //    detail.entityAspect.setDeleted();
+                    //});
+                    //var io = order.getProperty("internationalOrder");
+                    //if (io) {
+                    //    io.entityAspect.setDeleted();
+                    //}
                     order.entityAspect.setDeleted();
                 });
                 cust.entityAspect.setDeleted();
+                //var pr = em.saveChanges();
+                //promises.push(pr);
             });
+            // return Q.all(promises);
             return em.saveChanges();
+
         }).then(function(sr) {
-            ok(sr, "save failed");
+            
             ok(sr.entities.length, "deleted count:" + sr.entities.length);
-        }).fail(testFns.handleFail).fin(start);
+        }).fail(function (err) {
+            testFns.handleFail(err);
+        }).fin(start);
     });
 
     function createCustomer(em) {

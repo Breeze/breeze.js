@@ -32,7 +32,7 @@
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
-            ok(emps.length === 2, "should be only 2 emps with orders with freight > 950");
+            ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
         }).fail(testFns.handleFail).fin(start);
 
     });
@@ -45,7 +45,7 @@
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
-            ok(emps.length === 2, "should be only 2 emps with orders with freight > 950");
+            ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
             var emps2 = em.executeQueryLocally(query);
 
             var isOk = testFns.haveSameContents(emps, emps2);
@@ -135,7 +135,7 @@
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
-            ok(emps.length === 2, "should be only 2 emps with orders with freight > 950");
+            ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
             emps.forEach(function (emp) {
                 var orders = emp.getProperty("orders");
                 var isOk = orders.some(function (order) {
@@ -215,7 +215,7 @@
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
-            ok(emps.length === 2, "should be only 2 emps with (orders with freight > 950) and (orders with shipCountry starting with 'G'");
+            ok(emps.length >= 1, "should be at least 1 emp with (orders with freight > 950) and (orders with shipCountry starting with 'G'");
             emps.forEach(function (emp) {
                 var orders = emp.getProperty("orders");
                 var isOk = orders.some(function (order) {

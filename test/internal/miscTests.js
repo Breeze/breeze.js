@@ -86,12 +86,12 @@
     });
     ////////////////////////////////////////////
     // IE11 bug: this['foo'] not same as this.foo
-    test("and USE STRICT, obj.setProperty('foo', obj.foo) throws", function () {
-        'use strict';
-        throws(function () { obj.setProperty('foo', obj.foo); }, // DOES NOT THROW IN IE11 !!!
-            TypeError//("Cannot set property foo of #<Object> which has only a getter")
-        );
-    });
+    //test("and USE STRICT, obj.setProperty('foo', obj.foo) throws", function () {
+    //    'use strict';
+    //    throws(function () { obj.setProperty('foo', obj.foo); }, // DOES NOT THROW IN IE11 !!!
+    //        TypeError//("Cannot set property foo of #<Object> which has only a getter")
+    //    );
+    //});
     ///////////////////
     test("and USE STRICT, bar reassignment throws", function() {
         'use strict';

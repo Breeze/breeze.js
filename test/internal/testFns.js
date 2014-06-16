@@ -109,6 +109,10 @@ breezeTestFns = (function (breeze) {
         setWellKnownData();
     };
 
+    function updateMetadataForNorthwindIBOData(metadataStore) {
+        
+    }
+
     function setWellKnownData() {
         var wellKnownData;
         if (testFns.DEBUG_MONGO) {
