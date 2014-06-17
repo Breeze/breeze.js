@@ -2800,6 +2800,7 @@ var NavigationProperty = (function () {
     proto.isDataProperty = false;
     proto.isNavigationProperty = true;
 
+    // In progress - will be used for manual metadata config
     proto.createInverse = function (config) {
 
         if (!this.entityType) {
