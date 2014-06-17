@@ -23,8 +23,10 @@
     var ctor = function () {
         this.name = "backbone";
     };
+    // protoFn used instead of proto here to avoid naming collision with function params.
+    var protoFn = ctor.prototype;
    
-    ctor.prototype.initialize = function() {
+    protoFn.initialize = function() {
         Backbone = core.requireLib("Backbone");
         _ = core.requireLib("_;underscore");
         bbSet = Backbone.Model.prototype.set;
@@ -32,7 +34,7 @@
     };
 
     // may be an entityType or a complexType
-    ctor.prototype.createCtor = function(structuralType) {
+    protoFn.createCtor = function(structuralType) {
         var defaults = { };
         structuralType.dataProperties.forEach(function (dp) {
             defaults[dp.name] = dp.defaultValue;
@@ -55,7 +57,7 @@
 
     };
 
-    ctor.prototype.getTrackablePropertyNames = function(entity) {
+    protoFn.getTrackablePropertyNames = function(entity) {
         var names = [];
         for (var p in entity.attributes) {
             names.push(p);
@@ -63,7 +65,7 @@
         return names;
     };
 
-    ctor.prototype.initializeEntityPrototype = function(proto) {
+    protoFn.initializeEntityPrototype = function(proto) {
 
         proto.getProperty = function(propertyName) {
             return this.get(propertyName);
@@ -137,7 +139,7 @@
     };
 
     // called when the entityAspect is first created for an entity
-    ctor.prototype.startTracking = function(entity, proto) {
+    protoFn.startTracking = function(entity, proto) {
         if (!(entity instanceof Backbone.Model)) {
             throw new Error("This entity is not an Backbone.Model instance");
         }

@@ -1182,14 +1182,16 @@ var CsdlMetadataParser = (function () {
         var constraint = association.referentialConstraint;
         if (!constraint) {
             // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
-            return;
+            
             // Think about adding this back later.
-            //if (association.end[0].multiplicity == &quot;*&quot; &amp;&amp; association.end[1].multiplicity == &quot;*&quot;) {
-            //    // many to many relation
-            //    ???
-            //} else {
-            //    throw new Error(&quot;Foreign Key Associations must be turned on for this model&quot;);
-            //}
+            if (association.end[0].multiplicity == &quot;*&quot; &amp;&amp; association.end[1].multiplicity == &quot;*&quot;) {
+                // ignore many to many relations for now
+                return;
+            } else {
+                // For now assume it will be set later directly on the client.
+                // other alternative is to throw an error: 
+                // throw new Error(&quot;Foreign Key Associations must be turned on for this model&quot;);
+            }
         }
         
         var cfg = {
@@ -1199,16 +1201,18 @@ var CsdlMetadataParser = (function () {
             associationName: association.name
         };
 
-        var principal = constraint.principal;
-        var dependent = constraint.dependent;
-        
-        var propRefs = __toArray(dependent.propertyRef);
-        var fkNames = propRefs.map(__pluck(&quot;name&quot;));
-        if (csdlProperty.fromRole === principal.role) {
-            cfg.invForeignKeyNamesOnServer = fkNames;
-        } else {
-            // will be used later by np._update
-            cfg.foreignKeyNamesOnServer = fkNames;
+        if (constraint) {
+            var principal = constraint.principal;
+            var dependent = constraint.dependent;
+
+            var propRefs = __toArray(dependent.propertyRef);
+            var fkNames = propRefs.map(__pluck(&quot;name&quot;));
+            if (csdlProperty.fromRole === principal.role) {
+                cfg.invForeignKeyNamesOnServer = fkNames;
+            } else {
+                // will be used later by np._update
+                cfg.foreignKeyNamesOnServer = fkNames;
+            }
         }
 
         var np = new NavigationProperty(cfg);
@@ -2348,7 +2352,7 @@ var ComplexType = (function () {
             .whereParam(&quot;namespace&quot;).isString().isOptional().withDefault(&quot;&quot;)
             .whereParam(&quot;dataProperties&quot;).isOptional()
             .whereParam(&quot;isComplexType&quot;).isOptional().isBoolean()   // needed because this ctor can get called from the addEntityType method which needs the isComplexType prop
-            .whereParam(&quot;custom&quot;).isOptional().isBoolean()
+            .whereParam(&quot;custom&quot;).isOptional()
             .applyAll(this);
 
         this.name = qualifyTypeName(this.shortName, this.namespace);
@@ -2618,7 +2622,13 @@ var DataProperty = (function () {
                     }
                 }
             }
+        } else if (this.dataType.isNumeric) {
+            // in case the defaultValue comes in as a string ( which it does in EF6).
+            if (typeof (this.defaultValue) === &quot;string&quot;) {
+                this.defaultValue = parseFloat(this.defaultValue);
+            }
         }
+
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
@@ -2996,6 +3006,27 @@ var NavigationProperty = (function () {
         
     proto.isDataProperty = false;
     proto.isNavigationProperty = true;
+
+    proto.createInverse = function (config) {
+
+        if (!this.entityType) {
+            throw new Error(&quot;Inverse entityType has not yet been defined&quot;);
+        }
+        if (this.entityType.isFrozen) {
+            throw new Error(&quot;This entityType is frozen&quot;);
+        }
+        var metadataStore = this.entityType.metadataStore;
+        if (metadataStore == null) {
+            throw new Error(&quot;Cannot create an inverse property until this entityType has been added to the metadataStore&quot;);
+        }
+
+        config.entityTypeName = this.parentEntityType.name;
+        config.associationName = this.associationName;
+        var invNp = new NavigationProperty(config);
+        this.parentEntityType.addNavigationProperty(invNp);
+        return invNp;
+    };
+
 
     /**
     General purpose property set method
