@@ -18,9 +18,9 @@
     var ctor = function () {
         this.name = "webApi";
     };
-    ctor.prototype = new AbstractDataServiceAdapter();
+    var proto = ctor.prototype = new AbstractDataServiceAdapter();
 
-    ctor.prototype._prepareSaveBundle = function(saveContext, saveBundle) {
+    proto._prepareSaveBundle = function(saveContext, saveBundle) {
         var changeRequestInterceptor = this._createChangeRequestInterceptor(saveContext, saveBundle);
         var em = saveContext.entityManager;
         var metadataStore = em.metadataStore;
@@ -54,7 +54,7 @@
         return saveBundle;
     };
 
-    ctor.prototype._prepareSaveResult = function (saveContext, data) {
+    proto._prepareSaveResult = function (saveContext, data) {
         // HACK: need to change the 'case' of properties in the saveResult
         // but KeyMapping properties internally are still ucase. ugh...
         var keyMappings = data.KeyMappings.map(function (km) {
@@ -64,7 +64,7 @@
         return { entities: data.Entities, keyMappings: keyMappings };
     };
     
-    ctor.prototype.jsonResultsAdapter = new JsonResultsAdapter({
+    proto.jsonResultsAdapter = new JsonResultsAdapter({
         
         name: "webApi_default",
         

@@ -22,19 +22,19 @@
         this.name = "OData";
     };
 
-    var fn = ctor.prototype; // minifies better (as seen in jQuery)
+    var proto = ctor.prototype; // minifies better (as seen in jQuery)
 
-    fn.initialize = function () {
+    proto.initialize = function () {
         OData = core.requireLib("OData", "Needed to support remote OData services");
         OData.jsonHandler.recognizeDates = true;
     };
     // borrow from AbstractDataServiceAdapter
     var abstractDsaProto = breeze.AbstractDataServiceAdapter.prototype;
-    fn._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
-    fn.ChangeRequestInterceptor = abstractDsaProto.ChangeRequestInterceptor;
-    fn._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
+    proto._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
+    proto.ChangeRequestInterceptor = abstractDsaProto.ChangeRequestInterceptor;
+    proto._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
 
-    fn.executeQuery = function (mappingContext) {
+    proto.executeQuery = function (mappingContext) {
     
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
@@ -59,7 +59,7 @@
     };
     
 
-    fn.fetchMetadata = function (metadataStore, dataService) {
+    proto.fetchMetadata = function (metadataStore, dataService) {
 
         var deferred = Q.defer();
 
@@ -107,9 +107,9 @@
 
     };
 
-    fn.getRoutePrefix = function(/*dataService*/){ return ''; } // see webApiODataCtor
+    proto.getRoutePrefix = function(/*dataService*/){ return ''; } // see webApiODataCtor
 
-    fn.saveChanges = function (saveContext, saveBundle) {
+    proto.saveChanges = function (saveContext, saveBundle) {
         var adapter = saveContext.adapter = this;
         var deferred = Q.defer();
         saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
@@ -167,7 +167,7 @@
 
     };
  
-    fn.jsonResultsAdapter = new JsonResultsAdapter({
+    proto.jsonResultsAdapter = new JsonResultsAdapter({
         name: "OData_default",
 
         visitNode: function (node, mappingContext, nodeContext) {
@@ -348,7 +348,7 @@
 
             }
         }
-        fn._catchNoConnectionError(result);
+        proto._catchNoConnectionError(result);
         return result;
     }
 

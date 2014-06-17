@@ -33,9 +33,9 @@
         });
     };
 
-    var fn = ctor.prototype = new AbstractDataServiceAdapter();
+    var proto = ctor.prototype = new AbstractDataServiceAdapter();
 
-    fn._prepareSaveBundle = function(saveContext, saveBundle) {
+    proto._prepareSaveBundle = function(saveContext, saveBundle) {
         var changeRequestInterceptor = this._createChangeRequestInterceptor(saveContext, saveBundle);
         var em = saveContext.entityManager;
         var metadataStore = em.metadataStore;
@@ -85,7 +85,7 @@
         return saveBundle;
     };
 
-    fn._prepareSaveResult = function (saveContext, data) {
+    proto._prepareSaveResult = function (saveContext, data) {
 
         var em = saveContext.entityManager;
         var keys = data.insertedKeys.concat(data.updatedKeys, data.deletedKeys);
@@ -106,7 +106,7 @@
     };
 
 
-    fn.jsonResultsAdapter = new JsonResultsAdapter({
+    proto.jsonResultsAdapter = new JsonResultsAdapter({
         name: "mongo",
 
         visitNode: function (node, mappingContext /*, nodeContext*/) {

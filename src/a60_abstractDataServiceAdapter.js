@@ -4,15 +4,15 @@
     
     var ctor = function () { };
 
-    var fn = ctor.prototype; // minifies better (as seen in jQuery)
+    var proto = ctor.prototype; // minifies better (as seen in jQuery)
 
-    fn.checkForRecomposition = function (interfaceInitializedArgs) {
+    proto.checkForRecomposition = function (interfaceInitializedArgs) {
         if (interfaceInitializedArgs.interfaceName === "ajax" && interfaceInitializedArgs.isDefault) {
             this.initialize();
         }
     };
     
-    fn.initialize = function () {
+    proto.initialize = function () {
         ajaxImpl = breeze.config.getAdapterInstance("ajax");
 
         // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues. 
@@ -20,7 +20,7 @@
         throw new Error("Unable to find ajax adapter for dataservice adapter '"+(this.name||'')+"'.");
     };
 
-    fn.fetchMetadata = function (metadataStore, dataService) {
+    proto.fetchMetadata = function (metadataStore, dataService) {
         var serviceName = dataService.serviceName;
         var url = dataService.makeUrl("Metadata");
         
@@ -60,7 +60,7 @@
         return deferred.promise;
     };
 
-    fn.executeQuery = function (mappingContext) {
+    proto.executeQuery = function (mappingContext) {
 
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
@@ -102,7 +102,7 @@
         return deferred.promise;
     };
 
-    fn.saveChanges = function (saveContext, saveBundle) {
+    proto.saveChanges = function (saveContext, saveBundle) {
         var adapter = saveContext.adapter = this;     
         var deferred = Q.defer();
         saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
@@ -138,7 +138,7 @@
         return deferred.promise;
     };
 
-    fn._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
+    proto._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
         // The implementor should create and call the concrete adapter's ChangeRequestInterceptor
         throw new Error("Need a concrete implementation of _prepareSaveBundle");
     };
@@ -155,7 +155,7 @@
     // - accept the 'saveContext' and 'saveBundle' and as the first two parameters.
     // - instantiate an object that implements the methods shown here.
     // - use 'saveBundle' and 'saveContext' captures in those methods.
-    fn.ChangeRequestInterceptor = function (saveContext, saveBundle){
+    proto.ChangeRequestInterceptor = function (saveContext, saveBundle){
         // Method: getRequest
         // Prepare and return the save data for an entity-to-be-saved
         // Called for each entity-to-be-saved
@@ -176,7 +176,7 @@
         this.done = function(requests) {};    
     }
 
-    fn._createChangeRequestInterceptor = function(saveContext, saveBundle){
+    proto._createChangeRequestInterceptor = function(saveContext, saveBundle){
         var adapter = saveContext.adapter;
         var isFn = __isFunction;
         var CRI = adapter.ChangeRequestInterceptor;
@@ -195,11 +195,11 @@
         throw new Error(pre + post);
     }
 
-    fn._prepareSaveResult = function (/* saveContext, data */) {
+    proto._prepareSaveResult = function (/* saveContext, data */) {
         throw new Error("Need a concrete implementation of _prepareSaveResult");
     };
     
-    fn.jsonResultsAdapter = new JsonResultsAdapter( {
+    proto.jsonResultsAdapter = new JsonResultsAdapter( {
         name: "noop",
         
         visitNode: function (/* node, mappingContext, nodeContext */) {
@@ -239,12 +239,12 @@
         } else {
             err.message = httpResponse.error && httpResponse.error.toString();
         }
-        fn._catchNoConnectionError(err);
+        proto._catchNoConnectionError(err);
         return err;
     };
 
     // Put this at the bottom of your http error analysis
-    fn._catchNoConnectionError = function (err){
+    proto._catchNoConnectionError = function (err){
         if (err.status == 0 && err.message == null){
             err.message = "HTTP response status 0 and no message. " +
             "Likely did not or could not reach server. Is the server running?";
