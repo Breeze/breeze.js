@@ -283,6 +283,52 @@
 
     });
 
+    test("save new entity with enum", function() {
+        if (testFns.DEBUG_ODATA) {
+            ok(true, "Skipped tests - OData does not yet support enums");
+            return;
+        };
+
+        if (testFns.DEBUG_MONGO) {
+            ok(true, "N/A for MONGO - no enum support.");
+            return;
+        }
+
+        var em = newEm();
+        var em2 = newEm();
+        var roleType = em.metadataStore.getEntityType("Role");
+        stop();
+        
+        var aRole = em.createEntity("Role");
+        var aRole2;
+        aRole.setProperty("roleType", "Restricted");
+        aRole.setProperty("name", "TEMP" + testFns.makeTempString(5));
+        var ves = aRole.entityAspect.validateEntity();
+        em.saveChanges().then(function(sr) {
+            ok(sr.entities.length == 1, "should have saved (added) one entity");
+            aRole.setProperty("roleType", "Guest");
+            return em.saveChanges();
+        }).then(function(sr2) {
+            ok(sr2.entities.length == 1, "should have saved (modified) one entity");
+            var q2 = EntityQuery.fromEntities(aRole);
+            return em2.executeQuery(q2);
+        }).then(function(data) {
+            var roles = data.results;
+            ok(roles.length == 1, "should have queried one entity");
+
+            aRole2 = roles[0];
+            var rt = aRole2.getProperty("roleType");
+            ok(rt == "Guest", "value should be 'Guest'");
+            // throw away 'set' because the object is going to be deleted anyway.
+            aRole2.setProperty("roleType", "Restricted");
+            aRole2.entityAspect.setDeleted();
+            return em2.saveChanges();
+        }).then(function(sr3) {
+            ok(sr3.entities.length == 1, "should have deleted one entity");
+            ok(aRole2.entityAspect.entityState.isDetached(), "should be detached");
+        }).fail(testFns.handleFail).fin(start);
+    });
+
     test("exceptions thrown on server", function () {
         if (testFns.DEBUG_ODATA) {
             ok(true, "Skipped test - OData does not support server interception or alt resources");

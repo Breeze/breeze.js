@@ -617,6 +617,17 @@ breezeTestFns = (function (breeze) {
     };
 
     testFns.sizeOf = sizeOf;
+    testFns.sizeOfDif = sizeOfDif;
+
+    testFns.makeTempString = function (length) {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < length; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    };
 
     testFns.arrayDistinct = function(array) {
         array = array || [];
@@ -626,9 +637,9 @@ breezeTestFns = (function (breeze) {
                 result.push(array[i]);
         }
         return result;
-    }
+    };
 
-    testFns.sizeOfDif = sizeOfDif;
+    
 
     function sizeOf(value, level) {
         if (level == undefined) level = 0;
