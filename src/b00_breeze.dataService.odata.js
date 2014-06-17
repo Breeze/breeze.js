@@ -364,7 +364,7 @@
         this.name = "webApiOData";
     }
 
-    breeze.core.extend(webApiODataCtor.prototype, fn);
+    breeze.core.extend(webApiODataCtor.prototype, proto);
 
     webApiODataCtor.prototype.getRoutePrefix = function(dataService){
         // Get the routePrefix from a Web API OData service name.
