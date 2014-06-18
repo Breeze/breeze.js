@@ -216,7 +216,7 @@ var Q = __requireLibCore(&quot;Q&quot;);
 if (!Q) {
     // No Q.js! Substitute a placeholder Q which always fails 
     // Should be replaced by the app via breeze.config.setQ
-    // For example, see Breeze Labs &quot;breeze.use$q&quot;
+    // For example, see Breeze Labs &quot;breeze.angular&quot;
     Q = function() {
         var eMsg = &#x27;Q is undefined. Are you missing Q.js? See https://github.com/kriskowal/q&#x27;;
         throw new Error(eMsg);
@@ -224,8 +224,7 @@ if (!Q) {
     
     // all Q methods called by Breeze should fail
     Q.defer = Q.resolve = Q.reject = Q;
-}
-    
+} 
 
 /**
 (Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.
@@ -235,7 +234,8 @@ if (!Q) {
 @param [q.resolve] {Function} A function returning a resolved promise.
 @param [q.reject] {Function} A function returning a rejected promise.
 **/
-breeze.config.setQ = function (q) { Q = q; }
+breeze.config.setQ = function (q) { breeze.Q = Q = q; }
+breeze.Q = Q; // Todo: consider a &quot;safer&quot; way for apps to get breeze&#x27;s Q. 
 
 // TODO: still need to handle inheritence here.
              

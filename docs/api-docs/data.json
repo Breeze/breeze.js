@@ -2824,7 +2824,7 @@
                 }
             ],
             "return": {
-                "description": "\n\n    promiseData.results {Array of Entity}\n    promiseData.query {EntityQuery} The original query\n    promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.",
+                "description": "promiseData.results {Array of Entity}\n    promiseData.query {EntityQuery} The original query\n    promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.",
                 "type": "Promise"
             },
             "class": "EntityAspect",
@@ -3735,7 +3735,7 @@
         },
         {
             "file": "..\\..\\src\\a40_entityMetadata.js",
-            "line": 23,
+            "line": 22,
             "description": "(Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.",
             "itemtype": "method",
             "name": "setQ",
@@ -7845,7 +7845,7 @@
                 }
             ],
             "return": {
-                "description": "\n\n    promiseData.entity {Object} The entity returned or null\n    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.\n    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.",
+                "description": "promiseData.entity {Object} The entity returned or null\n    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.\n    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.",
                 "type": "Promise"
             },
             "class": "EntityManager",
@@ -7874,7 +7874,7 @@
                 }
             ],
             "return": {
-                "description": "\n    \n    promiseData.entity {Object} The entity returned or null\n    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.\n    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.",
+                "description": "promiseData.entity {Object} The entity returned or null\n    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.\n    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.",
                 "type": "Promise"
             },
             "class": "EntityManager",
