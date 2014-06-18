@@ -17,14 +17,14 @@
             // left behind by some outside test that forgot to cleanup.
             // The prototype-level interceptor is untouched.
             dsAdapter = breeze.config.getAdapterInstance('dataService');
-            delete dsAdapter.ChangeRequestInterceptor;
+            delete dsAdapter.changeRequestInterceptor;
         },
         teardown: function () {
-            delete dsAdapter.ChangeRequestInterceptor;
+            delete dsAdapter.changeRequestInterceptor;
         }
     });
 
-    asyncTest('no interceptor, no harm', function(){
+    asyncTest('Default interceptor, no harm', function(){
         var em = newEm();
         getNancy(em).then(function(nancy){
             tweakEmp(nancy);
@@ -35,14 +35,25 @@
         })
         .catch(handleFail).finally(start);
     });
-
+    asyncTest('NULL interceptor, no harm', function () {
+        dsAdapter.changeRequestInterceptor = null;
+        var em = newEm();
+        getNancy(em).then(function (nancy) {
+            tweakEmp(nancy);
+            return em.saveChanges();
+        })
+        .then(function (result) {
+            equal(result.entities.length, 1, "should have saved Nancy");
+        })
+        .catch(handleFail).finally(start);
+    });
     asyncTest('interceptor members called with expected values', function () {
         var em = newEm();
         var nancy;
         var wasCalled = false;
 
         // simple enough for all dataservice adapters
-        dsAdapter.ChangeRequestInterceptor = function (saveContext, saveBundle) {
+        dsAdapter.changeRequestInterceptor = function (saveContext, saveBundle) {
 
             ok(saveContext.entityManager === em, "'saveContext' should have the em");
             ok(saveBundle.saveOptions, "'saveBundle' should have a 'saveOptions'");
@@ -82,7 +93,7 @@
         .catch(handleFail)
         .finally(function() {
             // poison this adapter's interceptor to prove test module always clears it
-            dsAdapter.ChangeRequestInterceptor = PoisonInterceptor;
+            dsAdapter.changeRequestInterceptor = PoisonInterceptor;
             start();
         });
     });

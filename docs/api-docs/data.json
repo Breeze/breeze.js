@@ -242,6 +242,13 @@
             "fors": {},
             "namespaces": {}
         },
+        "..\\..\\src\\a60_abstractDataServiceAdapter.js": {
+            "name": "..\\..\\src\\a60_abstractDataServiceAdapter.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "..\\..\\src\\iface.ajaxInterface.js": {
             "name": "..\\..\\src\\iface.ajaxInterface.js",
             "modules": {},
@@ -8203,6 +8210,86 @@
             ],
             "chainable": 1,
             "class": "SaveOptions",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\..\\src\\a60_abstractDataServiceAdapter.js",
+            "line": 146,
+            "description": "Returns a constructor function for a \"ChangeRequestInterceptor\"\nthat can tweak the saveBundle both as it is built and when it is completed\nby a concrete DataServiceAdapater.\n\nInitialized with a default, no-op implementation that developers can replace with a\nsubstantive implementation that changes the individual entity change requests \nor aspects of the entire 'saveBundle' without having to write their own DataService adapters.",
+            "example": [
+                "\nvar adapter = breeze.config.getAdapterInstance('dataService');\nadapter.changeRequestInterceptor = function (saveContext, saveBundle) {\n    this.getRequest = function (request, entity, index) {\n        // alter the request that the adapter prepared for this entity\n        // based on the entity, saveContext, and saveBundle\n        // e.g., add a custom header or prune the originalValuesMap\n        return request;\n    };\n    this.done = function (requests) {\n        // alter the array of requests representing the entire change-set \n        // based on the saveContext and saveBundle\n    };\n}"
+            ],
+            "itemtype": "method",
+            "name": "changeRequestInterceptor",
+            "params": [
+                {
+                    "name": "saveContext",
+                    "description": "The BreezeJS \"context\" for the save operation.",
+                    "type": "Object"
+                },
+                {
+                    "name": "saveBundle",
+                    "description": "Contains the array of entities-to-be-saved (AKA, the entity change-set).",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Constructor for a \"ChangeRequestInterceptor\".",
+                "type": "Function"
+            },
+            "class": "ↈ_ajax_interface",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\..\\src\\a60_abstractDataServiceAdapter.js",
+            "line": 178,
+            "description": "Prepare and return the save data for an entity change-set. \n\nThe adapter calls this method for each entity in the change-set,\nafter it has prepared a \"change request\" for that object.\n\nThe method can do anything to the request but it must return a valid, non-null request.",
+            "example": [
+                "\nthis.getRequest = function (request, entity, index) {\n    // alter the request that the adapter prepared for this entity\n    // based on the entity, saveContext, and saveBundle\n    // e.g., add a custom header or prune the originalValuesMap\n    return request;\n};"
+            ],
+            "itemtype": "method",
+            "name": "getRequest",
+            "params": [
+                {
+                    "name": "request",
+                    "description": "The object representing the adapter's request to save this entity.",
+                    "type": "Object"
+                },
+                {
+                    "name": "entity",
+                    "description": "The entity-to-be-save as it is in cache",
+                    "type": "Entity"
+                },
+                {
+                    "name": "index",
+                    "description": "The zero-based index of this entity in the change-set array",
+                    "type": "Integer"
+                }
+            ],
+            "return": {
+                "description": "The potentially revised request.",
+                "type": "Function"
+            },
+            "class": "ↈ_ajax_interface",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\..\\src\\a60_abstractDataServiceAdapter.js",
+            "line": 200,
+            "description": "Last chance to change anything about the 'requests' array\nafter it has been built with requests for all of the entities-to-be-saved. \n\nThe 'requests' array is the same as 'saveBundle.entities' in many implementations\n\nThis method can do anything to the array including add and remove requests.\nIt's up to you to ensure that server will accept the requests array data as valid.\n\nReturned value is ignored.",
+            "example": [
+                "\nthis.done = function (requests) {\n    // alter the array of requests representing the entire change-set \n    // based on the saveContext and saveBundle\n};"
+            ],
+            "itemtype": "method",
+            "name": "done",
+            "params": [
+                {
+                    "name": "requests",
+                    "description": "The adapter's array of request for this changeset.",
+                    "type": "Array of Object"
+                }
+            ],
+            "class": "ↈ_ajax_interface",
             "module": "breeze"
         },
         {

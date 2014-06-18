@@ -31,7 +31,7 @@
     // borrow from AbstractDataServiceAdapter
     var abstractDsaProto = breeze.AbstractDataServiceAdapter.prototype;
     proto._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
-    proto.ChangeRequestInterceptor = abstractDsaProto.ChangeRequestInterceptor;
+    proto.changeRequestInterceptor = abstractDsaProto.changeRequestInterceptor;
     proto._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
 
     proto.executeQuery = function (mappingContext) {

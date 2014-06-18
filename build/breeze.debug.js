@@ -14867,50 +14867,92 @@ breeze.SaveOptions= SaveOptions;
     };
 
     proto._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
-        // The implementor should create and call the concrete adapter's ChangeRequestInterceptor
+        // The implementor should call _createChangeRequestInterceptor
         throw new Error("Need a concrete implementation of _prepareSaveBundle");
     };
 
-    // The default, no-op implementation of a "ChangeRequestInterceptor" ctor 
-    // that can tweak the saveBundle both as it is built and when it is completed
-    // by a concrete DataServiceAdapater.
-    //
-    // Applications can specify an alternative constructor with a different implementation
-    // enabling them to change aspects of the 'saveBundle' or the individual change requests 
-    // without having to write their own DataService adapters.
-    //
-    // Applications that define an overriding interceptor should follow this pattern.
-    // - accept the 'saveContext' and 'saveBundle' and as the first two parameters.
-    // - instantiate an object that implements the methods shown here.
-    // - use 'saveBundle' and 'saveContext' captures in those methods.
-    proto.ChangeRequestInterceptor = function (saveContext, saveBundle){
-        // Method: getRequest
-        // Prepare and return the save data for an entity-to-be-saved
-        // Called for each entity-to-be-saved
-        // Parameters:
-        //    'request' is the entity save data as prepared by the adapter before interception        
-        //    'entity' is the manager's cached entity-to-be-saved 
-        //    'index' is the index of this entity in the array of original entities-to-be-saved.
-        // This interceptor is free to do as it pleases with these inputs
-        // but it must return something.
+    /**
+    Returns a constructor function for a "ChangeRequestInterceptor"
+    that can tweak the saveBundle both as it is built and when it is completed
+    by a concrete DataServiceAdapater.
+
+    Initialized with a default, no-op implementation that developers can replace with a
+    substantive implementation that changes the individual entity change requests 
+    or aspects of the entire 'saveBundle' without having to write their own DataService adapters.
+
+    @example
+    var adapter = breeze.config.getAdapterInstance('dataService');
+    adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
+        this.getRequest = function (request, entity, index) {
+            // alter the request that the adapter prepared for this entity
+            // based on the entity, saveContext, and saveBundle
+            // e.g., add a custom header or prune the originalValuesMap
+            return request;
+        };
+        this.done = function (requests) {
+            // alter the array of requests representing the entire change-set 
+            // based on the saveContext and saveBundle
+        };
+    }
+    @method changeRequestInterceptor
+    @param saveContext {Object} The BreezeJS "context" for the save operation.
+    @param saveBundle {Object} Contains the array of entities-to-be-saved (AKA, the entity change-set).
+    @return {Function} Constructor for a "ChangeRequestInterceptor".
+    **/
+    proto.changeRequestInterceptor = DefaultChangeRequestInterceptor;
+
+    //This is a default, no-op implementation that developers can replace.
+    function DefaultChangeRequestInterceptor(saveContext, saveBundle) {
+        /**
+        Prepare and return the save data for an entity change-set. 
+        
+        The adapter calls this method for each entity in the change-set,
+        after it has prepared a "change request" for that object.
+
+        The method can do anything to the request but it must return a valid, non-null request.
+        @example
+        this.getRequest = function (request, entity, index) {
+            // alter the request that the adapter prepared for this entity
+            // based on the entity, saveContext, and saveBundle
+            // e.g., add a custom header or prune the originalValuesMap
+            return request;
+        };
+        @method getRequest
+        @param request {Object} The object representing the adapter's request to save this entity.       
+        @param entity {Entity} The entity-to-be-save as it is in cache
+        @param index {Integer} The zero-based index of this entity in the change-set array
+        @return {Function} The potentially revised request.
+        **/
         this.getRequest = function (request, entity, index){return request;};
 
-        // Method: done
-        // Last chance to change anything about the 'requests' object
-        // after it has been built with requests for all of the entities-to-be-saved.        
-        // 'requests' is the same as 'saveBundle.entities' in many implementations
-        // Returns void.
-        // Called just before the saveBundle is serialized for posting to the server
+        /**
+        Last chance to change anything about the 'requests' array
+        after it has been built with requests for all of the entities-to-be-saved. 
+        
+        The 'requests' array is the same as 'saveBundle.entities' in many implementations
+
+        This method can do anything to the array including add and remove requests.
+        It's up to you to ensure that server will accept the requests array data as valid.
+
+        Returned value is ignored.
+        @example
+        this.done = function (requests) {
+            // alter the array of requests representing the entire change-set 
+            // based on the saveContext and saveBundle
+        };
+        @method done
+        @param requests {Array of Object} The adapter's array of request for this changeset.       
+        **/
         this.done = function(requests) {};    
     }
 
     proto._createChangeRequestInterceptor = function(saveContext, saveBundle){
         var adapter = saveContext.adapter;
         var isFn = __isFunction;
-        var CRI = adapter.ChangeRequestInterceptor;
+        var CRI = adapter.changeRequestInterceptor;
         var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
         var post = " is missing or not a function.";
-        if (isFn(CRI)){
+        if (isFn(CRI)) {
             var interceptor = new CRI(saveContext, saveBundle);
             if (!isFn(interceptor.getRequest)) {
                 throw new Error(pre + '.getRequest' + post);
@@ -14919,8 +14961,9 @@ breeze.SaveOptions= SaveOptions;
                 throw new Error(pre + '.done' + post);
             }
             return interceptor;
+        } else {
+            return new DefaultChangeRequestInterceptor(saveContext, saveBundle);
         }
-        throw new Error(pre + post);
     }
 
     proto._prepareSaveResult = function (/* saveContext, data */) {
@@ -15320,7 +15363,7 @@ breeze.SaveOptions= SaveOptions;
     // borrow from AbstractDataServiceAdapter
     var abstractDsaProto = breeze.AbstractDataServiceAdapter.prototype;
     proto._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
-    proto.ChangeRequestInterceptor = abstractDsaProto.ChangeRequestInterceptor;
+    proto.changeRequestInterceptor = abstractDsaProto.changeRequestInterceptor;
     proto._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
 
     proto.executeQuery = function (mappingContext) {
