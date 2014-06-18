@@ -57,7 +57,7 @@ module.exports = function(grunt) {
       buildIntellisense: {
         // 'src' here only for the newer task to pick up - not needed for buildIntellisense
         src: srcDir + '*.*',
-        cwd: '../intellisense',
+        cwd: 'intellisense',
         cmd: 'node server.js'
       }
     },

@@ -1,4 +1,4 @@
-﻿// Generated on: Tue Jun 17 2014 09:47:56 GMT-0700 (Pacific Daylight Time)
+﻿// Generated on: Tue Jun 17 2014 17:14:06 GMT-0700 (Pacific Daylight Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -1001,7 +1001,7 @@ intellisense.annotate(breeze.breeze.EntityAspect.prototype, {
     ///   <param name="navigationProperty" type="NavigationProperty|String" optional="true">The NavigationProperty or the name of the NavigationProperty to 'load'.</param>
     ///   <param name="callback" type="Function" optional="true">Function to call on success.</param>
     ///   <param name="errorCallback" type="Function" optional="true">Function to call on failure.</param>
-    ///   <returns type="breeze.breeze.Promise" ></returns>
+    ///   <returns type="breeze.breeze.Promise" >promiseData.results {Array of Entity}     promiseData.query {EntityQuery} The original query     promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.</returns>
     /// </signature>
   },
   'validateEntity': function() {
@@ -2629,7 +2629,7 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   <param name="typeName" type="EntityType | String" optional="true">The EntityType or EntityType name for this key.</param>
     ///   <param name="keyValues" type="Object|Array of Object" optional="true">The values for this key - will usually just be a single value; an array is only needed for multipart keys.</param>
     ///   <param name="checkLocalCacheFirst" type="Boolean=false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
-    ///   <returns type="breeze.breeze.Promise" ></returns>
+    ///   <returns type="breeze.breeze.Promise" >promiseData.entity {Object} The entity returned or null     promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.     promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</returns>
     /// </signature>
   },
   'fetchEntityByKey - overload': function() {
@@ -2640,7 +2640,7 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   </summary>
     ///   <param name="entityKey" type="breeze.breeze.EntityKey" optional="true">The   'EntityKey' of the Entity to be located.</param>
     ///   <param name="checkLocalCacheFirst" type="Boolean=false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
-    ///   <returns type="breeze.breeze.Promise" >          promiseData.entity {Object} The entity returned or null     promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.     promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</returns>
+    ///   <returns type="breeze.breeze.Promise" >promiseData.entity {Object} The entity returned or null     promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.     promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</returns>
     /// </signature>
   },
   'findEntityByKey': function() {
