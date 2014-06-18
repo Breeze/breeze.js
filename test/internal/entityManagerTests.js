@@ -29,6 +29,55 @@
         }
     });
 
+    test("export/import with tempkey", function() {
+        var em = newEm();
+        var emp = em.createEntity("Employee");
+        var exportedEnts = em.exportEntities();
+        // result2.keyMap should import emp:-1 as emp:-2
+        var result = em.importEntities(exportedEnts);
+        var exportedEnts2 = em.exportEntities();
+        var em2 = newEm();
+        var result2 = em2.importEntities(exportedEnts2);
+        var emp3 = em2.createEntity("Employee");
+        ok(em2.getEntities().length == 3);
+        ok(true, "made it to here");
+
+    });
+
+    test("querying server unmapped property", function() {
+
+        var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
+
+        var Customer = function() {
+            this.extraInfo = "fromClient";
+        };
+
+        store.registerEntityTypeCtor("Customer", Customer);
+        var em = newEm(store);
+        // create a fake customer
+        var cust = em.createEntity("Customer", { CompanyName: "Acme" },
+            EntityState.Unchanged);
+        var extraInfo1 = cust.getProperty("extraInfo");
+        ok(extraInfo1 === "fromClient", "should be 'fromClient'");
+        var query = new breeze.EntityQuery()
+            .from("Customers").take(1);
+        stop();
+        em.executeQuery(query).then(function(data) {
+            var r = data.results;
+            ok(r.length == 1, "should have returned 1 record");
+            var extraInfo2 = r[0].getProperty("extraInfo");
+            ok(extraInfo2 === "fromServer", "should be 'fromServer'");
+            var q2 = query.noTracking();
+            var em2 = newEm(store);
+            return em2.executeQuery(q2);
+        }).then(function (data2) {
+            var r2 = data2.results;
+            ok(r2.length == 1, "should have returned 1 record");
+            ok(r2[0].extraInfo === "fromServer", "should also be 'fromServer'");
+        }).fail(testFns.handleFail).fin(start);
+        
+    });
+
     test("reject changes reverts an unmapped property - only unmapped property changed", 1, function () {
         ok(false, "Expected failure - for now at least one mapped property must be changed for rejectChanges to work.")
         return true;
@@ -59,6 +108,7 @@
             core.formatString("'lastTouched' unmapped property should be rolled back. Started as %1; now is %2",
             originalTime, cust.getProperty("lastTouched")));
     });
+
 
 
     test("export/import with nulls", function () {
