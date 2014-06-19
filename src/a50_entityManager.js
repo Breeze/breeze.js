@@ -1498,7 +1498,7 @@ var EntityManager = (function () {
             // attach any unattachedChildren
             var tuples = unattachedMap.getTuples(entityKey);
             if (tuples) {
-                tuples.forEach(function (tpl) {
+                tuples.slice(0).forEach(function (tpl) {
 
                     var unattachedChildren = tpl.children.filter(function (e) {
                         return e.entityAspect.entityState !== EntityState.Detached;
