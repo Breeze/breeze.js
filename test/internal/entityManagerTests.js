@@ -81,7 +81,8 @@
         var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 
         var Customer = function() {
-            this.extraInfo = "fromClient";
+            this.extraString = "fromClient";
+            this.extraDouble = 0;
         };
 
         store.registerEntityTypeCtor("Customer", Customer);
@@ -89,23 +90,28 @@
         // create a fake customer
         var cust = em.createEntity("Customer", { CompanyName: "Acme" },
             EntityState.Unchanged);
-        var extraInfo1 = cust.getProperty("extraInfo");
-        ok(extraInfo1 === "fromClient", "should be 'fromClient'");
+        var extraString1 = cust.getProperty("extraString");
+        var extraDouble1 = cust.getProperty("extraDouble")
+        ok(extraString1 === "fromClient", "should be 'fromClient'");
+        ok(extraDouble1 === 0, "should be 0");
         var query = new breeze.EntityQuery()
             .from("Customers").take(1);
         stop();
         em.executeQuery(query).then(function(data) {
             var r = data.results;
             ok(r.length == 1, "should have returned 1 record");
-            var extraInfo2 = r[0].getProperty("extraInfo");
-            ok(extraInfo2 === "fromServer", "should be 'fromServer'");
+            var extraString2 = r[0].getProperty("extraString");
+            var extraDouble2 = r[0].getProperty("extraDouble");
+            ok(extraString2 === "fromServer", "should be 'fromServer'");
+            ok(extraDouble2 === 3.14159, "should be 3.14159");
             var q2 = query.noTracking();
             var em2 = newEm(store);
             return em2.executeQuery(q2);
         }).then(function (data2) {
             var r2 = data2.results;
             ok(r2.length == 1, "should have returned 1 record");
-            ok(r2[0].extraInfo === "fromServer", "should also be 'fromServer'");
+            ok(r2[0].extraString === "fromServer", "should also be 'fromServer'");
+            ok(r2[0].extraDouble === 3.14159, "should also be 3.14159");
         }).fail(testFns.handleFail).fin(start);
         
     });
