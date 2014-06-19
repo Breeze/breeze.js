@@ -3388,7 +3388,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 185,
+            "line": 190,
             "itemtype": "property",
             "name": "String",
             "type": "DataType",
@@ -3399,7 +3399,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 196,
+            "line": 201,
             "itemtype": "property",
             "name": "Int64",
             "type": "DataType",
@@ -3410,7 +3410,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 207,
+            "line": 212,
             "itemtype": "property",
             "name": "Int32",
             "type": "DataType",
@@ -3421,7 +3421,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 218,
+            "line": 223,
             "itemtype": "property",
             "name": "Int16",
             "type": "DataType",
@@ -3432,7 +3432,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 229,
+            "line": 234,
             "itemtype": "property",
             "name": "Byte",
             "type": "DataType",
@@ -3443,7 +3443,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 235,
+            "line": 240,
             "itemtype": "property",
             "name": "Decimal",
             "type": "DataType",
@@ -3454,7 +3454,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 246,
+            "line": 251,
             "itemtype": "property",
             "name": "Double",
             "type": "DataType",
@@ -3465,7 +3465,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 257,
+            "line": 262,
             "itemtype": "property",
             "name": "Single",
             "type": "DataType",
@@ -3476,7 +3476,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 268,
+            "line": 273,
             "itemtype": "property",
             "name": "DateTime",
             "type": "DataType",
@@ -3487,7 +3487,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 280,
+            "line": 285,
             "itemtype": "property",
             "name": "DateTimeOffset",
             "type": "DataType",
@@ -3498,7 +3498,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 291,
+            "line": 296,
             "itemtype": "property",
             "name": "Time",
             "type": "DataType",
@@ -3509,7 +3509,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 297,
+            "line": 302,
             "itemtype": "property",
             "name": "Boolean",
             "type": "DataType",
@@ -3520,7 +3520,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 303,
+            "line": 308,
             "itemtype": "property",
             "name": "Guid",
             "type": "DataType",
@@ -3531,7 +3531,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 314,
+            "line": 319,
             "itemtype": "property",
             "name": "Binary",
             "type": "DataType",
@@ -3542,7 +3542,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 320,
+            "line": 325,
             "itemtype": "property",
             "name": "Undefined",
             "type": "DataType",
@@ -3553,7 +3553,7 @@
         },
         {
             "file": "..\\..\\src\\a37_dataType.js",
-            "line": 328,
+            "line": 333,
             "description": "Returns the DataType for a specified EDM type name.",
             "itemtype": "method",
             "name": "fromEdmDataType",
