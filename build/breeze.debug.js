@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.13",
+        version: "1.4.14",
         metadataVersion: "1.0.5"
     };
     ;/**
