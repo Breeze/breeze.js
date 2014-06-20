@@ -6,39 +6,33 @@
  * Author: Jay Traband
  */
 
-(function (global, definition) {
-    var def = function(){ return definition(global); };
+(function (definition) {
 
     // CommonJS
     if (typeof exports === "object" && typeof module === "object") {
-        module.exports = def();
+        module.exports = definition();
         // RequireJS
     } else if (typeof define === "function" && define["amd"]) {
-        define(def);
+        define(definition);
         // <script>
     } else {
-        breeze = def();
+        breeze = definition();
     }
 
-})(this, function (global) {
-    "use strict"; 
+})(function () {  
     var breeze = {
-        version: "1.4.14",
+        version: "1.4.12",
         metadataVersion: "1.0.5"
     };
+	"use strict";
+
+
     ;/**
  @module core
  **/
 
 var __hasOwnProperty = uncurry(Object.prototype.hasOwnProperty);
 var __arraySlice = uncurry(Array.prototype.slice);
-var __isES5Supported = function () {
-    try {
-        return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
-    } catch (e) {
-        return false;
-    }
-}();
 
 // iterate over object
 function __objectForEach(obj, kvFn) {
@@ -74,23 +68,7 @@ function __objectMapToArray(obj, kvFn) {
     return results;
 }
 
-function __isSettable(entity, propertyName) {
-    var pd = __getPropDescriptor(entity, propertyName);
-    if (pd == null) return true;
-    return !! (pd.writable || pd.set);
-}
 
-function __getPropDescriptor(obj, propertyName) {
-    if (!__isES5Supported) return null;
-
-    if (obj.hasOwnProperty(propertyName)) {
-        return Object.getOwnPropertyDescriptor(obj, propertyName);
-    } else {
-        var nextObj = Object.getPrototypeOf(obj);
-        if (nextObj == null) return null;
-        return __getPropDescriptor(nextObj, propertyName);
-    }
-} 
 
 // Functional extensions 
 
@@ -376,7 +354,7 @@ function __requireLib(libNames, errMessage) {
 
 // Returns the 'libName' module if loaded or else returns undefined
 function __requireLibCore(libName) {
-    var window = global.window;
+    var window = this.window;
     if (!window) return; // Must run in a browser. Todo: add commonjs support
 
     // get library from browser globals if we can
@@ -588,10 +566,6 @@ if (!Object.create) {
 }
 
 var core = {};
-
-
-
-core.__isES5Supported = __isES5Supported;
 
 // core.getOwnPropertyValues = __getOwnPropertyValues;
 core.objectForEach= __objectForEach;
@@ -3645,9 +3619,6 @@ var EntityAspect = (function() {
     }
 
     // Dangerous method - see notes - talk to Jay - this is not a complete impl
-    // Another alternative is to detach the reattach if already attached - but this would have
-    // the side effect of firing validation which would be 'correct' but possibly not 
-    // anticipated.
     //        proto.setAdded = function () {
     //            this.originalValues = {};
     //            this.entityState = EntityState.Added;
@@ -3935,7 +3906,7 @@ var EntityAspect = (function() {
                     that._pendingValidationResult.removed.push(valError);
                 }
             });
-            that.hasValidationErrors = !__isEmpty(that._validationErrors);
+            that.hasValidationErrors = !__isEmpty(this._validationErrors);
         });
     };
 
@@ -5255,16 +5226,11 @@ var DataType = (function () {
         // default
     };
 
-    var constants;
-    var resetConstants = function () {
-        constants = {
-            stringPrefix: "K_",
-            nextNumber: -1,
-            nextNumberIncrement: -1
-        };
+    var constants = {
+        stringPrefix: "K_",
+        nextNumber: -1,
+        nextNumberIncrement: -1
     };
-
-    resetConstants();
 
     var getNextString = function () {
         return constants.stringPrefix + getNextNumber().toString();
@@ -5599,7 +5565,7 @@ var DataType = (function () {
             case "boolean":
                 return DataType.Boolean;
             case "number":
-                return DataType.Double;
+                return DataType.Int32;
         }
         return DataType.Undefined;
     };
@@ -5661,8 +5627,6 @@ var DataType = (function () {
     }
 
     DataType.constants = constants;
-    // for internal testing only
-    DataType._resetConstants = resetConstants;
 
     DataType.getSymbols().forEach(function (sym) {
         sym.validatorCtor = getValidatorCtor(sym);
@@ -5982,7 +5946,7 @@ var Q = __requireLibCore("Q");
 if (!Q) {
     // No Q.js! Substitute a placeholder Q which always fails 
     // Should be replaced by the app via breeze.config.setQ
-    // For example, see Breeze Labs "breeze.angular"
+    // For example, see Breeze Labs "breeze.use$q"
     Q = function() {
         var eMsg = 'Q is undefined. Are you missing Q.js? See https://github.com/kriskowal/q';
         throw new Error(eMsg);
@@ -5990,7 +5954,8 @@ if (!Q) {
     
     // all Q methods called by Breeze should fail
     Q.defer = Q.resolve = Q.reject = Q;
-} 
+}
+    
 
 /**
 (Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.
@@ -6000,8 +5965,7 @@ if (!Q) {
 @param [q.resolve] {Function} A function returning a resolved promise.
 @param [q.reject] {Function} A function returning a rejected promise.
 **/
-breeze.config.setQ = function (q) { breeze.Q = Q = q; }
-breeze.Q = Q; // Todo: consider a "safer" way for apps to get breeze's Q. 
+breeze.config.setQ = function (q) { Q = q; }
 
 // TODO: still need to handle inheritence here.
              
@@ -6675,17 +6639,17 @@ var MetadataStore = (function () {
             baseEntityType.dataProperties.forEach(function (dp) {
                 var newDp = new DataProperty(dp);
                 newDp.isInherited = true;
-                stype._addPropertyCore(newDp);
+                stype.addProperty(newDp);
             });
             baseEntityType.navigationProperties.forEach(function (np) {
                 var newNp = new NavigationProperty(np);
                 newNp.isInherited = true;
-                stype._addPropertyCore(newNp);
+                stype.addProperty(newNp);
             });
         }
         
         json.dataProperties.forEach(function(dp) {
-            stype._addPropertyCore(DataProperty.fromJSON(dp));
+            stype.addProperty(DataProperty.fromJSON(dp));
         });
         
         
@@ -6693,7 +6657,7 @@ var MetadataStore = (function () {
         if (isEntityType) {
             //noinspection JSHint
             json.navigationProperties && json.navigationProperties.forEach(function(np) {
-                stype._addPropertyCore(NavigationProperty.fromJSON(np));
+                stype.addProperty(NavigationProperty.fromJSON(np));
             });
         }
         
@@ -6810,12 +6774,12 @@ var CsdlMetadataParser = (function () {
             baseEntityType.dataProperties.forEach(function (dp) {
                 var newDp = new DataProperty(dp);
                 newDp.isInherited = true;
-                entityType._addPropertyCore(newDp);
+                entityType.addProperty(newDp);
             });
             baseEntityType.navigationProperties.forEach(function (np) {
                 var newNp = new NavigationProperty(np);
                 newNp.isInherited = true;
-                entityType._addPropertyCore(newNp);
+                entityType.addProperty(newNp);
             });
         }
 
@@ -6863,8 +6827,7 @@ var CsdlMetadataParser = (function () {
     function parseCsdlDataProperty(parentType, csdlProperty, schema, keyNamesOnServer) {
         var dp;
         var typeParts = csdlProperty.type.split(".");
-        // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
-        if (typeParts[0] === "Edm" && typeParts.length === 2 ) {
+        if (typeParts.length === 2) {
             dp = parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
         } else {
             if (isEnumType(csdlProperty, schema)) {
@@ -6877,7 +6840,7 @@ var CsdlMetadataParser = (function () {
             }
         }
         if (dp) {
-            parentType._addPropertyCore(dp);
+            parentType.addProperty(dp);
             addValidators(dp);
         }
         return dp;
@@ -6901,8 +6864,8 @@ var CsdlMetadataParser = (function () {
         var maxLength = csdlProperty.maxLength;
         maxLength = (maxLength == null || maxLength === "Max") ? null : parseInt(maxLength,10);
         // can't set the name until we go thru namingConventions and these need the dp.
-
-
+        
+            
         var dp = new DataProperty({
             nameOnServer: csdlProperty.name,
             dataType: dataType,
@@ -6912,7 +6875,7 @@ var CsdlMetadataParser = (function () {
             defaultValue: csdlProperty.defaultValue,
             // fixedLength: fixedLength,
             concurrencyMode: csdlProperty.concurrencyMode
-        });
+        })
 
         if (dataType === DataType.Undefined) {
             dp.rawTypeName = csdlProperty.type;
@@ -6948,16 +6911,14 @@ var CsdlMetadataParser = (function () {
         var constraint = association.referentialConstraint;
         if (!constraint) {
             // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
-            
+            return;
             // Think about adding this back later.
-            if (association.end[0].multiplicity == "*" && association.end[1].multiplicity == "*") {
-                // ignore many to many relations for now
-                return;
-            } else {
-                // For now assume it will be set later directly on the client.
-                // other alternative is to throw an error: 
-                // throw new Error("Foreign Key Associations must be turned on for this model");
-            }
+            //if (association.end[0].multiplicity == "*" && association.end[1].multiplicity == "*") {
+            //    // many to many relation
+            //    ???
+            //} else {
+            //    throw new Error("Foreign Key Associations must be turned on for this model");
+            //}
         }
         
         var cfg = {
@@ -6967,50 +6928,30 @@ var CsdlMetadataParser = (function () {
             associationName: association.name
         };
 
-        if (constraint) {
-            var principal = constraint.principal;
-            var dependent = constraint.dependent;
-
-            var propRefs = __toArray(dependent.propertyRef);
-            var fkNames = propRefs.map(__pluck("name"));
-            if (csdlProperty.fromRole === principal.role) {
-                cfg.invForeignKeyNamesOnServer = fkNames;
-            } else {
-                // will be used later by np._update
-                cfg.foreignKeyNamesOnServer = fkNames;
-            }
+        var principal = constraint.principal;
+        var dependent = constraint.dependent;
+        
+        var propRefs = __toArray(dependent.propertyRef);
+        var fkNames = propRefs.map(__pluck("name"));
+        if (csdlProperty.fromRole === principal.role) {
+            cfg.invForeignKeyNamesOnServer = fkNames;
+        } else {
+            // will be used later by np._update
+            cfg.foreignKeyNamesOnServer = fkNames;
         }
 
         var np = new NavigationProperty(cfg);
-        entityType._addPropertyCore(np);
+        entityType.addProperty(np);
         return np;
     }
 
     function isEnumType(csdlProperty, schema) {
-        if (schema.enumType) return isEdmxEnumType(csdlProperty, schema);
-        else if (schema.extensions) return isODataEnumType(csdlProperty, schema);
-        else return false;
-    }
-
-    function isEdmxEnumType(csdlProperty, schema) {
+        if (!schema.enumType) return false;
         var enumTypes = __toArray(schema.enumType);
         var typeParts = csdlProperty.type.split(".");
         var baseTypeName = typeParts[typeParts.length - 1];
         return enumTypes.some(function (enumType) {
             return enumType.name === baseTypeName;
-        });
-    }
-
-    function isODataEnumType(csdlProperty, schema) {
-        var enumTypes = schema.extensions.filter(function (ext) {
-            return ext.name === "EnumType";
-        });
-        var typeParts = csdlProperty.type.split(".");
-        var baseTypeName = typeParts[typeParts.length - 1];
-        return enumTypes.some(function (enumType) {
-            return enumType.attributes.some(function (attr) {
-                return attr.name === "Name" && attr.value === baseTypeName;
-            });
         });
     }
 
@@ -7417,40 +7358,23 @@ var EntityType = (function () {
     @method addProperty
     @param property {DataProperty|NavigationProperty}
     **/
-    proto.addProperty = function(property) {
-        assertParam(property, "property").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
-        
-        // true is 2nd arg to force resolve of any navigation properties.
-        return this._addPropertyCore(property, true);
-    };
-
-    proto._addPropertyCore = function(property, shouldResolve) {
-        if (this.isFrozen) {
-            throw new Error("The '" + this.name + "' EntityType/ComplexType has been frozen. You can only add properties to an EntityType/ComplexType before any instances of that type have been created and attached to an entityManager.");
+    proto.addProperty = function (property) {
+        assertParam(property, "dataProperty").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
+        if (this.metadataStore && !property.isUnmapped) {
+            throw new Error("The '" + this.name + "' EntityType has already been added to a MetadataStore and therefore no additional properties may be added to it.");
         }
-        var parentType = property.parentType;
-        if (parentType) {
-            if (parentType !== this) {
-                throw new Error("This property: " + property.name + " has already been added to " + property.parentType.name);
+        if (property.parentType) {
+            if (property.parentType !== this) {
+                throw new Error("This dataProperty has already been added to " + property.parentType.name);
             } else {
-                // adding the same property more than once to the same entityType is just ignored. 
                 return this;
             }
         }
         property.parentType = this;
-        var ms = this.metadataStore;
         if (property.isDataProperty) {
             this._addDataProperty(property);
         } else {
             this._addNavigationProperty(property);
-            // metadataStore can be undefined if this entityType has not yet been added to a MetadataStore.
-            if (shouldResolve && ms) {
-                resolveNp(property, ms);
-            }
-        }
-        // unmapped properties can be added AFTER entityType has already resolved all property names.
-        if (ms && !(property.name && property.nameOnServer)) {
-            updateClientServerNames(ms.namingConvention, property, "name");
         }
         return this;
     };
@@ -7763,7 +7687,7 @@ var EntityType = (function () {
     proto._updateTargetFromRaw = function (target, raw, rawValueFn) {
         // called recursively for complex properties
         this.dataProperties.forEach(function (dp) {
-            if (!dp.isSettable) return;
+            
             var rawVal = rawValueFn(raw, dp);
             if (rawVal === undefined) return;
             var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
@@ -7806,16 +7730,10 @@ var EntityType = (function () {
 
         // if merging from an import then raw will have an entityAspect or a complexAspect
         var rawAspect = raw.entityAspect || raw.complexAspect;
-        if (rawAspect) {
+        if (rawAspect && rawAspect.originalValuesMap) {
             var targetAspect = target.entityAspect || target.complexAspect;
-            if (rawAspect.originalValuesMap) {
-                targetAspect.originalValues = rawAspect.originalValuesMap;
-            }
-            if (rawAspect.extraMetadata) {
-                targetAspect.extraMetadata = rawAspect.extraMetadata;
-            }
+            targetAspect.originalValues = rawAspect.originalValuesMap;
         }
-        
 
     }
 
@@ -7882,7 +7800,7 @@ var EntityType = (function () {
         var serverPropName = clientPropName + "OnServer";
         var clientName = parent[clientPropName];
         if (clientName && clientName.length) {
-            // if (parent.isUnmapped) return;
+            if (parent.isUnmapped) return;
             var serverNames = __toArray(clientName).map(function (cName) {
                 var sName = nc.clientPropertyNameToServer(cName, parent);
                 var testName = nc.serverPropertyNameToClient(sName, parent);
@@ -8006,7 +7924,7 @@ var EntityType = (function () {
         np.entityType = entityType;
         var invNp = __arrayFirst(entityType.navigationProperties, function( altNp) {
             // Can't do this because of possibility of comparing a base class np with a subclass altNp.
-            // return altNp.associationName === np.associationName
+            //return altNp.associationName === np.associationName
             //    && altNp !== np;
             // So use this instead.
             return altNp.associationName === np.associationName &&
@@ -8017,9 +7935,6 @@ var EntityType = (function () {
             // unidirectional 1-n relationship
             np.invForeignKeyNames.forEach(function (invFkName) {
                 var fkProp = entityType.getDataProperty(invFkName);
-                if (!fkProp) {
-                    throw new Error("EntityType '" + np.entityTypeName + "' has no foreign key matching '" + invFkName + "'");
-                }
                 var invEntityType = np.parentType;
                 fkProp.inverseNavigationProperty = __arrayFirst(invEntityType.navigationProperties, function (np2) {
                     return np2.invForeignKeyNames && np2.invForeignKeyNames.indexOf(fkProp.name) >= 0 && np2.entityType === fkProp.parentType;
@@ -8068,7 +7983,6 @@ var EntityType = (function () {
     function calcUnmappedProperties(stype, instance) {
         var metadataPropNames = stype.getPropertyNames();
         var trackablePropNames = __modelLibraryDef.getDefaultInstance().getTrackablePropertyNames(instance);
-        
         trackablePropNames.forEach(function (pn) {
             if (metadataPropNames.indexOf(pn) === -1) {
                 var dt = DataType.fromValue(instance[pn]);
@@ -8078,13 +7992,12 @@ var EntityType = (function () {
                     isNullable: true,
                     isUnmapped: true
                 });
-                newProp.isSettable = __isSettable(instance, pn);
                 if (stype.subtypes) {
                     stype.getSelfAndSubtypes().forEach(function (st) {
-                        st._addPropertyCore(new DataProperty(newProp));
+                        st.addProperty(new DataProperty(newProp));
                     });
                 } else {
-                    stype._addPropertyCore(newProp);
+                    stype.addProperty(newProp);
                 }
             }
         });
@@ -8123,7 +8036,7 @@ var ComplexType = (function () {
             .whereParam("namespace").isString().isOptional().withDefault("")
             .whereParam("dataProperties").isOptional()
             .whereParam("isComplexType").isOptional().isBoolean()   // needed because this ctor can get called from the addEntityType method which needs the isComplexType prop
-            .whereParam("custom").isOptional()
+            .whereParam("custom").isOptional().isBoolean()
             .applyAll(this);
 
         this.name = qualifyTypeName(this.shortName, this.namespace);
@@ -8231,8 +8144,20 @@ var ComplexType = (function () {
         
 
     proto.addProperty = function (dataProperty) {
-        assertParam(dataProperty, "dataProperty").isInstanceOf(DataProperty).check();       
-        return this._addPropertyCore(dataProperty);
+        assertParam(dataProperty, "dataProperty").isInstanceOf(DataProperty).check();
+        if (this.metadataStore && ! dataProperty.isUnmapped) {
+            throw new Error("The '" + this.name + "' ComplexType has already been added to a MetadataStore and therefore no additional properties may be added to it.");
+        }
+        if (dataProperty.parentType) {
+            if (dataProperty.parentType !== this) {
+                throw new Error("This dataProperty has already been added to " + property.parentType.name);
+            } else {
+                return this;
+            }
+        }
+        this._addDataProperty(dataProperty);
+
+        return this;
     };
         
     proto.getProperties = function () {
@@ -8267,7 +8192,6 @@ var ComplexType = (function () {
         "addValidator",
         "getProperty",
         "getPropertyNames",
-        "_addPropertyCore",
         "_addDataProperty",
         "_updateNames",
         "_updateCps",
@@ -8349,7 +8273,6 @@ var DataProperty = (function () {
             .whereParam("defaultValue").isOptional()
             .whereParam("isPartOfKey").isBoolean().isOptional()
             .whereParam("isUnmapped").isBoolean().isOptional()
-            .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
             .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
@@ -8393,13 +8316,7 @@ var DataProperty = (function () {
                     }
                 }
             }
-        } else if (this.dataType.isNumeric) {
-            // in case the defaultValue comes in as a string ( which it does in EF6).
-            if (typeof (this.defaultValue) === "string") {
-                this.defaultValue = parseFloat(this.defaultValue);
-            }
         }
-
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
@@ -8573,6 +8490,9 @@ var DataProperty = (function () {
             .applyAll(this);
     };
 
+    
+   
+
     proto.toJSON = function () {
         // do not serialize dataTypes that are complexTypes
         return __toJson(this, {
@@ -8583,7 +8503,6 @@ var DataProperty = (function () {
             defaultValue: null,
             isPartOfKey: false,
             isUnmapped: false,
-            isSettable: true,
             concurrencyMode: null,
             maxLength: null,
             validators: null,
@@ -8778,28 +8697,6 @@ var NavigationProperty = (function () {
     proto.isDataProperty = false;
     proto.isNavigationProperty = true;
 
-    // In progress - will be used for manual metadata config
-    proto.createInverse = function (config) {
-
-        if (!this.entityType) {
-            throw new Error("Inverse entityType has not yet been defined");
-        }
-        if (this.entityType.isFrozen) {
-            throw new Error("This entityType is frozen");
-        }
-        var metadataStore = this.entityType.metadataStore;
-        if (metadataStore == null) {
-            throw new Error("Cannot create an inverse property until this entityType has been added to the metadataStore");
-        }
-
-        config.entityTypeName = this.parentEntityType.name;
-        config.associationName = this.associationName;
-        var invNp = new NavigationProperty(config);
-        this.parentEntityType.addNavigationProperty(invNp);
-        return invNp;
-    };
-
-
     /**
     General purpose property set method
     @example
@@ -8925,14 +8822,14 @@ function addProperties(entityType, propObj, ctor) {
 
     if (!propObj) return;
     if (Array.isArray(propObj)) {
-        propObj.forEach(entityType._addPropertyCore.bind(entityType));
+        propObj.forEach(entityType.addProperty.bind(entityType));
     } else if (typeof (propObj) === 'object') {
         for (var key in propObj) {
             if (__hasOwnProperty(propObj, key)) {
                 var value = propObj[key];
                 value.name = key;
                 var prop = new ctor(value);
-                entityType._addPropertyCore(prop);
+                entityType.addProperty(prop);
             }
         }
     } else {
@@ -10473,6 +10370,7 @@ var FnNode = (function() {
     proto._validate = function(entityType) {
         // will throw if not found;
         if (this.isValidated) return;            
+        this.isValidated = true;
         if (this.propertyPath) {
             if (entityType.isAnonymous) return;
             var prop = entityType.getProperty(this.propertyPath, true);
@@ -10490,7 +10388,6 @@ var FnNode = (function() {
                 node._validate(entityType);
             });
         }
-        this.isValidated = true;
     };
         
     function createPropFunction(propertyPath) {
@@ -11818,8 +11715,6 @@ var EntityGroup = (function () {
     var ctor = function (entityManager, entityType) {
         this.entityManager = entityManager;
         this.entityType = entityType;
-        // freeze the entityType after the first instance of this type is either created or queried. 
-        this.entityType.isFrozen = true;
         this._indexMap = {};
         this._entities = [];
         this._emptyIndexes = [];
@@ -12761,7 +12656,7 @@ var EntityManager = (function () {
             });
     @method executeQueryLocally
     @param query {EntityQuery}  The {{#crossLink "EntityQuery"}}{{/crossLink}} to execute.
-    @return  {Array of Entity}  Array of entities from cache that satisfy the query
+    @return  {Array of Entity}  Array of Entities
     **/
     proto.executeQueryLocally = function (query) {
         assertParam(query, "query").isInstanceOf(EntityQuery).check();
@@ -12996,18 +12891,19 @@ var EntityManager = (function () {
     function clearServerErrors(entities) {
         entities.forEach(function (entity) {
             var serverKeys = [];
-            var aspect = entity.entityAspect;
-            __objectForEach(aspect._validationErrors, function (key, ve) {
+            var valErrors = entity.entityAspect._validationErrors;
+            __objectForEach(valErrors, function (key, ve) {
                 if (ve.isServerError) serverKeys.push(key);
             });
             if (serverKeys.length === 0) return;
-            aspect._processValidationOpAndPublish(function () {
-                serverKeys.forEach(function (key) {
-                    aspect._removeValidationError(key);
-                });
+            serverKeys.forEach(function(key) {
+                delete valErrors[key];
             });
+            entity.hasValidationErrors = !__isEmpty(valErrors);
         });
+
     }
+
 
     function createEntityErrors(entities) {
         var entityErrors = [];
@@ -13478,7 +13374,7 @@ var EntityManager = (function () {
             // attach any unattachedChildren
             var tuples = unattachedMap.getTuples(entityKey);
             if (tuples) {
-                tuples.slice(0).forEach(function (tpl) {
+                tuples.forEach(function (tpl) {
 
                     var unattachedChildren = tpl.children.filter(function (e) {
                         return e.entityAspect.entityState !== EntityState.Detached;
@@ -13717,11 +13613,8 @@ var EntityManager = (function () {
             var entityState = aspect.entityState;
             newAspect = {
                 tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
-                entityState: entityState.name,
+                entityState: entityState.name
             };
-            if (aspect.extraMetadata) {
-                newAspect.extraMetadata = aspect.extraMetadata;
-            }
             if (entityState.isModified() || entityState.isDeleted()) {
                 newAspect.originalValuesMap = aspect.originalValues;
             }
@@ -13804,8 +13697,7 @@ var EntityManager = (function () {
             } else {
                 targetEntity = entityType._createInstanceCore();
                 entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                if (newTempKey != null) {
-                    targetEntity.entityAspect.hasTempKey = true;
+                if (newTempKey !== undefined) {
                     // fixup pk
                     targetEntity.setProperty(entityType.keyProperties[0].name, newTempKey.values[0]);
 
@@ -14497,8 +14389,8 @@ var MappingContext = (function () {
                         || targetEntityState.isUnchanged()) {
                     updateEntity(mc, targetEntity, node);
                     targetEntity.entityAspect.wasLoaded = true;
-                    if (meta.extraMetadata) {
-                        targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
+                    if (meta.extra) {
+                        targetEntity.entityAspect.extraMetadata = meta.extra;
                     }
                     targetEntity.entityAspect.entityState = EntityState.Unchanged;
                     targetEntity.entityAspect.originalValues = {};
@@ -14519,8 +14411,8 @@ var MappingContext = (function () {
           
             updateEntity(mc, targetEntity, node);
             
-            if (meta.extraMetadata) {
-                targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
+            if (meta.extra) {
+                targetEntity.entityAspect.extraMetadata = meta.extra;
             }
             em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
             targetEntity.entityAspect.wasLoaded = true;
@@ -14771,17 +14663,17 @@ breeze.SaveOptions= SaveOptions;
     
     var ajaxImpl;
     
-    var ctor = function () { };
+    var ctor = function () {
+    
+    };
 
-    var proto = ctor.prototype; // minifies better (as seen in jQuery)
-
-    proto.checkForRecomposition = function (interfaceInitializedArgs) {
+    ctor.prototype.checkForRecomposition = function (interfaceInitializedArgs) {
         if (interfaceInitializedArgs.interfaceName === "ajax" && interfaceInitializedArgs.isDefault) {
             this.initialize();
         }
     };
     
-    proto.initialize = function () {
+    ctor.prototype.initialize = function () {
         ajaxImpl = breeze.config.getAdapterInstance("ajax");
 
         // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues. 
@@ -14789,12 +14681,13 @@ breeze.SaveOptions= SaveOptions;
         throw new Error("Unable to find ajax adapter for dataservice adapter '"+(this.name||'')+"'.");
     };
 
-    proto.fetchMetadata = function (metadataStore, dataService) {
+    ctor.prototype.fetchMetadata = function (metadataStore, dataService) {
         var serviceName = dataService.serviceName;
         var url = dataService.makeUrl("Metadata");
         
         var deferred = Q.defer();
 
+        var that = this;
         ajaxImpl.ajax({
             type: "GET",
             url: url,
@@ -14819,7 +14712,7 @@ breeze.SaveOptions= SaveOptions;
                     metadataStore.addDataService(dataService);
                 }
 
-                return deferred.resolve(metadata);
+                deferred.resolve(metadata);
                 
             },
             error: function (httpResponse) {
@@ -14829,11 +14722,12 @@ breeze.SaveOptions= SaveOptions;
         return deferred.promise;
     };
 
-    proto.executeQuery = function (mappingContext) {
+    ctor.prototype.executeQuery = function (mappingContext) {
 
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
 
+        var that = this;
         var params = {
             type: "GET",
             url: url,
@@ -14854,7 +14748,7 @@ breeze.SaveOptions= SaveOptions;
                     if (e instanceof Error) {
                         deferred.reject(e);
                     } else {
-                        handleHttpError(httpResponse);
+                        handleHttpError(httpResponse)
                     }
                 }
 
@@ -14871,14 +14765,15 @@ breeze.SaveOptions= SaveOptions;
         return deferred.promise;
     };
 
-    proto.saveChanges = function (saveContext, saveBundle) {
-        var adapter = saveContext.adapter = this;     
+    ctor.prototype.saveChanges = function (saveContext, saveBundle) {
+        
         var deferred = Q.defer();
-        saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
+        saveBundle = this._prepareSaveBundle(saveBundle, saveContext);
         var bundle = JSON.stringify(saveBundle);
         
         var url = saveContext.dataService.makeUrl(saveContext.resourceName);
 
+        var that = this;
         ajaxImpl.ajax({
             type: "POST",
             url: url,
@@ -14892,7 +14787,7 @@ breeze.SaveOptions= SaveOptions;
                 if (entityErrors) {
                     handleHttpError(deferred, httpResponse);
                 } else {
-                    var saveResult = adapter._prepareSaveResult(saveContext, data);
+                    var saveResult = that._prepareSaveResult(saveContext, data);
                     saveResult.httpResponse = httpResponse;
                     deferred.resolve(saveResult);
                 }
@@ -14907,114 +14802,21 @@ breeze.SaveOptions= SaveOptions;
         return deferred.promise;
     };
 
-    proto._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
-        // The implementor should call _createChangeRequestInterceptor
+
+
+
+    ctor.prototype._prepareSaveBundle = function(saveBundle, saveContext) {
         throw new Error("Need a concrete implementation of _prepareSaveBundle");
     };
 
-    /**
-    Returns a constructor function for a "ChangeRequestInterceptor"
-    that can tweak the saveBundle both as it is built and when it is completed
-    by a concrete DataServiceAdapater.
-
-    Initialized with a default, no-op implementation that developers can replace with a
-    substantive implementation that changes the individual entity change requests 
-    or aspects of the entire 'saveBundle' without having to write their own DataService adapters.
-
-    @example
-    var adapter = breeze.config.getAdapterInstance('dataService');
-    adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
-        this.getRequest = function (request, entity, index) {
-            // alter the request that the adapter prepared for this entity
-            // based on the entity, saveContext, and saveBundle
-            // e.g., add a custom header or prune the originalValuesMap
-            return request;
-        };
-        this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
-            // based on the saveContext and saveBundle
-        };
-    }
-    @method changeRequestInterceptor
-    @param saveContext {Object} The BreezeJS "context" for the save operation.
-    @param saveBundle {Object} Contains the array of entities-to-be-saved (AKA, the entity change-set).
-    @return {Function} Constructor for a "ChangeRequestInterceptor".
-    **/
-    proto.changeRequestInterceptor = DefaultChangeRequestInterceptor;
-
-    //This is a default, no-op implementation that developers can replace.
-    function DefaultChangeRequestInterceptor(saveContext, saveBundle) {
-        /**
-        Prepare and return the save data for an entity change-set. 
-        
-        The adapter calls this method for each entity in the change-set,
-        after it has prepared a "change request" for that object.
-
-        The method can do anything to the request but it must return a valid, non-null request.
-        @example
-        this.getRequest = function (request, entity, index) {
-            // alter the request that the adapter prepared for this entity
-            // based on the entity, saveContext, and saveBundle
-            // e.g., add a custom header or prune the originalValuesMap
-            return request;
-        };
-        @method getRequest
-        @param request {Object} The object representing the adapter's request to save this entity.       
-        @param entity {Entity} The entity-to-be-save as it is in cache
-        @param index {Integer} The zero-based index of this entity in the change-set array
-        @return {Function} The potentially revised request.
-        **/
-        this.getRequest = function (request, entity, index){return request;};
-
-        /**
-        Last chance to change anything about the 'requests' array
-        after it has been built with requests for all of the entities-to-be-saved. 
-        
-        The 'requests' array is the same as 'saveBundle.entities' in many implementations
-
-        This method can do anything to the array including add and remove requests.
-        It's up to you to ensure that server will accept the requests array data as valid.
-
-        Returned value is ignored.
-        @example
-        this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
-            // based on the saveContext and saveBundle
-        };
-        @method done
-        @param requests {Array of Object} The adapter's array of request for this changeset.       
-        **/
-        this.done = function(requests) {};    
-    }
-
-    proto._createChangeRequestInterceptor = function(saveContext, saveBundle){
-        var adapter = saveContext.adapter;
-        var isFn = __isFunction;
-        var CRI = adapter.changeRequestInterceptor;
-        var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
-        var post = " is missing or not a function.";
-        if (isFn(CRI)) {
-            var interceptor = new CRI(saveContext, saveBundle);
-            if (!isFn(interceptor.getRequest)) {
-                throw new Error(pre + '.getRequest' + post);
-            }
-            if (!isFn(interceptor.done)) {
-                throw new Error(pre + '.done' + post);
-            }
-            return interceptor;
-        } else {
-            return new DefaultChangeRequestInterceptor(saveContext, saveBundle);
-        }
-    }
-
-    proto._prepareSaveResult = function (/* saveContext, data */) {
+    ctor.prototype._prepareSaveResult = function (saveContext, data) {
         throw new Error("Need a concrete implementation of _prepareSaveResult");
     };
     
-    proto.jsonResultsAdapter = new JsonResultsAdapter( {
+    ctor.prototype.jsonResultsAdapter = new JsonResultsAdapter( {
         name: "noop",
         
-        visitNode: function (/* node, mappingContext, nodeContext */) {
+        visitNode: function (node, mappingContext, nodeContext) {
             return {};
         }
 
@@ -15046,22 +14848,14 @@ breeze.SaveOptions= SaveOptions;
             if (entityErrors && httpResponse.saveContext) {
                 processEntityErrors(err, entityErrors, httpResponse.saveContext);
             } else {
-                err.message = extractInnerMessage(errObj);
+                err.message = extractInnerMessage(errObj)
             }
         } else {
             err.message = httpResponse.error && httpResponse.error.toString();
         }
-        proto._catchNoConnectionError(err);
+        
         return err;
     };
-
-    // Put this at the bottom of your http error analysis
-    proto._catchNoConnectionError = function (err){
-        if (err.status == 0 && err.message == null){
-            err.message = "HTTP response status 0 and no message. " +
-            "Likely did not or could not reach server. Is the server running?";
-        }
-    }
 
     function extractInnerMessage(errObj) {
         while (errObj.InnerException) {
@@ -15088,6 +14882,1457 @@ breeze.SaveOptions= SaveOptions;
     return ctor;
 
 })();
+;// Angular ajax adapter
+// See https://docs.angularjs.org/api/ng/service/$http
+(function(factory) {
+    // Module systems magic dance.
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"]) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    var core = breeze.core;
+    
+    var httpService;
+    var rootScope;
+
+    var ctor = function () {
+        this.name = "angular";
+        this.defaultSettings = { };
+        this.requestInterceptor = null;
+    };
+
+    ctor.prototype.initialize = function () {
+
+        var ng = core.requireLib("angular");
+        if (ng) {
+            var $injector = ng.injector(['ng']);
+            $injector.invoke(['$http', '$rootScope', function(xHttp, xRootScope) {
+                httpService = xHttp;
+                rootScope = xRootScope;
+            }]);
+        }
+                
+    };
+
+    ctor.prototype.setHttp = function (http) {
+        httpService = http;
+        rootScope = null; // to suppress rootScope.digest
+    };
+
+    ctor.prototype.ajax = function (config) {
+        if (!httpService) {
+            throw new Error("Unable to locate angular for ajax adapter");
+        }
+        var ngConfig = {
+            method: config.type,
+            url: config.url,
+            dataType: config.dataType,
+            contentType: config.contentType,
+            crossDomain: config.crossDomain,
+            headers: config.headers || {}
+        }
+
+        if (config.params) {
+            // Hack: because of the way that Angular handles writing parameters out to the url.
+            // so this approach takes over the url param writing completely.
+            // See: http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
+            var delim = (ngConfig.url.indexOf("?") >= 0) ? "&" : "?";
+            ngConfig.url = ngConfig.url + delim + encodeParams(config.params);
+        }
+
+        if (config.data) {
+            ngConfig.data = config.data;
+        }
+        
+        if (!core.isEmpty(this.defaultSettings)) {
+            var compositeConfig = core.extend({}, this.defaultSettings);
+            ngConfig = core.extend(compositeConfig, ngConfig);
+            // extend is shallow; extend headers separately
+            ngConfig.headers = core.extend(this.defaultSettings.headers, ngConfig.headers);
+        }
+
+        var requestInfo = {
+            adapter: this,      // this adapter
+            config: ngConfig,   // angular's $http configuration object
+            zConfig: config,    // the config arg from the calling Breeze data service adapter
+            success: successFn, // adapter's success callback
+            error: errorFn      // adapter's error callback            
+        }
+
+        if (core.isFunction(this.requestInterceptor)){
+            this.requestInterceptor(requestInfo);
+            if (this.requestInterceptor.oneTime){
+                this.requestInterceptor = null;
+            }
+        }
+
+        if (requestInfo.config){
+            httpService(requestInfo.config)
+            .success(requestInfo.success)
+            .error(requestInfo.error);
+            rootScope && rootScope.$digest();           
+        }
+
+        function successFn(data, status, headers, xconfig, statusText) {
+            // HACK: because $http returns a server side null as a string containing "null" - this is WRONG. 
+            if (data === "null") data = null;
+            var httpResponse = {
+                config: config,
+                data: data,
+                getHeaders: headers,
+                status: status,
+                statusText: statusText
+            };
+            config.success(httpResponse);
+        }
+
+        function errorFn(data, status, headers, xconfig, statusText) {
+            // Timeout appears as an error with status===0 and no data. 
+            // Make it better
+            if (status === 0 && data == null){
+                data = 'timeout';
+            }
+            var httpResponse = {
+                config: config,
+                data: data,
+                getHeaders: headers,
+                status: status,
+                statusText: statusText
+            };
+            config.error(httpResponse);
+        }
+    };
+
+    function encodeParams(obj) {
+        var query = '';
+        var key, subValue, innerObj, fullSubName;
+
+        for (var name in obj) {
+            var value = obj[name];
+
+            if (value instanceof Array) {
+                for (var i = 0; i < value.length; ++i) {
+                    subValue = value[i];
+                    fullSubName = name + '[' + i + ']';
+                    innerObj = {};
+                    innerObj[fullSubName] = subValue;
+                    query += encodeParams(innerObj) + '&';
+                }
+            } else if (value instanceof Object) {
+                for (var subName in value) {
+                    subValue = value[subName];
+                    fullSubName = name + '[' + subName + ']';
+                    innerObj = {};
+                    innerObj[fullSubName] = subValue;
+                    query += encodeParams(innerObj) + '&';
+                }
+            } else if (value !== undefined) {
+                query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
+            }
+        }
+
+        return query.length ? query.substr(0, query.length - 1) : query;
+    }
+    
+    breeze.config.registerAdapter("ajax", ctor);
+    
+}));
+;// jQuery ajax adapter ( JQuery v.>=1.5 )
+// see https://api.jquery.com/jQuery.ajax/
+(function(factory) {
+    // Module systems magic dance.
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"]) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    var core = breeze.core;
+    
+    var jQuery;
+    
+    var ctor = function () {
+        this.name = "jQuery";
+        this.defaultSettings = { };
+        this.requestInterceptor = null; // s
+    };
+
+    ctor.prototype.initialize = function () {
+        // look for the jQuery lib but don't fail immediately if not found
+        jQuery = core.requireLib("jQuery");
+    };
+
+    ctor.prototype.ajax = function (config) {
+        if (!jQuery) {
+            throw new Error("Unable to locate jQuery");
+        }
+        var jqConfig = {
+            type: config.type, 
+            url: config.url,
+            data: config.params || config.data,
+            dataType: config.dataType,
+            contentType: config.contentType,
+            crossDomain: config.crossDomain,
+            headers: config.headers || {}
+        }
+        
+        if (!core.isEmpty(this.defaultSettings)) {
+            var compositeConfig = core.extend({}, this.defaultSettings);
+            jqConfig = core.extend(compositeConfig, jqConfig);
+            // extend is shallow; extend headers separately
+            jqConfig.headers = core.extend(this.defaultSettings.headers, jqConfig.headers);
+        }
+        
+        var requestInfo = {
+            adapter: this,      // this adapter
+            config: jqConfig,   // jQuery's ajax 'settings' object
+            zConfig: config,    // the config arg from the calling Breeze data service adapter
+            success: successFn, // adapter's success callback
+            error: errorFn      // adapter's error callback
+        }
+
+        if (core.isFunction(this.requestInterceptor)){
+            this.requestInterceptor(requestInfo);
+            if (this.requestInterceptor.oneTime){
+                this.requestInterceptor = null;
+            }
+        }
+
+        if (requestInfo.config){
+            requestInfo.jqXHR = jQuery.ajax(requestInfo.config)
+            .done(requestInfo.success)
+            .fail(requestInfo.error); 
+        }
+
+        function successFn(data, statusText, jqXHR) {
+            var httpResponse = {
+                config: config,
+                data: data,
+                getHeaders: getHeadersFn(jqXHR),
+                status: jqXHR.status,
+                statusText: statusText
+            };
+            config.success(httpResponse);
+            jqXHR.onreadystatechange = null;
+            jqXHR.abort = null;               
+        }
+
+        function errorFn(jqXHR, statusText, errorThrown) {
+            var httpResponse = {
+                config: config,
+                data: jqXHR.responseText,
+                error: errorThrown,
+                getHeaders: getHeadersFn(jqXHR),
+                status: jqXHR.status,
+                statusText: statusText
+            };
+            config.error(httpResponse);
+            jqXHR.onreadystatechange = null;
+            jqXHR.abort = null;               
+        }
+    };
+    
+    function getHeadersFn(jqXHR) {
+        if (jqXHR.status === 0) { // timeout or abort; no headers
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ? "" : {};
+            };
+        } else { // jqXHR should have header functions          
+            return function (headerName) {
+                return (headerName && headerName.length > 0) ?
+                    jqXHR.getResponseHeader(headerName) :
+                    jqXHR.getAllResponseHeaders();
+            };
+        } 
+    }
+
+    breeze.config.registerAdapter("ajax", ctor);
+    
+}));
+;(function (factory) {
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"] && !breeze) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    
+    var core = breeze.core;
+ 
+    var MetadataStore = breeze.MetadataStore;
+    var JsonResultsAdapter = breeze.JsonResultsAdapter;
+    var DataProperty = breeze.DataProperty;
+    
+    var OData;
+    
+    var ctor = function () {
+        this.name = "OData";
+    };
+
+    var fn = ctor.prototype; // minifies better (as seen in jQuery)
+
+    fn.initialize = function () {
+        OData = core.requireLib("OData", "Needed to support remote OData services");
+        OData.jsonHandler.recognizeDates = true;
+    };
+    
+    
+    fn.executeQuery = function (mappingContext) {
+    
+        var deferred = Q.defer();
+        var url = mappingContext.getUrl();
+        
+        OData.read({
+                requestUri: url,
+                headers: { "DataServiceVersion": "2.0" }
+            },
+            function (data, response) {
+                var inlineCount;
+                if (data.__count) {
+                    // OData can return data.__count as a string
+                    inlineCount = parseInt(data.__count, 10);
+                }
+                return deferred.resolve({ results: data.results, inlineCount: inlineCount });
+            },
+            function (error) {
+                return deferred.reject(createError(error, url));
+            }
+        );
+        return deferred.promise;
+    };
+    
+
+    fn.fetchMetadata = function (metadataStore, dataService) {
+
+        var deferred = Q.defer();
+
+        var serviceName = dataService.serviceName;
+        var url = dataService.makeUrl('$metadata');
+        
+        //OData.read({
+        //    requestUri: url,
+        //    headers: {
+        //        "Accept": "application/json",
+        //    }
+        //},
+        OData.read(url,
+            function (data) {
+                // data.dataServices.schema is an array of schemas. with properties of 
+                // entityContainer[], association[], entityType[], and namespace.
+                if (!data || !data.dataServices) {
+                    var error = new Error("Metadata query failed for: " + url);
+                    return deferred.reject(error);
+                }
+                var csdlMetadata = data.dataServices;
+
+                // might have been fetched by another query
+                if (!metadataStore.hasMetadataFor(serviceName)) {
+                    try {
+                        metadataStore.importMetadata(csdlMetadata);
+                    } catch(e) {
+                        return deferred.reject(new Error("Metadata query failed for " + url + "; Unable to process returned metadata: " + e.message));
+                    }
+
+                    metadataStore.addDataService(dataService);
+                }
+
+                return deferred.resolve(csdlMetadata);
+
+            }, function (error) {
+                var err = createError(error, url);
+                err.message = "Metadata query failed for: " + url + "; " + (err.message || "");
+                return deferred.reject(err);
+            },
+            OData.metadataHandler
+        );
+
+        return deferred.promise;
+
+    };
+
+    fn.getRoutePrefix = function(dataService){ return ''; /* see webApiODataCtor */}
+
+    fn.saveChanges = function (saveContext, saveBundle) {
+
+        var deferred = Q.defer();
+
+        var helper = saveContext.entityManager.helper;
+        var url = saveContext.dataService.makeUrl("$batch");
+        var routePrefix = this.getRoutePrefix(saveContext.dataService);
+        var requestData = createChangeRequests(saveContext, saveBundle, routePrefix);
+        var tempKeys = saveContext.tempKeys;
+        var contentKeys = saveContext.contentKeys;
+        var that = this;
+        OData.request({
+            headers : { "DataServiceVersion": "2.0" } ,
+            requestUri: url,
+            method: "POST",
+            data: requestData
+        }, function (data, response) {
+            var entities = [];
+            var keyMappings = [];
+            var saveResult = { entities: entities, keyMappings: keyMappings };
+            data.__batchResponses.forEach(function(br) {
+                br.__changeResponses.forEach(function (cr) {
+                    var response = cr.response || cr;
+                    var statusCode = response.statusCode;
+                    if ((!statusCode) || statusCode >= 400) {
+                        return deferred.reject(createError(cr, url));
+                    }
+                    
+                    var contentId = cr.headers["Content-ID"];
+                    
+                    var rawEntity = cr.data;
+                    if (rawEntity) {
+                        var tempKey = tempKeys[contentId];
+                        if (tempKey) {
+                            var entityType = tempKey.entityType;
+                            if (entityType.autoGeneratedKeyType !== AutoGeneratedKeyType.None) {
+                                var tempValue = tempKey.values[0];
+                                var realKey = entityType.getEntityKeyFromRawEntity(rawEntity, DataProperty.getRawValueFromServer);
+                                var keyMapping = { entityTypeName: entityType.name, tempValue: tempValue, realValue: realKey.values[0] };
+                                keyMappings.push(keyMapping);
+                            }
+                        }
+                        entities.push(rawEntity);
+                    } else {
+                        var origEntity = contentKeys[contentId];
+                        entities.push(origEntity);
+                    }
+                });
+            });
+            return deferred.resolve(saveResult);
+        }, function (err) {
+            return deferred.reject(createError(err, url));
+        }, OData.batchHandler);
+
+        return deferred.promise;
+
+    };
+ 
+    fn.jsonResultsAdapter = new JsonResultsAdapter({
+        name: "OData_default",
+
+        visitNode: function (node, mappingContext, nodeContext) {
+            var result = {};
+            if (node == null) return result;
+            if (node.__metadata != null) {
+                // TODO: may be able to make this more efficient by caching of the previous value.
+                var entityTypeName = MetadataStore.normalizeTypeName(node.__metadata.type);
+                var et = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
+                // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) {
+                if (et && et._mappedPropertiesCount <= Object.keys(node).length - 1) {
+                    result.entityType = et;
+                    result.extra = node.__metadata;
+                }
+            }
+            // OData v3 - projection arrays will be enclosed in a results array
+            if (node.results) {
+                result.node = node.results;
+            }
+
+            var propertyName = nodeContext.propertyName;
+            result.ignore = node.__deferred != null || propertyName === "__metadata" ||
+                // EntityKey properties can be produced by EDMX models
+                (propertyName === "EntityKey" && node.$type && core.stringStartsWith(node.$type, "System.Data"));
+            return result;
+        }
+        
+    });
+
+    function transformValue(prop, val ) {
+        if (prop.isUnmapped) return undefined;
+        if (prop.dataType === DataType.DateTimeOffset) {
+            // The datajs lib tries to treat client dateTimes that are defined as DateTimeOffset on the server differently
+            // from other dateTimes. This fix compensates before the save.
+            val = val && new Date(val.getTime() - (val.getTimezoneOffset() * 60000));
+        } else if (prop.dataType.quoteJsonOData) {
+            val = val != null ? val.toString() : val;
+        }
+        return val;
+    }
+
+    function createChangeRequests(saveContext, saveBundle, routePrefix) {
+        var changeRequests = [];
+        var tempKeys = [];
+        var contentKeys = [];
+        var baseUri = saveContext.dataService.serviceName;
+        var entityManager = saveContext.entityManager;
+        var helper = entityManager.helper;
+        var id = 0;
+        saveBundle.entities.forEach(function (entity) {
+            var aspect = entity.entityAspect;
+            id = id + 1; // we are deliberately skipping id=0 because Content-ID = 0 seems to be ignored.
+            var request = { headers: { "Content-ID": id, "DataServiceVersion": "2.0" } };
+            contentKeys[id] = entity;
+            if (aspect.entityState.isAdded()) {
+                request.requestUri = routePrefix + entity.entityType.defaultResourceName;
+                request.method = "POST";
+                request.data = helper.unwrapInstance(entity, transformValue);
+                tempKeys[id] = aspect.getKey();
+            } else if (aspect.entityState.isModified()) {
+                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                request.method = "MERGE";
+                request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, transformValue);
+                // should be a PATCH/MERGE
+            } else if (aspect.entityState.isDeleted()) {
+                updateDeleteMergeRequest(request, aspect, baseUri, routePrefix);
+                request.method = "DELETE";
+            } else {
+                return;
+            }
+            changeRequests.push(request);
+        });
+        saveContext.contentKeys = contentKeys;
+        saveContext.tempKeys = tempKeys;
+        return {
+            __batchRequests: [{
+                __changeRequests: changeRequests
+            }]
+        };
+
+    }
+
+    function updateDeleteMergeRequest(request, aspect, baseUri, routePrefix) {
+        var extraMetadata = aspect.extraMetadata;
+        var uri = extraMetadata.uri || extraMetadata.id;
+        if (core.stringStartsWith(uri, baseUri)) {
+            uri = routePrefix + uri.substring(baseUri.length);
+        }
+        request.requestUri = uri;
+        if (extraMetadata.etag) {
+            request.headers["If-Match"] = extraMetadata.etag;
+        }
+    }
+   
+    function createError(error, url) {
+        // OData errors can have the message buried very deeply - and nonobviously
+        // this code is tricky so be careful changing the response.body parsing.
+        var result = new Error();
+        var response = error && error.response;
+        if (!response) {
+            // in case DataJS returns "No handler for this data"
+            result.message = error;
+            result.statusText = error;
+            return result;
+        }
+        result.message = response.statusText;
+        result.statusText = response.statusText;
+        result.status = response.statusCode;
+        // non std
+        if (url) result.url = url;
+        result.body = response.body;
+        if (response.body) {
+            var nextErr;
+            try {
+                var body = JSON.parse(response.body);
+                result.body = body;
+                // OData v3 logic
+                if (body['odata.error']) {
+                    body = body['odata.error'];
+                }
+                var msg = "";
+                do {
+                    nextErr = body.error || body.innererror;
+                    if (!nextErr) msg = msg + getMessage(body);
+                    nextErr = nextErr || body.internalexception;
+                    body = nextErr || body;
+                } while (nextErr);
+                if (msg.length > 0) {
+                    result.message = msg;
+                }
+            } catch (e) {
+
+            }
+        }
+        return result;
+    }
+
+    function getMessage(body) {
+        var msg = body.message || "";
+        return ((typeof (msg) === "string") ? msg : msg.value) + "; ";
+    }
+
+    breeze.config.registerAdapter("dataService", ctor);
+
+
+    var webApiODataCtor = function () {
+        this.name = "webApiOData";
+    }
+
+    breeze.core.extend(webApiODataCtor.prototype, fn);
+
+    webApiODataCtor.prototype.getRoutePrefix = function(dataService){
+        // Get the routePrefix from a Web API OData service name.
+        // Web API OData requires inclusion of the routePrefix in the Uri of a batch subrequest
+        // By convention, Breeze developers add the Web API OData routePrefix to the end of the serviceName
+        // e.g. the routePrefix in 'http://localhost:55802/odata/' is 'odata/'
+        var segments = dataService.serviceName.split('/');
+        var last = segments.length-1 ;
+        var routePrefix = segments[last] || segments[last-1];
+        routePrefix = routePrefix ? routePrefix += '/' : '';
+        return routePrefix;
+    };
+
+    breeze.config.registerAdapter("dataService", webApiODataCtor);
+
+}));;(function(factory) {
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"] && !breeze) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    
+    var core = breeze.core;
+
+    var MetadataStore = breeze.MetadataStore;
+    var JsonResultsAdapter = breeze.JsonResultsAdapter;
+    var AbstractDataServiceAdapter = breeze.AbstractDataServiceAdapter;
+    
+    var ajaxImpl;
+    
+    var ctor = function () {
+        this.name = "webApi";
+    };
+    ctor.prototype = new AbstractDataServiceAdapter();
+
+    ctor.prototype._prepareSaveBundle = function(saveBundle, saveContext) {
+        var em = saveContext.entityManager;
+        var metadataStore = em.metadataStore;
+        var helper = em.helper;
+
+        saveBundle.entities = saveBundle.entities.map(function (e) {
+            var rawEntity = helper.unwrapInstance(e);
+
+            var autoGeneratedKey = null;
+            if (e.entityType.autoGeneratedKeyType !== AutoGeneratedKeyType.None) {
+                autoGeneratedKey = {
+                    propertyName: e.entityType.keyProperties[0].nameOnServer,
+                    autoGeneratedKeyType: e.entityType.autoGeneratedKeyType.name
+                };
+            }
+
+            var originalValuesOnServer = helper.unwrapOriginalValues(e, metadataStore);
+            rawEntity.entityAspect = {
+                entityTypeName: e.entityType.name,
+                defaultResourceName: e.entityType.defaultResourceName,
+                entityState: e.entityAspect.entityState.name,
+                originalValuesMap: originalValuesOnServer,
+                autoGeneratedKey: autoGeneratedKey
+            };
+            return rawEntity;
+        });
+
+        saveBundle.saveOptions = { tag: saveBundle.saveOptions.tag };
+
+        return saveBundle;
+    };
+
+    ctor.prototype._prepareSaveResult = function (saveContext, data) {
+        // HACK: need to change the 'case' of properties in the saveResult
+        // but KeyMapping properties internally are still ucase. ugh...
+        var keyMappings = data.KeyMappings.map(function (km) {
+            var entityTypeName = MetadataStore.normalizeTypeName(km.EntityTypeName);
+            return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
+        });
+        return { entities: data.Entities, keyMappings: keyMappings };
+    };
+    
+    ctor.prototype.jsonResultsAdapter = new JsonResultsAdapter({
+        
+        name: "webApi_default",
+        
+        visitNode: function (node, mappingContext, nodeContext) {
+            if (node == null) return {};
+            var entityTypeName = MetadataStore.normalizeTypeName(node.$type);
+            var entityType = entityTypeName && mappingContext.entityManager.metadataStore._getEntityType(entityTypeName, true);
+            var propertyName = nodeContext.propertyName;
+            var ignore = propertyName && propertyName.substr(0, 1) === "$";
+
+            return {
+                entityType: entityType,
+                nodeId: node.$id,
+                nodeRefId: node.$ref,
+                ignore: ignore
+            };
+        }
+        
+    });
+    
+    
+    breeze.config.registerAdapter("dataService", ctor);
+
+}));;"use strict";
+(function (factory) {
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"] && !breeze) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    
+    var core = breeze.core;
+    var ComplexAspect = breeze.ComplexAspect;
+
+    var Backbone;
+    var _;
+    
+    var bbSet, bbGet;
+    
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    var ctor = function () {
+        this.name = "backbone";
+    };
+   
+    ctor.prototype.initialize = function() {
+        Backbone = core.requireLib("Backbone");
+        _ = core.requireLib("_;underscore");
+        bbSet = Backbone.Model.prototype.set;
+        bbGet = Backbone.Model.prototype.get;
+    };
+
+    // may be an entityType or a complexType
+    ctor.prototype.createCtor = function(structuralType) {
+        var defaults = { };
+        structuralType.dataProperties.forEach(function (dp) {
+            defaults[dp.name] = dp.defaultValue;
+        });
+        var modelCtor = Backbone.Model.extend({
+            defaults: defaults,
+            initialize: function () {
+                if (structuralType.navigationProperties) {
+                    var that = this;
+                    structuralType.navigationProperties.forEach(function (np) {
+                        if (!np.isScalar) {
+                            var val = breeze.makeRelationArray([], that, np);
+                            Backbone.Model.prototype.set.call(that, np.name, val);
+                        }
+                    });
+                }
+            }
+        });
+        return modelCtor;
+
+    };
+
+    ctor.prototype.getTrackablePropertyNames = function(entity) {
+        var names = [];
+        for (var p in entity.attributes) {
+            names.push(p);
+        }
+        return names;
+    };
+
+    ctor.prototype.initializeEntityPrototype = function(proto) {
+
+        proto.getProperty = function(propertyName) {
+            return this.get(propertyName);
+        };
+
+        proto.setProperty = function(propertyName, value) {
+            this.set(propertyName, value);
+            // allow setProperty chaining.
+            return this;
+        };
+
+        // override Backbone's set method.
+        proto.set = function(key, value, options) {
+            // call Backbone validate first - we need this because if it fails we don't want to call the Breeze interceptor.
+            // if valid then call Breeze interceptor which will call Backbone's internal set
+            var aspect = this.entityAspect || this.complexAspect;
+            if (!aspect) {
+                return bbSet.call(this, key, value, options);
+            }
+            var attrs, prop, propName;
+            var that = this;
+            var stype = this.entityType || this.complexType;
+            // Handle both `"key", value` and `{key: value}` -style arguments.
+            if (_.isObject(key) || key == null) {
+                attrs = key;
+                options = value;
+                if (!this._validate(attrs, options)) return false;
+                // TODO: suppress validate here
+                for (propName in attrs) {
+                    if (hasOwnProperty.call(attrs, propName)) {
+                        prop = stype.getProperty(propName);
+                        if (prop == null) {
+                            throw new Error("Unknown property: " + key);
+                        }
+                        // avoiding mutable variable inside of closure.
+                        var fn = (function(pName) {
+                            return function(pValue) {
+                                if (arguments.length === 0) {
+                                    return bbGet.call(that, pName);
+                                } else {
+                                    return bbSet.call(that, pName, pValue, options);
+                                }
+                            }
+                        })(propName);
+                        this._$interceptor(prop, attrs[propName], fn);
+                    }
+                }
+            } else {
+                attrs = { };
+                attrs[key] = value;
+                options || (options = { });
+                if (!this._validate(attrs, options)) return false;
+                // TODO: suppress validate here
+                prop = stype.getProperty(key);
+                if (prop == null) {
+                    throw new Error("Unknown property: " + key);
+                }
+                propName = key;
+                this._$interceptor(prop, value, function(pvalue) {
+                    if (arguments.length === 0) {
+                        return bbGet.call(that, propName);
+                    } else {
+                        return bbSet.call(that, propName, pvalue, options);
+                    }
+                });
+            }
+            return this;
+
+        };
+
+    };
+
+    // called when the entityAspect is first created for an entity
+    ctor.prototype.startTracking = function(entity, proto) {
+        if (!(entity instanceof Backbone.Model)) {
+            throw new Error("This entity is not an Backbone.Model instance");
+        }
+        var stype = entity.entityType || entity.complexType;
+        var attributes = entity.attributes;
+        // Update so that every data and navigation property has a value. 
+        stype.dataProperties.forEach(function (dp) {
+            var propName = dp.name;
+            var val = attributes[propName];
+            if (dp.isComplexProperty) {
+                // TODO: right now we create Empty complexObjects here - these should actually come from the entity
+                if (dp.isScalar) {
+                    val = dp.dataType._createInstanceCore(entity, dp);
+                } else {
+                    val = breeze.makeComplexArray([], entity, dp);
+                }
+            } else if (!dp.isScalar) {
+                val = breeze.makePrimitiveArray([], entity, dp);
+            } else if (val === undefined) {
+                val = dp.defaultValue;
+            }
+            bbSet.call(entity, propName, val)
+        });
+        
+        if (stype.navigationProperties) {
+            stype.navigationProperties.forEach(function(np) {
+                var msg;
+                if (np.name in attributes) {
+                    var val = bbGet.call(entity, np.name);
+                    if (np.isScalar) {
+                        if (val && !val.entityType) {
+                            msg = core.formatString("The value of the '%1' property for entityType: '%2' must be either null or another entity",
+                                np.name, entity.entityType.name);
+                            throw new Error(msg);
+                        }
+                    } else {
+                        if (val) {
+                            if (!val.parentEntity) {
+                                msg = core.formatString("The value of the '%1' property for entityType: '%2' must be either null or a Breeze relation array",
+                                    np.name, entity.entityType.name);
+                                throw new Error(msg);
+                            }
+                        } else {
+                            val = breeze.makeRelationArray([], entity, np);
+                            bbSet.call(entity, np.name, val);
+                        }
+                    }
+                } else {
+                    if (np.isScalar) {
+                        bbSet.call(entity, np.name, null);
+                    } else {
+                        val = breeze.makeRelationArray([], entity, np);
+                        bbSet.call(entity, np.name, val);
+                    }
+                }
+            });
+        }
+    };
+
+    breeze.config.registerAdapter("modelLibrary", ctor);
+
+    // private methods
+
+}));
+;"use strict";
+(function (factory) {
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"] && !breeze) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    
+    var core = breeze.core;
+
+    var ctor = function() {
+        this.name = "backingStore";
+    };
+    
+    ctor.prototype.initialize = function() {
+
+    };
+
+    ctor.prototype.getTrackablePropertyNames = function (entity) {
+        var names = [];
+        for (var p in entity) {
+            if (p === "entityType") continue;
+            if (p === "_$typeName") continue;
+            if (p === "_pendingSets") continue;
+            if (p === "_backingStore") continue;
+            var val = entity[p];
+            if (!core.isFunction(val)) {
+                names.push(p);
+            }
+        }
+        return names;
+    };
+
+    // This method is called during Metadata initialization 
+    ctor.prototype.initializeEntityPrototype = function (proto) {
+
+        proto.getProperty = function(propertyName) {
+            return this[propertyName];
+        };
+
+        proto.setProperty = function (propertyName, value) {
+            //if (!this._backingStore.hasOwnProperty(propertyName)) {
+            //    throw new Error("Unknown property name:" + propertyName);
+            //}
+            this[propertyName] = value;
+            // allow setProperty chaining.
+            return this;
+        };
+
+        movePropDefsToProto(proto);
+    };
+
+    // This method is called when an EntityAspect is first created - this will occur as part of the entityType.createEntity call. 
+    // which can be called either directly or via standard query materialization
+
+    // entity is either an entity or a complexObject
+    ctor.prototype.startTracking = function (entity, proto) {
+        // can't touch the normal property sets within this method - access the backingStore directly instead. 
+        var bs = movePropsToBackingStore(entity);
+
+        // assign default values to the entity
+        var stype = entity.entityType || entity.complexType;
+        stype.getProperties().forEach(function(prop) {
+            var propName = prop.name;
+            var val = entity[propName];
+            if (prop.isDataProperty) {
+                if (prop.isComplexProperty) {
+                    if (prop.isScalar) {
+                        val = prop.dataType._createInstanceCore(entity, prop);
+                    } else {
+                        val = breeze.makeComplexArray([], entity, prop);
+                    }
+                } else if (!prop.isScalar) {
+                    val = breeze.makePrimitiveArray([], entity, prop);
+                } else if (val === undefined) {
+                    val = prop.defaultValue;
+                }
+                
+            } else if (prop.isNavigationProperty) {
+                if (val !== undefined) {
+                    throw new Error("Cannot assign a navigation property in an entity ctor.: " + prop.Name);
+                }
+                if (prop.isScalar) {
+                    // TODO: change this to nullstob later.
+                    val = null;
+                } else {
+                    val = breeze.makeRelationArray([], entity, prop);
+                }
+            } else {
+                throw new Error("unknown property: " + propName);
+            }
+            // can't touch the normal property sets within this method (IE9 Bug) - so we access the backingStore directly instead. 
+            // otherwise we could just do 
+            // entity[propName] = val 
+            // after all of the interception logic had been injected.
+            bs[propName] = val;
+        });
+    };
+
+
+    // private methods
+
+    // This method is called during Metadata initialization to correctly "wrap" properties.
+    function movePropDefsToProto(proto) {
+        var stype = proto.entityType || proto.complexType;
+        var extra = stype._extra;
+
+        var alreadyWrapped = extra.alreadyWrappedProps || {};
+        
+        stype.getProperties().forEach(function(prop) {
+            var propName = prop.name;
+            // we only want to wrap props that haven't already been wrapped
+            if (alreadyWrapped[propName]) return;
+                
+            // If property is already defined on the prototype then wrap it in another propertyDescriptor.
+            // otherwise create a propDescriptor for it. 
+            if (propName in proto) {
+               wrapPropDescription(proto, prop);
+            } else {
+               makePropDescription(proto, prop);
+            }
+            alreadyWrapped[propName] = true;
+        });
+        extra.alreadyWrappedProps = alreadyWrapped;
+    }
+
+    // This method is called when an instance is first created via materialization or createEntity.
+    // this method cannot be called while a 'defineProperty' accessor is executing
+    // because of IE bug mentioned above.
+
+    function movePropsToBackingStore(instance) {
+        
+        var bs = getBackingStore(instance);
+        var proto = Object.getPrototypeOf(instance);
+        var stype = proto.entityType || proto.complexType;
+        stype.getProperties().forEach(function(prop) {
+            var propName = prop.name;
+            if (!instance.hasOwnProperty(propName)) return;
+            // pulls off the value, removes the instance property and then rewrites it via ES5 accessor
+            var value = instance[propName];
+            delete instance[propName];
+            instance[propName] = value;
+        });
+        return bs;
+    }
+
+    function makePropDescription(proto, property) {
+        var propName = property.name;
+        var pendingStores = proto._pendingBackingStores;
+        if (!pendingStores) {
+            pendingStores = [];
+            proto._pendingBackingStores = pendingStores;
+        }
+        var descr = {
+            get: function () {
+                var bs = this._backingStore || getBackingStore(this);
+                return bs[propName];
+            },
+            set: function (value) {
+                // IE9 cannot touch instance._backingStore here
+                var bs = this._backingStore || getPendingBackingStore(this);
+                var accessorFn = getAccessorFn(bs, propName);
+                this._$interceptor(property, value, accessorFn);
+            },
+            enumerable: true,
+            configurable: true
+        };
+        Object.defineProperty(proto, propName, descr);
+    }
+
+    function getAccessorFn(bs, propName) {
+        return function () {
+            if (arguments.length == 0) {
+                return bs[propName];
+            } else {
+                bs[propName] = arguments[0];
+            }
+        };
+    }
+
+    // caching version of the above code - perf gain is minimal or negative based on simple testing.
+
+    //function getAccessorFn(bs, propName) {
+    //    // check if fn is already cached 
+    //    var fns = bs.__fns || (bs.__fns = {});
+    //    var fn = fns[propName];
+    //    if (fn) return fn;
+        
+    //    fn = function () {
+    //        if (arguments.length == 0) {
+    //            return bs[propName];
+    //        } else {
+    //            bs[propName] = arguments[0];
+    //        }
+    //    };
+    //    fns[propName] = fn;
+    //    return fn;
+    //}
+
+    function wrapPropDescription(proto, property) {
+        if (!proto.hasOwnProperty(property.name)) {
+            var nextProto = Object.getPrototypeOf(proto);
+            wrapPropDescription(nextProto, property);
+            return;
+        } 
+
+        var propDescr = Object.getOwnPropertyDescriptor(proto, property.name);
+        // if not configurable; we can't touch it - so leave.
+        if (!propDescr.configurable) return;
+        // if a data descriptor - don't change it - this is basically a static property - i.e. defined on every instance of the type with the same value. 
+        if (propDescr.value) return;
+        // if a read only property descriptor - no need to change it.
+        if (!propDescr.set) return;
+            
+        var getAccessorFn = function(entity) {
+            return function() {
+                if (arguments.length == 0) {
+                    return propDescr.get.bind(entity)();
+                } else {
+                    propDescr.set.bind(entity)(arguments[0]);
+                }
+            }
+        };
+            
+        var newDescr = {
+            get: function () {
+                return propDescr.get.bind(this)();
+            },
+            set: function (value) {
+                this._$interceptor(property, value, getAccessorFn(this));
+            },
+            enumerable: propDescr.enumerable,
+            configurable: true
+        };
+        Object.defineProperty(proto, property.name, newDescr);
+    };
+
+   
+    
+
+    function getBackingStore(instance) {
+        var proto = Object.getPrototypeOf(instance);
+        processPendingStores(proto);
+        var bs = instance._backingStore;
+        if (!bs) {
+            bs = {};
+            instance._backingStore = bs;
+        }
+        return bs;
+    }
+
+    // workaround for IE9 bug where instance properties cannot be changed when executing a property 'set' method.
+    function getPendingBackingStore(instance) {
+        var proto = Object.getPrototypeOf(instance);
+        var pendingStores = proto._pendingBackingStores;
+        var pending = core.arrayFirst(pendingStores, function (pending) {
+            return pending.entity === instance;
+        });
+        if (pending) return pending.backingStore;
+        var bs = {};
+        pendingStores.push({ entity: instance, backingStore: bs });
+        return bs;
+    }
+
+    function processPendingStores(proto) {
+        var pendingStores = proto._pendingBackingStores;
+        if (pendingStores) {
+            pendingStores.forEach(function (pending) {
+                pending.entity._backingStore = pending.backingStore;
+            });
+            pendingStores.length = 0;
+        }
+    }
+        
+
+    breeze.config.registerAdapter("modelLibrary", ctor);
+
+}));
+;"use strict";
+(function (factory) {
+    if (breeze) {
+        factory(breeze);
+    } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze"));
+    } else if (typeof define === "function" && define["amd"] && !breeze) {
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
+    }
+}(function(breeze) {
+    
+    var core = breeze.core;
+    var ko;
+
+    var ctor = function () {
+        this.name = "ko";
+    };
+
+    ctor.prototype.initialize = function () {
+        ko = core.requireLib("ko", "The Knockout library");
+        ko.extenders.intercept = function(target, interceptorOptions) {
+            var instance = interceptorOptions.instance;
+            var property = interceptorOptions.property;
+
+            // create a computed observable to intercept writes to our observable
+            var result;
+            if (target.splice) {
+                result = ko.computed({
+                    read: target  //always return the original observables value
+                });
+            } else {
+                result = ko.computed({
+                    read: target,  //always return the original observables value
+                    write: function(newValue) {
+                        instance._$interceptor(property, newValue, target);
+                        return instance;
+                    }
+                });
+            }
+            //return the new computed observable
+            return result;
+        };
+
+    };
+
+    ctor.prototype.getTrackablePropertyNames = function (entity) {
+        var names = [];
+        for (var p in entity) {
+            if (p === "entityType") continue;
+            if (p === "_$typeName") continue;
+            
+            var propDescr = getES5PropDescriptor(entity, p);
+            if (propDescr && propDescr.get) {          
+                names.push(p)
+            } else {
+                var val = entity[p];
+                if (ko.isObservable(val)) {
+                    names.push(p);
+                } else if (!core.isFunction(val)) {
+                    names.push(p);
+                }
+            }
+        }
+        return names;
+    };
+
+    ctor.prototype.initializeEntityPrototype = function (proto) {
+
+        proto.getProperty = function(propertyName) {
+            return this[propertyName]();
+        };
+
+        proto.setProperty = function(propertyName, value) {
+            this[propertyName](value);
+            // allow set property chaining.
+            return this;
+        };
+
+        if (canIsolateES5Props()) {
+            isolateES5Props(proto);
+        }
+
+    };
+
+    function canIsolateES5Props() {
+        try {
+            return Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function isolateES5Props(proto) {
+        
+        var stype = proto.entityType || proto.complexType;
+        var es5Descriptors = {};
+        stype.getProperties().forEach(function (prop) {
+            var propDescr = getES5PropDescriptor(proto, prop.name);
+            if (propDescr) {
+                es5Descriptors[prop.name] = propDescr;
+            }
+        })
+        if (!__isEmpty(es5Descriptors)) {
+            var extra = stype._extra;
+            extra.es5Descriptors = es5Descriptors;
+            stype._koDummy = ko.observable(null);
+
+        }
+        
+    }
+
+    function getES5PropDescriptor(proto, propName) {
+        if (!canIsolateES5Props()) {
+            return null;
+        }
+        if (proto.hasOwnProperty(propName)) {
+            return Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(proto, propName);
+        } else {
+            var nextProto = Object.getPrototypeOf(proto);
+            return nextProto ? getES5PropDescriptor(nextProto, propName) : null;
+        }
+    }
+
+    ctor.prototype.startTracking = function (entity, proto) {
+        // create ko's for each property and assign defaultValues
+
+        var stype = entity.entityType || entity.complexType;
+        var es5Descriptors = stype._extra.es5Descriptors || {};
+
+        // sort unmapped properties to the end
+        stype.getProperties().sort(function (p1, p2) {
+            var v1 = p1.isUnmapped ? 1 :  0;
+            var v2 = p2.isUnmapped ? 1 :  0;
+            return v1 - v2;
+        }).forEach(function(prop) {
+            var propName = prop.name;
+            var val = entity[propName];
+            var propDescr = es5Descriptors[propName];
+            var koObj;
+            
+            // check if property is an ES5 property
+            if (propDescr) {             
+                var getFn = propDescr.get.bind(entity);
+                if (propDescr.set) {
+                    var setFn = propDescr.set.bind(entity);
+                    var rawAccessorFn = function (newValue) {
+                        if (arguments.length === 0) {
+                            return getFn();
+                        } else {
+                            setFn(newValue);
+                        }
+                    }
+                    koObj = ko.computed({
+                        read: function () {
+                            stype._koDummy();
+                            return getFn();
+                        },
+                        write: function(newValue) {
+                            entity._$interceptor(prop, newValue, rawAccessorFn);
+                            stype._koDummy.valueHasMutated();
+                            return entity;
+                        }
+                    });
+                } else {
+                    koObj = ko.computed({
+                        read: getFn,
+                        write: function() {}
+
+                    });
+                }
+            // check if property is already exposed as a ko object               
+            } else if (ko.isObservable(val)) {
+                if (prop.isNavigationProperty) {
+                    throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
+                }
+                koObj = val;
+            // otherwise
+            } else {
+                var val = initializeValueForProp(entity, prop, val);
+                koObj = prop.isScalar ? ko.observable(val) : ko.observableArray(val);
+            }
+
+        
+            if (prop.isScalar) {
+                if (propDescr) {
+                    Object.defineProperty(entity, propName, {
+                        enumerable: true,
+                        configurable: true,
+                        writable: true,
+                        value: koObj
+                    });
+                } else {
+                    var koExt = koObj.extend({ intercept: { instance: entity, property: prop } });
+                    entity[propName] = koExt;
+                }
+            } else {
+                val._koObj = koObj;
+                // code to suppress extra breeze notification when 
+                // ko's array methods are called.
+                koObj.subscribe(onBeforeChange, null, "beforeChange");
+                // code to insure that any direct breeze changes notify ko
+                val.arrayChanged.subscribe(onArrayChanged);
+
+                koObj.equalityComparer = function () {
+                    throw new Error("Collection navigation properties may NOT be set.");
+                };
+                entity[propName] = koObj;
+            }
+        
+
+        });
+        
+    };
+
+    function initializeValueForProp(entity, prop, val) {
+        if (prop.isDataProperty) {
+            if (prop.isComplexProperty) {
+                // TODO: right now we create Empty complexObjects here - these should actually come from the entity
+                if (prop.isScalar) {
+                    val = prop.dataType._createInstanceCore(entity, prop);
+                } else {
+                    val = breeze.makeComplexArray([], entity, prop);
+                }
+            } else if (!prop.isScalar) {
+                val = breeze.makePrimitiveArray([], entity, prop);
+            } else if (val === undefined) {
+                val = prop.defaultValue;
+            }
+
+        } else if (prop.isNavigationProperty) {
+            if (val !== undefined) {
+                throw new Error("Cannot assign a navigation property in an entity ctor.: " + prop.name);
+            }
+            if (prop.isScalar) {
+                // TODO: change this to nullEntity later.
+                val = null;
+            } else {
+                val = breeze.makeRelationArray([], entity, prop);
+            }
+        }  else {
+            throw new Error("unknown property: " + prop.name);
+        }
+        return val;
+    }
+    
+    
+    function onBeforeChange(args) {
+        args._koObj._suppressBreeze = true;
+    }
+    
+    function onArrayChanged(args) {
+        var koObj = args.array._koObj;
+        if (koObj._suppressBreeze) {
+            koObj._suppressBreeze = false;
+        } else {
+            koObj.valueHasMutated();
+        }
+    }
+
+    breeze.config.registerAdapter("modelLibrary", ctor);
+    
+}));
 ;
 // set defaults
 // will no longer fail at initialization time if jQuery is not found.
@@ -15101,8 +16346,8 @@ if (ko) {
     breeze.config.initializeAdapterInstance("modelLibrary", "backingStore");
 }
 
-if (global.window) {
-    global.window.breeze = breeze;
+if (this.window) {
+    this.window.breeze = breeze;
 }
 
 
