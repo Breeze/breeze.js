@@ -1,4 +1,4 @@
-#![BreezeJS](http://www.breezejs.com/sites/all/themes/breeze/images/logo.png "BreezeJS")<span style="font-size:200%; font-weight:bold; position: relative; top:-14px">JS</span>
+#![BreezeJS](http://www.breezejs.com/sites/all/themes/breeze/images/BreezeJSlogo.png "BreezeJS")
 
 ###Welcome to "**Breeze for JavaScript**" by [**IdeaBlade**](http://www.ideablade.com "IdeaBlade website"). 
 
@@ -26,8 +26,8 @@ Please post your [**feature suggestions** to our User Voice site](https://breeze
 
 ##Documentation
 
-[**Samples** and Breeze-related code for server development](https://github.com/Breeze "Breeze sample repositories on github") reside in sibling Breeze repositories.
+[**Samples** and Breeze-related code for server development](https://github.com/Breeze "Breeze sample repositories on github") reside in sibling Breeze repositories such as [breeze.js.samples](https://github.com/Breeze/breeze.js.samples "BreezeJS samples").
 
 [**Documentation** is on the BreezeJS website](http://www.breezejs.com/ "BreezeJS documentation").
 
-[**Release notes** and **installation instructions**](http://www.breezejs.com/documentation/download) are also on BreezeJS website.
+[**Release notes** and **installation instructions**](http://www.breezejs.com/documentation/download) are also on the BreezeJS website.
