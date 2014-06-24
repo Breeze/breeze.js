@@ -1,0 +1,7 @@
+{
+  "name": "breeze.js",
+  "version": "1.4.14-mod",
+  "main": "./build/breeze.base.debug.js",
+  "dependencies": {},
+  "homepage": "https://github.com/Breeze/breeze.js"
+}

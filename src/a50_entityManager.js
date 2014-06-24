@@ -388,11 +388,12 @@ var EntityManager = (function () {
         // em2 will now have a complete copy of what was in em1
     @method exportEntitiesByType
     @param entityType {EntityType} The entity type to export for
+    @param [entities] {Array of Entity} A set of entities to export.
 
     @return {Array} An Array of the exported items
     **/
-    proto.exportEntitiesByType = function (entityType) {
-        var entityGroup = entityGroupForType(this, entityType);
+    proto.exportEntitiesByType = function (entityType, entities) {
+        var entityGroup = entityGroupForType(this, entityType, entities);
         var exportBundle = exportEntityGroup(entityGroup, []);
         return exportBundle.entities;
     };
@@ -1741,13 +1742,19 @@ var EntityManager = (function () {
         });
     }
 
-    function entityGroupForType( em, entityType) {
+    function entityGroupForType( em, entityType, entities) {
         var group = em._entityGroupMap[entityType.name];
         if (!group) {
             group = {
                 entityType: entityType,
                 _entities: []
             };
+        }
+        if ( entities && entities.length > 0 ) {
+            group = {
+                entityType: entityType,
+                _entities: entities
+            }
         }
         return group;
     };
