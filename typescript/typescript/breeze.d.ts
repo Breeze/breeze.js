@@ -31,7 +31,7 @@ declare module breeze.core {
         getNames(): string[];
         getSymbols(): EnumSymbol[];
         static isSymbol(object: any): boolean;
-        seal(): void;
+        resolveSymbols(): void;
     }
 
     class EnumSymbol {
@@ -53,6 +53,7 @@ declare module breeze.core {
         publishAsync(data: any, errorCallback?: ErrorCallback): void;
         subscribe(callback?: (data: any) => void): number;
         unsubscribe(unsubKey: number): boolean;
+        clear(): void;
     }
 
     export function objectForEach(obj: Object, kvfn: (key: string, value: any) => void): void;
@@ -283,6 +284,7 @@ declare module breeze {
         entityState: EntityStateSymbol;
         isBeingSaved: boolean;
         originalValues: Object;
+        extraMetadata: Object;
 
         propertyChanged: PropertyChangedEvent;
         validationErrorsChanged: ValidationErrorsChangedEvent;
@@ -320,9 +322,11 @@ declare module breeze {
 
     class PropertyChangedEventArgs {
         entity: Entity;
+        property: IProperty;
         propertyName: string;
         oldValue: any;
         newValue: any;
+        parent: any;
     }
 
     class PropertyChangedEvent extends breeze.core.Event {
@@ -372,17 +376,17 @@ declare module breeze {
         constructor(config?: string);
 
         addEntity(entity: Entity): Entity;
-        attachEntity(entity: Entity, entityState?: EntityStateSymbol): Entity;
+        attachEntity(entity: Entity, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         clear(): void;
         createEmptyCopy(): EntityManager;
-        createEntity(typeName: string, config?: {}, entityState?: EntityStateSymbol): Entity;
-        createEntity(entityType: EntityType, config?: {}, entityState?: EntityStateSymbol): Entity;
+        createEntity(typeName: string, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
+        createEntity(entityType: EntityType, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         detachEntity(entity: Entity): boolean;
         executeQuery(query: string, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Q.Promise<QueryResult>;
         executeQuery(query: EntityQuery, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Q.Promise<QueryResult>;
 
         executeQueryLocally(query: EntityQuery): Entity[];
-        exportEntities(entities?: Entity[]): string;
+        exportEntities(entities?: Entity[], includeMetadata?: boolean): string;
         fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): Q.Promise<EntityByKeyResult>;
         fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): Q.Promise<EntityByKeyResult>;
         fetchEntityByKey(entityKey: EntityKey): Q.Promise<EntityByKeyResult>;
@@ -414,10 +418,10 @@ declare module breeze {
         hasChanges(entityType: EntityType): boolean;
         hasChanges(entityTypes: EntityType[]): boolean;
 
-        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; }): EntityManager;
-        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; }): EntityManager;
-        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; }): EntityManager;
-        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; }): EntityManager;
+        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): EntityManager;
+        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): EntityManager;
+        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
+        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
         saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): Q.Promise<SaveResult>;
@@ -516,6 +520,7 @@ declare module breeze {
         static fromEntityKey(entityKey: EntityKey): EntityQuery;
         static fromEntityNavigation(entity: Entity, navigationProperty: NavigationProperty): EntityQuery;
         inlineCount(enabled?: boolean): EntityQuery;
+        noTracking(enabled?: boolean): EntityQuery;
         orderBy(propertyPaths: string): EntityQuery;
         orderBy(propertyPaths: string[]): EntityQuery;
         orderByDesc(propertyPaths: string): EntityQuery;
@@ -611,6 +616,7 @@ declare module breeze {
     interface EntityTypeProperties {
         autoGeneratedKeyType?: AutoGeneratedKeyType;
         defaultResourceName?: string;
+        serializerFn?: (dataProperty: DataProperty, value: any) => any;
     }
 
     class FetchStrategySymbol extends breeze.core.EnumSymbol {
@@ -634,6 +640,8 @@ declare module breeze {
         LessThanOrEqual: FilterQueryOpSymbol;
         NotEquals: FilterQueryOpSymbol;
         StartsWith: FilterQueryOpSymbol;
+        Any: FilterQueryOpSymbol;
+        All: FilterQueryOpSymbol;
     }
     var FilterQueryOp: FilterQueryOp;
 
@@ -651,6 +659,8 @@ declare module breeze {
     interface MergeStrategy extends breeze.core.IEnum {
         OverwriteChanges: MergeStrategySymbol;
         PreserveChanges: MergeStrategySymbol;
+        SkipMerge: MergeStrategySymbol;
+        Disallowed: MergeStrategySymbol;
     }
     var MergeStrategy: MergeStrategy;
 
@@ -658,7 +668,7 @@ declare module breeze {
         constructor();
         constructor(config?: MetadataStoreOptions);
         namingConvention: NamingConvention;
-        addDataService(dataService: DataService): void;
+        addDataService(dataService: DataService, shouldOverwrite?: boolean): void;
         addEntityType(structuralType: IStructuralType): void;
         exportMetadata(): string;
         fetchMetadata(dataService: string, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): Q.Promise<any>;
@@ -668,13 +678,14 @@ declare module breeze {
         getEntityTypes(): IStructuralType[];
         hasMetadataFor(serviceName: string): boolean;
         static importMetadata(exportedString: string): MetadataStore;
-        importMetadata(exportedString: string): MetadataStore;
+        importMetadata(exportedString: string, allowMerge?: boolean): MetadataStore;
         isEmpty(): boolean;
-        registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void): void;
+        registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (entity: Entity) => Entity): void;
         trackUnmappedType(entityCtor: Function, interceptor?: Function);
         setEntityTypeForResourceName(resourceName: string, entityType: EntityType): void;
         setEntityTypeForResourceName(resourceName: string, entityTypeName: string): void;
         getEntityTypeNameForResourceName(resourceName: string): string;
+        setProperties(config: { name?: string; serializerFn?: Function });
     }
 
     interface MetadataStoreOptions {
@@ -731,8 +742,10 @@ declare module breeze {
     }
 
     class Predicate {
-        constructor(property: string, operator: string, value: any, valueIsLiteral?: boolean);
-        constructor(property: string, operator: FilterQueryOpSymbol, value: any, valueIsLiteral?: boolean);
+        constructor(property: string, operator: string, value: any);
+        constructor(property: string, operator: FilterQueryOpSymbol, value: any);
+        constructor(property: string, operator: string, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
+        constructor(property: string, operator: FilterQueryOpSymbol, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
 
         and: PredicateMethod;
         static and: PredicateMethod;
@@ -904,8 +917,8 @@ declare module breeze.config {
     var dataService: string;
     var functionRegistry: Object;
     export function getAdapter(interfaceName: string, adapterName: string): Object;
-    export function getAdapterInstance(interfaceName: string, adapterName: string): Object;
-    export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault: boolean): void;
+    export function getAdapterInstance(interfaceName: string, adapterName?: string): Object;
+    export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault?: boolean): void;
     export function initializeAdapterInstances(config: Object): void;
     var interfaceInitialized: Event;
     var interfaceRegistry: Object;
