@@ -20,7 +20,7 @@
     var ctor = function () {
         this.name = "jQuery";
         this.defaultSettings = { };
-        this.requestInterceptor = null; // s
+        this.requestInterceptor = null;
     };
     var proto = ctor.prototype;
 
