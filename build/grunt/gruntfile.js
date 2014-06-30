@@ -15,21 +15,21 @@ module.exports = function(grunt) {
     
     concat: {
       options: {
-        separator: ';',
+        separator: ';'
       },
       base: {
         src: mapPath(srcDir, baseFileNames),
-        dest: destDir+'breeze.base.debug.js',
+        dest: destDir+'breeze.base.debug.js'
       },
       def: {
         src: mapPath(srcDir, fileNames),
-        dest: destDir+'breeze.debug.js',
+        dest: destDir+'breeze.debug.js'
       }
     },
     
     uglify: {
       options: {
-        report: 'min',
+        report: 'min'
       },
       base: {
 		    src: [destDir+'breeze.debug.js'],
@@ -38,7 +38,7 @@ module.exports = function(grunt) {
       def: {
         src: [destDir+'breeze.base.debug.js'],
 		    dest: destDir+'breeze.base.min.js'
-      },
+      }
     },
     
     yuidoc: {
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
         cwd: 'intellisense',
         cmd: 'node server.js'
       }
-    },
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
