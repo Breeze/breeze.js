@@ -76,7 +76,12 @@
         metadataStore.setEntityTypeForResourceName('Employee', 'Employee');
     }
 
-    test("querying server unmapped property", function() {
+    test("querying server unmapped property", function () {
+
+        if (testFns.DEBUG_ODATA) {
+            ok(true, "NA for ODATA - Not sure how to expose a server side unmapped property with OData");
+            return;
+        }
 
         var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 

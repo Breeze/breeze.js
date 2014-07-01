@@ -39,7 +39,7 @@
         setTimeout(function () {
             ok(product.unitPrice == 3);
             start();
-        })
+        });
 
     });
 

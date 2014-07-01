@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.14",
+        version: "1.4.14.2",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -6001,8 +6001,7 @@ if (!Q) {
 breeze.config.setQ = function (q) { breeze.Q = Q = q; }
 breeze.Q = Q; // Todo: consider a "safer" way for apps to get breeze's Q. 
 
-// TODO: still need to handle inheritence here.
-             
+           
 var MetadataStore = (function () {
 
     /**
@@ -7813,11 +7812,7 @@ var EntityType = (function () {
                 targetAspect.extraMetadata = rawAspect.extraMetadata;
             }
         }
-        
-
     }
-
-  
 
     /**
     Returns a string representation of this EntityType.
@@ -7954,19 +7949,19 @@ var EntityType = (function () {
 
     proto._updateCps = function () {
         var metadataStore = this.metadataStore;
-        var incompleteMap = metadataStore._incompleteComplexTypeMap;
+        var incompleteTypeMap = metadataStore._incompleteComplexTypeMap;
         this.complexProperties.forEach(function (cp) {
             if (cp.complexType) return;
             if (!resolveCp(cp, metadataStore)) {
-                __getArray(incompleteMap, cp.complexTypeName).push(cp);
+                __getArray(incompleteTypeMap, cp.complexTypeName).push(cp);
             }
         });
 
         if (this.isComplexType) {
-            (incompleteMap[this.name] || []).forEach(function (cp) {
+            (incompleteTypeMap[this.name] || []).forEach(function (cp) {
                 resolveCp(cp, metadataStore);
             });
-            delete incompleteMap[this.name];
+            delete incompleteTypeMap[this.name];
         }
     };
 
@@ -7983,19 +7978,19 @@ var EntityType = (function () {
 
     proto._updateNps = function () {
         var metadataStore = this.metadataStore;
-        var incompleteMap = metadataStore._incompleteTypeMap;
+        var incompleteTypeMap = metadataStore._incompleteTypeMap;
         this.navigationProperties.forEach(function (np) {
             if (np.entityType) return;
             if (!resolveNp(np, metadataStore)) {
-                __getArray(incompleteMap, np.entityTypeName).push(np);
+                __getArray(incompleteTypeMap, np.entityTypeName).push(np);
             }
         });
 
-        (incompleteMap[this.name] || []).forEach(function (np) {
+        (incompleteTypeMap[this.name] || []).forEach(function (np) {
             resolveNp(np, metadataStore);
         });
 
-        delete incompleteMap[this.name];
+        delete incompleteTypeMap[this.name];
     };
 
     function resolveNp(np, metadataStore) {
@@ -8022,7 +8017,6 @@ var EntityType = (function () {
                 fkProp.inverseNavigationProperty = __arrayFirst(invEntityType.navigationProperties, function (np2) {
                     return np2.invForeignKeyNames && np2.invForeignKeyNames.indexOf(fkProp.name) >= 0 && np2.entityType === fkProp.parentType;
                 });
-                // entityType.foreignKeyProperties.push(fkProp);
                 addUniqueItem(entityType.foreignKeyProperties, fkProp);
             });
         }
@@ -8047,8 +8041,7 @@ var EntityType = (function () {
             return parentEntityType.getDataProperty(fkName);
         });
         var fkPropCollection = parentEntityType.foreignKeyProperties;
-        // Array.prototype.push.apply(parentEntityType.foreignKeyProperties, fkProps);
-
+        
         fkProps.forEach(function (dp) {
             addUniqueItem(fkPropCollection, dp);
             dp.relatedNavigationProperty = np;
@@ -16146,10 +16139,15 @@ breeze.SaveOptions= SaveOptions;
                 
             // If property is already defined on the prototype then wrap it in another propertyDescriptor.
             // otherwise create a propDescriptor for it. 
+            var descr;
             if (propName in proto) {
-               wrapPropDescription(proto, prop);
+               descr = wrapPropDescription(proto, prop);
             } else {
-               makePropDescription(proto, prop);
+               descr = makePropDescription(proto, prop);
+            }
+            // descr will be null for a wrapped descr that is not configurable
+            if (descr != null) {
+                Object.defineProperty(proto, propName, descr);
             }
             alreadyWrapped[propName] = true;
         });
@@ -16197,7 +16195,8 @@ breeze.SaveOptions= SaveOptions;
             enumerable: true,
             configurable: true
         };
-        Object.defineProperty(proto, propName, descr);
+        return descr;
+        
     }
 
     function getAccessorFn(bs, propName) {
@@ -16232,8 +16231,7 @@ breeze.SaveOptions= SaveOptions;
     function wrapPropDescription(proto, property) {
         if (!proto.hasOwnProperty(property.name)) {
             var nextProto = Object.getPrototypeOf(proto);
-            wrapPropDescription(nextProto, property);
-            return;
+            return wrapPropDescription(nextProto, property);
         } 
 
         var propDescr = Object.getOwnPropertyDescriptor(proto, property.name);
@@ -16264,7 +16262,7 @@ breeze.SaveOptions= SaveOptions;
             enumerable: propDescr.enumerable,
             configurable: true
         };
-        Object.defineProperty(proto, property.name, newDescr);
+        return newDescr;
     };
 
    

@@ -22,6 +22,7 @@
 
 
     if (testFns.DEBUG_MONGO) return;
+    if (testFns.DEBUG_ODATA) return;
 
     module("queryNonEF", {
         setup: function () {

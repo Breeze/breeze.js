@@ -124,10 +124,15 @@
                 
             // If property is already defined on the prototype then wrap it in another propertyDescriptor.
             // otherwise create a propDescriptor for it. 
+            var descr;
             if (propName in proto) {
-               wrapPropDescription(proto, prop);
+               descr = wrapPropDescription(proto, prop);
             } else {
-               makePropDescription(proto, prop);
+               descr = makePropDescription(proto, prop);
+            }
+            // descr will be null for a wrapped descr that is not configurable
+            if (descr != null) {
+                Object.defineProperty(proto, propName, descr);
             }
             alreadyWrapped[propName] = true;
         });
@@ -175,7 +180,8 @@
             enumerable: true,
             configurable: true
         };
-        Object.defineProperty(proto, propName, descr);
+        return descr;
+        
     }
 
     function getAccessorFn(bs, propName) {
@@ -210,8 +216,7 @@
     function wrapPropDescription(proto, property) {
         if (!proto.hasOwnProperty(property.name)) {
             var nextProto = Object.getPrototypeOf(proto);
-            wrapPropDescription(nextProto, property);
-            return;
+            return wrapPropDescription(nextProto, property);
         } 
 
         var propDescr = Object.getOwnPropertyDescriptor(proto, property.name);
@@ -242,7 +247,7 @@
             enumerable: propDescr.enumerable,
             configurable: true
         };
-        Object.defineProperty(proto, property.name, newDescr);
+        return newDescr;
     };
 
    
