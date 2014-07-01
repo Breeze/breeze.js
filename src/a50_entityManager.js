@@ -1737,7 +1737,7 @@ var EntityManager = (function () {
             var entityState = aspect.entityState;
             newAspect = {
                 tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
-                entityState: entityState.name,
+                entityState: entityState.name
             };
             if (aspect.extraMetadata) {
                 newAspect.extraMetadata = aspect.extraMetadata;
