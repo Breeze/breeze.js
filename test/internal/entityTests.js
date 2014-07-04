@@ -26,6 +26,19 @@
         }
     });
 
+    test("entityChangedAndHasChangesInterop", function() {
+        var em = newEm();
+      
+        var emp = em.createEntity("Employee", { firstName: "Joe", lastName: "Smith", birthDate: new Date(2000, 1, 1) });
+        emp.entityAspect.acceptChanges();
+        em.entityChanged.subscribe(function (args) {
+            var hasChanges = em.hasChanges();
+            ok(hasChanges, "should have changes");
+        });
+        emp.setProperty("firstName", "test");
+        ok(em.hasChanges());
+    });
+
     test("angular keystroke hack", function () {
         var em = newEm();
         var productType = em.metadataStore.getEntityType("Product");

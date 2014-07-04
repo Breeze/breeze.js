@@ -122,9 +122,9 @@ function __getOwnPropertyValues(source) {
 function __extend(target, source, propNames) {
     if (!source) return target;
     if (propNames) {
-        propNames.forEach(function (propName) {
+        propNames.forEach(function(propName) {
             target[propName] = source[propName];
-        })
+        });
     } else {
         for (var propName in source) {
             if (__hasOwnProperty(source, propName)) {
@@ -199,7 +199,7 @@ function __toJSONSafe(obj, replacer) {
     } else if (typeof (obj) === "function") {
         result = undefined;
     } else {
-        var result = {};
+        result = {};
         for (var prop in obj) {
             if (prop === "_$visited") continue;
             var val = obj[prop];
@@ -207,7 +207,7 @@ function __toJSONSafe(obj, replacer) {
                 val = replacer(prop, val);
                 if (val === undefined) continue;
             }
-            var val = __toJSONSafe(val);
+            val = __toJSONSafe(val);
             if (val === undefined) continue;
             result[prop] = val;
         }
@@ -253,7 +253,7 @@ function __map(items, fn) {
     if (items == null) return items;
     var result;
     if (Array.isArray(items)) {
-        result = []
+        result = [];
         items.map(function (v, ix) {
             result[ix] = fn(v, ix);
         });
@@ -278,6 +278,11 @@ function __arrayIndexOf(array, predicate) {
         if (predicate(array[i])) return i;
     }
     return -1;
+}
+
+function __arrayAddItemUnique(array, item) {
+    var ix = array.indexOf(item);
+    if (ix === -1) array.push(item);
 }
 
 function __arrayRemoveItem(array, predicateOrItem, shouldRemoveMultiple) {
@@ -606,6 +611,7 @@ core.arrayEquals = __arrayEquals;
 // core.arrayDistinct = __arrayDistinct;
 core.arrayFirst = __arrayFirst;
 core.arrayIndexOf = __arrayIndexOf;
+// core.__arrayAddUnique = __arrayAddUnique;
 core.arrayRemoveItem = __arrayRemoveItem;
 core.arrayZip = __arrayZip;
 
@@ -919,9 +925,9 @@ var Param = (function () {
     };
 
 
-    proto.applyAll = function (instance, checkOnly, allowUnknownProperty) {
+    proto.applyAll = function (instance, checkOnly) {
         var parentTypeName = instance._$typeName;
-        allowUnknownProperty = allowUnknownProperty || (parentTypeName && this.parent.config._$typeName === parentTypeName);
+        var allowUnknownProperty = (parentTypeName && this.parent.config._$typeName === parentTypeName);
         
         var clone = __extend({}, this.parent.config);
         this.parent.params.forEach(function(p) {
@@ -6050,9 +6056,12 @@ var MetadataStore = (function () {
         this._incompleteTypeMap = {}; // key is entityTypeName; value is array of nav props
         this._incompleteComplexTypeMap = {}; // key is complexTypeName; value is array of complexType props
         this._id = __id++;
+        this.metadataFetched = new Event("metadataFetched", this);
+        
     };
     var proto = ctor.prototype;
     proto._$typeName = "MetadataStore";
+    Event.bubbleEvent(proto, null);
     ctor.ANONTYPE_PREFIX = "_IB_";
 
     /**
@@ -6366,8 +6375,9 @@ var MetadataStore = (function () {
             if (this.hasMetadataFor(dataService.serviceName)) {
                 throw new Error("Metadata for a specific serviceName may only be fetched once per MetadataStore. ServiceName: " + dataService.serviceName);
             }
-            
+            var that = this;
             return dataService.adapterInstance.fetchMetadata(this, dataService).then(function(rawMetadata) {
+                that.metadataFetched.publish({ metadataStore: that, dataService: dataService, rawMetadata: rawMetadata });
                 if (callback) callback(rawMetadata);
                 return Q.resolve(rawMetadata);
             }, function(error) {
@@ -6760,7 +6770,10 @@ var CsdlMetadataParser = (function () {
         });
         var badNavProps = metadataStore.getIncompleteNavigationProperties();
         if (badNavProps.length > 0) {
-            throw new Error("Bad nav properties");
+            var msg = badNavProps.map(function(np) {
+                return np.parentType.name + ":" + np.name;
+            }).join(', ');
+            throw new Error("Incomplete navigation properties: " + msg);
         }
         if (altMetadata) {
             metadataStore.importMetadata(altMetadata, true);
@@ -7099,10 +7112,12 @@ var CsdlMetadataParser = (function () {
 
             var shortName = nameParts[nameParts.length - 1];
 
-            var ns;
+            var ns = null;
             if (schema) {
                 ns = getNamespaceFor(shortName, schema);
-            } else {
+            }
+
+            if (!ns) {
                 var namespaceParts = nameParts.slice(0, nameParts.length - 1);
                 ns = namespaceParts.join(".");
             }
@@ -7120,16 +7135,20 @@ var CsdlMetadataParser = (function () {
         }
     }
 
-    
-
     function getNamespaceFor(shortName, schema) {
         var ns;
         var mapping = schema.cSpaceOSpaceMapping;
         if (mapping) {
             var fullName = mapping[schema.namespace + "." + shortName];
             ns = fullName && fullName.substr(0, fullName.length - (shortName.length + 1));
+            if (ns) return ns;
         }
-        return ns || schema.namespace;
+        // if schema does not also have an entityType node then
+        // this is an WebApi2 OData schema which is usually equal to 'Default'; which is useless.
+        if (schema.entityType || schema.namespace != 'Default') {
+            return schema.namespace;
+        }
+        return null;
     }
 
     var normalizeTypeName = __memoize(function (rawTypeName) {
@@ -7442,7 +7461,7 @@ var EntityType = (function () {
             this._addNavigationProperty(property);
             // metadataStore can be undefined if this entityType has not yet been added to a MetadataStore.
             if (shouldResolve && ms) {
-                resolveNp(property, ms);
+                tryResolveNp(property, ms);
             }
         }
         // unmapped properties can be added AFTER entityType has already resolved all property names.
@@ -7978,84 +7997,36 @@ var EntityType = (function () {
 
     proto._updateNps = function () {
         var metadataStore = this.metadataStore;
-        var incompleteTypeMap = metadataStore._incompleteTypeMap;
+        
+        // resolve all navProps for this entityType
         this.navigationProperties.forEach(function (np) {
-            if (np.entityType) return;
-            if (!resolveNp(np, metadataStore)) {
-                __getArray(incompleteTypeMap, np.entityTypeName).push(np);
-            }
+            tryResolveNp(np, metadataStore);
         });
-
+        var incompleteTypeMap = metadataStore._incompleteTypeMap;
+        // next resolve all navProp that point to this entityType.
         (incompleteTypeMap[this.name] || []).forEach(function (np) {
-            resolveNp(np, metadataStore);
+            tryResolveNp(np, metadataStore);
         });
-
+        // every navProp that pointed to this type should now be resolved
         delete incompleteTypeMap[this.name];
     };
 
-    function resolveNp(np, metadataStore) {
+    function tryResolveNp(np, metadataStore) {
+        if (np.entityType) return true;
+
         var entityType = metadataStore._getEntityType(np.entityTypeName, true);
-        if (!entityType) return false;
-        np.entityType = entityType;
-        var invNp = __arrayFirst(entityType.navigationProperties, function( altNp) {
-            // Can't do this because of possibility of comparing a base class np with a subclass altNp.
-            // return altNp.associationName === np.associationName
-            //    && altNp !== np;
-            // So use this instead.
-            return altNp.associationName === np.associationName &&
-                (altNp.name !== np.name || altNp.entityTypeName !== np.entityTypeName);
-        });
-        np.inverse = invNp;
-        if (!invNp) {
-            // unidirectional 1-n relationship
-            np.invForeignKeyNames.forEach(function (invFkName) {
-                var fkProp = entityType.getDataProperty(invFkName);
-                if (!fkProp) {
-                    throw new Error("EntityType '" + np.entityTypeName + "' has no foreign key matching '" + invFkName + "'");
-                }
-                var invEntityType = np.parentType;
-                fkProp.inverseNavigationProperty = __arrayFirst(invEntityType.navigationProperties, function (np2) {
-                    return np2.invForeignKeyNames && np2.invForeignKeyNames.indexOf(fkProp.name) >= 0 && np2.entityType === fkProp.parentType;
-                });
-                addUniqueItem(entityType.foreignKeyProperties, fkProp);
-            });
+        if (entityType) {
+            np.entityType = entityType;
+            np._resolveNp();
+            // don't bother removing - _updateNps will do it later.
+            // __arrayRemoveItem(incompleteNps, np, false);
+        } else {
+            var incompleteNps = __getArray(metadataStore._incompleteTypeMap, np.entityTypeName);
+            __arrayAddItemUnique(incompleteNps, np);
         }
-        
-        resolveRelated(np);
-        return true;
+        return !!entityType;
     }
-
-    function addUniqueItem(collection, item) {
-        var ix = collection.indexOf(item);
-        if (ix === -1) collection.push(item);
-    }
-
-    // sets navigation property: relatedDataProperties and dataProperty: relatedNavigationProperty
-    function resolveRelated(np) {
-
-        var fkNames = np.foreignKeyNames;
-        if (fkNames.length === 0) return;
-
-        var parentEntityType = np.parentType;
-        var fkProps = fkNames.map(function (fkName) {
-            return parentEntityType.getDataProperty(fkName);
-        });
-        var fkPropCollection = parentEntityType.foreignKeyProperties;
-        
-        fkProps.forEach(function (dp) {
-            addUniqueItem(fkPropCollection, dp);
-            dp.relatedNavigationProperty = np;
-            // now update the inverse
-            np.entityType.inverseForeignKeyProperties.push(dp);
-            if (np.relatedDataProperties) {
-                np.relatedDataProperties.push(dp);
-            } else {
-                np.relatedDataProperties = [dp];
-            }
-        });
-    }
-
-   
+  
     function calcUnmappedProperties(stype, instance) {
         var metadataPropNames = stype.getPropertyNames();
         var trackablePropNames = __modelLibraryDef.getDefaultInstance().getTrackablePropertyNames(instance);
@@ -8546,6 +8517,11 @@ var DataProperty = (function () {
     proto.isDataProperty = true;
     proto.isNavigationProperty = false;
 
+    proto.formatName = function () {
+        return this.parentType.name + "--" + this.name;
+    }
+
+
     /**
     General purpose property set method
     @example
@@ -8769,27 +8745,9 @@ var NavigationProperty = (function () {
     proto.isDataProperty = false;
     proto.isNavigationProperty = true;
 
-    // In progress - will be used for manual metadata config
-    proto.createInverse = function (config) {
-
-        if (!this.entityType) {
-            throw new Error("Inverse entityType has not yet been defined");
-        }
-        if (this.entityType.isFrozen) {
-            throw new Error("This entityType is frozen");
-        }
-        var metadataStore = this.entityType.metadataStore;
-        if (metadataStore == null) {
-            throw new Error("Cannot create an inverse property until this entityType has been added to the metadataStore");
-        }
-
-        config.entityTypeName = this.parentEntityType.name;
-        config.associationName = this.associationName;
-        var invNp = new NavigationProperty(config);
-        this.parentEntityType.addNavigationProperty(invNp);
-        return invNp;
-    };
-
+    __extend(proto, DataProperty.prototype, [
+        "formatName"
+    ]);
 
     /**
     General purpose property set method
@@ -8801,13 +8759,86 @@ var NavigationProperty = (function () {
         });
     @method setProperties
     @param config [object]
+    @param [config.inverse] {String}
     @param [config.custom] {Object}
     **/
     proto.setProperties = function (config) {
+        if (!this.parentType) {
+            throw new Error("Cannot call NavigationProperty.setProperties until the parent EntityType of the NavigationProperty has been set.");
+        }
+        var inverse = config.inverse;
+        if (inverse) delete config.inverse;
         assertConfig(config)
+            .whereParam("foreignKeyNames").isArray().isString().isOptional().withDefault([])
+            .whereParam("invForeignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("custom").isOptional()
             .applyAll(this);
+        this.parentType._updateNames(this);
+        
+        this._resolveNp();
+        if (inverse) {
+            this.setInverse(inverse);
+        }
+        
     };
+
+    proto.setInverse = function (inverseNp) {
+        var invNp;
+        if (typeof (inverseNp) === "string") {
+            invNp = this.entityType.getNavigationProperty(inverseNp);
+        } else {
+            invNp = inverseNp;
+        }
+        
+        if (!invNp) {
+            throw throwSetInverseError(this, "Unable to find inverse property: " + invNpName);
+        }
+        if (this.inverse || invNp.inverse) {
+            throwSetInverseError(this, "It has already been set on one side or the other.");
+        }
+        if (invNp.entityType != this.parentType) {
+            throwSetInverseError(this, invNp.formatName + " is not a valid inverse property for this.");
+        }
+        if (this.associationName) {
+            invNp.associationName = this.associationName;
+        } else {
+            if (!invNp.associationName) {
+                invNp.associationName = this.formatName() + "_" + invNp.formatName();
+            }
+            this.associationName = invNp.associationName;
+        }
+        this._resolveNp();
+        invNp._resolveNp();
+    };
+
+    // In progress - will be used for manual metadata config
+    proto.createInverse = function (config) {
+
+        if (!this.entityType) {
+            throwCreateInverseError(this, "has not yet been defined.");
+        }
+        if (this.entityType.isFrozen) {
+            throwCreateInverseError(this, "is frozen.");
+        }
+        var metadataStore = this.entityType.metadataStore;
+        if (metadataStore == null) {
+            throwCreateInverseError(this, "has not yet been added to the metadataStore.");
+        }
+
+        config.entityTypeName = this.parentEntityType.name;
+        config.associationName = this.associationName;
+        var invNp = new NavigationProperty(config);
+        this.parentEntityType.addNavigationProperty(invNp);
+        return invNp;
+    };
+
+    function throwSetInverseError(np, message) {
+        throw new Error("Cannot set the inverse property for: " + np.formatName() + ". " + message);
+    }
+
+    function throwCreateInverseError(np, message) {
+        throw new Error("Cannot create inverse for: " + np.formatName() + ". The entityType for this navigation property " + message);
+    }
 
     proto.toJSON = function () {
         return __toJson(this, {
@@ -8828,6 +8859,64 @@ var NavigationProperty = (function () {
         }
         return new NavigationProperty(json);
     };
+
+    proto._resolveNp = function () {
+        var np = this;
+        var entityType = np.entityType;
+        var invNp = __arrayFirst(entityType.navigationProperties, function (altNp) {
+            // Can't do this because of possibility of comparing a base class np with a subclass altNp.
+            // return altNp.associationName === np.associationName
+            //    && altNp !== np;
+            // So use this instead.
+            return altNp.associationName === np.associationName &&
+                (altNp.name !== np.name || altNp.entityTypeName !== np.entityTypeName);
+        });
+        np.inverse = invNp;
+        //if (invNp && invNp.inverse == null) {
+        //    invNp._resolveNp();
+        //}
+        if (!invNp) {
+            // unidirectional 1-n relationship
+            np.invForeignKeyNames.forEach(function (invFkName) {
+                var fkProp = entityType.getDataProperty(invFkName);
+                if (!fkProp) {
+                    throw new Error("EntityType '" + np.entityTypeName + "' has no foreign key matching '" + invFkName + "'");
+                }
+                var invEntityType = np.parentType;
+                fkProp.inverseNavigationProperty = __arrayFirst(invEntityType.navigationProperties, function (np2) {
+                    return np2.invForeignKeyNames && np2.invForeignKeyNames.indexOf(fkProp.name) >= 0 && np2.entityType === fkProp.parentType;
+                });
+                __arrayAddItemUnique(entityType.foreignKeyProperties, fkProp);
+            });
+        }
+
+        resolveRelated(np);
+    }
+
+    // sets navigation property: relatedDataProperties and dataProperty: relatedNavigationProperty
+    function resolveRelated(np) {
+
+        var fkNames = np.foreignKeyNames;
+        if (fkNames.length === 0) return;
+
+        var parentEntityType = np.parentType;
+        var fkProps = fkNames.map(function (fkName) {
+            return parentEntityType.getDataProperty(fkName);
+        });
+        var fkPropCollection = parentEntityType.foreignKeyProperties;
+
+        fkProps.forEach(function (dp) {
+            __arrayAddItemUnique(fkPropCollection, dp);
+            dp.relatedNavigationProperty = np;
+            // now update the inverse
+            __arrayAddItemUnique(np.entityType.inverseForeignKeyProperties, dp);
+            if (np.relatedDataProperties) {
+                __arrayAddItemUnique(np.relatedDataProperties, dp);
+            } else {
+                np.relatedDataProperties = [dp];
+            }
+        });
+    }
     
     return ctor;
 })();
@@ -13427,11 +13516,12 @@ var EntityManager = (function () {
     };
 
     proto._notifyStateChange = function (entity, needsSave) {
-        this.entityChanged.publish({ entityAction: EntityAction.EntityStateChange, entity: entity });
-
+        var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
+        
         if (needsSave) {
             if (!this._hasChanges) {
                 this._setHasChanges(true);
+                this.entityChanged.publish(ecArgs);
             }
         } else {
             // called when rejecting a change or merging an unchanged record.
@@ -13439,9 +13529,13 @@ var EntityManager = (function () {
             // so defer it during a query/import or save and call it once when complete ( if needed).
             if (this._hasChanges) {
                 if (this.isLoading) {
-                    this._hasChangesAction = this._hasChangesAction || function () { this._setHasChanges(null); }.bind(this);
+                    this._hasChangesAction = this._hasChangesAction || function() {
+                        this._setHasChanges(null);
+                        this.entityChanged.publish(ecArgs);
+                    }.bind(this);
                 } else {
                     this._setHasChanges(null);
+                    this.entityChanged.publish(ecArgs);
                 }
             }
         }
@@ -13708,7 +13802,7 @@ var EntityManager = (function () {
             var entityState = aspect.entityState;
             newAspect = {
                 tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
-                entityState: entityState.name,
+                entityState: entityState.name
             };
             if (aspect.extraMetadata) {
                 newAspect.extraMetadata = aspect.extraMetadata;

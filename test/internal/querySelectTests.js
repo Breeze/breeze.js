@@ -32,7 +32,9 @@
             .where("freight", FilterQueryOp.GreaterThan, 500)
             .select("customer.companyName")
             .orderBy("customer.companyName");
-            //.expand("customer");
+        if (testFns.DEBUG_ODATA) {
+            query = query.expand("customer");
+        }
         var queryUrl = query._toUri(em.metadataStore);
         stop();
         em.executeQuery(query).then(function (data) {

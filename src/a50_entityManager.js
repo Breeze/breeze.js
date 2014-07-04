@@ -1456,11 +1456,12 @@ var EntityManager = (function () {
     };
 
     proto._notifyStateChange = function (entity, needsSave) {
-        this.entityChanged.publish({ entityAction: EntityAction.EntityStateChange, entity: entity });
-
+        var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
+        
         if (needsSave) {
             if (!this._hasChanges) {
                 this._setHasChanges(true);
+                this.entityChanged.publish(ecArgs);
             }
         } else {
             // called when rejecting a change or merging an unchanged record.
@@ -1468,9 +1469,13 @@ var EntityManager = (function () {
             // so defer it during a query/import or save and call it once when complete ( if needed).
             if (this._hasChanges) {
                 if (this.isLoading) {
-                    this._hasChangesAction = this._hasChangesAction || function () { this._setHasChanges(null); }.bind(this);
+                    this._hasChangesAction = this._hasChangesAction || function() {
+                        this._setHasChanges(null);
+                        this.entityChanged.publish(ecArgs);
+                    }.bind(this);
                 } else {
                     this._setHasChanges(null);
+                    this.entityChanged.publish(ecArgs);
                 }
             }
         }

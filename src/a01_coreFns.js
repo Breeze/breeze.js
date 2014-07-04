@@ -94,9 +94,9 @@ function __getOwnPropertyValues(source) {
 function __extend(target, source, propNames) {
     if (!source) return target;
     if (propNames) {
-        propNames.forEach(function (propName) {
+        propNames.forEach(function(propName) {
             target[propName] = source[propName];
-        })
+        });
     } else {
         for (var propName in source) {
             if (__hasOwnProperty(source, propName)) {
@@ -171,7 +171,7 @@ function __toJSONSafe(obj, replacer) {
     } else if (typeof (obj) === "function") {
         result = undefined;
     } else {
-        var result = {};
+        result = {};
         for (var prop in obj) {
             if (prop === "_$visited") continue;
             var val = obj[prop];
@@ -179,7 +179,7 @@ function __toJSONSafe(obj, replacer) {
                 val = replacer(prop, val);
                 if (val === undefined) continue;
             }
-            var val = __toJSONSafe(val);
+            val = __toJSONSafe(val);
             if (val === undefined) continue;
             result[prop] = val;
         }
@@ -225,7 +225,7 @@ function __map(items, fn) {
     if (items == null) return items;
     var result;
     if (Array.isArray(items)) {
-        result = []
+        result = [];
         items.map(function (v, ix) {
             result[ix] = fn(v, ix);
         });
@@ -250,6 +250,11 @@ function __arrayIndexOf(array, predicate) {
         if (predicate(array[i])) return i;
     }
     return -1;
+}
+
+function __arrayAddItemUnique(array, item) {
+    var ix = array.indexOf(item);
+    if (ix === -1) array.push(item);
 }
 
 function __arrayRemoveItem(array, predicateOrItem, shouldRemoveMultiple) {
@@ -578,6 +583,7 @@ core.arrayEquals = __arrayEquals;
 // core.arrayDistinct = __arrayDistinct;
 core.arrayFirst = __arrayFirst;
 core.arrayIndexOf = __arrayIndexOf;
+// core.__arrayAddUnique = __arrayAddUnique;
 core.arrayRemoveItem = __arrayRemoveItem;
 core.arrayZip = __arrayZip;
 

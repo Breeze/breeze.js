@@ -161,10 +161,10 @@
     });
     
     test("create metadata and use it for save - CodeFirst only", function () {
-        if (testFns.DEBUG_ODATA) {
-            ok(true, "NA for OData - TimeList and Timegroup not yet added");
-            return;
-        }
+        //if (testFns.DEBUG_ODATA) {
+        //    ok(true, "NA for OData - TimeList and Timegroup not yet added");
+        //    return;
+        //}
 
         if (testFns.DEBUG_MONGO) {
             ok(true, "NA for Mongo - TimeList and Timegroup not yet added");
@@ -194,10 +194,10 @@
     
     test("create metadata and insert using existing entity re-attached - CodeFirst only", function () {
 
-        if (testFns.DEBUG_ODATA) {
-            ok(true, "Skipped tests - not applicable to OData");
-            return;
-        };
+        //if (testFns.DEBUG_ODATA) {
+        //    ok(true, "Skipped tests - not applicable to OData");
+        //    return;
+        //};
 
         if (testFns.DEBUG_MONGO) {
             ok(true, "NA for Mongo - TimeList and Timegroup not yet added");

@@ -283,9 +283,9 @@ var Param = (function () {
     };
 
 
-    proto.applyAll = function (instance, checkOnly, allowUnknownProperty) {
+    proto.applyAll = function (instance, checkOnly) {
         var parentTypeName = instance._$typeName;
-        allowUnknownProperty = allowUnknownProperty || (parentTypeName && this.parent.config._$typeName === parentTypeName);
+        var allowUnknownProperty = (parentTypeName && this.parent.config._$typeName === parentTypeName);
         
         var clone = __extend({}, this.parent.config);
         this.parent.params.forEach(function(p) {
