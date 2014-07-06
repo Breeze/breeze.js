@@ -50,6 +50,65 @@
         });
     }
 
+    test("canSaveNonscalarComplexProps 1", function() {
+        var em = newAltEm();
+
+        initializeMetadataStore(em.metadataStore);
+        var shiftType = em.metadataStore.getEntityType("Shift");
+        var person = em.createEntity("Person", { personId: 1 });
+        var shifts = person.getProperty("shifts");
+        var shift1 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
+        shifts.push(shift1);
+        person.entityAspect.acceptChanges();
+        person.setProperty("firstName", "Albert");
+        
+        var shift2 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
+        shifts.push(shift2);
+        var helper = em.helper;
+        var changedJson = helper.unwrapChangedValues(person, em.metadataStore);
+        ok(changedJson.FirstName == "Albert");
+        ok(changedJson.Shifts.length == 2);
+
+    });
+
+    test("canSaveNonscalarComplexProps 2", function () {
+        var em = newAltEm();
+
+        initializeMetadataStore(em.metadataStore);
+        var shiftType = em.metadataStore.getEntityType("Shift");
+        var person = em.createEntity("Person", { personId: 1 });
+        var shifts = person.getProperty("shifts");
+        var shift1 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
+        shifts.push(shift1);
+        person.entityAspect.acceptChanges();
+        person.setProperty("firstName", "Albert");
+        shift1.setProperty("numHours", 7);
+        var helper = em.helper;
+        var changedJson = helper.unwrapChangedValues(person, em.metadataStore);
+        ok(changedJson.FirstName == "Albert");
+        ok(changedJson.Shifts.length == 1);
+
+    });
+
+    test("canSaveNonscalarComplexProps 3", function () {
+        var em = newAltEm();
+
+        initializeMetadataStore(em.metadataStore);
+        var shiftType = em.metadataStore.getEntityType("Shift");
+        var person = em.createEntity("Person", { personId: 1 });
+        var shifts = person.getProperty("shifts");
+        var shift1 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
+        shifts.push(shift1);
+        person.entityAspect.acceptChanges();
+        person.setProperty("firstName", "Albert");
+       
+        var helper = em.helper;
+        var changedJson = helper.unwrapChangedValues(person, em.metadataStore);
+        ok(changedJson.FirstName == "Albert");
+        ok(changedJson.Shifts === undefined);
+
+    });
+
     test("bad addEntityType - no key", function () {
         var ms = new MetadataStore();
         try {
@@ -150,13 +209,23 @@
 
     function initializeMetadataStore(metadataStore) {
         metadataStore.addEntityType({
+            shortName: "Shift",
+            namespace: testFns.sampleNamespace,
+            isComplexType: true,
+            dataProperties: {
+                startDate: { dataType: DataType.DateTime },
+                numHours: { dataType: DataType.Int32 }
+            }
+        });
+        metadataStore.addEntityType({
             shortName: "Person",
             namespace: testFns.sampleNamespace,
             dataProperties: {
                 personId: { dataType: DataType.Int32, isNullable: false, isPartOfKey: true },
                 firstName: { dataType: DataType.String, isNullable: false },
                 lastName: { dataType: DataType.String, isNullable: false },
-                birthDate: { dataType: DataType.DateTime }
+                birthDate: { dataType: DataType.DateTime },
+                shifts: { complexTypeName: "Shift:#" + testFns.sampleNamespace, isScalar: false }
             },
             navigationProperties: {
                 meals: { entityTypeName: "Meal", isScalar: false, associationName: "personMeals" }

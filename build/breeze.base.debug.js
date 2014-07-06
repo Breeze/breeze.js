@@ -249,18 +249,15 @@ function __toArray(item) {
 }
 
 // a version of Array.map that doesn't require an array, i.e. works on arrays and scalars.
-function __map(items, fn) {
-    if (items == null) return items;
-    var result;
-    if (Array.isArray(items)) {
-        result = [];
-        items.map(function (v, ix) {
-            result[ix] = fn(v, ix);
+function __map(itemOrItems, fn) {
+    if (itemOrItems == null) return itemOrItems;
+    if (Array.isArray(itemOrItems)) {
+        return itemOrItems.map(function (item, ix) {
+            return fn(item, ix);
         });
     } else {
-        result = fn(items);
+        return fn(itemOrItems);
     }
-    return result;
 }
 
 
@@ -14249,37 +14246,64 @@ var EntityManager = (function () {
         return result;
     }
     
-    function unwrapChangedValues(target, metadataStore, transformFn) {
-        var stype = target.entityType || target.complexType;
+    function unwrapChangedValues(entity, metadataStore, transformFn) {
+        var stype = entity.entityType; 
         var serializerFn = getSerializerFn(stype);
-        var aspect = target.entityAspect || target.complexAspect;
         var fn = metadataStore.namingConvention.clientPropertyNameToServer;
         var result = {};
-        __objectForEach(aspect.originalValues, function (propName, value) {
+        __objectForEach(entity.entityAspect.originalValues, function (propName, value) {
             var prop = stype.getProperty(propName);
-            var val = target.getProperty(propName);
+            var val = entity.getProperty(propName);
             val = transformFn ? transformFn(prop, val) : val;
             if (val === undefined) return;
-            val = serializerFn ? serializerFn(dp, val) : val;
+            val = serializerFn ? serializerFn(prop, val) : val;
             if (val !== undefined) {
                 result[fn(propName, prop)] = val;
             }
         });
+        // any change to any complex object or array of complex objects returns the ENTIRE
+        // current complex object or complex object array.  This is by design. Complex Objects
+        // are atomic. 
         stype.complexProperties.forEach(function (cp) {
-            var nextTarget = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                var unwrappedCo = unwrapChangedValues(nextTarget, metadataStore, transformFn);
-                if (!__isEmpty(unwrappedCo)) {
-                    result[fn(cp.name, cp)] = unwrappedCo;
-                }
-            } else {
-                var unwrappedCos = nextTarget.map(function (item) {
-                    return unwrapChangedValues(item, metadataStore, transformFn);
+            if (cpHasOriginalValues(entity, cp)) {
+                var coOrCos = entity.getProperty(cp.name);
+                result[fn(cp.name, cp)] = __map(coOrCos, function(co) {
+                    return unwrapInstance(co, transformFn);
                 });
-                result[fn(cp.name, cp)] = unwrappedCos;
-            }
+                // long version of prev 2 lines.
+                //var unwrapped;
+                //if (cp.isScalar) {
+                //    unwrapped = unwrapInstance(coOrCos, transformFn);
+                //} else {
+                //    unwrapped = coOrCos.map(function(co) {
+                //        return unwrapInstance(co, transformFn);
+                //    });
+                // result[fn(cp.name, cp)] = unwrapped;
+            } 
         });
         return result;
+    }
+
+    function cpHasOriginalValues(structuralObject, cp) {
+        var coOrCos = structuralObject.getProperty(cp.name);
+        if (cp.isScalar) {
+            return coHasOriginalValues(coOrCos);
+        } else {
+            // this occurs when a nonscalar co array has had cos added or removed.
+            if (coOrCos._origValues) return true;
+            return coOrCos.some(function (co) {
+                return coHasOriginalValues(co);
+            });
+        }
+    }
+
+    function coHasOriginalValues(co) {
+        // next line checks all non complex properties of the co.
+        if (!__isEmpty(co.complexAspect.originalValues)) return true;
+        // now need to recursively check each of the cps
+        return co.complexType.complexProperties.some(function(cp) {
+            return cpHasOriginalValues(co, cp);
+        });
     }
 
     function getSerializerFn(stype) {
@@ -15159,11 +15183,6 @@ if (ko) {
 } else {
     breeze.config.initializeAdapterInstance("modelLibrary", "backingStore");
 }
-
-if (global.window) {
-    global.window.breeze = breeze;
-}
-
 
 return breeze;
 });
