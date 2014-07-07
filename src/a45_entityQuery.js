@@ -25,7 +25,7 @@ var EntityQuery = (function () {
     var ctor = function (resourceName) {
         assertParam(resourceName, "resourceName").isOptional().isString().check();
         this.resourceName = resourceName;
-        this.entityType = null;
+        this._fromEntityType = null;
         this.wherePredicate = null;
         this.orderByClause = null;
         this.selectClause = null;
@@ -161,7 +161,7 @@ var EntityQuery = (function () {
     **/
     proto.toType = function(entityType) {
         assertParam(entityType, "entityType").isString().or().isInstanceOf(EntityType).check();
-        return clone(this, "resultEntityType", entityType)
+        return clone(this, "resultEntityType", entityType);
     };
 
         
@@ -228,7 +228,7 @@ var EntityQuery = (function () {
             } else {
                 wherePredicate = Predicate.create(__arraySlice(arguments));
             }
-            if (this.entityType) wherePredicate.validate(this.entityType);
+            if (this._fromEntityType) wherePredicate.validate(this._fromEntityType);
             if (this.wherePredicate) {
                 wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
             } 
@@ -737,7 +737,7 @@ var EntityQuery = (function () {
         // Uncomment next two lines if we make this method public.
         // assertParam(metadataStore, "metadataStore").isInstanceOf(MetadataStore).check();
         // assertParam(throwErrorIfNotFound, "throwErrorIfNotFound").isBoolean().isOptional().check();
-        var entityType = this.entityType;
+        var entityType = this._fromEntityType;
         if (entityType) return entityType;
 
         var resourceName = this.resourceName;
@@ -771,7 +771,7 @@ var EntityQuery = (function () {
             }
         }
                 
-        this.entityType = entityType;
+        this._fromEntityType = entityType;
         return entityType;
         
     };
@@ -844,13 +844,8 @@ var EntityQuery = (function () {
         // private methods to this func.
 
         function toFilterString() {
-            var clause = eq.wherePredicate;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
             Predicate._next = 0;
-            return clause.toODataFragment(entityType);
+            return validateToOData(eq.wherePredicate);
         }
             
         function toInlineCountString() {
@@ -859,21 +854,11 @@ var EntityQuery = (function () {
         }
 
         function toOrderByString() {
-            var clause = eq.orderByClause;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
-            return clause.toODataFragment(entityType);
+            return validateToOData(eq.orderByClause);
         }
             
-            function toSelectString() {
-            var clause = eq.selectClause;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
-            return clause.toODataFragment(entityType);
+        function toSelectString() {
+            return validateToOData(eq.selectClause);
         }
             
         function toExpandString() {
@@ -914,6 +899,14 @@ var EntityQuery = (function () {
             } else {
                 return "";
             }
+        }
+
+        function validateToOData(clause) {
+            if (!clause) return;
+            if (!entityType.isAnonymous) {
+                clause.validate(entityType);
+            }
+            return clause.toODataFragment(entityType);
         }
     };
 

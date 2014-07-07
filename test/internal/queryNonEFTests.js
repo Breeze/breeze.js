@@ -50,6 +50,24 @@
         });
     }
 
+    test("canValidateNonscalarComplexProps 1", function() {
+        var em = newAltEm();
+
+        initializeMetadataStore(em.metadataStore);
+        var shiftType = em.metadataStore.getEntityType("Shift");
+        var person = em.createEntity("Person", { personId: 1 });
+        var shifts = person.getProperty("shifts");
+        var shift1 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
+        shifts.push(shift1);
+        var shift2 = shiftType.createInstance({ startDate: "Foo", numHours: 8 });
+        shifts.push(shift2);
+        person.entityAspect.acceptChanges();
+        var valOk = person.entityAspect.validateEntity();
+        ok(valOk == false, "should fail validation");
+        var ves = person.entityAspect.getValidationErrors();
+        ok(ves.length == 1 && ves[0].propertyName === "shifts.startDate" && ves[0].context.index == 1);
+    });
+
     test("canSaveNonscalarComplexProps 1", function() {
         var em = newAltEm();
 
@@ -208,15 +226,20 @@
     });
 
     function initializeMetadataStore(metadataStore) {
-        metadataStore.addEntityType({
+        var x = metadataStore.addEntityType({
             shortName: "Shift",
             namespace: testFns.sampleNamespace,
             isComplexType: true,
             dataProperties: {
-                startDate: { dataType: DataType.DateTime },
+                startDate: {
+                    dataType: DataType.DateTime,
+                    validators: [{ name: "date" }, { name: "required" }]
+                },
                 numHours: { dataType: DataType.Int32 }
             }
         });
+        
+
         metadataStore.addEntityType({
             shortName: "Person",
             namespace: testFns.sampleNamespace,

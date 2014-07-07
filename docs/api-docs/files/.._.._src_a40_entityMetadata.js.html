@@ -1800,9 +1800,14 @@ var EntityType = (function () {
         var r = ctorRegistry[this.name] || ctorRegistry[this.shortName] || {};
         var aCtor = r.ctor || this._ctor;
 
-        if (aCtor &amp;&amp; aCtor.prototype.entityType &amp;&amp; aCtor.prototype.entityType.metadataStore !== this.metadataStore) {
+        var ctorType = aCtor &amp;&amp; aCtor.prototype &amp;&amp; (aCtor.prototype.entityType || aCtor.prototype.complexType);
+        if (ctorType &amp;&amp; ctorType.metadataStore !== this.metadataStore) {
+            // We can&#x27;t risk a mismatch between the ctor and the type info in a specific metadatastore
+            // because modelLibraries rely on type info to intercept ctor properties
             throw new Error(&quot;Cannot register the same constructor for &quot; + this.name + &quot; in different metadata stores.  Please define a separate constructor for each metadata store.&quot;);
         }
+
+
         if (r.ctor &amp;&amp; forceRefresh) {
             this._extra = undefined;
         }
@@ -2544,11 +2549,11 @@ var DataProperty = (function () {
             .whereParam(&quot;isSettable&quot;).isBoolean().isOptional().withDefault(true)
             .whereParam(&quot;concurrencyMode&quot;).isString().isOptional()
             .whereParam(&quot;maxLength&quot;).isNumber().isOptional()
-            .whereParam(&quot;validators&quot;).isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam(&quot;validators&quot;).isInstanceOf(Validator).isArray().or().isObject().isArray().isOptional().withDefault([])
+            .whereParam(&quot;displayName&quot;).isOptional()
             .whereParam(&quot;enumType&quot;).isOptional()
             .whereParam(&quot;rawTypeName&quot;).isOptional() // occurs with undefined datatypes
             .whereParam(&quot;custom&quot;).isOptional()
-
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
         if (!hasName) {
@@ -2595,6 +2600,11 @@ var DataProperty = (function () {
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
+        }
+
+        if (this.validators.length &gt; 0 &amp;&amp; this.validators[0]._$typeName !== &quot;Validator&quot;) {
+            // TODO: think about a try/catch here with explanatory error message
+            this.validators = this.validators.map(function(json) { return Validator.fromJSON(json); });
         }
     };
     var proto = ctor.prototype;
@@ -2766,6 +2776,7 @@ var DataProperty = (function () {
     **/
     proto.setProperties = function (config) {
         assertConfig(config)
+            .whereParam(&quot;displayName&quot;).isOptional()
             .whereParam(&quot;custom&quot;).isOptional()
             .applyAll(this);
     };
@@ -2784,6 +2795,7 @@ var DataProperty = (function () {
             concurrencyMode: null,
             maxLength: null,
             validators: null,
+            displayName: null,
             enumType: null,
             rawTypeName: null,
             isScalar: true,
@@ -2864,6 +2876,7 @@ var NavigationProperty = (function () {
             .whereParam(&quot;invForeignKeyNames&quot;).isArray().isString().isOptional().withDefault([])
             .whereParam(&quot;invForeignKeyNamesOnServer&quot;).isArray().isString().isOptional().withDefault([])
             .whereParam(&quot;validators&quot;).isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam(&quot;displayName&quot;).isOptional()
             .whereParam(&quot;custom&quot;).isOptional()
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
@@ -2999,6 +3012,7 @@ var NavigationProperty = (function () {
         var inverse = config.inverse;
         if (inverse) delete config.inverse;
         assertConfig(config)
+            .whereParam(&quot;displayName&quot;).isOptional()
             .whereParam(&quot;foreignKeyNames&quot;).isArray().isString().isOptional().withDefault([])
             .whereParam(&quot;invForeignKeyNames&quot;).isArray().isString().isOptional().withDefault([])
             .whereParam(&quot;custom&quot;).isOptional()
@@ -3077,6 +3091,7 @@ var NavigationProperty = (function () {
             isScalar: null,
             associationName: null,
             validators: null,
+            displayName: null,
             foreignKeyNames: null,
             invForeignKeyNames: null,
             custom: null

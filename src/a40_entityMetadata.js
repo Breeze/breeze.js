@@ -1593,9 +1593,14 @@ var EntityType = (function () {
         var r = ctorRegistry[this.name] || ctorRegistry[this.shortName] || {};
         var aCtor = r.ctor || this._ctor;
 
-        if (aCtor && aCtor.prototype.entityType && aCtor.prototype.entityType.metadataStore !== this.metadataStore) {
+        var ctorType = aCtor && aCtor.prototype && (aCtor.prototype.entityType || aCtor.prototype.complexType);
+        if (ctorType && ctorType.metadataStore !== this.metadataStore) {
+            // We can't risk a mismatch between the ctor and the type info in a specific metadatastore
+            // because modelLibraries rely on type info to intercept ctor properties
             throw new Error("Cannot register the same constructor for " + this.name + " in different metadata stores.  Please define a separate constructor for each metadata store.");
         }
+
+
         if (r.ctor && forceRefresh) {
             this._extra = undefined;
         }
@@ -2337,11 +2342,11 @@ var DataProperty = (function () {
             .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
-            .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam("validators").isInstanceOf(Validator).isArray().or().isObject().isArray().isOptional().withDefault([])
+            .whereParam("displayName").isOptional()
             .whereParam("enumType").isOptional()
             .whereParam("rawTypeName").isOptional() // occurs with undefined datatypes
             .whereParam("custom").isOptional()
-
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
         if (!hasName) {
@@ -2388,6 +2393,11 @@ var DataProperty = (function () {
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
+        }
+
+        if (this.validators.length > 0 && this.validators[0]._$typeName !== "Validator") {
+            // TODO: think about a try/catch here with explanatory error message
+            this.validators = this.validators.map(function(json) { return Validator.fromJSON(json); });
         }
     };
     var proto = ctor.prototype;
@@ -2559,6 +2569,7 @@ var DataProperty = (function () {
     **/
     proto.setProperties = function (config) {
         assertConfig(config)
+            .whereParam("displayName").isOptional()
             .whereParam("custom").isOptional()
             .applyAll(this);
     };
@@ -2577,6 +2588,7 @@ var DataProperty = (function () {
             concurrencyMode: null,
             maxLength: null,
             validators: null,
+            displayName: null,
             enumType: null,
             rawTypeName: null,
             isScalar: true,
@@ -2657,6 +2669,7 @@ var NavigationProperty = (function () {
             .whereParam("invForeignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("invForeignKeyNamesOnServer").isArray().isString().isOptional().withDefault([])
             .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam("displayName").isOptional()
             .whereParam("custom").isOptional()
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
@@ -2792,6 +2805,7 @@ var NavigationProperty = (function () {
         var inverse = config.inverse;
         if (inverse) delete config.inverse;
         assertConfig(config)
+            .whereParam("displayName").isOptional()
             .whereParam("foreignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("invForeignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("custom").isOptional()
@@ -2870,6 +2884,7 @@ var NavigationProperty = (function () {
             isScalar: null,
             associationName: null,
             validators: null,
+            displayName: null,
             foreignKeyNames: null,
             invForeignKeyNames: null,
             custom: null

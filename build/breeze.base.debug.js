@@ -249,15 +249,18 @@ function __toArray(item) {
 }
 
 // a version of Array.map that doesn't require an array, i.e. works on arrays and scalars.
-function __map(itemOrItems, fn) {
-    if (itemOrItems == null) return itemOrItems;
-    if (Array.isArray(itemOrItems)) {
-        return itemOrItems.map(function (item, ix) {
-            return fn(item, ix);
+function __map(items, fn) {
+    if (items == null) return items;
+    var result;
+    if (Array.isArray(items)) {
+        result = [];
+        items.map(function (v, ix) {
+            result[ix] = fn(v, ix);
         });
     } else {
-        return fn(itemOrItems);
+        result = fn(items);
     }
+    return result;
 }
 
 
@@ -3797,32 +3800,40 @@ var EntityAspect = (function() {
         return ok;
     };
 
-    function validateTarget(target) {
+    // coIndex is only used where target is a complex object that is part of an array of complex objects 
+    // in which case ctIndex is the index of the target within the array.
+    function validateTarget(target, coIndex) {
         var ok = true;
         var stype = target.entityType || target.complexType;
         var aspect = target.entityAspect || target.complexAspect;
         var entityAspect = target.entityAspect || target.complexAspect.getEntityAspect();
-            
+        var context = { entity: entityAspect.entity  };
+        if (coIndex !== undefined) {
+            context.index = coIndex;
+        }    
+        
         stype.getProperties().forEach(function (p) {
             var value = target.getProperty(p.name);
-            var propName = aspect.getPropertyPath(p.name);
             if (p.validators.length > 0) {
-                var context = { entity: entityAspect.entity, property: p, propertyName: propName };
+                context.property = p;
+                context.propertyName = aspect.getPropertyPath(p.name);
                 ok = entityAspect._validateProperty(value, context) && ok;
             }
             if (p.isComplexProperty) {
                 if (p.isScalar) {
                     ok = validateTarget(value) && ok;
                 } else {
-                    // TODO: do we want to iterate over all of the complexObject in this property?
+                    ok = value.reduce(function(pv, cv, ix) {
+                        return validateTarget(cv, ix) && pv;
+                    }, ok);
                 }
             }
         });
             
 
-        // then entity level
+        // then target level
         stype.validators.forEach(function (validator) {
-            ok = validate(entityAspect, validator, aspect.entity) && ok;
+            ok = validate(entityAspect, validator, target) && ok;
         });
         return ok;
     }
@@ -4088,15 +4099,15 @@ var EntityAspect = (function() {
 
     };
 
-    
-    function validate(aspect, validator, value, context) {
+    // note entityAspect only - ( no complex aspect allowed on the call).
+    function validate(entityAspect, validator, value, context) {
         var ve = validator.validate(value, context);
         if (ve) {
-            aspect._addValidationError(ve);
+            entityAspect._addValidationError(ve);
             return false;
         } else {
             var key = ValidationError.getKey(validator, context ? context.propertyName: null);
-            aspect._removeValidationError(key);
+            entityAspect._removeValidationError(key);
             return true;
         }
     }
@@ -7567,9 +7578,14 @@ var EntityType = (function () {
         var r = ctorRegistry[this.name] || ctorRegistry[this.shortName] || {};
         var aCtor = r.ctor || this._ctor;
 
-        if (aCtor && aCtor.prototype.entityType && aCtor.prototype.entityType.metadataStore !== this.metadataStore) {
+        var ctorType = aCtor && aCtor.prototype && (aCtor.prototype.entityType || aCtor.prototype.complexType);
+        if (ctorType && ctorType.metadataStore !== this.metadataStore) {
+            // We can't risk a mismatch between the ctor and the type info in a specific metadatastore
+            // because modelLibraries rely on type info to intercept ctor properties
             throw new Error("Cannot register the same constructor for " + this.name + " in different metadata stores.  Please define a separate constructor for each metadata store.");
         }
+
+
         if (r.ctor && forceRefresh) {
             this._extra = undefined;
         }
@@ -8311,11 +8327,11 @@ var DataProperty = (function () {
             .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
-            .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam("validators").isInstanceOf(Validator).isArray().or().isObject().isArray().isOptional().withDefault([])
+            .whereParam("displayName").isOptional()
             .whereParam("enumType").isOptional()
             .whereParam("rawTypeName").isOptional() // occurs with undefined datatypes
             .whereParam("custom").isOptional()
-
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
         if (!hasName) {
@@ -8362,6 +8378,11 @@ var DataProperty = (function () {
 
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
+        }
+
+        if (this.validators.length > 0 && this.validators[0]._$typeName !== "Validator") {
+            // TODO: think about a try/catch here with explanatory error message
+            this.validators = this.validators.map(function(json) { return Validator.fromJSON(json); });
         }
     };
     var proto = ctor.prototype;
@@ -8533,6 +8554,7 @@ var DataProperty = (function () {
     **/
     proto.setProperties = function (config) {
         assertConfig(config)
+            .whereParam("displayName").isOptional()
             .whereParam("custom").isOptional()
             .applyAll(this);
     };
@@ -8551,6 +8573,7 @@ var DataProperty = (function () {
             concurrencyMode: null,
             maxLength: null,
             validators: null,
+            displayName: null,
             enumType: null,
             rawTypeName: null,
             isScalar: true,
@@ -8631,6 +8654,7 @@ var NavigationProperty = (function () {
             .whereParam("invForeignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("invForeignKeyNamesOnServer").isArray().isString().isOptional().withDefault([])
             .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
+            .whereParam("displayName").isOptional()
             .whereParam("custom").isOptional()
             .applyAll(this);
         var hasName = !!(this.name || this.nameOnServer);
@@ -8766,6 +8790,7 @@ var NavigationProperty = (function () {
         var inverse = config.inverse;
         if (inverse) delete config.inverse;
         assertConfig(config)
+            .whereParam("displayName").isOptional()
             .whereParam("foreignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("invForeignKeyNames").isArray().isString().isOptional().withDefault([])
             .whereParam("custom").isOptional()
@@ -8844,6 +8869,7 @@ var NavigationProperty = (function () {
             isScalar: null,
             associationName: null,
             validators: null,
+            displayName: null,
             foreignKeyNames: null,
             invForeignKeyNames: null,
             custom: null
@@ -9404,7 +9430,7 @@ var EntityQuery = (function () {
     var ctor = function (resourceName) {
         assertParam(resourceName, "resourceName").isOptional().isString().check();
         this.resourceName = resourceName;
-        this.entityType = null;
+        this._fromEntityType = null;
         this.wherePredicate = null;
         this.orderByClause = null;
         this.selectClause = null;
@@ -9540,7 +9566,7 @@ var EntityQuery = (function () {
     **/
     proto.toType = function(entityType) {
         assertParam(entityType, "entityType").isString().or().isInstanceOf(EntityType).check();
-        return clone(this, "resultEntityType", entityType)
+        return clone(this, "resultEntityType", entityType);
     };
 
         
@@ -9607,7 +9633,7 @@ var EntityQuery = (function () {
             } else {
                 wherePredicate = Predicate.create(__arraySlice(arguments));
             }
-            if (this.entityType) wherePredicate.validate(this.entityType);
+            if (this._fromEntityType) wherePredicate.validate(this._fromEntityType);
             if (this.wherePredicate) {
                 wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
             } 
@@ -10116,7 +10142,7 @@ var EntityQuery = (function () {
         // Uncomment next two lines if we make this method public.
         // assertParam(metadataStore, "metadataStore").isInstanceOf(MetadataStore).check();
         // assertParam(throwErrorIfNotFound, "throwErrorIfNotFound").isBoolean().isOptional().check();
-        var entityType = this.entityType;
+        var entityType = this._fromEntityType;
         if (entityType) return entityType;
 
         var resourceName = this.resourceName;
@@ -10150,7 +10176,7 @@ var EntityQuery = (function () {
             }
         }
                 
-        this.entityType = entityType;
+        this._fromEntityType = entityType;
         return entityType;
         
     };
@@ -10223,13 +10249,8 @@ var EntityQuery = (function () {
         // private methods to this func.
 
         function toFilterString() {
-            var clause = eq.wherePredicate;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
             Predicate._next = 0;
-            return clause.toODataFragment(entityType);
+            return validateToOData(eq.wherePredicate);
         }
             
         function toInlineCountString() {
@@ -10238,21 +10259,11 @@ var EntityQuery = (function () {
         }
 
         function toOrderByString() {
-            var clause = eq.orderByClause;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
-            return clause.toODataFragment(entityType);
+            return validateToOData(eq.orderByClause);
         }
             
-            function toSelectString() {
-            var clause = eq.selectClause;
-            if (!clause) return;
-            if (eq.entityType) {
-                clause.validate(eq.entityType);
-            }
-            return clause.toODataFragment(entityType);
+        function toSelectString() {
+            return validateToOData(eq.selectClause);
         }
             
         function toExpandString() {
@@ -10293,6 +10304,14 @@ var EntityQuery = (function () {
             } else {
                 return "";
             }
+        }
+
+        function validateToOData(clause) {
+            if (!clause) return;
+            if (!entityType.isAnonymous) {
+                clause.validate(entityType);
+            }
+            return clause.toODataFragment(entityType);
         }
     };
 

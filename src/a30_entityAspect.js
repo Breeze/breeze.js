@@ -438,32 +438,40 @@ var EntityAspect = (function() {
         return ok;
     };
 
-    function validateTarget(target) {
+    // coIndex is only used where target is a complex object that is part of an array of complex objects 
+    // in which case ctIndex is the index of the target within the array.
+    function validateTarget(target, coIndex) {
         var ok = true;
         var stype = target.entityType || target.complexType;
         var aspect = target.entityAspect || target.complexAspect;
         var entityAspect = target.entityAspect || target.complexAspect.getEntityAspect();
-            
+        var context = { entity: entityAspect.entity  };
+        if (coIndex !== undefined) {
+            context.index = coIndex;
+        }    
+        
         stype.getProperties().forEach(function (p) {
             var value = target.getProperty(p.name);
-            var propName = aspect.getPropertyPath(p.name);
             if (p.validators.length > 0) {
-                var context = { entity: entityAspect.entity, property: p, propertyName: propName };
+                context.property = p;
+                context.propertyName = aspect.getPropertyPath(p.name);
                 ok = entityAspect._validateProperty(value, context) && ok;
             }
             if (p.isComplexProperty) {
                 if (p.isScalar) {
                     ok = validateTarget(value) && ok;
                 } else {
-                    // TODO: do we want to iterate over all of the complexObject in this property?
+                    ok = value.reduce(function(pv, cv, ix) {
+                        return validateTarget(cv, ix) && pv;
+                    }, ok);
                 }
             }
         });
             
 
-        // then entity level
+        // then target level
         stype.validators.forEach(function (validator) {
-            ok = validate(entityAspect, validator, aspect.entity) && ok;
+            ok = validate(entityAspect, validator, target) && ok;
         });
         return ok;
     }
@@ -729,15 +737,15 @@ var EntityAspect = (function() {
 
     };
 
-    
-    function validate(aspect, validator, value, context) {
+    // note entityAspect only - ( no complex aspect allowed on the call).
+    function validate(entityAspect, validator, value, context) {
         var ve = validator.validate(value, context);
         if (ve) {
-            aspect._addValidationError(ve);
+            entityAspect._addValidationError(ve);
             return false;
         } else {
             var key = ValidationError.getKey(validator, context ? context.propertyName: null);
-            aspect._removeValidationError(key);
+            entityAspect._removeValidationError(key);
             return true;
         }
     }
