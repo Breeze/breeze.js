@@ -393,27 +393,54 @@ var EntityAspect = (function() {
         var entity = this.entity;
         var navProperty = entity.entityType._checkNavProperty(navigationProperty);
         var query = EntityQuery.fromEntityNavigation(entity, navProperty);
-        return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
+        // return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
+        var promise = entity.entityAspect.entityManager.executeQuery(query);
+        var that = this;
+        return promise.then(function(data) {
+            that._markAsLoaded(navProperty.name);
+            if (callback) callback(data);
+            return Q.resolve(data);
+        }, function(error) {
+            if (errorCallback) errorCallback(error);
+            return Q.reject(error);
+        });
+
     };
 
-    ///**
-    //Marks this navigationProperty on this entity as already having been loaded.
-    //@example
-    //        emp.entityAspect.markAsLoaded("Orders");
+    /**
+    Marks this navigationProperty on this entity as already having been loaded.
+    @example
+            emp.entityAspect.markNavigationPropertyAsLoaded("Orders");
             
-    //@method markAsLoaded
-    //@async
-    //@param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
-    //**/
-    //proto.markNavigationPropertyAsLoaded = function(navigationProperty) {
-    //    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-    //    this._loadedNavPropMap[navProperty.name] = true;
-    //}
+    @method markAsLoaded
+    @async
+    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
+    **/
+    proto.markNavigationPropertyAsLoaded = function(navigationProperty) {
+        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+        this._markAsLoaded(navProperty.name);
+    }
 
-    //proto.isNavigationPropertyLoaded = function (navigationProperty) {
-    //    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-    //    return !!_loadedNavPropMap[navProperty.name];
-    //}
+    /**
+    Determines whether a navigationProperty on this entity has already been loaded.
+    @example
+    var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
+            
+    @method isNavigationPropertyLoaded
+    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
+    **/
+    proto.isNavigationPropertyLoaded = function (navigationProperty) {
+        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+        if (navProperty.isScalar && this.entity.getProperty(navProperty.name) != null) {
+            return true;
+        }
+        return this._loadedNps && this._loadedNps.indexOf(navProperty.name) >= 0;
+    }
+
+    proto._markAsLoaded = function(navPropName) {
+        this._loadedNps = this._loadedNps || [];
+        __arrayAddItemUnique(this._loadedNps, navPropName);
+    }
 
 
     /**

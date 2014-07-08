@@ -492,8 +492,7 @@ var MappingContext = (function () {
     function mergeRelatedEntities(mc, navigationProperty, targetEntity, rawEntity) {
         var relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
         if (relatedEntities == null) return;
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // targetEntity.entityAspect.markNavigationPropertyAsLoaded(navigationProperty);
+        
         var inverseProperty = navigationProperty.inverse;
         if (!inverseProperty) return;
 
@@ -542,9 +541,6 @@ var MappingContext = (function () {
         var propName = navigationProperty.name;
         var currentRelatedEntity = targetEntity.getProperty(propName);
 
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // targetEntity.entityAspect.markNavigationPropertyAsLoaded(navigationProperty);
-
         // check if the related entity is already hooked up
         if (currentRelatedEntity !== relatedEntity) {
             // if not hook up both directions.
@@ -553,21 +549,17 @@ var MappingContext = (function () {
             if (!inverseProperty) return;
             if (inverseProperty.isScalar) {
                 relatedEntity.setProperty(inverseProperty.name, targetEntity);
-
-                // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-                // relatedEntity.entityAspect.markNavigationPropertyAsLoaded(inverseProperty);
             } else {
                 var collection = relatedEntity.getProperty(inverseProperty.name);
                 collection.push(targetEntity);
-                // can&#x27;t call _markAsLoaded here because this may be only a partial load.
+
             }
         }
     } 
 
     function updateRelatedEntityInCollection(relatedEntity, relatedEntities, targetEntity, inverseProperty) {
         if (!relatedEntity) return;
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // relatedEntity.entityAspect.markNavigationPropertyAsLoaded(inverseProperty);
+
         // check if the related entity is already hooked up
         var thisEntity = relatedEntity.getProperty(inverseProperty.name);
         if (thisEntity !== targetEntity) {

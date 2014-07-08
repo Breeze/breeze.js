@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.14.2",
+        version: "1.4.15",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -3755,27 +3755,54 @@ var EntityAspect = (function() {
         var entity = this.entity;
         var navProperty = entity.entityType._checkNavProperty(navigationProperty);
         var query = EntityQuery.fromEntityNavigation(entity, navProperty);
-        return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
+        // return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
+        var promise = entity.entityAspect.entityManager.executeQuery(query);
+        var that = this;
+        return promise.then(function(data) {
+            that._markAsLoaded(navProperty.name);
+            if (callback) callback(data);
+            return Q.resolve(data);
+        }, function(error) {
+            if (errorCallback) errorCallback(error);
+            return Q.reject(error);
+        });
+
     };
 
-    ///**
-    //Marks this navigationProperty on this entity as already having been loaded.
-    //@example
-    //        emp.entityAspect.markAsLoaded("Orders");
+    /**
+    Marks this navigationProperty on this entity as already having been loaded.
+    @example
+            emp.entityAspect.markNavigationPropertyAsLoaded("Orders");
             
-    //@method markAsLoaded
-    //@async
-    //@param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
-    //**/
-    //proto.markNavigationPropertyAsLoaded = function(navigationProperty) {
-    //    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-    //    this._loadedNavPropMap[navProperty.name] = true;
-    //}
+    @method markAsLoaded
+    @async
+    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
+    **/
+    proto.markNavigationPropertyAsLoaded = function(navigationProperty) {
+        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+        this._markAsLoaded(navProperty.name);
+    }
 
-    //proto.isNavigationPropertyLoaded = function (navigationProperty) {
-    //    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-    //    return !!_loadedNavPropMap[navProperty.name];
-    //}
+    /**
+    Determines whether a navigationProperty on this entity has already been loaded.
+    @example
+    var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
+            
+    @method isNavigationPropertyLoaded
+    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
+    **/
+    proto.isNavigationPropertyLoaded = function (navigationProperty) {
+        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+        if (navProperty.isScalar && this.entity.getProperty(navProperty.name) != null) {
+            return true;
+        }
+        return this._loadedNps && this._loadedNps.indexOf(navProperty.name) >= 0;
+    }
+
+    proto._markAsLoaded = function(navPropName) {
+        this._loadedNps = this._loadedNps || [];
+        __arrayAddItemUnique(this._loadedNps, navPropName);
+    }
 
 
     /**
@@ -14055,6 +14082,7 @@ var EntityManager = (function () {
     // returns a promise
     function executeQueryCore(em, query, queryOptions, dataService) {
         try {
+            var results;
             var metadataStore = em.metadataStore;
             
             if (metadataStore.isEmpty() && dataService.hasServerMetadata) {
@@ -14063,7 +14091,7 @@ var EntityManager = (function () {
             
             if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
                 try {
-                    var results = em.executeQueryLocally(query);
+                    results = em.executeQueryLocally(query);
                     return Q.resolve({ results: results, query: query });
                 } catch(e) {
                     return Q.reject(e);
@@ -14107,7 +14135,7 @@ var EntityManager = (function () {
                     var nodes = dataService.jsonResultsAdapter.extractResults(data);
                     nodes = __toArray(nodes);
                     
-                    var results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
+                    results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
                     if (validateOnQuery) {
                         results.forEach(function (r) {
                             // anon types and simple types will not have an entityAspect.
@@ -14115,6 +14143,8 @@ var EntityManager = (function () {
                         });
                     }
                     mappingContext.processDeferred();
+                    // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
+                    markLoadedNavProps(results, query);
                     return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount };
                 });
                 return Q.resolve(result);
@@ -14132,6 +14162,32 @@ var EntityManager = (function () {
             }
             return Q.reject(e);
         }
+    }
+
+    function markLoadedNavProps(entities, query) {
+        if (query.noTrackingEnabled) return;
+        var expandClause = query.expandClause;
+        if (expandClause == null) return;
+        expandClause.propertyPaths.forEach(function(propertyPath) {
+            var propNames = propertyPath.split('.');
+            markLoadedNavPath(entities, propNames);
+        });
+    }
+
+    function markLoadedNavPath(entities, propNames) {
+        var propName = propNames[0];
+        entities.forEach(function (entity) {
+            var ea = entity.entityAspect;
+            if (!ea) return; // entity may not be a 'real' entity in the case of a projection.
+            ea._markAsLoaded(propName);           
+            if (propNames.length === 1) return;
+            var next = entity.getProperty(propName);
+            if (!next) return; // no children to process.
+            // strange logic because nonscalar nav values are NOT really arrays 
+            // otherwise we could use Array.isArray
+            if (!next.arrayChanged) next = [next];
+            markLoadedNavPath(next, propNames.slice(1)); 
+        });
     }
    
     function updateConcurrencyProperties(entities) {
@@ -14674,8 +14730,7 @@ var MappingContext = (function () {
     function mergeRelatedEntities(mc, navigationProperty, targetEntity, rawEntity) {
         var relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
         if (relatedEntities == null) return;
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // targetEntity.entityAspect.markNavigationPropertyAsLoaded(navigationProperty);
+        
         var inverseProperty = navigationProperty.inverse;
         if (!inverseProperty) return;
 
@@ -14724,9 +14779,6 @@ var MappingContext = (function () {
         var propName = navigationProperty.name;
         var currentRelatedEntity = targetEntity.getProperty(propName);
 
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // targetEntity.entityAspect.markNavigationPropertyAsLoaded(navigationProperty);
-
         // check if the related entity is already hooked up
         if (currentRelatedEntity !== relatedEntity) {
             // if not hook up both directions.
@@ -14735,21 +14787,17 @@ var MappingContext = (function () {
             if (!inverseProperty) return;
             if (inverseProperty.isScalar) {
                 relatedEntity.setProperty(inverseProperty.name, targetEntity);
-
-                // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-                // relatedEntity.entityAspect.markNavigationPropertyAsLoaded(inverseProperty);
             } else {
                 var collection = relatedEntity.getProperty(inverseProperty.name);
                 collection.push(targetEntity);
-                // can't call _markAsLoaded here because this may be only a partial load.
+
             }
         }
     } 
 
     function updateRelatedEntityInCollection(relatedEntity, relatedEntities, targetEntity, inverseProperty) {
         if (!relatedEntity) return;
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // relatedEntity.entityAspect.markNavigationPropertyAsLoaded(inverseProperty);
+
         // check if the related entity is already hooked up
         var thisEntity = relatedEntity.getProperty(inverseProperty.name);
         if (thisEntity !== targetEntity) {

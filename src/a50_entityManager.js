@@ -1979,6 +1979,7 @@ var EntityManager = (function () {
     // returns a promise
     function executeQueryCore(em, query, queryOptions, dataService) {
         try {
+            var results;
             var metadataStore = em.metadataStore;
             
             if (metadataStore.isEmpty() && dataService.hasServerMetadata) {
@@ -1987,7 +1988,7 @@ var EntityManager = (function () {
             
             if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
                 try {
-                    var results = em.executeQueryLocally(query);
+                    results = em.executeQueryLocally(query);
                     return Q.resolve({ results: results, query: query });
                 } catch(e) {
                     return Q.reject(e);
@@ -2031,7 +2032,7 @@ var EntityManager = (function () {
                     var nodes = dataService.jsonResultsAdapter.extractResults(data);
                     nodes = __toArray(nodes);
                     
-                    var results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
+                    results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
                     if (validateOnQuery) {
                         results.forEach(function (r) {
                             // anon types and simple types will not have an entityAspect.
@@ -2039,6 +2040,8 @@ var EntityManager = (function () {
                         });
                     }
                     mappingContext.processDeferred();
+                    // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
+                    markLoadedNavProps(results, query);
                     return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount };
                 });
                 return Q.resolve(result);
@@ -2056,6 +2059,32 @@ var EntityManager = (function () {
             }
             return Q.reject(e);
         }
+    }
+
+    function markLoadedNavProps(entities, query) {
+        if (query.noTrackingEnabled) return;
+        var expandClause = query.expandClause;
+        if (expandClause == null) return;
+        expandClause.propertyPaths.forEach(function(propertyPath) {
+            var propNames = propertyPath.split('.');
+            markLoadedNavPath(entities, propNames);
+        });
+    }
+
+    function markLoadedNavPath(entities, propNames) {
+        var propName = propNames[0];
+        entities.forEach(function (entity) {
+            var ea = entity.entityAspect;
+            if (!ea) return; // entity may not be a 'real' entity in the case of a projection.
+            ea._markAsLoaded(propName);           
+            if (propNames.length === 1) return;
+            var next = entity.getProperty(propName);
+            if (!next) return; // no children to process.
+            // strange logic because nonscalar nav values are NOT really arrays 
+            // otherwise we could use Array.isArray
+            if (!next.arrayChanged) next = [next];
+            markLoadedNavPath(next, propNames.slice(1)); 
+        });
     }
    
     function updateConcurrencyProperties(entities) {
