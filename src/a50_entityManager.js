@@ -1804,7 +1804,8 @@ var EntityManager = (function () {
             var entityState = EntityState.fromName(newAspect.entityState);
             var newTempKey;
             if (entityState.isAdded()) {
-                newTempKey = tempKeyMap[entityKey.toString()];
+                // newTempKey = tempKeyMap[entityKey.toString()];
+                newTempKey = getMappedKey(tempKeyMap, entityKey);
                 // merge added records with non temp keys
                 targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
             } else {
@@ -1842,7 +1843,8 @@ var EntityManager = (function () {
                             var fkPropName = np.relatedDataProperties[0].name;
                             var oldFkValue = targetEntity.getProperty(fkPropName);
                             var fk = new EntityKey(np.entityType, [oldFkValue]);
-                            var newFk = tempKeyMap[fk.toString()];
+                            // var newFk = tempKeyMap[fk.toString()];
+                            var newFk = getMappedKey(tempKeyMap, fk);
                             targetEntity.setProperty(fkPropName, newFk.values[0]);
                         });
                     }
@@ -1860,6 +1862,18 @@ var EntityManager = (function () {
             entitiesToLink.push(targetEntity);
         });
         return entitiesToLink;
+    }
+
+    function getMappedKey(tempKeyMap, entityKey) {
+        var newKey = tempKeyMap[entityKey.toString()];
+        if (newKey) return newKey;
+        var subtypes = entityKey._subtypes;
+        if (!subtypes) return null;
+        for (var i = 0, j = subtypes.length; i < j; i++) {
+            newKey = tempKeyMap[entityKey.toString(subtypes[i])];
+            if (newKey) return newKey;
+        }
+        return null;
     }
 
     function promiseWithCallbacks(promise, callback, errorCallback) {

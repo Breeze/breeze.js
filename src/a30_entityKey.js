@@ -110,8 +110,8 @@ var EntityKey = (function () {
     Returns a human readable representation of this EntityKey.
     @method toString
     */
-    proto.toString = function () {
-        return this.entityType.name + '-' + this._keyInGroup;
+    proto.toString = function (altEntityType) {
+        return (altEntityType || this.entityType).name + '-' + this._keyInGroup;
     };
 
     /**
