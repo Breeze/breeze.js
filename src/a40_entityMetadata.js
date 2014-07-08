@@ -2342,7 +2342,7 @@ var DataProperty = (function () {
             .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
-            .whereParam("validators").isInstanceOf(Validator).isArray().or().isObject().isArray().isOptional().withDefault([])
+            .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
             .whereParam("displayName").isOptional()
             .whereParam("enumType").isOptional()
             .whereParam("rawTypeName").isOptional() // occurs with undefined datatypes
@@ -2390,15 +2390,10 @@ var DataProperty = (function () {
             }
         }
 
-
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
         }
-
-        if (this.validators.length > 0 && this.validators[0]._$typeName !== "Validator") {
-            // TODO: think about a try/catch here with explanatory error message
-            this.validators = this.validators.map(function(json) { return Validator.fromJSON(json); });
-        }
+        
     };
     var proto = ctor.prototype;
     proto._$typeName = "DataProperty";

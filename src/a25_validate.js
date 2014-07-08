@@ -258,7 +258,7 @@ var Validator = (function () {
             } else if (context.messageTemplate) {
                 return formatTemplate(context.messageTemplate, context);
             } else {
-                return "invalid value: " + this.name || "{unnamed validator}";
+                return "invalid value: " + (this.name || "{unnamed validator}");
             }
         } catch (e) {
             return "Unable to format error message" + e.toString();
@@ -269,7 +269,16 @@ var Validator = (function () {
         return this._baseContext;
     };
 
+    /**
+    Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
+    @method fromJSON
+    @static
+    @param json {Object} JSON object that represents the serialized version of a validator.
+    **/
     ctor.fromJSON = function (json) {
+        if (Array.isArray(json)) {
+            return json.map(function(js) { return ctor.fromJSON(js); });
+        };
         var validatorName = "Validator." + json.name;
         var fn = __config.functionRegistry[validatorName];
         if (!fn) {
@@ -882,11 +891,11 @@ var ValidationError = (function () {
         assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
         assertParam(key, "key").isOptional().isNonEmptyString().check();
         this.validator = validator;
-        var context = context || {};
+        context = context || {};
         this.context = context;
         this.errorMessage = errorMessage;
-        
-        this.property = context.property 
+
+        this.property = context.property;
         this.propertyName = context.propertyName || (context.property && context.property.name);
         
         if (key) {
@@ -958,7 +967,6 @@ var ValidationError = (function () {
     **/
     ctor.getKey = function (validatorOrErrorName, propertyName) {
         return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? ":" + propertyName : "");
-        // return (propertyName || "") + ":" + (validator.name || validator);
     };
 
 

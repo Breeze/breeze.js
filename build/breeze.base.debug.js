@@ -2259,7 +2259,7 @@ var Validator = (function () {
             } else if (context.messageTemplate) {
                 return formatTemplate(context.messageTemplate, context);
             } else {
-                return "invalid value: " + this.name || "{unnamed validator}";
+                return "invalid value: " + (this.name || "{unnamed validator}");
             }
         } catch (e) {
             return "Unable to format error message" + e.toString();
@@ -2270,7 +2270,16 @@ var Validator = (function () {
         return this._baseContext;
     };
 
+    /**
+    Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
+    @method fromJSON
+    @static
+    @param json {Object} JSON object that represents the serialized version of a validator.
+    **/
     ctor.fromJSON = function (json) {
+        if (Array.isArray(json)) {
+            return json.map(function(js) { return ctor.fromJSON(js); });
+        };
         var validatorName = "Validator." + json.name;
         var fn = __config.functionRegistry[validatorName];
         if (!fn) {
@@ -2883,11 +2892,11 @@ var ValidationError = (function () {
         assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
         assertParam(key, "key").isOptional().isNonEmptyString().check();
         this.validator = validator;
-        var context = context || {};
+        context = context || {};
         this.context = context;
         this.errorMessage = errorMessage;
-        
-        this.property = context.property 
+
+        this.property = context.property;
         this.propertyName = context.propertyName || (context.property && context.property.name);
         
         if (key) {
@@ -2959,7 +2968,6 @@ var ValidationError = (function () {
     **/
     ctor.getKey = function (validatorOrErrorName, propertyName) {
         return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? ":" + propertyName : "");
-        // return (propertyName || "") + ":" + (validator.name || validator);
     };
 
 
@@ -8364,7 +8372,7 @@ var DataProperty = (function () {
             .whereParam("isSettable").isBoolean().isOptional().withDefault(true)
             .whereParam("concurrencyMode").isString().isOptional()
             .whereParam("maxLength").isNumber().isOptional()
-            .whereParam("validators").isInstanceOf(Validator).isArray().or().isObject().isArray().isOptional().withDefault([])
+            .whereParam("validators").isInstanceOf(Validator).isArray().isOptional().withDefault([])
             .whereParam("displayName").isOptional()
             .whereParam("enumType").isOptional()
             .whereParam("rawTypeName").isOptional() // occurs with undefined datatypes
@@ -8412,15 +8420,10 @@ var DataProperty = (function () {
             }
         }
 
-
         if (this.isComplexProperty) {
             this.isScalar = this.isScalar == null || this.isScalar === true;
         }
-
-        if (this.validators.length > 0 && this.validators[0]._$typeName !== "Validator") {
-            // TODO: think about a try/catch here with explanatory error message
-            this.validators = this.validators.map(function(json) { return Validator.fromJSON(json); });
-        }
+        
     };
     var proto = ctor.prototype;
     proto._$typeName = "DataProperty";
@@ -12906,15 +12909,18 @@ var EntityManager = (function () {
         // filter then order then skip then take
         var filterFunc = query._toFilterFunction(entityType);
 
-        if (filterFunc) {
-            var newFilterFunc = function(entity) {
-                return entity && (!entity.entityAspect.entityState.isDeleted()) && filterFunc(entity);
-            };
-        } else {
-            var newFilterFunc = function(entity) {
-                return entity && (!entity.entityAspect.entityState.isDeleted());
-            };
-        }
+        var newFilterFunc = function(entity) {
+            return entity && (!entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
+        };
+        //if (filterFunc) {
+        //    var newFilterFunc = function(entity) {
+        //        return entity && (!entity.entityAspect.entityState.isDeleted()) && filterFunc(entity);
+        //    };
+        //} else {
+        //    var newFilterFunc = function(entity) {
+        //        return entity && (!entity.entityAspect.entityState.isDeleted());
+        //    };
+        //}
         var result = [];
         groups.forEach(function (group) {
             result.push.apply(result, group._entities.filter(newFilterFunc));
@@ -13234,22 +13240,17 @@ var EntityManager = (function () {
     **/
     proto.getEntityByKey = function () {
         var entityKey = createEntityKey(this, arguments).entityKey;
-        var group;
-        var subtypes = entityKey._subtypes;
-        if (subtypes) {
-            for (var i = 0, j = subtypes.length; i < j; i++) {
-                group = this._findEntityGroup(subtypes[i]);
-                // group version of findEntityByKey doesn't care about entityType
-                var ek = group && group.findEntityByKey(entityKey);
-                if (ek) return ek;
-            }
-        } else {
-            group = this._findEntityGroup(entityKey.entityType);
-            return group && group.findEntityByKey(entityKey);
-        }
+        var entityTypes = entityKey._subtypes || [entityKey.entityType];
+        var ek = null;
+        // hack use of some to simulate mapFirst logic.
+        entityTypes.some(function(et) {
+            var group = this._findEntityGroup(et);
+            // group version of findEntityByKey doesn't care about entityType
+            ek = group && group.findEntityByKey(entityKey);
+            return ek;
+        }, this);
+        return ek;
     };
-    
-
         
     /**
     Attempts to fetch an entity from the server by its key with
@@ -13835,7 +13836,6 @@ var EntityManager = (function () {
             if (value == null && dp.defaultValue == null) return;
 
             if (value && dp.isComplexProperty) {
-                var newValue;
                 var coDps = dp.dataType.dataProperties;
                 value = __map(value, function (v) {
                     return structuralObjectToJson(v, coDps, serializerFn);
@@ -13917,7 +13917,6 @@ var EntityManager = (function () {
             var entityState = EntityState.fromName(newAspect.entityState);
             var newTempKey;
             if (entityState.isAdded()) {
-                // newTempKey = tempKeyMap[entityKey.toString()];
                 newTempKey = getMappedKey(tempKeyMap, entityKey);
                 // merge added records with non temp keys
                 targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
@@ -13956,14 +13955,12 @@ var EntityManager = (function () {
                             var fkPropName = np.relatedDataProperties[0].name;
                             var oldFkValue = targetEntity.getProperty(fkPropName);
                             var fk = new EntityKey(np.entityType, [oldFkValue]);
-                            // var newFk = tempKeyMap[fk.toString()];
                             var newFk = getMappedKey(tempKeyMap, fk);
                             targetEntity.setProperty(fkPropName, newFk.values[0]);
                         });
                     }
                 }
                 // Now performed in attachEntity
-                // entityType._initializeInstance(targetEntity);
                 targetEntity = entityGroup.attachEntity(targetEntity, entityState);
                 entityChanged.publish({ entityAction: EntityAction.AttachOnImport, entity: targetEntity });
                 if (!entityState.isUnchanged()) {
@@ -13990,7 +13987,6 @@ var EntityManager = (function () {
     }
 
     function promiseWithCallbacks(promise, callback, errorCallback) {
-
         promise = promise.then(function (data) {
             if (callback) callback(data);
             return Q.resolve(data);
@@ -14041,7 +14037,6 @@ var EntityManager = (function () {
         } else {
             return __getOwnPropertyValues(groupMap);
         }
-
     }
 
     function checkEntityKey(em, entity) {
@@ -14067,11 +14062,11 @@ var EntityManager = (function () {
     function validateEntityStates(em, entityStates) {
         if (!entityStates) return null;
         entityStates = __toArray(entityStates);
-        entityStates.forEach(function (es) {
+        entityStates.forEach(function(es) {
             if (!EntityState.contains(es)) {
                 throw new Error("The EntityManager.getChanges() 'entityStates' parameter must either be null, an entityState or an array of entityStates");
             }
-        })
+        });
         return entityStates;
     }
 

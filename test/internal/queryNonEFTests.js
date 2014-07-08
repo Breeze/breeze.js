@@ -226,6 +226,7 @@
     });
 
     function initializeMetadataStore(metadataStore) {
+        var Validator = breeze.Validator;
         var x = metadataStore.addEntityType({
             shortName: "Shift",
             namespace: testFns.sampleNamespace,
@@ -233,7 +234,7 @@
             dataProperties: {
                 startDate: {
                     dataType: DataType.DateTime,
-                    validators: [{ name: "date" }, { name: "required" }]
+                    validators: Validator.fromJSON([{ name: "date" }, { name: "required" }])
                 },
                 numHours: { dataType: DataType.Int32 }
             }

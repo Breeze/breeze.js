@@ -465,7 +465,7 @@ var Validator = (function () {
             } else if (context.messageTemplate) {
                 return formatTemplate(context.messageTemplate, context);
             } else {
-                return &quot;invalid value: &quot; + this.name || &quot;{unnamed validator}&quot;;
+                return &quot;invalid value: &quot; + (this.name || &quot;{unnamed validator}&quot;);
             }
         } catch (e) {
             return &quot;Unable to format error message&quot; + e.toString();
@@ -476,7 +476,16 @@ var Validator = (function () {
         return this._baseContext;
     };
 
+    /**
+    Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
+    @method fromJSON
+    @static
+    @param json {Object} JSON object that represents the serialized version of a validator.
+    **/
     ctor.fromJSON = function (json) {
+        if (Array.isArray(json)) {
+            return json.map(function(js) { return ctor.fromJSON(js); });
+        };
         var validatorName = &quot;Validator.&quot; + json.name;
         var fn = __config.functionRegistry[validatorName];
         if (!fn) {
@@ -1089,11 +1098,11 @@ var ValidationError = (function () {
         assertParam(errorMessage, &quot;errorMessage&quot;).isNonEmptyString().check();
         assertParam(key, &quot;key&quot;).isOptional().isNonEmptyString().check();
         this.validator = validator;
-        var context = context || {};
+        context = context || {};
         this.context = context;
         this.errorMessage = errorMessage;
-        
-        this.property = context.property 
+
+        this.property = context.property;
         this.propertyName = context.propertyName || (context.property &amp;&amp; context.property.name);
         
         if (key) {
@@ -1165,7 +1174,6 @@ var ValidationError = (function () {
     **/
     ctor.getKey = function (validatorOrErrorName, propertyName) {
         return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? &quot;:&quot; + propertyName : &quot;&quot;);
-        // return (propertyName || &quot;&quot;) + &quot;:&quot; + (validator.name || validator);
     };
 
 
