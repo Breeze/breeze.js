@@ -1300,13 +1300,18 @@
         var em = newEm();
         var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2);
         stop();
+        var entity;
         em.executeQuery(query).then(function (data) {
             var r = data.results;
+
             ok(r.length === 2);
             ok(!em.hasChanges());
-            return r[0].entityAspect.loadNavigationProperty("orders");
+            entity = r[0];
+            return entity.entityAspect.loadNavigationProperty("orders");
         }).then(function (data2) {
             var orders = data2.results;
+            var isLoaded = entity.entityAspect.isNavigationPropertyLoaded("orders");
+            ok(isLoaded, "navProp should be marked as loaded");
             ok(orders.length > 0, "should be some orders - this is a 'test' bug if not");
             var areAllOrders = orders.every(function(o) {
                 return o.entityType.shortName === "Order";
@@ -1349,7 +1354,27 @@
         }
     });
 
+    test("isNavigationPropertyLoaded on expand", function() {
+        var em = newEm();
+        var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2).expand("orders.orderDetails");
+        stop();
+        
+        em.executeQuery(query).then(function(data) {
+            var r = data.results;
 
+            ok(r.length === 2);
+            r.forEach(function(cust) {
+                var ordersLoaded = cust.entityAspect.isNavigationPropertyLoaded("orders");
+                ok(ordersLoaded, "orders should all be marked as loaded");
+                var orders = cust.getProperty("orders");
+                ok(orders.length > 0, "should have so orders");
+                orders.forEach(function(order) {
+                    var detailsLoaded = order.entityAspect.isNavigationPropertyLoaded("orderDetails");
+                    ok(detailsLoaded, "orders should all be marked as loaded");
+                });
+            });
+        }).fail(testFns.handleFail).fin(start);
+    });
     
     test("can run two queries in parallel for fresh EM w/ empty metadataStore", 1, function () {
         var em = newEm();
