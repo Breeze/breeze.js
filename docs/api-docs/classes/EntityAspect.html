@@ -574,7 +574,7 @@ had &#39;acceptChanges&#39; called on it.</p>
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l577"><code>..\..\src\a30_entityAspect.js:577</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l587"><code>..\..\src\a30_entityAspect.js:587</code></a>
         
         </p>
 
@@ -652,7 +652,7 @@ had &#39;acceptChanges&#39; called on it.</p>
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l603"><code>..\..\src\a30_entityAspect.js:603</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l613"><code>..\..\src\a30_entityAspect.js:613</code></a>
         
         </p>
 
@@ -839,7 +839,7 @@ var entityKey = order.entityAspect.getKey();</code></pre>
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l544"><code>..\..\src\a30_entityAspect.js:544</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l554"><code>..\..\src\a30_entityAspect.js:554</code></a>
         
         </p>
 
@@ -1008,7 +1008,13 @@ var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded(&quot;Orders&quot;);</p>
+                <p>A navigation property is considered loaded when any of the following three conditions applies:  </p>
+<pre class="code prettyprint"><code>1) It was fetched from the backend server.  
+    a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method. 
+    b) Note that even if the fetch returns nothing the property is still marked as loaded in this case. 
+2) The property is scalar and has been set to a nonnull value. 
+3) The EntityAspect.markNavigationPropertyAsLoaded was called.</code></pre>
+<pre class="code prettyprint"><code>var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded(&quot;Orders&quot;);</code></pre>
 
             </div>
         </div>
@@ -1396,7 +1402,7 @@ had &#39;rejectChanges&#39; called on it.</p>
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l589"><code>..\..\src\a30_entityAspect.js:589</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l599"><code>..\..\src\a30_entityAspect.js:599</code></a>
         
         </p>
 
@@ -1744,7 +1750,7 @@ order.entityAspect.setModified();
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l446"><code>..\..\src\a30_entityAspect.js:446</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l456"><code>..\..\src\a30_entityAspect.js:456</code></a>
         
         </p>
 
@@ -1849,7 +1855,7 @@ if (!isOk) {
             
         
         
-        <a href="../files/.._.._src_a30_entityAspect.js.html#l507"><code>..\..\src\a30_entityAspect.js:507</code></a>
+        <a href="../files/.._.._src_a30_entityAspect.js.html#l517"><code>..\..\src\a30_entityAspect.js:517</code></a>
         
         </p>
 

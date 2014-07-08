@@ -422,9 +422,19 @@ var EntityAspect = (function() {
     }
 
     /**
-    Determines whether a navigationProperty on this entity has already been loaded.
+    Determines whether a navigationProperty on this entity has already been loaded. 
+    
     @example
-    var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
+    A navigation property is considered loaded when any of the following three conditions applies:  
+
+        1) It was fetched from the backend server.  
+            a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method. 
+            b) Note that even if the fetch returns nothing the property is still marked as loaded in this case. 
+        2) The property is scalar and has been set to a nonnull value. 
+        3) The EntityAspect.markNavigationPropertyAsLoaded was called.
+    
+    @example
+        var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
             
     @method isNavigationPropertyLoaded
     @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
