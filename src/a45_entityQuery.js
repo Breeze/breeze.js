@@ -217,21 +217,15 @@ var EntityQuery = (function () {
     @return {EntityQuery}
     @chainable
     **/
-    proto.where = function (predicate) {
-        var wherePredicate;
-        if (predicate == null) {
-            wherePredicate = null;
-        } else {
-            var pred;
-            if (predicate instanceof Predicate) {
-                wherePredicate = predicate;
-            } else {
+    proto.where = function (wherePredicate) {
+        if (wherePredicate != null) {
+            if (!(wherePredicate instanceof Predicate)) {
                 wherePredicate = Predicate.create(__arraySlice(arguments));
             }
             if (this._fromEntityType) wherePredicate.validate(this._fromEntityType);
             if (this.wherePredicate) {
                 wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
-            } 
+            }
         }
         return clone(this, "wherePredicate", wherePredicate);
 
@@ -1704,7 +1698,7 @@ var SimplePredicate = (function () {
 
     proto.toFunction = function (entityType) {
         if (this._odataExpr) {
-            throw new Exception("OData predicateexpressions cannot be interpreted locally");
+            throw new Error("OData predicateexpressions cannot be interpreted locally");
         }
         this.validate(entityType);
 
@@ -2182,9 +2176,7 @@ var SelectClause = (function () {
     var proto = ctor.prototype;
 
     proto.validate = function (entityType) {
-        if (!entityType) {
-            return;
-        } // can't validate yet
+        if (!entityType) return; // can't validate yet
         // will throw an exception on bad propertyPath
         this.propertyPaths.forEach(function(path) {
             entityType.getProperty(path, true);
@@ -2221,11 +2213,6 @@ var ExpandClause = (function () {
     };
         
     var proto = ctor.prototype;
-       
-//        // TODO:
-//        proto.validate = function (entityType) {
-//            
-//        };
 
     proto.toODataFragment = function(entityType) {
         var frag = this.propertyPaths.map(function(pp) {
@@ -2238,23 +2225,16 @@ var ExpandClause = (function () {
 })();
     
 function getPropertyPathValue(obj, propertyPath) {
-    var properties;
-    if (Array.isArray(propertyPath)) {
-        properties = propertyPath;
-    } else {
-        properties = propertyPath.split(".");
-    }
+    var properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(".");
     if (properties.length === 1) {
         return obj.getProperty(propertyPath);
     } else {
         var nextValue = obj;
-        for (var i = 0; i < properties.length; i++) {
-            nextValue = nextValue.getProperty(properties[i]);
-            // == in next line is deliberate - checks for undefined or null.
-            if (nextValue == null) {
-                break;
-            }
-        }
+        // hack use of some to perform mapFirst operation.
+        properties.some(function(prop) {
+            nextValue = nextValue.getProperty(prop);
+            return nextValue == null;
+        });
         return nextValue;
     }
 }

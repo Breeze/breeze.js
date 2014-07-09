@@ -312,7 +312,7 @@ var EntityManager = (function () {
     @method acceptChanges
     **/
     proto.acceptChanges = function () {
-        this.getChanges().forEach(function (entity) { entity.entityAspect.acceptChanges(); })
+        this.getChanges().forEach(function(entity) { entity.entityAspect.acceptChanges(); });
     }
 
     /**
@@ -1422,10 +1422,8 @@ var EntityManager = (function () {
     proto.getEntities = function (entityTypes, entityStates) {
         entityTypes = checkEntityTypes(this, entityTypes);
         assertParam(entityStates, "entityStates").isOptional().isEnumOf(EntityState).or().isNonEmptyArray().isEnumOf(EntityState).check();
-            
-        if (entityStates) {
-            entityStates = validateEntityStates(this, entityStates);
-        }
+               
+        entityStates = entityStates && validateEntityStates(this, entityStates);
         return getEntitiesCore(this, entityTypes, entityStates);
     };
         
@@ -1631,10 +1629,10 @@ var EntityManager = (function () {
             // eg may be undefined or null
             if (!eg) return;
             var entities = eg.getEntities(entityStates);
-            if (!selected) {
-                selected = entities;
-            } else {
+            if (selected) {
                 selected.push.apply(selected, entities);
+            } else {
+                selected = entities;
             }
         });
         return selected || [];
@@ -1956,7 +1954,7 @@ var EntityManager = (function () {
     proto._updateFkVal = function (fkProp, oldValue, newValue) {
         var group = this._entityGroupMap[fkProp.parentType.name];
         if (!group) return;
-        group._updateFkVal(fkProp, oldValue, newValue)
+        group._updateFkVal(fkProp, oldValue, newValue);
     }
 
     function attachRelatedEntities(em, entity, entityState, mergeStrategy) {
@@ -2240,15 +2238,6 @@ var EntityManager = (function () {
                 result[fn(cp.name, cp)] = __map(coOrCos, function(co) {
                     return unwrapInstance(co, transformFn);
                 });
-                // long version of prev 2 lines.
-                //var unwrapped;
-                //if (cp.isScalar) {
-                //    unwrapped = unwrapInstance(coOrCos, transformFn);
-                //} else {
-                //    unwrapped = coOrCos.map(function(co) {
-                //        return unwrapInstance(co, transformFn);
-                //    });
-                // result[fn(cp.name, cp)] = unwrapped;
             } 
         });
         return result;
