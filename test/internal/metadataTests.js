@@ -298,7 +298,7 @@
 
                         et.guid = breeze.core.getUuid(); // to see distinct entity types while debugging
                         store.addEntityType(et);
-                        store.registerEntityTypeCtor("CodeBase", CodeBase);
+                        store.registerEntityTypeCtor("CodeBase", testFns.makeEntityCtor(CodeBase));
                     };
                     CodeBase.typeName = "CodeBase";
                     return CodeBase;
@@ -362,7 +362,7 @@
                         et.guid = breeze.core.getUuid(); // to see distinct entity types while debugging
                         store.addEntityType(et);
 
-                        store.registerEntityTypeCtor("TimeGroup", TimeGroup);
+                        store.registerEntityTypeCtor("TimeGroup", testFns.makeEntityCtor(TimeGroup));
                     };
                     TimeGroup.typeName = "TimeGroup";
                     return TimeGroup;
@@ -425,7 +425,7 @@
 
                         et.guid = breeze.core.getUuid(); // to see distinct entity types while debugging
                         store.addEntityType(et);
-                        store.registerEntityTypeCtor("FooBar", FooBar);
+                        store.registerEntityTypeCtor("FooBar", testFns.makeEntityCtor(FooBar));
                     };
                     FooBar.typeName = "FooBar";
                     return FooBar;

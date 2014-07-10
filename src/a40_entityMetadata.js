@@ -1625,7 +1625,7 @@ var EntityType = (function () {
     // May make public later.
     proto._setCtor = function (aCtor, interceptor) {
 
-        var proto = aCtor.prototype;
+        var instanceProto = aCtor.prototype;
 
         // place for extra breeze related data
         this._extra = this._extra || {};
@@ -1635,17 +1635,15 @@ var EntityType = (function () {
 
         if (this._$typeName === "EntityType") {
             // insure that all of the properties are on the 'template' instance before watching the class.
-            proto.entityType = this;
+            instanceProto.entityType = this;
         } else {
-            proto.complexType = this;
+            instanceProto.complexType = this;
         }
 
         // defaultPropertyInterceptor is a 'global' (but internal to breeze) function;
-        proto._$interceptor = interceptor || defaultPropertyInterceptor;
-                
-        __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(proto);
-        
-        
+        instanceProto._$interceptor = interceptor || defaultPropertyInterceptor;
+        __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(instanceProto);
+
         this._ctor = aCtor;
     };
 
@@ -2057,11 +2055,16 @@ var EntityType = (function () {
   
     function calcUnmappedProperties(stype, instance) {
         var metadataPropNames = stype.getPropertyNames();
-        var trackablePropNames = __modelLibraryDef.getDefaultInstance().getTrackablePropertyNames(instance);
-        
+        var modelLib = __modelLibraryDef.getDefaultInstance();
+        var trackablePropNames = modelLib.getTrackablePropertyNames(instance);
         trackablePropNames.forEach(function (pn) {
             if (metadataPropNames.indexOf(pn) === -1) {
-                var dt = DataType.fromValue(instance[pn]);
+                var val = instance[pn];
+                try {
+                    if (typeof val == "function") val = val();
+                } catch (e) {
+                }
+                var dt = DataType.fromValue(val);
                 var newProp = new DataProperty({
                     name: pn,
                     dataType: dt,

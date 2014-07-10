@@ -196,6 +196,15 @@
             ok(r.every(function (f) {
                 return f.entityType.isSubtypeOf(iopType);
             }));
+            var r0value = r[0].getProperty("quantityPerUnit");
+            var r1value = r[1].getProperty("quantityPerUnit");
+            ok(r0value != null, "value should not be null");
+            r[0].setProperty("quantityPerUnit", "zzzz");
+            var r0valueNew = r[0].getProperty("quantityPerUnit");
+            var r1valueNew = r[1].getProperty("quantityPerUnit");
+
+            ok(r0valueNew === "zzzz", "r0ValueNew should have changed");
+            ok(r1valueNew === r1value, "r1ValueNew should not have changed");
 
         }).fail(testFns.handleFail).fin(start);
 
@@ -259,7 +268,7 @@
 
     });
 
-    test("query ItemsOfProduce and modify ", function () {
+    test("query ItemsOfProduce(ES5) and modify ", function () {
         var em = newEmX();
         registerItemOfProduceWithES5(em, "ItemOfProduce");
 
@@ -284,7 +293,7 @@
         }).fail(testFns.handleFail).fin(start);
     });
 
-    test("query ItemsOfProduce unique quantityPerProduct values", function () {
+    test("query ItemsOfProduc(ES5)e unique quantityPerProduct values", function () {
         var em = newEmX();
         registerItemOfProduceWithES5(em, "ItemOfProduce");
 
@@ -304,11 +313,11 @@
                     count = count + 1;
                 }
             });
-            ok(count > 1, "count shoud be greater than 1")
+            ok(count > 1, "count shoud be greater than 1");
         }).fail(testFns.handleFail).fin(start);
     });
 
-    test("query ItemsOfProduce - ES5", function () {
+    test("query ItemsOfProduce(ES5)", function () {
         var em = newEmX();
         registerItemOfProduceWithES5(em, "ItemOfProduce");
 
@@ -354,7 +363,7 @@
 
     });
 
-    test("query Fruits - ES5", function () {
+    test("query Fruits(ES5)", function () {
         var em = newEmX();
         // initializer only down to Fruit - not ItemOfProduce.
         registerItemOfProduceWithES5(em, "Fruit");
@@ -401,7 +410,11 @@
 
     });
 
-    test("query ItemsOfProduce - Additional Base Class - ES5", function () {
+    test("query ItemsOfProduce - Additional Base Class(ES5)", function () {
+        if (testFns.modelLibrary == "backbone") {
+            ok(true, "NA for backbone - not sure how to do this in backbone");
+            return;
+        }
         var em = newEmX();
         registerWithAdditionalBaseClass(em, "ItemOfProduce");
 
@@ -452,7 +465,7 @@
     });
 
     function registerWithAdditionalBaseClass(em, baseTypeName) {
-        var rootCtor = function () { };
+        var rootCtor = testFns.makeEntityCtor(function() { });
         Object.defineProperty(rootCtor.prototype, "onBase", {
             get: function () {
                 return this["_onBase"] || "I am on base";
@@ -463,7 +476,8 @@
             enumerable: true,
             configurable: true
         });
-        // no easy way to add another initFn without registering a new base type for itemOfProduce with breeze ( right now basetype are coming for EF)
+        // no easy way to add another initFn without registering a new base type for itemOfProduce with breeze 
+        //( right now basetypes are coming from EF)
         // hence no test to add an initFn at this level. i.e. possible but not easy to test in current env.
         var entityType = registerItemOfProduceWithES5(em, baseTypeName, rootCtor);
     }
@@ -480,9 +494,18 @@
 
     function registerSelfAndSubtypes(em, baseType, baseCtor) {
         em.metadataStore.registerEntityTypeCtor(baseType.name, baseCtor, entityInitializeFn(baseType.name));
+        var newCtor;
         baseType.subtypes.forEach(function (subtype) {
-            var newCtor = function () { };
-            newCtor.prototype = new baseCtor();
+            if (testFns.modelLibrary == "backbone") {
+                newCtor = baseCtor.extend({
+                    constructor: function() {
+                        baseCtor.apply(this, arguments);
+                    }
+                });
+            } else {
+                newCtor = testFns.makeEntityCtor(function () { });
+                newCtor.prototype = new baseCtor();
+            }
             registerSelfAndSubtypes(em, subtype, newCtor);
         });
 
@@ -505,31 +528,25 @@
 
         var ctor;
         if (testFns.modelLibrary == "ko") {
-            ctor = function () {
-
-            };
+            ctor = function () { };
             if (baseCtor) ctor.prototype = new baseCtor();
             createProduceES5Props(ctor.prototype);
-
         } else if (testFns.modelLibrary == "backbone") {
-            ctor = Backbone.Model.extend({
+            baseCtor = baseCtor || Backbone.Model;
+            ctor = baseCtor.extend({
+                constructor: function() {
+                    baseCtor.apply(this, arguments);
+                },
                 initialize: function (attr, options) {
-                    createProduceES5Props(this.attributes);
+                  createProduceES5Props(this.attributes);
                 }
             });
-            if (baseCtor) ctor.prototype = new baseCtor();
-
         } else {
-            ctor = function () {
-
-            };
+            ctor = function () { };
             if (baseCtor) ctor.prototype = new baseCtor();
             createProduceES5Props(ctor.prototype);
         }
-
-       
         return ctor;
-
     };
 
 
@@ -539,14 +556,18 @@
                 return this["_quantityPerUnit"] || null;
             },
             set: function (value) {
-                this["_quantityPerUnit"] = value.toUpperCase();
+                this["_quantityPerUnit"] = value && value.toUpperCase();
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(target, "amountOnHand", {
             get: function () {
-                return this.getProperty && this.getProperty("unitsInStock") + ":" + this.getProperty("quantityPerUnit") || "";
+                if (testFns.modelLibrary == "ko") {
+                    return this.getProperty && this.getProperty("unitsInStock") + ":" + ( this.getProperty("quantityPerUnit") || "");
+                } else {
+                    return this["unitsInStock"] + ":" + (this["quantityPerUnit"] || "");
+                }
             },
             enumerable: true,
             configurable: true

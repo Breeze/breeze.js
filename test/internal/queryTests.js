@@ -888,7 +888,7 @@
         var query = EntityQuery.from("Customers").take(5).expand("orders");
         stop();
         var s1, s2, s3, s4, s5, s6;
-        var sizeDif;
+        var difObj;
         em.executeQuery(query).then(function(data) {
             s1 = testFns.sizeOf(em);
             return em.executeQuery(query);
@@ -896,8 +896,8 @@
             s2 = testFns.sizeOf(em);
             em.clear();
             s3 = testFns.sizeOf(em);
-            sizeDif = testFns.sizeOfDif(s2, s3);
-            ok(sizeDif, "should be a sizeDif");
+            difObj = testFns.sizeOfDif(s2, s3);
+            ok(difObj.dif, "should be a sizeDif");
             return em.executeQuery(query);
         }).then(function(data3) {
             s4 = testFns.sizeOf(em);
@@ -906,16 +906,13 @@
             return em2.executeQuery(query);
         }).then(function (data4) {
             s5 = testFns.sizeOf(em2);
-            sizeDif = testFns.sizeOfDif(s1, s5);
-            if (sizeDif) {
-                ok(false, "sizes should be equal");
-            }
+            difObj = testFns.sizeOfDif(s1, s5);
+            ok(difObj.dif == 0, "sizes should be equal but dif was: " + difObj.dif);
+            
             em2.clear();
             s6 = testFns.sizeOf(em2);
-            sizeDif = testFns.sizeOfDif(s3, s6);
-            if (sizeDif) {
-                ok(false, "empty sizes should be equal");
-            }
+            difObj = testFns.sizeOfDif(s3, s6);
+            ok(difObj.dif == 0, "empty sizes should be equal but dif was: " + difObj.dif);
             
         }).fail(testFns.handleFail).fin(start);
     });
@@ -964,7 +961,7 @@
         var query = EntityQuery.from("Customers").take(5).expand("orders");
         stop();
         var s1, s2, s3, s4, s5, s6;
-        var sizeDif; 
+        var sizeDif, difObj; 
         var hasChanges = em.hasChanges();
         
         em.entityChanged.subscribe(function(x) {
@@ -985,29 +982,30 @@
             });
             em.rejectChanges();
             s2 = testFns.sizeOf(em);
-            sizeDif = testFns.sizeOfDif(s1, s2);
-            ok(Math.abs(sizeDif.dif) < 20, "s12 dif should be very small");
+            difObj = testFns.sizeOfDif(s1, s2);
+            sizeDif = Math.abs(difObj.dif);
+            ok(sizeDif < 20, "s12 dif should be very small: " + sizeDif);
             em.clear();
             s3 = testFns.sizeOf(em);
-            sizeDif = testFns.sizeOfDif(s2, s3);
-            ok(sizeDif, "should be a sizeDif");
+            difObj = testFns.sizeOfDif(s2, s3);
+            ok(difObj.dif, "should be a sizeDif result");
             return em.executeQuery(query);
         }).then(function (data3) {
             s4 = testFns.sizeOf(em);
-            ok(Math.abs(s1.size - s4.size) < 20, "sizes should be equal");
+            sizeDif = Math.abs(s1.size - s4.size);
+            ok(sizeDif < 20, "sizes should be equal: " + sizeDif);
             return em2.executeQuery(query);
         }).then(function (data4) {
             s5 = testFns.sizeOf(em2);
-            sizeDif = testFns.sizeOfDif(s1, s5);
-            if (sizeDif > 20) {
-                ok(false, "sizes should be almost equal");
-            }
+            difObj = testFns.sizeOfDif(s1, s5);
+            sizeDif = Math.abs(difObj.dif);
+            ok(sizeDif < 20, "sizes should be almost equal: " + sizeDif);
+           
             em2.clear();
             s6 = testFns.sizeOf(em2);
-            sizeDif = testFns.sizeOfDif(s3, s6);
-            if (sizeDif > 20) {
-                ok(false, "empty sizes should be almost equal");
-            }
+            difObj = testFns.sizeOfDif(s3, s6);
+            sizeDif = Math.abs(difObj.dif);
+            ok(sizeDif < 20, "empty sizes should be almost equal: " + sizeDif);
 
         }).fail(testFns.handleFail).fin(start);
     });
@@ -1582,9 +1580,22 @@
         
     });
 
+    function createProductCtor() {
+        var init = function (entity) {
+            ok(entity.entityType.shortName === "Product", "entity's productType should be 'Product'");
+            ok(entity.getProperty("isObsolete") === false, "should not be obsolete");
+            entity.setProperty("isObsolete", true);
+        };
+        return testFns.makeEntityCtor(function () {
+            this.isObsolete = false;
+            this.init = init;
+        });
+
+    };
+
     test("post create init after materialization", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Product = testFns.models.Product();
+        var Product = createProductCtor();
        
         var productType = em.metadataStore.getEntityType("Product");
         em.metadataStore.registerEntityTypeCtor("Product", Product, "init");
@@ -1601,7 +1612,9 @@
     
     test("post create init using materialized data", 2,function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Customer = testFns.models.Customer();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.companyName = null;
+        });
         
         var customerInitializer = function (customer) {
             // should be called after materialization ... but is not.

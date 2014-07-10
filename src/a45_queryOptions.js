@@ -111,7 +111,7 @@ var QueryOptions = (function () {
         updateWithConfig(this, config);
     };
     var proto = ctor.prototype;
-     
+    proto._$typeName = "QueryOptions";
     
     /**
     A {{#crossLink "FetchStrategy"}}{{/crossLink}}
@@ -124,8 +124,6 @@ var QueryOptions = (function () {
     __readOnly__
     @property mergeStrategy {MergeStrategy}
     **/
-    
-    proto._$typeName = "QueryOptions";
 
     ctor.resolve = function (queryOptionsArray) {
         return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy"]));

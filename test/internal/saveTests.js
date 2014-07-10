@@ -412,9 +412,9 @@
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
         var customerType = em.metadataStore.getEntityType("Customer");
 
-        var Customer = function () {
+        var Customer = testFns.makeEntityCtor(function () {
             this.myUnmappedProperty = "anything22";
-        };
+        });
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
 
@@ -450,8 +450,8 @@
                 }
                 return value;
             }
-        })
-        var Customer = function () {
+        });
+        var Customer = testFns.makeEntityCtor( function () {
             this.myUnmappedProperty = "anything22";
             var x = {
                 x: "22",
@@ -461,7 +461,7 @@
             }
             x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
             this.anotherOne = x;
-        };
+        });
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
 
@@ -492,8 +492,8 @@
                 if (dp.isUnmapped) return undefined;
                 return value;
             }
-        })
-        var Customer = function () {
+        });
+        var Customer = testFns.makeEntityCtor( function () {
             this.myUnmappedProperty = "anything22";
             var x = {
                 x: "22",
@@ -502,7 +502,7 @@
             }
             x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
             this.anotherOne = x;
-        };
+        });
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
 
@@ -800,7 +800,9 @@
 
     test("save update with unmapped changes", function() {
         var em1 = newEm(testFns.newMs());
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
         var q = new EntityQuery("Customers").take(1);
@@ -883,7 +885,9 @@
     
     test("save delete with unmapped changes", function () {
         var em1 = newEm(testFns.newMs());
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
         var zzz;
@@ -1425,7 +1429,9 @@
 
         // use a different metadata store for this em - so we don't polute other tests
         var em1 = newEm(testFns.newMs());
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
         var q = new EntityQuery("Customers")

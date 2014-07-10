@@ -59,10 +59,13 @@
     test("new instead of createEntity with entityAspect", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
         
-        var Customer = testFns.models.CustomerWithMiscData();
-        Customer.prototype.getNameLength = function () {
-            return (this.getProperty("companyName") || "").length;
-        };
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+            this.getNameLength = function () {
+                return (this.getProperty("companyName") || "").length;
+            };
+        });
+        
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
         var cust1 = new Customer();
@@ -83,10 +86,12 @@
     test("new instead of createEntity w/o entityAspect", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
 
-        var Customer = testFns.models.CustomerWithMiscData();
-        Customer.prototype.getNameLength = function () {
-            return (this.getProperty("companyName") || "").length;
-        };
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+            this.getNameLength = function () {
+                return (this.getProperty("companyName") || "").length;
+            };
+        });
 
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
        
@@ -105,7 +110,7 @@
             cust1[testFns.customerKeyName]  = breeze.core.getUuid();
             em.attachEntity(cust1);
             ok(cust1.getProperty("city") === "zzz", "city should be zzz");
-        } else if (testFns.modelLibrary = "ko") {
+        } else if (testFns.modelLibrary === "ko") {
             // before we attach it we can treat it just like a regular js object.
             var cust1 = new Customer();
             cust1.city = "zzz";
@@ -221,7 +226,9 @@
     test("registerEntityTypeCtor causing error on importEntities1", function () {
         // 4/25/13 - sbelini - this test should not fail - it's just to ensure the third parameter is causing the error
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         var productType = em.metadataStore.getEntityType("Customer");
 
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
@@ -282,7 +289,9 @@
 
     test("rejectChanges on unmapped property", function () {
         var em1 = newEm(newMs());
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
         em1.fetchMetadata().then(function () {
@@ -685,10 +694,12 @@
     test("custom Customer type with createEntity", function () {
         var em = newEm(newMs());
 
-        var Customer = testFns.models.CustomerWithMiscData();
-        Customer.prototype.getNameLength = function () {
-            return (this.getProperty("companyName") || "").length;
-        };
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+            this.getNameLength = function () {
+                return (this.getProperty("companyName") || "").length;
+            };
+        });
 
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
@@ -735,10 +746,12 @@
     test("custom Customer type with new", function () {
         var em = newEm(newMs());
 
-        var Customer = testFns.models.CustomerWithMiscData();
-        Customer.prototype.getNameLength = function () {
-            return (this.getProperty("companyName") || "").length;
-        };
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+            this.getNameLength = function () {
+                return (this.getProperty("companyName") || "").length;
+            };
+        });
 
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
@@ -789,10 +802,12 @@
     test("custom Customer type with new - v2", function () {
         var em = newEm(newMs());
 
-        var Customer = testFns.models.CustomerWithMiscData();
-        Customer.prototype.getNameLength = function () {
-            return (this.getProperty("companyName") || "").length;
-        };
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+            this.getNameLength = function () {
+                return (this.getProperty("companyName") || "").length;
+            };
+        });
 
         stop();
         // register after fetchMetadata
@@ -870,7 +885,9 @@
     test("entityCtor materialization with js ctor", function () {
         // use a different metadata store for this em - so we don't polute other tests
         var em1 = newEm(newMs());
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
 
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         stop();
@@ -904,7 +921,9 @@
         // use a different metadata store for this em - so we don't polute other tests
         
         var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         
         var custType = em1.metadataStore.getEntityType("Customer");
@@ -930,7 +949,9 @@
 
         // use a different metadata store for this em - so we don't polute other tests
         var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
         
         var custType = em1.metadataStore.getEntityType("Customer");
@@ -962,7 +983,9 @@
 
         // use a different metadata store for this em - so we don't polute other tests
         var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Customer = testFns.models.CustomerWithMiscData();
+        var Customer = testFns.makeEntityCtor(function () {
+            this.miscData = "asdf";
+        });
         em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
         var custType = em1.metadataStore.getEntityType("Customer");

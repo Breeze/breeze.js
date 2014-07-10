@@ -53,8 +53,8 @@
             if (p === "_$typeName") continue;
             
             var propDescr = getES5PropDescriptor(entity, p);
-            if (propDescr && propDescr.get) {          
-                names.push(p)
+            if (propDescr && propDescr.get) {
+                names.push(p);
             } else {
                 var val = entity[p];
                 if (ko.isObservable(val)) {
@@ -179,7 +179,7 @@
                 koObj = val;
             // otherwise
             } else {
-                var val = initializeValueForProp(entity, prop, val);
+                val = initializeValueForProp(entity, prop, val);
                 koObj = prop.isScalar ? ko.observable(val) : ko.observableArray(val);
             }
 

@@ -39,18 +39,22 @@
         structuralType.dataProperties.forEach(function (dp) {
             defaults[dp.name] = dp.defaultValue;
         });
-        var modelCtor = Backbone.Model.extend({
+        var baseCtor = (structuralType.baseEntityType && structuralType.baseEntityType.getEntityCtor()) || Backbone.Model;
+        var modelCtor = baseCtor.extend({
             defaults: defaults,
-            initialize: function () {
+            initialize: function() {
                 if (structuralType.navigationProperties) {
                     var that = this;
-                    structuralType.navigationProperties.forEach(function (np) {
+                    structuralType.navigationProperties.forEach(function(np) {
                         if (!np.isScalar) {
                             var val = breeze.makeRelationArray([], that, np);
                             Backbone.Model.prototype.set.call(that, np.name, val);
                         }
                     });
                 }
+            },
+            constructor: function () {
+                baseCtor.apply(this, arguments);
             }
         });
         return modelCtor;
@@ -161,7 +165,7 @@
             } else if (val === undefined) {
                 val = dp.defaultValue;
             }
-            bbSet.call(entity, propName, val)
+            bbSet.call(entity, propName, val);
         });
         
         if (stype.navigationProperties) {

@@ -102,7 +102,6 @@ function setDpValueSimple(context, rawAccessorFn) {
     }
 
     // if we are changing the key update our internal entityGroup indexes.
-    // if (property.isPartOfKey && (!this.complexAspect) && entityManager && !entityManager.isLoading) {
     if (property.isPartOfKey && entityManager && !entityManager.isLoading) {
         var keyProps = entityType.keyProperties;
         var values = keyProps.map(function (p) {

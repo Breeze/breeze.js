@@ -514,89 +514,76 @@ breezeTestFns = (function (breeze) {
         document.body.appendChild(document.createElement('pre')).innerHTML = text;
     };
 
+    
+
     testFns.models = {};
     var models = testFns.models;
 
-    models.Supplier = function() {
-        if (testFns.modelLibrary == "ko") {
-            return function () {
-        
-            };
+    function makeEntityCtor(fn) {
+        if (testFns.modelLibrary == "backingStore") {
+            return fn;
+        } else if (testFns.modelLibrary == "ko") {
+            return makeCtorForKnockout(fn);
         } else if (testFns.modelLibrary == "backbone") {
-            return Backbone.Model.extend({
-                defaults: {
-                    
-                }
-            });
+            return makeCtorForBackbone(fn);
         } else {
-            return function () {
-            };
+            throw Error("Cannot find matching testFns.modelLibrary");
         }
-    };
-    
-    models.Customer = function () {
-        if (testFns.modelLibrary == "ko") {
-            return function () {
-                this.companyName = ko.observable(null);
-            };
-        } else if (testFns.modelLibrary == "backbone") {
-            return Backbone.Model.extend({
-                defaults: {
-                    companyName: null
-                }
-            });
-        } else {
-            return function () {
-                this.companyName = null;
-            };
-        }
-    };
+    }
 
-    models.CustomerWithMiscData = function () {
-        if (testFns.modelLibrary == "ko") {
-            return function () {
-                this.miscData = ko.observable("asdf");
-            };
-        } else if (testFns.modelLibrary == "backbone") {
-            return Backbone.Model.extend({
-                defaults: {
-                    miscData: "asdf"
+    testFns.makeEntityCtor = makeEntityCtor;
+
+    function makeCtorForKnockout(fn) {
+        var instance = new fn();
+        return function () {
+            for (var p in instance) {
+                if (instance.hasOwnProperty(p)) {
+                    var value = instance[p];
+                    if (typeof value == "function") {
+                        this[p] = value;
+                    } else {
+                        this[p] = ko.observable(value);
+                    }
                 }
-            });
-        } else {
-            return function () {
-                this.miscData = "asdf";
-            };
+            }
         }
-    };
+    }
+
+    function makeCtorForBackbone(fn) {
+        var instance = new fn();
+        var model = { defaults: {} };
+        for (var p in instance) {
+            if (instance.hasOwnProperty(p)) {
+                var value = instance[p];
+                if (typeof value == "function") {
+                    model[p] = value;
+                } else {
+                    model.defaults[p] = value;
+                }
+            }
+        }
+        return Backbone.Model.extend(model);
+    }
+    
+
+  
 
     models.CustomerWithES5Props = function () {
-
         var ctor; 
         if (testFns.modelLibrary == "ko") {
-            ctor = function () {
-                
-            };
+            ctor = function () { };
             createES5Props(ctor.prototype);
-
-            
         } else if (testFns.modelLibrary == "backbone") {
             ctor = Backbone.Model.extend({
                 initialize: function(attr, options) {
                     createES5Props(this.attributes);
                 }
             });
-            
-
         } else {
-            ctor = function () {
-                
-            };
+            ctor = function () { };
             createES5Props(ctor.prototype);
         }
         return ctor;
-
-
     };
 
     function createES5Props(target) {
@@ -605,14 +592,14 @@ breezeTestFns = (function (breeze) {
                 return this["_companyName"] || null;
             },
             set: function (value) {
-                this["_companyName"] = value.toUpperCase();
+                this["_companyName"] = value && value.toUpperCase();
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(target, "idAndName", {
             get: function () {
-                return this.customerID + ":" + this._companyName || "";
+                return this.customerID + ":" + ( this._companyName || "" );
             },
             enumerable: true,
             configurable: true
@@ -630,73 +617,6 @@ breezeTestFns = (function (breeze) {
         });
     }
         
-
-    // Object.defineProperty(proto, "firstName", makePropDescription("firstName"));
-    function makePropDescription(propName) {
-        return {
-            get: function () {
-                return this["_" + propName];
-            },
-            set: function (value) {
-                this["_" + propName] = value.toUpperCase();
-            },
-            enumerable: true,
-            configurable: true
-        };
-    }
-
-    
-
-    models.Product = function () {
-        var init = function (entity) {
-            ok(entity.entityType.shortName === "Product", "entity's productType should be 'Product'");
-            ok(entity.getProperty("isObsolete") === false, "should not be obsolete");
-            entity.setProperty("isObsolete", true);
-        };
-        if (testFns.modelLibrary == "ko") {
-            return function () {
-                this.isObsolete = ko.observable(false);
-                this.init = init;
-            };
-        } else if (testFns.modelLibrary == "backbone") {
-            return Backbone.Model.extend({
-                defaults: {
-                    isObsolete: false
-                },
-                init: init
-            });
-        } else {
-            return function () {
-                this.isObsolete = false;
-                this.init = init;
-            };
-        }
-    };
-    
-    models.Location = function () {
-        var init = function (entity) {
-            ok(entity.complexType.shortName === "Location", "complexType should be 'Location'");
-
-        };
-        if (testFns.modelLibrary == "ko") {
-            return function () {
-                this.extraName = ko.observable("xtra");
-                this.init = init;
-            };
-        } else if (testFns.modelLibrary == "backbone") {
-            return Backbone.Model.extend({
-                defaults: {
-                    extraName: "xtra"
-                },
-                init: init
-            });
-        } else {
-            return function () {
-                this.extraName = "xtra";
-                this.init = init;
-            };
-        }
-    };
 
     testFns.sizeOf = sizeOf;
     testFns.sizeOfDif = sizeOfDif;
@@ -774,7 +694,7 @@ breezeTestFns = (function (breeze) {
         
         var dif = (s1.size || 0) - (s2.size || 0);
         var s1Val, s2Val, oDif;
-        if (dif === 0) return null;
+        if (dif === 0) return { dif: 0, children: [] };
         var children = [];
         var s1Children = s1.children || {};
         var s2Children = s2.children || {};

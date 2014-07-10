@@ -85,10 +85,10 @@
 
         var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 
-        var Customer = function() {
+        var Customer = testFns.makeEntityCtor(function() {
             this.extraString = "fromClient";
             this.extraDouble = 0;
-        };
+        });
 
         store.registerEntityTypeCtor("Customer", Customer);
         var em = newEm(store);

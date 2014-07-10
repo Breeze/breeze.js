@@ -159,7 +159,9 @@
 
     test("class watcher - 2", function () {
 
-        var Customer = testFns.models.Customer();
+        var Customer = testFns.makeEntityCtor(function() {
+            this.companyName = null;
+        });
 
         var metadataStore = new MetadataStore();
         metadataStore.trackUnmappedType(Customer, this.interceptor);
@@ -177,7 +179,9 @@
 
     test("class watcher - 3", function () {
 
-        var Customer = testFns.models.Customer();
+        var Customer = testFns.makeEntityCtor(function() {
+            this.companyName = null;
+        });
 
         var metadataStore = new MetadataStore();
         metadataStore.trackUnmappedType(Customer, this.interceptor);

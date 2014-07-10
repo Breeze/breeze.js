@@ -305,22 +305,16 @@
 
         var ctor;
         if (testFns.modelLibrary == "ko") {
-            ctor = function () {
-
-            };
+            ctor = function () {};
             createBillingDetailES5Props(ctor.prototype);
-
         } else if (testFns.modelLibrary == "backbone") {
             ctor = Backbone.Model.extend({
                 initialize: function (attr, options) {
                     createBillingDetailES5Props(this.attributes);
                 }
             });
-
         } else {
-            ctor = function () {
-
-            };
+            ctor = function () {};
             createBillingDetailES5Props(ctor.prototype);
         }
         return ctor;
@@ -333,7 +327,7 @@
                 return this["_owner"] || null;
             },
             set: function (value) {
-                this["_owner"] = value.toUpperCase();
+                this["_owner"] = value && value.toUpperCase();
             },
             enumerable: true,
             configurable: true
@@ -353,7 +347,11 @@
 
         Object.defineProperty(target, "idAndOwner", {
             get: function () {
-                return this.getProperty && this.getProperty("id") + ":" + this.getProperty("owner") || "";
+                if (testFns.modelLibrary == "ko") {
+                    return this.getProperty && this.getProperty("id") + ":" + (this.getProperty("owner") || "");
+                } else {
+                    return this["id"] + ":" + (this["owner"] || "");
+                }
             },
             enumerable: true,
             configurable: true

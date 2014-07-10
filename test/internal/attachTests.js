@@ -63,10 +63,11 @@
        });
 
     test("infer unmapped boolean datatype", function() {
-        var em = newEm();
-        var Customer = function() {
+        
+        var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+        var Customer = testFns.makeEntityCtor(function () {
             this.isBeingEdited = false;
-        };
+        });
         em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
         var customerType = em.metadataStore.getEntityType("Customer");
@@ -344,9 +345,22 @@
         ok(product === sameProduct);
     });
 
+    function createProductCtor() {
+        var init = function (entity) {
+            ok(entity.entityType.shortName === "Product", "entity's productType should be 'Product'");
+            ok(entity.getProperty("isObsolete") === false, "should not be obsolete");
+            entity.setProperty("isObsolete", true);
+        };
+        return testFns.makeEntityCtor(function () {
+            this.isObsolete = false;
+            this.init = init;
+        });
+
+    };
+
     test("post create init 1", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Product = testFns.models.Product();
+        var Product = createProductCtor();
         var productType = em.metadataStore.getEntityType("Product");
         em.metadataStore.registerEntityTypeCtor("Product", Product, function(entity) {
             ok(entity.entityType === productType, "entity's productType should be 'Product'");
@@ -363,7 +377,7 @@
     
     test("post create init 2", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Product = testFns.models.Product();
+        var Product = createProductCtor();
         
         var productType = em.metadataStore.getEntityType("Product");
         em.metadataStore.registerEntityTypeCtor("Product", Product, "init");
@@ -374,7 +388,7 @@
 
     test("post create init 3", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Product = testFns.models.Product();
+        var Product = createProductCtor();
         var productType = em.metadataStore.getEntityType("Product");
         em.metadataStore.registerEntityTypeCtor("Product", Product, "init");
 
@@ -384,7 +398,7 @@
     
     test("post create init after new and attach", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Product = testFns.models.Product();
+        var Product = createProductCtor();
         var product = new Product();
         var productType = em.metadataStore.getEntityType("Product");
         em.metadataStore.registerEntityTypeCtor("Product", Product, "init");

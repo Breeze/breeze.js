@@ -157,9 +157,6 @@
     <Content Include="..\..\src\b00_breeze.dataService.webApi.js">
       <Link>src\b00_breeze.dataService.webApi.js</Link>
     </Content>
-    <Content Include="..\..\src\b00_breeze.modelLibrary.backbone.js">
-      <Link>src\b00_breeze.modelLibrary.backbone.js</Link>
-    </Content>
     <Content Include="..\..\src\b00_breeze.modelLibrary.backingStore.js">
       <Link>src\b00_breeze.modelLibrary.backingStore.js</Link>
     </Content>
@@ -168,6 +165,9 @@
     </Content>
     <Content Include="..\..\src\breeze.dataService.mongo.js">
       <Link>src\breeze.dataService.mongo.js</Link>
+    </Content>
+    <Content Include="..\..\src\breeze.modelLibrary.backbone.js">
+      <Link>src\breeze.modelLibrary.backbone.js</Link>
     </Content>
     <Content Include="..\..\src\iface.ajaxInterface.js">
       <Link>src\iface.ajaxInterface.js</Link>

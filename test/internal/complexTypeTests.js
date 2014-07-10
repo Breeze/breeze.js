@@ -81,7 +81,7 @@
     test("initializer on complexType for createInstance", function () {
 
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Supplier = testFns.models.Supplier();
+        var Supplier = testFns.makeEntityCtor(function () { });
 
         var locationInitializer = function (location) {
             location.setProperty("city", "FOO");
@@ -98,7 +98,7 @@
 
     test("initializer on complexType during query",  function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Supplier = testFns.models.Supplier();
+        var Supplier = testFns.makeEntityCtor(function () { });
 
         var locationInitializer = function (location) {
             var city = location.getProperty("city");
@@ -238,9 +238,20 @@
         }).fail(testFns.handleFail).fin(start);
     });
 
+    function createLocationCtor() {
+        var init = function(entity) {
+            ok(entity.complexType.shortName === "Location", "complexType should be 'Location'");
+
+        };
+        return testFns.makeEntityCtor(function () {
+            this.extraName = "extra";
+            this.init = init;
+        });
+    }
+
     test("create an instance with custom ctor and unmapped prop", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Location = testFns.models.Location();
+        var Location = createLocationCtor();
 
         var locationType = em.metadataStore.getEntityType("Location");
         em.metadataStore.registerEntityTypeCtor("Location", Location, "init");
@@ -268,7 +279,7 @@
 
     test("create an entity instance with a populated complex type", function () {
         var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-        var Location = testFns.models.Location();
+        var Location = createLocationCtor();
         var locationType = em.metadataStore.getEntityType("Location");
         em.metadataStore.registerEntityTypeCtor("Location", Location, "init");
 
@@ -289,12 +300,12 @@
     // change needs to be made to each of the modelLibraries. 
     //test("new an entity instance with a populated complex type", function () {
     //    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-    //    var Supplier = testFns.models.Supplier();
+    //    var Supplier = testFns.makeEntityCtor(function() {});
         
 
     //    em.metadataStore.registerEntityTypeCtor("Supplier", Supplier);
 
-    //    var Location = testFns.models.Location();
+    //    var Location = createLocationCtor();
     //    var locationType = em.metadataStore.getEntityType("Location");
     //    em.metadataStore.registerEntityTypeCtor("Location", Location, "init");
         
