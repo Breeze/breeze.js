@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.15",
+        version: "1.4.16",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -9472,7 +9472,7 @@ var EntityQuery = (function () {
     var ctor = function (resourceName) {
         assertParam(resourceName, "resourceName").isOptional().isString().check();
         this.resourceName = resourceName;
-        this._fromEntityType = null;
+        this.fromEntityType = null;
         this.wherePredicate = null;
         this.orderByClause = null;
         this.selectClause = null;
@@ -9496,6 +9496,15 @@ var EntityQuery = (function () {
 
     __readOnly__
     @property resourceName {String}
+    **/
+
+    /**
+    The entityType that is associated with the 'from' clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query 
+    has been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.
+    This value may be null if the entityType cannot be associated with a resourceName.
+
+    __readOnly__
+    @property fromEntityType {EntityType}
     **/
 
     /**
@@ -9669,7 +9678,7 @@ var EntityQuery = (function () {
             if (!(wherePredicate instanceof Predicate)) {
                 wherePredicate = Predicate.create(__arraySlice(arguments));
             }
-            if (this._fromEntityType) wherePredicate.validate(this._fromEntityType);
+            if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
             if (this.wherePredicate) {
                 wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
             }
@@ -10178,7 +10187,7 @@ var EntityQuery = (function () {
         // Uncomment next two lines if we make this method public.
         // assertParam(metadataStore, "metadataStore").isInstanceOf(MetadataStore).check();
         // assertParam(throwErrorIfNotFound, "throwErrorIfNotFound").isBoolean().isOptional().check();
-        var entityType = this._fromEntityType;
+        var entityType = this.fromEntityType;
         if (entityType) return entityType;
 
         var resourceName = this.resourceName;
@@ -10212,7 +10221,7 @@ var EntityQuery = (function () {
             }
         }
                 
-        this._fromEntityType = entityType;
+        this.fromEntityType = entityType;
         return entityType;
         
     };
@@ -10241,7 +10250,7 @@ var EntityQuery = (function () {
         // copying QueryOptions is safe because they are are immutable; 
         var copy = __extend(new EntityQuery(), that, [
             "resourceName",
-            "entityType",
+            "fromEntityType",
             "wherePredicate",
             "orderByClause",
             "selectClause",
