@@ -354,8 +354,12 @@ var Validator = (function () {
         var regionProperty - custType.getProperty("Region");
         // Makes "Region" on Customer a required property.
         regionProperty.validators.push(Validator.required());
+        // or to allow empty strings
+        regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
     @method required
     @static
+    @param context {Object} 
+    @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
     @return {Validator} A new Validator
     **/
     ctor.required = function (context) {

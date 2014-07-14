@@ -2355,8 +2355,12 @@ var Validator = (function () {
         var regionProperty - custType.getProperty("Region");
         // Makes "Region" on Customer a required property.
         regionProperty.validators.push(Validator.required());
+        // or to allow empty strings
+        regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
     @method required
     @static
+    @param context {Object} 
+    @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
     @return {Validator} A new Validator
     **/
     ctor.required = function (context) {
@@ -6115,6 +6119,23 @@ var MetadataStore = (function () {
     proto._$typeName = "MetadataStore";
     Event.bubbleEvent(proto, null);
     ctor.ANONTYPE_PREFIX = "_IB_";
+
+    /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires after a MetadataStore has completed fetching metadata from a remote service. 
+
+       var ms = myEntityManager.metadataStore;
+       ms.metadataFetched.subscribe(function(args) {
+           var metadataStore = args.metadataStore;
+           var dataService = args.dataService;
+       });
+   });
+     
+   @event metadataFetched
+   @param metadataStore {MetadataStore} The MetadataStore into which the metadata was fetched.
+   @param dataService {DataService} The DataService that metadata was fetched from.
+   @param rawMetadata {Object} The raw metadata returned from the service. (It will have already been processed by this point).
+   @readOnly
+   **/
 
     /**
     General purpose property set method

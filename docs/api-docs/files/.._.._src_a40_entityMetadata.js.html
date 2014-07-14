@@ -295,6 +295,23 @@ var MetadataStore = (function () {
     ctor.ANONTYPE_PREFIX = &quot;_IB_&quot;;
 
     /**
+   An {{#crossLink &quot;Event&quot;}}{{/crossLink}} that fires after a MetadataStore has completed fetching metadata from a remote service. 
+
+       var ms = myEntityManager.metadataStore;
+       ms.metadataFetched.subscribe(function(args) {
+           var metadataStore = args.metadataStore;
+           var dataService = args.dataService;
+       });
+   });
+     
+   @event metadataFetched
+   @param metadataStore {MetadataStore} The MetadataStore into which the metadata was fetched.
+   @param dataService {DataService} The DataService that metadata was fetched from.
+   @param rawMetadata {Object} The raw metadata returned from the service. (It will have already been processed by this point).
+   @readOnly
+   **/
+
+    /**
     General purpose property set method
     @example
         // assume em1 is an EntityManager containing a number of existing entities.
