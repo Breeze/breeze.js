@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.16",
+        version: "1.4.17",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -14414,7 +14414,7 @@ var EntityManager = (function () {
         var tuples = this.map[parentEntityKey.toString()];
         if (!tuples) return;
         __arrayRemoveItem(tuples, function (t) {
-            return t.navigationProperty === navigationProperty;
+            return t.navigationProperty.name === navigationProperty.name;
         });
         if (!tuples.length) {
             delete this.map[parentEntityKey.toString()];
@@ -14434,16 +14434,24 @@ var EntityManager = (function () {
     };
 
     UnattachedChildrenMap.prototype.getTuple = function (parentEntityKey, navigationProperty) {
-        var tuples = this.map[parentEntityKey.toString()];
+        var tuples = this.getTuples(parentEntityKey);
         if (!tuples) return null;
         var tuple = __arrayFirst(tuples, function (t) {
-            return t.navigationProperty === navigationProperty;
+            return t.navigationProperty.name === navigationProperty.name;
         });
         return tuple;
     };
 
+    
     UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
-        return this.map[parentEntityKey.toString()];
+        var tuples = this.map[parentEntityKey.toString()];
+        var entityType = parentEntityKey.entityType;
+        while (!tuples && entityType.baseEntityType) {
+            entityType = entityType.baseEntityType;
+            var baseKey = parentEntityKey.toString(entityType);
+            tuples = this.map[baseKey];
+        }
+        return tuples;
     };
 
     return ctor;
