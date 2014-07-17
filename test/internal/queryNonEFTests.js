@@ -1,9 +1,9 @@
-(function (testFns) {
+(function(testFns) {
     var breeze = testFns.breeze;
     var core = breeze.core;
     var Event = core.Event;
-    
-    
+
+
     var EntityType = breeze.EntityType;
     var NamingConvention = breeze.NamingConvention;
     var DataProperty = breeze.DataProperty;
@@ -25,10 +25,10 @@
     if (testFns.DEBUG_ODATA) return;
 
     module("queryNonEF", {
-        setup: function () {
+        setup: function() {
             testFns.setup();
         },
-        teardown: function () {
+        teardown: function() {
         }
     });
 
@@ -43,7 +43,7 @@
         var altMs = new MetadataStore({
             namingConvention: NamingConvention.camelCase
         });
-        
+
         return new EntityManager({
             dataService: dataService,
             metadataStore: altMs
@@ -53,7 +53,7 @@
     test("canValidateNonscalarComplexProps 1", function() {
         var em = newAltEm();
 
-        initializeMetadataStore(em.metadataStore);
+        initMsForPersonMeal(em.metadataStore);
         var shiftType = em.metadataStore.getEntityType("Shift");
         var person = em.createEntity("Person", { personId: 1 });
         var shifts = person.getProperty("shifts");
@@ -71,7 +71,7 @@
     test("canSaveNonscalarComplexProps 1", function() {
         var em = newAltEm();
 
-        initializeMetadataStore(em.metadataStore);
+        initMsForPersonMeal(em.metadataStore);
         var shiftType = em.metadataStore.getEntityType("Shift");
         var person = em.createEntity("Person", { personId: 1 });
         var shifts = person.getProperty("shifts");
@@ -79,7 +79,7 @@
         shifts.push(shift1);
         person.entityAspect.acceptChanges();
         person.setProperty("firstName", "Albert");
-        
+
         var shift2 = shiftType.createInstance({ startDate: new Date(2010, 1, 1, 10, 30), numHours: 8 });
         shifts.push(shift2);
         var helper = em.helper;
@@ -89,10 +89,10 @@
 
     });
 
-    test("canSaveNonscalarComplexProps 2", function () {
+    test("canSaveNonscalarComplexProps 2", function() {
         var em = newAltEm();
 
-        initializeMetadataStore(em.metadataStore);
+        initMsForPersonMeal(em.metadataStore);
         var shiftType = em.metadataStore.getEntityType("Shift");
         var person = em.createEntity("Person", { personId: 1 });
         var shifts = person.getProperty("shifts");
@@ -108,10 +108,10 @@
 
     });
 
-    test("canSaveNonscalarComplexProps 3", function () {
+    test("canSaveNonscalarComplexProps 3", function() {
         var em = newAltEm();
 
-        initializeMetadataStore(em.metadataStore);
+        initMsForPersonMeal(em.metadataStore);
         var shiftType = em.metadataStore.getEntityType("Shift");
         var person = em.createEntity("Person", { personId: 1 });
         var shifts = person.getProperty("shifts");
@@ -119,7 +119,7 @@
         shifts.push(shift1);
         person.entityAspect.acceptChanges();
         person.setProperty("firstName", "Albert");
-       
+
         var helper = em.helper;
         var changedJson = helper.unwrapChangedValues(person, em.metadataStore);
         ok(changedJson.FirstName == "Albert");
@@ -127,7 +127,7 @@
 
     });
 
-    test("bad addEntityType - no key", function () {
+    test("bad addEntityType - no key", function() {
         var ms = new MetadataStore();
         try {
             ms.addEntityType({
@@ -145,8 +145,8 @@
             ok(e.message.toLowerCase().indexOf("ispartofkey") >= 0, "message should mention 'isPartOfKey'");
         }
     });
-    
-    test("create complexType - compact form", function () {
+
+    test("create complexType - compact form", function() {
         var ms = new MetadataStore();
         try {
             ms.addEntityType({
@@ -165,13 +165,13 @@
         }
     });
 
-    
+
     test("getSimple - anonymous - Persons", function() {
         var em = newAltEm();
-        
+
         var query = breeze.EntityQuery.from("Persons");
         stop();
-        
+
         em.executeQuery(query).then(function(data) {
             ok(data.results.length > 0);
             var person = data.results[0];
@@ -180,19 +180,19 @@
             // and fixup will not occur with anon types
             // ok(person.meals[0].person === person, "check internal consistency");
             var ents = em.getEntities();
-            ok(ents.length === 0,"should return 0 - not yet entities");
+            ok(ents.length === 0, "should return 0 - not yet entities");
         }).fail(testFns.handleFail).fin(start);
-        
+
     });
-    
-    test("getSimple - typed - Persons", function () {
+
+    test("getSimple - typed - Persons", function() {
         var em = newAltEm();
-        
-        initializeMetadataStore(em.metadataStore);
+
+        initMsForPersonMeal(em.metadataStore);
         var query = breeze.EntityQuery.from("Persons");
         stop();
 
-        em.executeQuery(query).then(function (data) {
+        em.executeQuery(query).then(function(data) {
             ok(!em.hasChanges(), "should not have any changes");
             ok(data.results.length > 0);
             var person = data.results[0];
@@ -205,14 +205,14 @@
 
     });
 
-    test("getSimple - typed - Persons - long form metadata", function () {
+    test("getSimple - typed - Persons - long form metadata", function() {
         var em = newAltEm();
 
-        initializeMetadataStore_long(em.metadataStore);
+        initMsForPersonMeal_long(em.metadataStore);
         var query = breeze.EntityQuery.from("Persons");
         stop();
 
-        em.executeQuery(query).then(function (data) {
+        em.executeQuery(query).then(function(data) {
             ok(!em.hasChanges(), "should not have any changes");
             ok(data.results.length > 0);
             var person = data.results[0];
@@ -225,7 +225,110 @@
 
     });
 
-    function initializeMetadataStore(metadataStore) {
+    test("unattached children - inherit - 1", function() {
+        var em = newAltEm();
+
+        initMsForOrgBase(em.metadataStore);
+        var org1 = em.createEntity("Organization", {
+            id: 1,
+            name: "Org1"
+        });
+        var ur1 = em.createEntity("UserRight", {
+            id: 2,
+            baseId: 1
+        });
+        var ur2 = em.createEntity("UserRight", {
+            id: 3,
+            baseId: 1
+        });
+        var orgRights = org1.getProperty("userRights");
+        ok(orgRights.length === 2);
+        ok(orgRights.some(function(ur) { return ur == ur1; }));
+        ok(orgRights.some(function(ur) { return ur == ur2; }));
+        var ur1Org = ur1.getProperty("base");
+        ok(ur1Org === org1);
+        var ur2Org = ur2.getProperty("base");
+        ok(ur2Org === org1);
+    });
+
+    test("unattached children - inherit - 2", function () {
+        var em = newAltEm();
+
+        initMsForOrgBase(em.metadataStore);
+        var ur1 = em.createEntity("UserRight", {
+            id: 2,
+            baseId: 1
+        });
+        var ur2 = em.createEntity("UserRight", {
+            id: 3,
+            baseId: 1
+        });
+        var org1 = em.createEntity("Organization", {
+            id: 1,
+            name: "Org1"
+        });
+        
+        var orgRights = org1.getProperty("userRights");
+        ok(orgRights.length === 2);
+        ok(orgRights.some(function (ur) { return ur == ur1; }));
+        ok(orgRights.some(function (ur) { return ur == ur2; }));
+        var ur1Org = ur1.getProperty("base");
+        ok(ur1Org === org1);
+        var ur2Org = ur2.getProperty("base");
+        ok(ur2Org === org1);
+    });
+
+//    class Base {
+//        public int Id;
+//        virtual public ICollection<UserRight> UserRights;
+//    }
+//    class Organisation : Base {
+//        public String Name;  
+//    }
+//    class UserRight {
+//        public int Id;
+//        public int BaseId;
+//        virtual public Base Base;
+//    }
+
+    function initMsForOrgBase(metadataStore) {
+        var ns = "XXX";
+        var qt = function(shortName) {
+            return EntityType.qualifyTypeName(shortName, ns);
+        }
+        var baseT = metadataStore.addEntityType({
+            shortName: "Base",
+            namespace: ns,
+            dataProperties: {
+                id: { dataType: DataType.Int32, isPartOfKey: true, isNullable: false }
+            },
+            navigationProperties: {
+                userRights: { entityTypeName: "UserRight", isScalar: false, associationName: "BaseRights" }
+            }
+        });
+        var orgT = metadataStore.addEntityType({
+            shortName: "Organization",
+            namespace: ns,
+            baseTypeName: qt("Base"),
+            dataProperties: {
+                id: { dataType: DataType.String, isNullable: false }
+            },
+        });
+        var urT = metadataStore.addEntityType({
+            shortName: "UserRight",
+            namespace: ns,
+            dataProperties: {
+                id: { dataType: DataType.Int32, isPartOfKey: true, isNullable: false },
+                baseId: { dataType: DataType.Int32, isNullable: false }
+            },
+            navigationProperties: {
+                base: { entityTypeName: "Base", associationName: "BaseRights", foreignKeyNames: [ "baseId"] } 
+            }
+        });
+    };
+
+
+    function initMsForPersonMeal(metadataStore) {
         var Validator = breeze.Validator;
         var x = metadataStore.addEntityType({
             shortName: "Shift",
@@ -295,7 +398,7 @@
         metadataStore.addEntityType(et);
     }
     
-    function initializeMetadataStore_long(metadataStore) {
+    function initMsForPersonMeal_long(metadataStore) {
         var et = new EntityType({
             shortName: "Person",
             namespace: testFns.sampleNamespace
@@ -411,101 +514,6 @@
         metadataStore.addEntityType(et);
     }
     
-    //function initializeMetadataStore_import(metadataStore, serviceName) {
-    //    var entityTypes = [ {
-    //        shortName: "Person",
-    //        namespace: testFns.sampleNamespace,
-    //        dataProperties: [{
-    //                name: "personId",
-    //                dataType: DataType.Int32,
-    //                isNullable: false,
-    //                isPartOfKey: true,
-    //            }, {
-    //                name: "firstName",
-    //                dataType: DataType.String,
-    //                isNullable: false,
-    //            }, {
-    //                name: "lastName",
-    //                dataType: DataType.String,
-    //                isNullable: false,
-    //            }, {
-    //                name: "birthDate",
-    //                dataType: DataType.DateTime,
-    //                isNullable: true
-    //            }],
-    //        navigationProperties: [{
-    //            name: "meals",
-    //            entityTypeName: "Meal",
-    //            isScalar: false,
-    //            associationName: "personMeals"
-    //        }]
-    //    }, {
-    //        shortName: "Meal",
-    //        namespace: testFns.sampleNamespace,
-    //        dataProperties: [{
-    //                name: "mealId",
-    //                dataType: DataType.Int32,
-    //                isNullable: false,
-    //                isPartOfKey: true,
-    //            }, {
-    //                name: "personId",
-    //                dataType: DataType.Int32,
-    //                isNullable: false,
-    //            }, {
-    //                name: "dateConsumed",
-    //                dataType: DataType.DateTime,
-    //                isNullable: false,
-    //            }],
-    //        navigationProperties: [{
-    //                name: "person",
-    //                entityTypeName: "Person",
-    //                isScalar: true,
-    //                associationName: "personMeals",
-    //                foreignKeyNames: ["personId"]
-    //            }, {
-    //                name: "dishes",
-    //                entityTypeName: "Dish",
-    //                isScalar: false,
-    //                associationName: "mealDishes",
-    //            }]
-    //    }, {
-    //        shortName: "Dish",
-    //        namespace: testFns.sampleNamespace,
-    //        dataProperties: [{
-    //                name: "dishId",
-    //                dataType: DataType.Int32,
-    //                isNullable: false,
-    //                isPartOfKey: true,
-    //            }, {
-    //                name: "foodName",
-    //                dataType: DataType.String,
-    //                isNullable: false,
-    //            }, {
-    //                name: "servingSize",
-    //                dataType: DataType.Double,
-    //                isNullable: false,
-    //            }],
-    //        navigationProperties: [{
-    //            name: "food",
-    //            entityTypeName: "Food",
-    //            isScalar: true,
-    //            associationName: "DishFood",
-    //            foreignKeyNames: ["foodName"]
-    //        }]
-    //    }, {
-    //        shortName: "Food",
-    //        namespace: testFns.sampleNamespace,
-    //        dataProperties: [{
-    //                name: "foodName",
-    //                dataType: DataType.String,
-    //                isNullable: false,
-    //                isPartOfKey: true,
-    //            }, {
-    //                name: "calories",
-    //                dataType: DataType.Int32,
-    //                isNullable: false,
-    //            }]
-    //    }];
-    //}
+    
     
 })(breezeTestFns);
