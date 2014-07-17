@@ -2492,10 +2492,10 @@ var EntityManager = (function () {
     };
 
     UnattachedChildrenMap.prototype.removeChildren = function (parentEntityKey, navigationProperty) {
-        var tuples = this.map[parentEntityKey.toString()];
+        var tuples = this.getTuples(parentEntityKey);
         if (!tuples) return;
         __arrayRemoveItem(tuples, function (t) {
-            return t.navigationProperty.name === navigationProperty.name;
+            return t.navigationProperty === navigationProperty;
         });
         if (!tuples.length) {
             delete this.map[parentEntityKey.toString()];
@@ -2518,7 +2518,7 @@ var EntityManager = (function () {
         var tuples = this.getTuples(parentEntityKey);
         if (!tuples) return null;
         var tuple = __arrayFirst(tuples, function (t) {
-            return t.navigationProperty.name === navigationProperty.name;
+            return t.navigationProperty === navigationProperty;
         });
         return tuple;
     };
