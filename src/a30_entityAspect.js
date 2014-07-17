@@ -489,7 +489,8 @@ var EntityAspect = (function() {
         
         stype.getProperties().forEach(function (p) {
             var value = target.getProperty(p.name);
-            if (p.validators.length > 0) {
+            var validators = p.getAllValidators();
+            if (validators.length > 0) {
                 context.property = p;
                 context.propertyName = aspect.getPropertyPath(p.name);
                 ok = entityAspect._validateProperty(value, context) && ok;
@@ -507,7 +508,7 @@ var EntityAspect = (function() {
             
 
         // then target level
-        stype.validators.forEach(function (validator) {
+        stype.getAllValidators().forEach(function (validator) {
             ok = validate(entityAspect, validator, target) && ok;
         });
         return ok;
@@ -682,7 +683,7 @@ var EntityAspect = (function() {
     proto._validateProperty = function (value, context) {
         var ok = true;
         this._processValidationOpAndPublish(function (that) {
-            context.property.validators.forEach(function (validator) {
+            context.property.getAllValidators().forEach(function (validator) {
                 ok = validate(that, validator, value, context) && ok;
             });
         });

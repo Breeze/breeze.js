@@ -16,6 +16,7 @@
     var FetchStrategy = breeze.FetchStrategy;
     var MergeStrategy = breeze.MergeStrategy;
     var EntityState = breeze.EntityState;
+    var Validator = breeze.Validator;
 
     var altServiceName;
     if (testFns.DEBUG_ODATA) {
@@ -40,6 +41,36 @@
         },
         teardown: function () {
         }
+    });
+
+    function tweakMetadata(metadataStore) {
+        metadataStore.metadataFetched.subscribe(function (arg) {
+            var et = arg.metadataStore.getEntityType("BillingDetailTPH");
+            var prop = et.getProperty("owner");
+            prop.validators.push(Validator.maxLength({ maxLength: 25, message: "Owner must be < 26 in length." }));
+        });
+    }
+
+    test("base class property validation - BillingDetailTPH", function () {
+        var ms = testFns.newMs();
+        tweakMetadata(ms);
+        var em = newEm(ms);
+        
+        var typeName = "BankAccountTPH";
+        var q = EntityQuery.from(typeName + 's').take(3)
+           .using(em);
+        stop();
+
+        q.execute().then(function(data) {
+            var bankAccounts = data.results;
+            var ba1 = bankAccounts[0];
+            var ves = ba1.entityAspect.getValidationErrors();
+            ok(ves.length == 0);
+            ba1.setProperty("owner", "test value that is too long");
+            ves = ba1.entityAspect.getValidationErrors();
+            ok(ves.length == 1);
+            ok(ves[0].errorMessage == "Owner must be < 26 in length.");
+        }).fail(testFns.handleFail).fin(start);
     });
 
     function queryBillingBase(typeName) {

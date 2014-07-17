@@ -3863,7 +3863,8 @@ var EntityAspect = (function() {
         
         stype.getProperties().forEach(function (p) {
             var value = target.getProperty(p.name);
-            if (p.validators.length > 0) {
+            var validators = p.getAllValidators();
+            if (validators.length > 0) {
                 context.property = p;
                 context.propertyName = aspect.getPropertyPath(p.name);
                 ok = entityAspect._validateProperty(value, context) && ok;
@@ -3881,7 +3882,7 @@ var EntityAspect = (function() {
             
 
         // then target level
-        stype.validators.forEach(function (validator) {
+        stype.getAllValidators().forEach(function (validator) {
             ok = validate(entityAspect, validator, target) && ok;
         });
         return ok;
@@ -4056,7 +4057,7 @@ var EntityAspect = (function() {
     proto._validateProperty = function (value, context) {
         var ok = true;
         this._processValidationOpAndPublish(function (that) {
-            context.property.validators.forEach(function (validator) {
+            context.property.getAllValidators().forEach(function (validator) {
                 ok = validate(that, validator, value, context) && ok;
             });
         });
@@ -7466,6 +7467,16 @@ var EntityType = (function () {
         return result;
     };
 
+    proto.getAllValidators = function() {
+        var result = this.validators;
+        var bt = this.baseEntityType;
+        while (bt) {
+            result.push.apply(result, bt.validators);
+            bt = bt.baseEntityType;
+        };
+        return result;
+    }
+
     /**
     Adds a  {{#crossLink "DataProperty"}}{{/crossLink}} or a {{#crossLink "NavigationProperty"}}{{/crossLink}} to this EntityType.
     @example
@@ -7491,12 +7502,16 @@ var EntityType = (function () {
         
         baseEntityType.dataProperties.forEach(function (dp) {
             var newDp = new DataProperty(dp);
-            newDp.isInherited = true;
+            // don't need to copy validators becaue we will walk the hierarchy to find them
+            newDp.validators = [];
+            newDp.baseProperty = dp;
             this._addPropertyCore(newDp);
         }, this);
         baseEntityType.navigationProperties.forEach(function (np) {
             var newNp = new NavigationProperty(np);
-            newNp.isInherited = true;
+            // don't need to copy validators becaue we will walk the hierarchy to find them
+            newNp.validators = [];
+            newNp.baseProperty = np;
             this._addPropertyCore(newNp);
         }, this);
         baseEntityType.subtypes.push(this);
@@ -7923,7 +7938,7 @@ var EntityType = (function () {
     };
 
     function localPropsOnly(props) {
-        return props.filter(function (prop) { return !prop.isInherited; });
+        return props.filter(function (prop) { return prop.baseProperty == null; });
     }
 
     // fromJSON is handled by structuralTypeFromJson function.
@@ -8247,6 +8262,11 @@ var ComplexType = (function () {
             .applyAll(this);
     };
 
+    proto.getAllValidators = function () {
+        // ComplexType inheritance is not YET supported.
+        return this.validators;
+    }
+
     /**
     Creates a new non-attached instance of this ComplexType.
     @method createInstance
@@ -8505,10 +8525,10 @@ var DataProperty = (function () {
     **/
 
     /**
-    Whether this property is inherited from a base class. 
+    Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
 
     __readOnly__
-    @property isInherited {Boolean}
+    @property baseProperty {DataProperty}
     **/
 
     /**
@@ -8610,6 +8630,16 @@ var DataProperty = (function () {
             .whereParam("custom").isOptional()
             .applyAll(this);
     };
+
+    proto.getAllValidators = function () {
+        var validators = this.validators;
+        var baseProp = this.baseProperty;
+        while (baseProp) {
+            validators.push.apply(validators, baseProp.validators);
+            baseProp = baseProp.baseProperty;
+        }
+        return validators;
+    }
 
     proto.toJSON = function () {
         // do not serialize dataTypes that are complexTypes
@@ -8746,12 +8776,12 @@ var NavigationProperty = (function () {
     **/
 
     /**
-    Whether this property is inherited from a base class. 
+    Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
 
     __readOnly__
-    @property isInherited {Boolean}
+    @property baseProperty {NavigationProperty}
     **/
-
+    
     /**
     The name of the association to which that this property belongs.  This associationName will be shared with this 
     properties 'inverse'.
@@ -8819,7 +8849,7 @@ var NavigationProperty = (function () {
     proto.isNavigationProperty = true;
 
     __extend(proto, DataProperty.prototype, [
-        "formatName"
+        "formatName", "getAllValidators"
     ]);
 
     /**
