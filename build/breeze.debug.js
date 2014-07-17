@@ -14285,7 +14285,7 @@ var EntityManager = (function () {
                 }
             } else {
                 var unwrappedArr = unwrapChangedArray(nextTarget, metadataStore, transformFn);
-                if (!__isEmpty(unwrappedArr)) {
+                if ( unwrappedArr != null ) {
                     result[fn(cp.name, cp)] = unwrappedArr;
                 }
               }
