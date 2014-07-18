@@ -1435,7 +1435,7 @@ var EntityType = (function () {
     };
 
     proto.getAllValidators = function() {
-        var result = this.validators;
+        var result = this.validators.slice(0);
         var bt = this.baseEntityType;
         while (bt) {
             result.push.apply(result, bt.validators);
@@ -2599,7 +2599,7 @@ var DataProperty = (function () {
     };
 
     proto.getAllValidators = function () {
-        var validators = this.validators;
+        var validators = this.validators.slice(0);
         var baseProp = this.baseProperty;
         while (baseProp) {
             validators.push.apply(validators, baseProp.validators);

@@ -6746,7 +6746,8 @@ var MetadataStore = (function () {
 
     function completeStructuralTypeFromJson(metadataStore, json, stype) {
 
-        // TODO: should validators from baseType appear on subtypes.
+        // validators from baseType work because validation walks thru base types
+        // so no need to copy down.
         if (json.validators) {
             stype.validators = json.validators.map(Validator.fromJSON);
         }
@@ -7468,7 +7469,7 @@ var EntityType = (function () {
     };
 
     proto.getAllValidators = function() {
-        var result = this.validators;
+        var result = this.validators.slice(0);
         var bt = this.baseEntityType;
         while (bt) {
             result.push.apply(result, bt.validators);
@@ -8632,7 +8633,7 @@ var DataProperty = (function () {
     };
 
     proto.getAllValidators = function () {
-        var validators = this.validators;
+        var validators = this.validators.slice(0);
         var baseProp = this.baseProperty;
         while (baseProp) {
             validators.push.apply(validators, baseProp.validators);
