@@ -14311,7 +14311,7 @@ var EntityManager = (function () {
                 changed = true;
             }
         }
-        if ( target.length == 0 && ( !target._origValues || target._origValues.length == 0)) {
+        if ( target.length == 0 && ( !target._origValues || target._origValues.length != 0)) {
           changed = true
         }
 
