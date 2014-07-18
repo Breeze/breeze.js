@@ -368,14 +368,20 @@
 
     webApiODataCtor.prototype.getRoutePrefix = function(dataService){
         // Get the routePrefix from a Web API OData service name.
-        // Web API OData requires inclusion of the routePrefix in the Uri of a batch subrequest
-        // By convention, Breeze developers add the Web API OData routePrefix to the end of the serviceName
-        // e.g. the routePrefix in 'http://localhost:55802/odata/' is 'odata/'
-        var segments = dataService.serviceName.split('/');
-        var last = segments.length-1 ;
-        var routePrefix = segments[last] || segments[last-1];
-        return routePrefix ? routePrefix + '/' : '';
-    };
+        // The routePrefix is presumed to be the pathname within the dataService.serviceName
+        // Examples of servicename -> routePrefix:
+        //   'http://localhost:55802/odata/' -> 'odata/'
+        //   'http://198.154.121.75/service/odata/' -> 'service/odata/'
+        if (typeof document === 'object'){ // browser
+            var parser = document.createElement('a');
+            parser.href = dataService.serviceName;
+        } else { // node
+            parser = url.parse(dataService.serviceName);           
+        }
+        var prefix = parser.pathname.substr(1);          // drop leading '/' 
+        if (prefix.substr(-1) !== '/'){ prefix += '/'; } // ensure trailing '/'
+        return prefix;
+    }; 
 
     breeze.config.registerAdapter("dataService", webApiODataCtor);
 
