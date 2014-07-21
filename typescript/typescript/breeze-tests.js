@@ -757,6 +757,8 @@ function test_validator() {
     breeze.Validator.registerFactory(function () {
         return countryValidator;
     }, "country");
+
+    var urlValidator = breeze.Validator.url({ messageTemplate: 'u got that wrong' });
 }
 
 function test_demo() {

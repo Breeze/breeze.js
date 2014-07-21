@@ -788,6 +788,8 @@ function test_validator() {
 
     breeze.Validator.register(countryValidator);
     breeze.Validator.registerFactory(() => countryValidator, "country");
+
+    var urlValidator = breeze.Validator.url({ messageTemplate: 'u got that wrong' });
 }
 
 function test_demo() {
