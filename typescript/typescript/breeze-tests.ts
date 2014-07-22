@@ -864,7 +864,7 @@ function test_config() {
     s = config.interfaceInitialized.type;
     o = config.interfaceRegistry;
     o = config.objectRegistry;
-    config.registerAdapter("myAdapterName");
+    config.registerAdapter("myAdapterName", () => { });
     var f1: Function;
     config.registerFunction(f1, "myFunction");
     config.registerType(f1, "myCtor");
