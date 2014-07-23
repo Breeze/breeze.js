@@ -292,7 +292,24 @@
             ok(allok, "all employees should be in the US");
         }).fail(testFns.handleFail).fin(start);
     });
-    
+
+    test("with Date parameters", function () {
+        var em = newEm();
+        var born = new Date(1960, 1, 1);
+        var q = EntityQuery.from("EmployeesFilteredByCountryAndBirthdate")
+            .withParameters({ birthDate: born, country: "USA" });
+
+        stop();
+        em.executeQuery(q).then(function (data) {
+            var r = data.results;
+            ok(r.length > 0, "should be some results");
+            var allok = r.every(function (emp) {
+                return emp.getProperty("birthDate") >= born;
+            });
+            ok(allok, "all employees should be born after " + born);
+        }).fail(testFns.handleFail).fin(start);
+    });
+
     test("with bad parameters", function () {
         var em = newEm();
         var q = EntityQuery.from("CustomersStartingWith")

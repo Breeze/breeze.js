@@ -142,6 +142,8 @@
                     innerObj[fullSubName] = subValue;
                     query += encodeParams(innerObj) + '&';
                 }
+            } else if (value instanceof Date) {
+                query += encodeURIComponent(name) + '=' + encodeURIComponent(value.toISOString()) + '&';
             } else if (value instanceof Object) {
                 for (var subName in value) {
                     subValue = value[subName];
