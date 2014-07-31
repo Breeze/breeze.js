@@ -6,6 +6,7 @@
 // Updated Jan 14 2011 - Jay Traband ( www.ideablade.com).
 // Updated Aug 13 2013 - Steve Schmitt ( www.ideablade.com).
 // Updated Sep 26 2013 for Breeze 1.4.3 - Steve Schmitt ( www.ideablade.com).
+// Updated Jul 22 2014 for Breeze 1.4.16 - Steve Schmitt ( www.ideablade.com)
 
 /// <reference path="Q.d.ts" />
 
@@ -204,8 +205,8 @@ declare module breeze {
         checkForRecomposition(interfaceInitializedArgs: { interfaceName: string; isDefault: boolean }): void;
         initialize(): void;
         fetchMetadata(metadataStore: MetadataStore, dataService: DataService): Q.Promise<any>;
-        executeQuery(mappingContext: Object): Q.Promise<any>;
-        saveChanges(saveContext: { resourceName: string }, saveBundle: Object): Q.Promise<SaveResult>;
+        executeQuery(mappingContext: { getUrl: () => string; query: EntityQuery; dataService: DataService }): Q.Promise<any>;
+        saveChanges(saveContext: { resourceName: string; dataService: DataService }, saveBundle: Object): Q.Promise<SaveResult>;
         JsonResultsAdapter: JsonResultsAdapter;
     }
 
@@ -866,6 +867,7 @@ declare module breeze {
     }
 
     class Validator {
+        /** Map of standard error message templates keyed by validator name.*/
         static messageTemplates: any;
         context: any;
         name: string;
@@ -873,24 +875,57 @@ declare module breeze {
         constructor(name: string, validatorFn: ValidatorFunction, context?: any);
 
         static bool(): Validator;
-        static byte(): Validator;
+        /** integer between 0 and 255 inclusive */
+        static byte(context?: { messageTemplate?: string }): Validator;
         static date(): Validator;
+        /** Returns a ISO 8601 duration string Validator. */
         static duration(): Validator;
+        /** Validators number, double, and single are all the same */
+        static number(context?: { messageTemplate?: string }): Validator;
+        /** Validators number, double, and single are all the same */
+        static double(context?: { messageTemplate?: string }): Validator;
+        /** Validators number, double, and single are all the same */
+        static single(context?: { messageTemplate?: string }): Validator;
 
         static guid(): Validator;
-        static int16(): Validator;
-        static int32(): Validator;
-        static int64(): Validator;
-        static maxLength(context: { maxLength: number; }): Validator;
-        static number(): Validator;
-        static required(): Validator;
+        static int16(context?: { messageTemplate?: string }): Validator;
+        static int32(context?: { messageTemplate?: string }): Validator;
+        static int64(context?: { messageTemplate?: string }): Validator;
+        /** Same as int64 */
+        static integer(context?: { messageTemplate?: string }): Validator;
+        static maxLength(context: { maxLength: number; messageTemplate?: string }): Validator;
+        static required(context?: { messageTemplate?: string }): Validator;
         static string(): Validator;
-        static stringLength(context: { maxLength: number; minLength: number; }): Validator;
+        static stringLength(context: { maxLength: number; minLength: number; messageTemplate?: string }): Validator;
+        /** Returns a credit card number validator that performs a Luhn algorithm checksum test for plausability */
+        static creditCard(context?: { messageTemplate?: string }): Validator;
+        /** Returns a regular expression validator; the expression must be specified in the context parameter */
+        static regularExpression(context: { expression: RegExp; messageTemplate?: string }): Validator;
+        /** Returns the email address validator */
+        static emailAddress(context?: { messageTemplate?: string }): Validator;
+        /** Returns the phone validator, which handles prefix, country code, area code, and local number, with [-/. ] break characters. */
+        static phone(context?: { messageTemplate?: string }): Validator;
+        /** Returns the URL (protocol required) validator */
+        static url(context?: { messageTemplate?: string }): Validator;
+        /** Always returns true */
+        static none(): Validator;
 
+        /** Creates a validator instance from a JSON object or an array of instances from an array of JSON objects. */
+        static fromJSON(json: string): Validator;
+        /** Register a validator instance so that any deserialized metadata can reference it. */
         static register(validator: Validator);
+        /** Register a validator factory so that any deserialized metadata can reference it.  */
         static registerFactory(fn: () => Validator, name: string);
+        /** Creates a regular expression validator with a fixed expression. */
+        static makeRegExpValidator(validatorName: string, expression: RegExp, defaultMessage: string, context?: any): Validator;
 
+        /** Run this validator against the specified value. 
+            @param value {Object} Value to validate
+            @param additionalContext {Object} Any additional contextual information that the Validator can make use of.
+            @return {ValidationError|null} A ValidationError if validation fails, null otherwise        */
         validate(value: any, context?: any): ValidationError;
+
+        /** Returns the message generated by the most recent execution of this Validator. */
         getMessage(): string;
     }
 
@@ -916,14 +951,57 @@ declare module breeze.config {
     var ajax: string;
     var dataService: string;
     var functionRegistry: Object;
-    export function getAdapter(interfaceName: string, adapterName: string): Object;
+    /**
+    Returns the ctor function used to implement a specific interface with a specific adapter name.
+    @method getAdapter
+    @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
+    @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
+    this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
+    @return {Function|null} Returns either a ctor function or null.
+    **/
+    export function getAdapter(interfaceName: string, adapterName?: string): Function;
+    /**
+    Returns the adapter instance corresponding to the specified interface and adapter names.
+    @method getAdapterInstance
+    @param interfaceName {String} The name of the interface.
+    @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
+    omitted then the default implementation of the specified interface is returned. If there is
+    no defaultInstance of this interface, then the first registered instance of this interface is returned.
+    @return {an instance of the specified adapter}
+    **/
     export function getAdapterInstance(interfaceName: string, adapterName?: string): Object;
+    /**
+    Initializes a single adapter implementation. Initialization means either newing a instance of the 
+    specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
+    if it already exists.
+    @method initializeAdapterInstance
+    @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
+    @param adapterName {String} - The name of a previously registered adapter to initialize.
+    @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface. 
+    @return {an instance of the specified adapter}
+    **/
     export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault?: boolean): void;
-    export function initializeAdapterInstances(config: Object): void;
+    /**
+    Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
+    @method initializeAdapterInstances
+    @param config {Object}
+    @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
+    @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
+    @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+    @return [array of instances]
+    **/
+    export function initializeAdapterInstances(config: Object): Object[];
     var interfaceInitialized: Event;
     var interfaceRegistry: Object;
     var objectRegistry: Object;
-    export function registerAdapter(interfaceName: string): void;
+    /**
+    Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
+    made as the last step within an adapter implementation. 
+    @method registerAdapter
+    @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
+    @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.  
+    **/
+    export function registerAdapter(interfaceName: string, adapterCtor: Function): void;
     export function registerFunction(fn: Function, fnName: string): void;
     export function registerType(ctor: Function, typeName: string): void;
     //static setProperties(config: Object): void; //deprecated
