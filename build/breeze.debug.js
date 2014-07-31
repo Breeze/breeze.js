@@ -15236,7 +15236,7 @@ breeze.SaveOptions= SaveOptions;
     // Put this at the bottom of your http error analysis
     proto._catchNoConnectionError = function (err){
         if (err.status == 0 && err.message == null){
-            err.message = "HTTP response status 0 and no message. " +
+            err.message = "HTTP response status 0 and no message.  " +
             "Likely did not or could not reach server. Is the server running?";
         }
     }

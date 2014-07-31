@@ -487,7 +487,7 @@
     // Put this at the bottom of your http error analysis
     proto._catchNoConnectionError = function (err){
         if (err.status == 0 &amp;&amp; err.message == null){
-            err.message = &quot;HTTP response status 0 and no message. &quot; +
+            err.message = &quot;HTTP response status 0 and no message.  &quot; +
             &quot;Likely did not or could not reach server. Is the server running?&quot;;
         }
     }
