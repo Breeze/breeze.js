@@ -493,7 +493,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 797,
+            "line": 796,
             "description": "An ComplexAspect instance is associated with every complex object instance and is accessed via the complex object's 'complexAspect' property. \n \nThe ComplexAspect itself provides properties to determine the parent object, parent property and original values for the complex object.\n\nA ComplexAspect will almost never need to be constructed directly. You will usually get an ComplexAspect by accessing\nan entities 'complexAspect' property.  This property will be automatically attached when an complex object is created as part of an\nentity via either a query, import or EntityManager.createEntity call.\n \n    // assume address is a complex property on the 'Customer' type\n    var aspect = aCustomer.address.complexAspect;\n    // aCustomer === aspect.parent;"
         },
         "EntityKey": {
@@ -3025,7 +3025,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 852,
+            "line": 851,
             "description": "The complex object that this aspect is associated with.\n\n__readOnly__",
             "itemtype": "property",
             "name": "complexObject",
@@ -3035,7 +3035,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 859,
+            "line": 858,
             "description": "The parent object that to which this aspect belongs; this will either be an entity or another complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "parent",
@@ -3045,7 +3045,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 866,
+            "line": 865,
             "description": "The {{#crossLink \"DataProperty\"}}{{/crossLink}} on the 'parent' that contains this complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "parentProperty",
@@ -3055,7 +3055,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 873,
+            "line": 872,
             "description": "The 'original values' of this complex object where they are different from the 'current values'. \nThis is a map where the key is a property name and the value is the 'original value' of the property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "originalValues",
@@ -3065,7 +3065,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 881,
+            "line": 880,
             "description": "Returns the EntityAspect for the top level entity tht contains this complex object.",
             "itemtype": "method",
             "name": "getEntityAspect",
@@ -3078,7 +3078,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 898,
+            "line": 897,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "itemtype": "method",
             "name": "getPropertyPath",

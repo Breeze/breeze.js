@@ -667,7 +667,6 @@ var EntityAspect = (function() {
     // internal methods
 
     proto._detach = function() {
-            
         this.entityGroup = null;
         this.entityManager = null;
         this.entityState = EntityState.Detached;

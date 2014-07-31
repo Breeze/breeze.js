@@ -272,16 +272,7 @@
             } catch (e) { };
         }
         
-        if (errObj) {
-            var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
-            if (entityErrors && httpResponse.saveContext) {
-                processEntityErrors(err, entityErrors, httpResponse.saveContext);
-            } else {
-                err.message = extractInnerMessage(errObj);
-            }
-        } else {
-            err.message = httpResponse.error && httpResponse.error.toString();
-        }
+        processErrors(err, errObj, httpResponse);
         proto._catchNoConnectionError(err);
         return err;
     };
@@ -294,26 +285,34 @@
         }
     }
 
-    function extractInnerMessage(errObj) {
-        while (errObj.InnerException) {
-            errObj = errObj.InnerException;
+
+    function processErrors(err, errObj, httpResponse) {
+        if (errObj) {
+            var tmp = errObj;
+            do {
+                err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
+                tmp = tmp.InnerException;
+            } while (tmp);
+            var saveContext = httpResponse.saveContext;
+            var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
+            if (saveContext && entityErrors) {
+                var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
+                err.entityErrors = entityErrors.map(function(e) {
+                    return {
+                        errorName: e.ErrorName,
+                        entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
+                        keyValues: e.KeyValues,
+                        propertyName: e.PropertyName && propNameFn(e.PropertyName),
+                        errorMessage: e.ErrorMessage
+                    };
+                });
+                if (!err.message) {
+                    err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
+                }
+            }
+        } else {
+            err.message = httpResponse.error && httpResponse.error.toString();
         }
-        return errObj.ExceptionMessage || errObj.Message || errObj.toString();
-    }
-
-    function processEntityErrors(err, entityErrors, saveContext) {
-        err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
-        var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
-        err.entityErrors = entityErrors.map(function (e) {
-            return {
-                errorName: e.ErrorName,
-                entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
-                keyValues: e.KeyValues,
-                propertyName: e.PropertyName && propNameFn(e.PropertyName),
-                errorMessage: e.ErrorMessage
-            };
-        });
-
     }
     
     return ctor;

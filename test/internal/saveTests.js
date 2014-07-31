@@ -1069,6 +1069,7 @@
             ok(false, "should not get here");
 
         }).fail(function (e) {
+            ok(e.message == "test of custom exception message", "wrong custom error message");
             ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
             ok(order1ValErrorsChangedArgs[0].added.length == 1, "should have added 1");
             ok(order1ValErrorsChangedArgs[0].removed.length == 0, "should have added 1");
@@ -1120,6 +1121,7 @@
         }).then(function(sr2) {
             ok(false, "should not get here");
         }).fail(function (e) {
+            ok(e.message == "test of custom exception message", "wrong custom error message");
             ok(e.entityErrors, "should have server errors");
             ok(e.entityErrors.length === 2, "2 order entities should have failed");
             ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
