@@ -63,7 +63,7 @@ breezeTestFns = (function (breeze) {
         value = value.toLowerCase();
         version = (version || "").toLowerCase();
         testFns.DEBUG_WEBAPI = value === "webapi";
-        testFns.DEBUG_ODATA = value === "odata";
+        testFns.DEBUG_ODATA = value === "odata" || value === "odata4";
         testFns.DEBUG_MONGO = value === "mongo";
         testFns.DEBUG_ODATA_VERSION = version || "wcf";
         if (testFns.DEBUG_WEBAPI) {
@@ -99,9 +99,12 @@ breezeTestFns = (function (breeze) {
             if (testFns.DEBUG_ODATA_VERSION == "wcf") {
                 testFns.dataService = core.config.initializeAdapterInstance("dataService", "OData").name;
                 testFns.defaultServiceName = "http://localhost:9009/ODataService.svc";
-            } else if (testFns.DEBUG_ODATA_VERSION == "webapi2") {
+            } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata") {
                 testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApiOData").name;
                 testFns.defaultServiceName = "http://localhost:9011/NorthwindIB_odata";
+            } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata4") {
+                testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApiOData4").name;
+                testFns.defaultServiceName = "http://localhost:9017/NorthwindIB_odata";
             }
         } else if (testFns.DEBUG_MONGO) {
             testFns.dataService = core.config.initializeAdapterInstance("dataService", "mongo").name;

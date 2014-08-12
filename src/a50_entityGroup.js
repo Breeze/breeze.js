@@ -30,14 +30,15 @@ var EntityGroup = (function () {
         var ix = this._indexMap[keyInGroup];
         if (ix >= 0) {
             var targetEntity = this._entities[ix];
-            var wasUnchanged = targetEntity.entityAspect.entityState.isUnchanged();
+            var targetEntityState = targetEntity.entityAspect.entityState;
+            var wasUnchanged = targetEntityState.isUnchanged();
             if (targetEntity === entity) {
                 aspect.entityState = entityState;
             } else if (mergeStrategy === MergeStrategy.Disallowed) {
                 throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
                 this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
-                this.entityManager._checkStateChange(targetEntity, wasUnchanged, entityState.isUnchanged());
+                targetEntity.entityAspect._setEntityState(entityState);
             }
             return targetEntity;
         } else {

@@ -464,36 +464,6 @@ var EntityAspect = (function() {
         return propName;
     }
 
-    /**
-    Sets the entity to an EntityState of &#x27;Unchanged&#x27;.  This is also the equivalent of calling {{#crossLink &quot;EntityAspect/acceptChanges&quot;}}{{/crossLink}}
-        @example
-            // assume order is an order entity attached to an EntityManager.
-            order.entityAspect.setUnchanged();
-            // The &#x27;order&#x27; entity will now be in an &#x27;Unchanged&#x27; state with any changes committed.
-    @method setUnchanged
-    **/
-    proto.setUnchanged = function () {
-        checkStateChange(this);
-        clearOriginalValues(this.entity);
-        delete this.hasTempKey;
-        this.entityState = EntityState.Unchanged;
-        this.entityManager._notifyStateChange(this.entity, false);
-    };
-
-    function clearOriginalValues(target) {
-        var aspect = target.entityAspect || target.complexAspect;
-        aspect.originalValues = {};
-        var stype = target.entityType || target.complexType;
-        stype.complexProperties.forEach(function (cp) {
-            var cos = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                clearOriginalValues(cos);
-            } else {
-                cos._acceptChanges();
-                cos.forEach(function (co) { clearOriginalValues(co); });
-            }
-        });
-    }
 
     // Dangerous method - see notes - talk to Jay - this is not a complete impl
     // Another alternative is to detach the reattach if already attached - but this would have
@@ -508,6 +478,19 @@ var EntityAspect = (function() {
     //        };
 
     /**
+    Sets the entity to an EntityState of &#x27;Unchanged&#x27;.  This is also the equivalent of calling {{#crossLink &quot;EntityAspect/acceptChanges&quot;}}{{/crossLink}}
+        @example
+            // assume order is an order entity attached to an EntityManager.
+            order.entityAspect.setUnchanged();
+            // The &#x27;order&#x27; entity will now be in an &#x27;Unchanged&#x27; state with any changes committed.
+    @method setUnchanged
+    **/
+    proto.setUnchanged = function () {
+        return this._setEntityState(EntityState.Unchanged);
+    };
+
+
+    /**
     Sets the entity to an EntityState of &#x27;Modified&#x27;.  This can also be achieved by changing the value of any property on an &#x27;Unchanged&#x27; entity.
     @example
         // assume order is an order entity attached to an EntityManager.
@@ -516,9 +499,7 @@ var EntityAspect = (function() {
     @method setModified
     **/
     proto.setModified = function () {
-        checkStateChange(this);
-        this.entityState = EntityState.Modified;
-        this.entityManager._notifyStateChange(this.entity, true);
+        return this._setEntityState(EntityState.Modified);
     };
 
     /**
@@ -531,49 +512,77 @@ var EntityAspect = (function() {
     @method setDeleted
     **/
     proto.setDeleted = function () {
-        checkStateChange(this);
-        var em = this.entityManager;
-        var entity = this.entity;
-        if (this.entityState.isAdded()) {
-            em.detachEntity(entity);
-            em._notifyStateChange(entity, false);
-        } else {
-            this.entityState = EntityState.Deleted;
-            removeFromRelations(entity, EntityState.Deleted);
-            em._notifyStateChange(entity, true);
-        }
-        // TODO: think about cascade deletes
+        return this._setEntityState(EntityState.Deleted);
     };
 
-    function checkStateChange(aspect) {
-        if (aspect.entityState.isDetached()) {
-            throw new Error(&quot;You cannot set the &#x27;entityState&#x27; of an entity when it is detached - except by first attaching it to an EntityManager&quot;);
-        }
+    /**
+   Sets the entity to an EntityState of &#x27;Detached&#x27;.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
+   @example
+       // assume order is an order entity attached to an EntityManager.
+       order.entityAspect.setDetached();
+       // The &#x27;order&#x27; entity will now be in a &#x27;Detached&#x27; state and it will no longer have any &#x27;related&#x27; entities. 
+   @method setDetached
+   **/
+    proto.setDetached = function () {
+        return this._setEntityState(EntityState.Detached);
     }
 
-    /**
-    Sets the entity to an EntityState of &#x27;Detached&#x27;.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.setDetached();
-        // The &#x27;order&#x27; entity will now be in a &#x27;Detached&#x27; state and it will no longer have any &#x27;related&#x27; entities. 
-    @method setDetached
-    **/
-    proto.setDetached = function () {
-        if (this.entityState.isDetached()) return true;
-        var group = this.entityGroup;
-        if (!group) {
-            // no group === already detached.
-            return false;
+    proto._setEntityState = function (entityState) {
+        if (this.entityState === entityState) return false;
+        if (this.entityState.isDetached()) {
+            throw new Error(&quot;You cannot set the &#x27;entityState&#x27; of an entity when it is detached - except by first attaching it to an EntityManager&quot;);
         }
         var entity = this.entity;
-        group.detachEntity(entity);
-        this.entityState = EntityState.Detached;
-        removeFromRelations(entity, EntityState.Detached);
         var em = this.entityManager;
-        this._detach();
-        em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+        var needsSave = true;
+        if (entityState === EntityState.Unchanged) {
+            clearOriginalValues(entity);
+            delete this.hasTempKey;
+            needsSave = false;
+        } else if (entityState === EntityState.Added) {
+            clearOriginalValues(entity);
+            // TODO: more to do here... like regenerating key ???
+        } else if (entityState === EntityState.Deleted) {
+            if (this.entityState.isAdded()) {
+                // turn it into a detach and exit early
+                this._setEntityState(EntityState.Detached);
+                return true;
+            } else {
+                removeFromRelations(entity, EntityState.Deleted);
+                // TODO: think about cascade deletes
+            }
+        } else if (entityState === EntityState.Modified) {
+            // nothing extra needed
+        } else if (entityState === EntityState.Detached) {
+            var group = this.entityGroup;
+            // no group === already detached.
+            if (!group) return false;
+            group.detachEntity(entity);
+            // needs to occur early here - so this IS deliberately redundent with the same code later in this method.
+            this.entityState = entityState;
+            removeFromRelations(entity, EntityState.Detached);
+            this._detach();
+            em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+            needsSave = false;
+        }
+        this.entityState = entityState;
+        em._notifyStateChange(entity, needsSave);
         return true;
+    }
+
+    function clearOriginalValues(target) {
+        var aspect = target.entityAspect || target.complexAspect;
+        aspect.originalValues = {};
+        var stype = target.entityType || target.complexType;
+        stype.complexProperties.forEach(function (cp) {
+            var cos = target.getProperty(cp.name);
+            if (cp.isScalar) {
+                clearOriginalValues(cos);
+            } else {
+                cos._acceptChanges();
+                cos.forEach(function (co) { clearOriginalValues(co); });
+            }
+        });
     }
 
     /**

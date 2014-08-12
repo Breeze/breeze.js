@@ -3631,36 +3631,6 @@ var EntityAspect = (function() {
         return propName;
     }
 
-    /**
-    Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink "EntityAspect/acceptChanges"}}{{/crossLink}}
-        @example
-            // assume order is an order entity attached to an EntityManager.
-            order.entityAspect.setUnchanged();
-            // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
-    @method setUnchanged
-    **/
-    proto.setUnchanged = function () {
-        checkStateChange(this);
-        clearOriginalValues(this.entity);
-        delete this.hasTempKey;
-        this.entityState = EntityState.Unchanged;
-        this.entityManager._notifyStateChange(this.entity, false);
-    };
-
-    function clearOriginalValues(target) {
-        var aspect = target.entityAspect || target.complexAspect;
-        aspect.originalValues = {};
-        var stype = target.entityType || target.complexType;
-        stype.complexProperties.forEach(function (cp) {
-            var cos = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                clearOriginalValues(cos);
-            } else {
-                cos._acceptChanges();
-                cos.forEach(function (co) { clearOriginalValues(co); });
-            }
-        });
-    }
 
     // Dangerous method - see notes - talk to Jay - this is not a complete impl
     // Another alternative is to detach the reattach if already attached - but this would have
@@ -3675,6 +3645,19 @@ var EntityAspect = (function() {
     //        };
 
     /**
+    Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink "EntityAspect/acceptChanges"}}{{/crossLink}}
+        @example
+            // assume order is an order entity attached to an EntityManager.
+            order.entityAspect.setUnchanged();
+            // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
+    @method setUnchanged
+    **/
+    proto.setUnchanged = function () {
+        return this._setEntityState(EntityState.Unchanged);
+    };
+
+
+    /**
     Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.
     @example
         // assume order is an order entity attached to an EntityManager.
@@ -3683,9 +3666,7 @@ var EntityAspect = (function() {
     @method setModified
     **/
     proto.setModified = function () {
-        checkStateChange(this);
-        this.entityState = EntityState.Modified;
-        this.entityManager._notifyStateChange(this.entity, true);
+        return this._setEntityState(EntityState.Modified);
     };
 
     /**
@@ -3698,49 +3679,77 @@ var EntityAspect = (function() {
     @method setDeleted
     **/
     proto.setDeleted = function () {
-        checkStateChange(this);
-        var em = this.entityManager;
-        var entity = this.entity;
-        if (this.entityState.isAdded()) {
-            em.detachEntity(entity);
-            em._notifyStateChange(entity, false);
-        } else {
-            this.entityState = EntityState.Deleted;
-            removeFromRelations(entity, EntityState.Deleted);
-            em._notifyStateChange(entity, true);
-        }
-        // TODO: think about cascade deletes
+        return this._setEntityState(EntityState.Deleted);
     };
 
-    function checkStateChange(aspect) {
-        if (aspect.entityState.isDetached()) {
-            throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
-        }
+    /**
+   Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
+   @example
+       // assume order is an order entity attached to an EntityManager.
+       order.entityAspect.setDetached();
+       // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities. 
+   @method setDetached
+   **/
+    proto.setDetached = function () {
+        return this._setEntityState(EntityState.Detached);
     }
 
-    /**
-    Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.setDetached();
-        // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities. 
-    @method setDetached
-    **/
-    proto.setDetached = function () {
-        if (this.entityState.isDetached()) return true;
-        var group = this.entityGroup;
-        if (!group) {
-            // no group === already detached.
-            return false;
+    proto._setEntityState = function (entityState) {
+        if (this.entityState === entityState) return false;
+        if (this.entityState.isDetached()) {
+            throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
         }
         var entity = this.entity;
-        group.detachEntity(entity);
-        this.entityState = EntityState.Detached;
-        removeFromRelations(entity, EntityState.Detached);
         var em = this.entityManager;
-        this._detach();
-        em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+        var needsSave = true;
+        if (entityState === EntityState.Unchanged) {
+            clearOriginalValues(entity);
+            delete this.hasTempKey;
+            needsSave = false;
+        } else if (entityState === EntityState.Added) {
+            clearOriginalValues(entity);
+            // TODO: more to do here... like regenerating key ???
+        } else if (entityState === EntityState.Deleted) {
+            if (this.entityState.isAdded()) {
+                // turn it into a detach and exit early
+                this._setEntityState(EntityState.Detached);
+                return true;
+            } else {
+                removeFromRelations(entity, EntityState.Deleted);
+                // TODO: think about cascade deletes
+            }
+        } else if (entityState === EntityState.Modified) {
+            // nothing extra needed
+        } else if (entityState === EntityState.Detached) {
+            var group = this.entityGroup;
+            // no group === already detached.
+            if (!group) return false;
+            group.detachEntity(entity);
+            // needs to occur early here - so this IS deliberately redundent with the same code later in this method.
+            this.entityState = entityState;
+            removeFromRelations(entity, EntityState.Detached);
+            this._detach();
+            em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+            needsSave = false;
+        }
+        this.entityState = entityState;
+        em._notifyStateChange(entity, needsSave);
         return true;
+    }
+
+    function clearOriginalValues(target) {
+        var aspect = target.entityAspect || target.complexAspect;
+        aspect.originalValues = {};
+        var stype = target.entityType || target.complexType;
+        stype.complexProperties.forEach(function (cp) {
+            var cos = target.getProperty(cp.name);
+            if (cp.isScalar) {
+                clearOriginalValues(cos);
+            } else {
+                cos._acceptChanges();
+                cos.forEach(function (co) { clearOriginalValues(co); });
+            }
+        });
     }
 
     /**
@@ -12004,14 +12013,15 @@ var EntityGroup = (function () {
         var ix = this._indexMap[keyInGroup];
         if (ix >= 0) {
             var targetEntity = this._entities[ix];
-            var wasUnchanged = targetEntity.entityAspect.entityState.isUnchanged();
+            var targetEntityState = targetEntity.entityAspect.entityState;
+            var wasUnchanged = targetEntityState.isUnchanged();
             if (targetEntity === entity) {
                 aspect.entityState = entityState;
             } else if (mergeStrategy === MergeStrategy.Disallowed) {
                 throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
                 this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
-                this.entityManager._checkStateChange(targetEntity, wasUnchanged, entityState.isUnchanged());
+                targetEntity.entityAspect._setEntityState(entityState);
             }
             return targetEntity;
         } else {
@@ -13576,18 +13586,13 @@ var EntityManager = (function () {
 
     // protected methods
 
-    proto._checkStateChange = function (entity, wasUnchanged, isUnchanged) {
-        if (wasUnchanged) {
-            if (!isUnchanged) {
-                this._notifyStateChange(entity, true);
-            }
-        } else {
-            if (isUnchanged) {
-                this._notifyStateChange(entity, false);
-            }
-        }
-    };
+    //proto._checkStateChange = function (entity, oldEntityState, newEntityState) {
+    //    if (oldEntityState == newEntityState) return;
+    //    var isUnchanged = newEntityState == EntityState.Unchanged;
+    //    this._notifyStateChange(entity, !isUnchanged);
+    //};
 
+    
     proto._notifyStateChange = function (entity, needsSave) {
         var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
         
@@ -13949,13 +13954,12 @@ var EntityManager = (function () {
                 } else if (mergeStrategy === MergeStrategy.Disallowed) {
                     throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
                 } else {
-                    var wasUnchanged = targetEntity.entityAspect.entityState.isUnchanged();
+                    var targetEntityState = targetEntity.entityAspect.entityState;
+                    var wasUnchanged = targetEntityState.isUnchanged();
                     if (mergeStrategy === MergeStrategy.OverwriteChanges || wasUnchanged) {
                         entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                        targetEntity.entityAspect.entityState = entityState;
+                        targetEntity.entityAspect._setEntityState(entityState);
                         entityChanged.publish({ entityAction: EntityAction.MergeOnImport, entity: targetEntity });
-                        em._checkStateChange(targetEntity, wasUnchanged, entityState.isUnchanged());
-                        
                     } 
                 }
             } else {
@@ -15240,8 +15244,7 @@ breeze.SaveOptions= SaveOptions;
             "Likely did not or could not reach server. Is the server running?";
         }
     }
-
-
+    
     function processErrors(err, errObj, httpResponse) {
         if (errObj) {
             var tmp = errObj;

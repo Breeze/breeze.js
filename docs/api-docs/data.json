@@ -493,7 +493,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 796,
+            "line": 805,
             "description": "An ComplexAspect instance is associated with every complex object instance and is accessed via the complex object's 'complexAspect' property. \n \nThe ComplexAspect itself provides properties to determine the parent object, parent property and original values for the complex object.\n\nA ComplexAspect will almost never need to be constructed directly. You will usually get an ComplexAspect by accessing\nan entities 'complexAspect' property.  This property will be automatically attached when an complex object is created as part of an\nentity via either a query, import or EntityManager.createEntity call.\n \n    // assume address is a complex property on the 'Customer' type\n    var aspect = aCustomer.address.complexAspect;\n    // aCustomer === aspect.parent;"
         },
         "EntityKey": {
@@ -2787,7 +2787,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 260,
+            "line": 273,
             "description": "Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink \"EntityAspect/acceptChanges\"}}{{/crossLink}}",
             "example": [
                 "\n        // assume order is an order entity attached to an EntityManager.\n        order.entityAspect.setUnchanged();\n        // The 'order' entity will now be in an 'Unchanged' state with any changes committed."
@@ -2799,7 +2799,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 303,
+            "line": 286,
             "description": "Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.",
             "example": [
                 "\n    // assume order is an order entity attached to an EntityManager.\n    order.entityAspect.setModified();\n    // The 'order' entity will now be in a 'Modified' state. "
@@ -2811,7 +2811,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 317,
+            "line": 298,
             "description": "Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call\nbut also removes the entity from all of its related entities.",
             "example": [
                 "\n    // assume order is an order entity attached to an EntityManager.\n    order.entityAspect.setDeleted();\n    // The 'order' entity will now be in a 'Deleted' state and it will no longer have any 'related' entities. "
@@ -2823,7 +2823,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 347,
+            "line": 311,
             "description": "Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities.",
             "example": [
                 "\n    // assume order is an order entity attached to an EntityManager.\n    order.entityAspect.setDetached();\n    // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities. "
@@ -2835,7 +2835,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 372,
+            "line": 381,
             "description": "Performs a query for the value of a specified {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
             "example": [
                 "\n        emp.entityAspect.loadNavigationProperty(\"Orders\")\n        .then(function (data) {\n            var orders = data.results;\n        }).fail(function (exception) {\n            // handle exception here;\n        });"
@@ -2871,7 +2871,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 410,
+            "line": 419,
             "description": "Marks this navigationProperty on this entity as already having been loaded.",
             "example": [
                 "\n        emp.entityAspect.markNavigationPropertyAsLoaded(\"Orders\");"
@@ -2891,7 +2891,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 424,
+            "line": 433,
             "description": "Determines whether a navigationProperty on this entity has already been loaded.",
             "example": [
                 "\nA navigation property is considered loaded when any of the following three conditions applies:  \n\n    1) It was fetched from the backend server.  \n        a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method. \n        b) Note that even if the fetch returns nothing the property is still marked as loaded in this case. \n    2) The property is scalar and has been set to a nonnull value. \n    3) The EntityAspect.markNavigationPropertyAsLoaded was called.",
@@ -2911,7 +2911,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 456,
+            "line": 465,
             "description": "Performs validation on the entity, any errors encountered during the validation are available via the \n{{#crossLink \"EntityAspect.getValidationErrors\"}}{{/crossLink}} method. Validating an entity means executing\nall of the validators on both the entity itself as well as those on each of its properties.",
             "example": [
                 "\n    // assume order is an order entity attached to an EntityManager.\n    var isOk = order.entityAspect.validateEntity();\n    // isOk will be 'true' if there are no errors on the entity.\n    if (!isOk) {\n        var errors = order.entityAspect.getValidationErrors();\n    }"
@@ -2927,7 +2927,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 518,
+            "line": 527,
             "description": "Performs validation on a specific property of this entity, any errors encountered during the validation are available via the \n{{#crossLink \"EntityAspect.getValidationErrors\"}}{{/crossLink}} method. Validating a property means executing\nall of the validators on the specified property.  This call is also made automatically anytime a property\nof an entity is changed.",
             "example": [
                 "\n    // assume order is an order entity attached to an EntityManager.\n    var isOk = order.entityAspect.validateProperty(\"Order\"); \nor",
@@ -2957,7 +2957,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 555,
+            "line": 564,
             "description": "Returns the validation errors associated with either the entire entity or any specified property.",
             "example": [
                 "\nThis method can return all of the errors for an Entity",
@@ -2984,7 +2984,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 588,
+            "line": 597,
             "description": "Adds a validation error.",
             "itemtype": "method",
             "name": "addValidationError",
@@ -3000,7 +3000,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 600,
+            "line": 609,
             "description": "Removes a validation error.",
             "itemtype": "method",
             "name": "removeValidationError",
@@ -3016,7 +3016,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 614,
+            "line": 623,
             "description": "Removes all of the validation errors for a specified entity",
             "itemtype": "method",
             "name": "clearValidationErrors",
@@ -3025,7 +3025,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 851,
+            "line": 860,
             "description": "The complex object that this aspect is associated with.\n\n__readOnly__",
             "itemtype": "property",
             "name": "complexObject",
@@ -3035,7 +3035,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 858,
+            "line": 867,
             "description": "The parent object that to which this aspect belongs; this will either be an entity or another complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "parent",
@@ -3045,7 +3045,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 865,
+            "line": 874,
             "description": "The {{#crossLink \"DataProperty\"}}{{/crossLink}} on the 'parent' that contains this complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "parentProperty",
@@ -3055,7 +3055,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 872,
+            "line": 881,
             "description": "The 'original values' of this complex object where they are different from the 'current values'. \nThis is a map where the key is a property name and the value is the 'original value' of the property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "originalValues",
@@ -3065,7 +3065,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 880,
+            "line": 889,
             "description": "Returns the EntityAspect for the top level entity tht contains this complex object.",
             "itemtype": "method",
             "name": "getEntityAspect",
@@ -3078,7 +3078,7 @@
         },
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
-            "line": 897,
+            "line": 906,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "itemtype": "method",
             "name": "getPropertyPath",

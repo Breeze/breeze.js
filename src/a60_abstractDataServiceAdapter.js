@@ -284,8 +284,7 @@
             "Likely did not or could not reach server. Is the server running?";
         }
     }
-
-
+    
     function processErrors(err, errObj, httpResponse) {
         if (errObj) {
             var tmp = errObj;

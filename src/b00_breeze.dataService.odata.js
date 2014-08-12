@@ -33,15 +33,15 @@
     proto._catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
     proto.changeRequestInterceptor = abstractDsaProto.changeRequestInterceptor;
     proto._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
-
+    proto.headers = { "DataServiceVersion": "2.0" };
     proto.executeQuery = function (mappingContext) {
     
         var deferred = Q.defer();
         var url = mappingContext.getUrl();
-        
+
         OData.read({
                 requestUri: url,
-                headers: { "DataServiceVersion": "2.0" }
+                headers: this.headers
             },
             function (data, response) {
                 var inlineCount;
@@ -65,14 +65,12 @@
 
         var serviceName = dataService.serviceName;
         var url = dataService.makeUrl('$metadata');
-        
-        //OData.read({
-        //    requestUri: url,
-        //    headers: {
-        //        "Accept": "application/json",
-        //    }
-        //},
-        OData.read(url,
+        // OData.read(url,
+        OData.read({
+                requestUri: url,
+                // headers: { "Accept": "application/json"}
+                headers: { Accept : 'application/json;odata.metadata=full' }
+            },
             function (data) {
                 // data.dataServices.schema is an array of schemas. with properties of 
                 // entityContainer[], association[], entityType[], and namespace.
@@ -364,7 +362,7 @@
     var webApiODataCtor = function () {
         this.name = "webApiOData";
     }
-
+    
     breeze.core.extend(webApiODataCtor.prototype, proto);
 
     webApiODataCtor.prototype.getRoutePrefix = function(dataService){
@@ -385,5 +383,19 @@
     }; 
 
     breeze.config.registerAdapter("dataService", webApiODataCtor);
+    // OData 4 adapter
+    var webApiOData4Ctor = function() {
+        this.name = "webApiOData4";
+    }
+    breeze.core.extend(webApiOData4Ctor.prototype, webApiODataCtor.prototype);
+    webApiOData4Ctor.prototype.initialize = function () {
+        // Aargh... they moved the cheese.
+        var datajs = core.requireLib("datajs", "Needed to support remote OData v4 services");
+        OData = datajs.V4.oData;
+        OData.json.jsonHandler.recognizeDates = true;
+    };
+    webApiOData4Ctor.prototype.headers = { "OData-Version": "4.0" };
+    breeze.config.registerAdapter("dataService", webApiOData4Ctor);
+    
 
 }));

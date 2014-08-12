@@ -1431,18 +1431,13 @@ var EntityManager = (function () {
 
     // protected methods
 
-    proto._checkStateChange = function (entity, wasUnchanged, isUnchanged) {
-        if (wasUnchanged) {
-            if (!isUnchanged) {
-                this._notifyStateChange(entity, true);
-            }
-        } else {
-            if (isUnchanged) {
-                this._notifyStateChange(entity, false);
-            }
-        }
-    };
+    //proto._checkStateChange = function (entity, oldEntityState, newEntityState) {
+    //    if (oldEntityState == newEntityState) return;
+    //    var isUnchanged = newEntityState == EntityState.Unchanged;
+    //    this._notifyStateChange(entity, !isUnchanged);
+    //};
 
+    
     proto._notifyStateChange = function (entity, needsSave) {
         var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
         
@@ -1804,13 +1799,12 @@ var EntityManager = (function () {
                 } else if (mergeStrategy === MergeStrategy.Disallowed) {
                     throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
                 } else {
-                    var wasUnchanged = targetEntity.entityAspect.entityState.isUnchanged();
+                    var targetEntityState = targetEntity.entityAspect.entityState;
+                    var wasUnchanged = targetEntityState.isUnchanged();
                     if (mergeStrategy === MergeStrategy.OverwriteChanges || wasUnchanged) {
                         entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                        targetEntity.entityAspect.entityState = entityState;
+                        targetEntity.entityAspect._setEntityState(entityState);
                         entityChanged.publish({ entityAction: EntityAction.MergeOnImport, entity: targetEntity });
-                        em._checkStateChange(targetEntity, wasUnchanged, entityState.isUnchanged());
-                        
                     } 
                 }
             } else {
