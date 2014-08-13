@@ -209,7 +209,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._.._src_a50_entityManager.js.html#l6"><code>..\..\src\a50_entityManager.js:6</code></a>
+            Defined in: <a href="../files/.._.._src_a50_entityManager.js.html#l6"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:6</code></a>
         </div>
     
 
@@ -335,6 +335,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_exportEntitiesByType">exportEntitiesByType</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_fetchEntityByKey">fetchEntityByKey</a>
 
                                 
@@ -410,13 +417,20 @@
                                 <a href="#method_importEntities">importEntities</a>
 
                                 
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_importEntities">importEntities</a>
+
+                                
                                     <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_importEntities">importEntities</a>
+                                <a href="#method_importEntitiesByType">importEntitiesByType</a>
 
                                 
                                 
@@ -587,7 +601,7 @@
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l11"><code>..\..\src\a50_entityManager.js:11</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l11"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:11</code></a>
         
         </p>
 
@@ -641,7 +655,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[dataService]</code>
-                                    <span class="type"><a href="..\classes\DataService.html" class="crosslink">DataService</a></span>
+                                    <span class="type"><a href="../classes/DataService.html" class="crosslink">DataService</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -656,7 +670,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[metadataStore=MetadataStore.defaultInstance]</code>
-                                    <span class="type"><a href="..\classes\MetadataStore.html" class="crosslink">MetadataStore</a></span>
+                                    <span class="type"><a href="../classes/MetadataStore.html" class="crosslink">MetadataStore</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -670,7 +684,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[queryOptions]</code>
-                                    <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>
+                                    <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -684,7 +698,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[saveOptions]</code>
-                                    <span class="type"><a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a></span>
+                                    <span class="type"><a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -698,7 +712,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[validationOptions=ValidationOptions.defaultInstance]</code>
-                                    <span class="type"><a href="..\classes\ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
+                                    <span class="type"><a href="../classes/ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -806,7 +820,7 @@ var entityManager = new EntityManager({
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l310"><code>..\..\src\a50_entityManager.js:310</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l310"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:310</code></a>
         
         </p>
 
@@ -875,7 +889,7 @@ var entityManager = new EntityManager({
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l501"><code>..\..\src\a50_entityManager.js:501</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l580"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:580</code></a>
         
         </p>
 
@@ -886,7 +900,7 @@ var entityManager = new EntityManager({
     </div>
 
     <div class="description">
-        <p>Attaches an entity to this EntityManager with an  <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> of &#39;Added&#39;.</p>
+        <p>Attaches an entity to this EntityManager with an  <a href="../classes/EntityState.html" class="crosslink">EntityState</a> of &#39;Added&#39;.</p>
 
     </div>
 
@@ -941,7 +955,7 @@ var entityManager = new EntityManager({
 var custType = em1.metadataStore.getEntityType("Customer");
 var cust1 = custType.createEntity();
 em1.addEntity(cust1);</code></pre>
-<p>Note that this is the same as using &#39;attachEntity&#39; with an <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> of &#39;Added&#39;.</p>
+<p>Note that this is the same as using &#39;attachEntity&#39; with an <a href="../classes/EntityState.html" class="crosslink">EntityState</a> of &#39;Added&#39;.</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var cust1 = custType.createEntity();
@@ -1011,7 +1025,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l522"><code>..\..\src\a50_entityManager.js:522</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l601"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:601</code></a>
         
         </p>
 
@@ -1022,7 +1036,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
     </div>
 
     <div class="description">
-        <p>Attaches an entity to this EntityManager with a specified <a href="..\classes\EntityState.html" class="crosslink">EntityState</a>.</p>
+        <p>Attaches an entity to this EntityManager with a specified <a href="../classes/EntityState.html" class="crosslink">EntityState</a>.</p>
 
     </div>
 
@@ -1051,7 +1065,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
                 <li class="param">
                     
                         <code class="param-name optional">[entityState=EntityState.Unchanged]</code>
-                        <span class="type"><a href="..\classes\EntityState.html" class="crosslink">EntityState</a></span>
+                        <span class="type"><a href="../classes/EntityState.html" class="crosslink">EntityState</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -1068,7 +1082,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
                 <li class="param">
                     
                         <code class="param-name optional">[mergeStrategy=MergeStrategy.Disallowed]</code>
-                        <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                        <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -1150,7 +1164,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l460"><code>..\..\src\a50_entityManager.js:460</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l539"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:539</code></a>
         
         </p>
 
@@ -1195,7 +1209,7 @@ em1.clear();
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>
+            <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>
         </span>
     
 
@@ -1222,7 +1236,7 @@ em1.clear();
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l485"><code>..\..\src\a50_entityManager.js:485</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l564"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:564</code></a>
         
         </p>
 
@@ -1246,7 +1260,7 @@ em1.clear();
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>:
+                        <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>:
                     
                     <p>A new EntityManager.</p>
 
@@ -1335,7 +1349,7 @@ var em2 = em1.createEmptyCopy();
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l236"><code>..\..\src\a50_entityManager.js:236</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l236"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:236</code></a>
         
         </p>
 
@@ -1361,7 +1375,7 @@ to the EntityManager.</p>
                 <li class="param">
                     
                         <code class="param-name">entityType</code>
-                        <span class="type">String | <a href="..\classes\EntityType.html" class="crosslink">EntityType</a></span>
+                        <span class="type">String | <a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
                     
 
                     
@@ -1396,7 +1410,7 @@ to the EntityManager.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[entityState=EntityState.Added]</code>
-                        <span class="type"><a href="..\classes\EntityState.html" class="crosslink">EntityState</a></span>
+                        <span class="type"><a href="../classes/EntityState.html" class="crosslink">EntityState</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -1415,7 +1429,7 @@ to the EntityManager.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[mergeStrategy=MergeStrategy.Disallowed]</code>
-                        <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                        <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -1518,7 +1532,7 @@ var emp4 = em1.createEntity(&quot;Employee&quot;, { id: 435, lastName: Smith&quo
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l590"><code>..\..\src\a50_entityManager.js:590</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l669"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:669</code></a>
         
         </p>
 
@@ -1623,7 +1637,7 @@ em1.detachEntity(cust1);
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
         </span>
     
 
@@ -1652,7 +1666,7 @@ em1.detachEntity(cust1);
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l665"><code>..\..\src\a50_entityManager.js:665</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l744"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:744</code></a>
         
         </p>
 
@@ -1676,13 +1690,13 @@ em1.detachEntity(cust1);
                 <li class="param">
                     
                         <code class="param-name">query</code>
-                        <span class="type"><a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a> | String</span>
+                        <span class="type"><a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a> | String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a> or OData query string to execute.</p>
+                        <p>The <a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a> or OData query string to execute.</p>
 
                     </div>
 
@@ -1734,7 +1748,7 @@ em1.detachEntity(cust1);
                                         <li class="param">
                                             
                                                 <code class="param-name">query</code>
-                                                <span class="type"><a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a></span>
+                                                <span class="type"><a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a></span>
                                             
 
                                             <div class="param-description">
@@ -1745,7 +1759,7 @@ em1.detachEntity(cust1);
                                         <li class="param">
                                             
                                                 <code class="param-name">entityManager</code>
-                                                <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>
+                                                <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>
                                             
 
                                             <div class="param-description">
@@ -1756,7 +1770,7 @@ em1.detachEntity(cust1);
                                         <li class="param">
                                             
                                                 <code class="param-name">httpResponse</code>
-                                                <span class="type"><a href="..\classes\HttpResponse.html" class="crosslink">HttpResponse</a></span>
+                                                <span class="type"><a href="../classes/HttpResponse.html" class="crosslink">HttpResponse</a></span>
                                             
 
                                             <div class="param-description">
@@ -1845,7 +1859,7 @@ em1.detachEntity(cust1);
                                         <li class="param">
                                             
                                                 <code class="param-name optional">[httpResponse]</code>
-                                                <span class="type"><a href="..\classes\HttpResponse.html" class="crosslink">HttpResponse</a></span>
+                                                <span class="type"><a href="../classes/HttpResponse.html" class="crosslink">HttpResponse</a></span>
                                                 <span class="flag optional" title="This parameter is optional.">optional</span>
                                             
 
@@ -1873,7 +1887,7 @@ em1.detachEntity(cust1);
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>:
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
                     <p>Promise</p>
 <pre><code>promiseData.results {Array of Entity}
@@ -1915,7 +1929,7 @@ would have been applied.</code></pre>
     function(err) {
         ... query failure processed here
     });</code></pre>
-<p>Either way this method is the same as calling the The <a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a> &#39;execute&#39; method.</p>
+<p>Either way this method is the same as calling the The <a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a> &#39;execute&#39; method.</p>
 <pre class="code prettyprint"><code>    var em = new EntityManager(serviceName);
     var query = new EntityQuery(&quot;Orders&quot;).using(em);
     query.execute()
@@ -1978,7 +1992,7 @@ would have been applied.</code></pre>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l761"><code>..\..\src\a50_entityManager.js:761</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l840"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:840</code></a>
         
         </p>
 
@@ -2002,13 +2016,13 @@ would have been applied.</code></pre>
                 <li class="param">
                     
                         <code class="param-name">query</code>
-                        <span class="type"><a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a></span>
+                        <span class="type"><a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityQuery.html" class="crosslink">EntityQuery</a> to execute.</p>
+                        <p>The <a href="../classes/EntityQuery.html" class="crosslink">EntityQuery</a> to execute.</p>
 
                     </div>
 
@@ -2114,7 +2128,7 @@ a FetchStrategy of FromLocalCache and making use of the Promise or callback</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l318"><code>..\..\src\a50_entityManager.js:318</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l318"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:318</code></a>
         
         </p>
 
@@ -2219,6 +2233,162 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</c
 </div>
 
                 
+                    <div id="method_exportEntitiesByType" class="method item">
+    <h3 class="name"><code>exportEntitiesByType</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>entityType</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[entities]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a50_entityManager.js.html#l367"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:367</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Exports all of the entities from this EntityManager by a specific Type.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">entityType</code>
+                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The entity type to export for</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[entities]</code>
+                        <span class="type">Array of Entity</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A set of entities to export.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                    <p>An Array of the exported items</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <p>This method can be used to snapshot a particular type for export to a typed store such as indexedDB
+or WebSQL.  You may later import these entries by calling importEntitiesByType.</p>
+<pre class="code prettyprint"><code>// assume em is an EntityManager containing a number of existing entities.
+// and aType is an EntityType which is NOT complex
+// and objectStore is an indexedDB objectStore which can store this type
+var entities = em.exportEntitiesByType(aType);
+//stuff all the entities into the objectStore
+for( var i = 0; i &lt; entities.length; i++) {
+  objectStore.upsert(entities[i]);
+}
+// assume the code below occurs in a different session.
+var allEntitiesAgain = objectStore.getAll();
+var em2 = new EntityManager({
+    serviceName: em1.serviceName,
+    metadataStore: em1.metadataStore
+});
+em2.importEntitiesByType(aType, allEntitiesAgain);
+// em2 will now have a complete copy of what was in em1</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
                     <div id="method_fetchEntityByKey" class="method item">
     <h3 class="name"><code>fetchEntityByKey</code></h3>
 
@@ -2250,7 +2420,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</c
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
         </span>
     
 
@@ -2279,7 +2449,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</c
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1141"><code>..\..\src\a50_entityManager.js:1141</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1220"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1220</code></a>
         
         </p>
 
@@ -2305,7 +2475,7 @@ will be used to merge any server side entity returned by this method.</p>
                 <li class="param">
                     
                         <code class="param-name">typeName</code>
-                        <span class="type"><a href="..\classes\EntityType.html" class="crosslink">EntityType</a> | String</span>
+                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a> | String</span>
                     
 
                     
@@ -2361,11 +2531,11 @@ will be used to merge any server side entity returned by this method.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>:
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
-                    <pre><code>promiseData.entity {Object} The entity returned or null
-promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</code></pre>
+                    <p>promiseData.entity {Object} The entity returned or null
+    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
+    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</p>
 
                 
             </div>
@@ -2415,7 +2585,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
         </span>
     
 
@@ -2444,7 +2614,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1164"><code>..\..\src\a50_entityManager.js:1164</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1243"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1243</code></a>
         
         </p>
 
@@ -2455,7 +2625,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
     </div>
 
     <div class="description">
-        <p>Attempts to fetch an entity from the server by its <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a> with
+        <p>Attempts to fetch an entity from the server by its <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a> with
 an option to check the local cache first.</p>
 
     </div>
@@ -2469,13 +2639,13 @@ an option to check the local cache first.</p>
                 <li class="param">
                     
                         <code class="param-name">entityKey</code>
-                        <span class="type"><a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a></span>
+                        <span class="type"><a href="../classes/EntityKey.html" class="crosslink">EntityKey</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The  <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
+                        <p>The  <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
 
                     </div>
 
@@ -2509,11 +2679,11 @@ an option to check the local cache first.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>:
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
-                    <pre><code>promiseData.entity {Object} The entity returned or null
-promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</code></pre>
+                    <p>promiseData.entity {Object} The entity returned or null
+    promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
+    promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</p>
 
                 
             </div>
@@ -2565,7 +2735,7 @@ em1.fetchEntityByKey(employeeKey).then(function(result) {
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
         </span>
     
 
@@ -2594,7 +2764,7 @@ em1.fetchEntityByKey(employeeKey).then(function(result) {
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l616"><code>..\..\src\a50_entityManager.js:616</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l695"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:695</code></a>
         
         </p>
 
@@ -2703,7 +2873,7 @@ loaded.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>:
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
                     <p>Promise </p>
 <pre><code>promiseData.schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
@@ -2785,7 +2955,7 @@ ask for the metadata from the EntityManager after the fetchMetadata call returns
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1227"><code>..\..\src\a50_entityManager.js:1227</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1306"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1306</code></a>
         
         </p>
 
@@ -2798,7 +2968,7 @@ ask for the metadata from the EntityManager after the fetchMetadata call returns
     </div>
 
     <div class="description">
-        <p>Attempts to locate an entity within this EntityManager by its  <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a>.</p>
+        <p>Attempts to locate an entity within this EntityManager by its  <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a>.</p>
 
     </div>
 
@@ -2811,13 +2981,13 @@ ask for the metadata from the EntityManager after the fetchMetadata call returns
                 <li class="param">
                     
                         <code class="param-name">entityKey</code>
-                        <span class="type"><a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a></span>
+                        <span class="type"><a href="../classes/EntityKey.html" class="crosslink">EntityKey</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The  <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
+                        <p>The  <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
 
                     </div>
 
@@ -2907,7 +3077,7 @@ var employee = em1.findEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1244"><code>..\..\src\a50_entityManager.js:1244</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1323"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1323</code></a>
         
         </p>
 
@@ -3043,7 +3213,7 @@ em1.saveChanges()
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1347"><code>..\..\src\a50_entityManager.js:1347</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1426"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1426</code></a>
         
         </p>
 
@@ -3054,8 +3224,8 @@ em1.saveChanges()
     </div>
 
     <div class="description">
-        <p>Returns a array of all changed entities of the specified <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s. A &#39;changed&#39; Entity has
-has an <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> of either Added, Modified or Deleted.</p>
+        <p>Returns a array of all changed entities of the specified <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s. A &#39;changed&#39; Entity has
+has an <a href="../classes/EntityState.html" class="crosslink">EntityState</a> of either Added, Modified or Deleted.</p>
 
     </div>
 
@@ -3068,14 +3238,14 @@ has an <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> o
                 <li class="param">
                     
                         <code class="param-name optional">[entityTypes]</code>
-                        <span class="type">String | Array of String | <a href="..\classes\EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
+                        <span class="type">String | Array of String | <a href="../classes/EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s for which &#39;changed&#39; entities will be found.
+                        <p>The <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s for which &#39;changed&#39; entities will be found.
 If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.</p>
 
                     </div>
@@ -3111,11 +3281,11 @@ If this parameter is omitted, all EntityTypes are searched. String parameters ar
                 <p>This method can be used to get all of the changed entities within an EntityManager</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var changedEntities = em1.getChanges();</code></pre>
-<p>or you can specify that you only want the changes on a specific <a href="..\classes\EntityType.html" class="crosslink">EntityType</a></p>
+<p>or you can specify that you only want the changes on a specific <a href="../classes/EntityType.html" class="crosslink">EntityType</a></p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType("Customer");
 var changedCustomers = em1.getChanges(custType);</code></pre>
-<p>or to a collection of <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s</p>
+<p>or to a collection of <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var orderType = em1.metadataStore.getEntityType(&quot;Order&quot;);
@@ -3179,7 +3349,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1401"><code>..\..\src\a50_entityManager.js:1401</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1480"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1480</code></a>
         
         </p>
 
@@ -3190,7 +3360,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
     </div>
 
     <div class="description">
-        <p>Returns a array of all entities of the specified <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s with the specified <a href="..\classes\EntityState.html" class="crosslink">EntityState</a>s.</p>
+        <p>Returns a array of all entities of the specified <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s with the specified <a href="../classes/EntityState.html" class="crosslink">EntityState</a>s.</p>
 
     </div>
 
@@ -3203,14 +3373,14 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
                 <li class="param">
                     
                         <code class="param-name optional">[entityTypes]</code>
-                        <span class="type">String | Array of String | <a href="..\classes\EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
+                        <span class="type">String | Array of String | <a href="../classes/EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s for which entities will be found.
+                        <p>The <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s for which entities will be found.
 If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.</p>
 
                     </div>
@@ -3221,14 +3391,14 @@ If this parameter is omitted, all EntityTypes are searched. String parameters ar
                 <li class="param">
                     
                         <code class="param-name optional">[entityState]</code>
-                        <span class="type"><a href="..\classes\EntityState.html" class="crosslink">EntityState</a> | Array of EntityState</span>
+                        <span class="type"><a href="../classes/EntityState.html" class="crosslink">EntityState</a> | Array of EntityState</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityState.html" class="crosslink">EntityState</a>s for which entities will be found.
+                        <p>The <a href="../classes/EntityState.html" class="crosslink">EntityState</a>s for which entities will be found.
 If this parameter is omitted, entities of all EntityStates are returned.</p>
 
                     </div>
@@ -3264,16 +3434,16 @@ If this parameter is omitted, entities of all EntityStates are returned.</p>
                 <p>This method can be used to get all of the entities within an EntityManager</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var entities = em1.getEntities();</code></pre>
-<p>or you can specify that you only want the changes on a specific <a href="..\classes\EntityType.html" class="crosslink">EntityType</a></p>
+<p>or you can specify that you only want the changes on a specific <a href="../classes/EntityType.html" class="crosslink">EntityType</a></p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType("Customer");
 var customers = em1.getEntities(custType);</code></pre>
-<p>or to a collection of <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s</p>
+<p>or to a collection of <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType("Customer");
 var orderType = em1.metadataStore.getEntityType("Order");
 var customersAndOrders = em1.getChanges([custType, orderType]);</code></pre>
-<p>You can also ask for entities with a particular <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> or EntityStates.</p>
+<p>You can also ask for entities with a particular <a href="../classes/EntityState.html" class="crosslink">EntityState</a> or EntityStates.</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var orderType = em1.metadataStore.getEntityType(&quot;Order&quot;);
@@ -3337,7 +3507,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1098"><code>..\..\src\a50_entityManager.js:1098</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1177"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1177</code></a>
         
         </p>
 
@@ -3361,7 +3531,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
                 <li class="param">
                     
                         <code class="param-name">typeName</code>
-                        <span class="type"><a href="..\classes\EntityType.html" class="crosslink">EntityType</a> | String</span>
+                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a> | String</span>
                     
 
                     
@@ -3471,7 +3641,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1110"><code>..\..\src\a50_entityManager.js:1110</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1189"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1189</code></a>
         
         </p>
 
@@ -3482,7 +3652,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
     </div>
 
     <div class="description">
-        <p>Attempts to locate an entity within this EntityManager by its  <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a>.</p>
+        <p>Attempts to locate an entity within this EntityManager by its  <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a>.</p>
 
     </div>
 
@@ -3495,13 +3665,13 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
                 <li class="param">
                     
                         <code class="param-name">entityKey</code>
-                        <span class="type"><a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a></span>
+                        <span class="type"><a href="../classes/EntityKey.html" class="crosslink">EntityKey</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The  <a href="..\classes\EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
+                        <p>The  <a href="../classes/EntityKey.html" class="crosslink">EntityKey</a> of the Entity to be located.</p>
 
                     </div>
 
@@ -3591,7 +3761,7 @@ var employee = em1.getEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1285"><code>..\..\src\a50_entityManager.js:1285</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1364"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1364</code></a>
         
         </p>
 
@@ -3602,8 +3772,8 @@ var employee = em1.getEntityByKey(employeeKey);
     </div>
 
     <div class="description">
-        <p>Returns whether there are any changed entities of the specified <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s. A &#39;changed&#39; Entity has
-has an <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> of either Added, Modified or Deleted.</p>
+        <p>Returns whether there are any changed entities of the specified <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s. A &#39;changed&#39; Entity has
+has an <a href="../classes/EntityState.html" class="crosslink">EntityState</a> of either Added, Modified or Deleted.</p>
 
     </div>
 
@@ -3616,14 +3786,14 @@ has an <a href="..\classes\EntityState.html" class="crosslink">EntityState</a> o
                 <li class="param">
                     
                         <code class="param-name optional">[entityTypes]</code>
-                        <span class="type">String | Array of String | <a href="..\classes\EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
+                        <span class="type">String | Array of String | <a href="../classes/EntityType.html" class="crosslink">EntityType</a> | Array of EntityType</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s for which &#39;changed&#39; entities will be found.
+                        <p>The <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s for which &#39;changed&#39; entities will be found.
 If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.</p>
 
                     </div>
@@ -3661,213 +3831,19 @@ If this parameter is omitted, all EntityTypes are searched. String parameters ar
 if ( em1.hasChanges() {
     // do something interesting
 }</code></pre>
-<p>or if it has any changes on to a specific <a href="..\classes\EntityType.html" class="crosslink">EntityType</a></p>
+<p>or if it has any changes on to a specific <a href="../classes/EntityType.html" class="crosslink">EntityType</a></p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType("Customer");
 if ( em1.hasChanges(custType) {
     // do something interesting
 }</code></pre>
-<p>or to a collection of <a href="..\classes\EntityType.html" class="crosslink">EntityType</a>s</p>
+<p>or to a collection of <a href="../classes/EntityType.html" class="crosslink">EntityType</a>s</p>
 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities. 
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var orderType = em1.metadataStore.getEntityType(&quot;Order&quot;);
 if ( em1.hasChanges( [custType, orderType]) {
     // do something interesting
 }</code></pre>
-
-            </div>
-        </div>
-    
-</div>
-
-                
-                    <div id="method_importEntities" class="method item">
-    <h3 class="name"><code>importEntities</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>exportedString</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[config]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>[config.metadataVersionFn}</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-        <span class="flag static">static</span>
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/.._.._src_a50_entityManager.js.html#l278"><code>..\..\src\a50_entityManager.js:278</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Creates a new EntityManager and imports a previously exported result into it.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">exportedString</code>
-                        <span class="type">String</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The result of a previous &#39;exportEntities&#39; call.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[config]</code>
-                        <span class="type">Object</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>A configuration object.</p>
-
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[mergeStrategy]</code>
-                                    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>A  <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a> to use when 
-merging into an existing EntityManager.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">[config.metadataVersionFn}</code>
-                        <span class="type">Function</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>A function that takes two arguments ( the current metadataVersion and the imported store&#39;s &#39;name&#39;} 
-    and may be used to perform version checking.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>:
-                    
-                    <p>A new EntityManager.  Note that the return value of this method call is different from that 
-provided by the same named method on an EntityManager instance. Use that method if you need additional information
-regarding the imported entities.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-        <div class="example">
-            <h4>Example:</h4>
-
-            <div class="example-content">
-                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities.
-var bundle = em1.exportEntities();
-// can be stored via the web storage api
-window.localStorage.setItem(&quot;myEntityManager&quot;, bundle);
-// assume the code below occurs in a different session.
-var bundleFromStorage = window.localStorage.getItem(&quot;myEntityManager&quot;);
-// and imported
-var em2 = EntityManager.importEntities(bundleFromStorage);
-// em2 will now have a complete copy of what was in em1</code></pre>
 
             </div>
         </div>
@@ -3933,7 +3909,7 @@ var em2 = EntityManager.importEntities(bundleFromStorage);
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l367"><code>..\..\src\a50_entityManager.js:367</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l401"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:401</code></a>
         
         </p>
 
@@ -3990,12 +3966,12 @@ var em2 = EntityManager.importEntities(bundleFromStorage);
                             <li class="param">
                                 
                                     <code class="param-name optional">[mergeStrategy]</code>
-                                    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                                    <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
                                 <div class="param-description">
-                                    <p>A  <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a> to use when 
+                                    <p>A  <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> to use when 
     merging into an existing EntityManager.</p>
 
                                 </div>
@@ -4077,6 +4053,402 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
 </div>
 
                 
+                    <div id="method_importEntities" class="method item">
+    <h3 class="name"><code>importEntities</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>exportedString</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[config]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>[config.metadataVersionFn}</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a50_entityManager.js.html#l278"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:278</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Creates a new EntityManager and imports a previously exported result into it.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">exportedString</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The result of a previous &#39;exportEntities&#39; call.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[config]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A configuration object.</p>
+
+                    </div>
+
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[mergeStrategy]</code>
+                                    <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>A  <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> to use when 
+merging into an existing EntityManager.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">[config.metadataVersionFn}</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A function that takes two arguments ( the current metadataVersion and the imported store&#39;s &#39;name&#39;} 
+    and may be used to perform version checking.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>:
+                    
+                    <p>A new EntityManager.  Note that the return value of this method call is different from that 
+provided by the same named method on an EntityManager instance. Use that method if you need additional information
+regarding the imported entities.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities.
+var bundle = em1.exportEntities();
+// can be stored via the web storage api
+window.localStorage.setItem(&quot;myEntityManager&quot;, bundle);
+// assume the code below occurs in a different session.
+var bundleFromStorage = window.localStorage.getItem(&quot;myEntityManager&quot;);
+// and imported
+var em2 = EntityManager.importEntities(bundleFromStorage);
+// em2 will now have a complete copy of what was in em1</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
+                    <div id="method_importEntitiesByType" class="method item">
+    <h3 class="name"><code>importEntitiesByType</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>entityType</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[config]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>[config.metadataVersionFn}</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a50_entityManager.js.html#l493"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:493</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Imports entities exported by exportEntitiesByType</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">entityType</code>
+                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The result of a previous &#39;exportEntitiesByType&#39; call.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[config]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A configuration object.</p>
+
+                    </div>
+
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[mergeStrategy]</code>
+                                    <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>A  <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> to use when
+    merging into an existing EntityManager.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">[config.metadataVersionFn}</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A function that takes two arguments ( the current metadataVersion and the imported store&#39;s &#39;name&#39;}
+    and may be used to perform version checking.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>result </p>
+<pre><code>result.entities {Array of Entities} The entities that were imported.
+result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager.</code></pre>
+
+                
+            </div>
+        </div>
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <p>This method can be used to make a complete copy of any previously created entityManager, even if created
+in a previous session and stored in indexedDB.</p>
+<pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+// assume aType is an EntityType
+var entities = em1.exportEntitiesByType(aType);
+// bundle can be stored in window.localStorage or just held in memory.
+var em2 = new EntityManager({
+    serviceName: em1.serviceName,
+    metadataStore: em1.metadataStore
+});
+em2.importEntitiesByType(aType, entities);
+// em2 will now have a complete copy of what was in em1</code></pre>
+<p>It can also be used to merge the contents of a previously created EntityManager with an
+existing EntityManager with control over how the two are merged.</p>
+<pre class="code prettyprint"><code>var entities = em1.exportEntitiesByType(aType);
+// assume em2 is another entityManager containing some of the same entities possibly with modifications.
+em2.importEntitiesByType(aType, entities, { mergeStrategy: MergeStrategy.PreserveChanges} );
+// em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously
+// made modifications will not have been touched, but all other entities from em1 will have been imported.</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
                     <div id="method_rejectChanges" class="method item">
     <h3 class="name"><code>rejectChanges</code></h3>
 
@@ -4113,7 +4485,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1377"><code>..\..\src\a50_entityManager.js:1377</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1456"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1456</code></a>
         
         </p>
 
@@ -4199,7 +4571,7 @@ var entities = em1.rejectChanges();</code></pre>
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
         </span>
     
 
@@ -4228,7 +4600,7 @@ var entities = em1.rejectChanges();</code></pre>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l833"><code>..\..\src\a50_entityManager.js:833</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l912"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:912</code></a>
         
         </p>
 
@@ -4273,14 +4645,14 @@ every entity with pending changes in this EntityManager will be saved.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[saveOptions]</code>
-                        <span class="type"><a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a></span>
+                        <span class="type"><a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p><a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a> for the save - will default to
+                        <p><a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a> for the save - will default to
 EntityManager/saveOptions if null.</p>
 
                     </div>
@@ -4349,7 +4721,7 @@ EntityManager/saveOptions if null.</p>
                                         <li class="param">
                                             
                                                 <code class="param-name optional">[httpResponse]</code>
-                                                <span class="type"><a href="..\classes\HttpResponse.html" class="crosslink">HttpResponse</a></span>
+                                                <span class="type"><a href="../classes/HttpResponse.html" class="crosslink">HttpResponse</a></span>
                                                 <span class="flag optional" title="This parameter is optional.">optional</span>
                                             
 
@@ -4414,7 +4786,7 @@ EntityManager/saveOptions if null.</p>
                                         <li class="param">
                                             
                                                 <code class="param-name optional">[httpResponse]</code>
-                                                <span class="type"><a href="..\classes\HttpResponse.html" class="crosslink">HttpResponse</a></span>
+                                                <span class="type"><a href="../classes/HttpResponse.html" class="crosslink">HttpResponse</a></span>
                                                 <span class="flag optional" title="This parameter is optional.">optional</span>
                                             
 
@@ -4457,7 +4829,7 @@ EntityManager/saveOptions if null.</p>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\Promise.html" class="crosslink">Promise</a></span>:
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
                     <p>Promise</p>
 
@@ -4548,7 +4920,7 @@ em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l81"><code>..\..\src\a50_entityManager.js:81</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l81"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:81</code></a>
         
         </p>
 
@@ -4602,7 +4974,7 @@ may be set.</p>
                             <li class="param">
                                 
                                     <code class="param-name optional">[dataService]</code>
-                                    <span class="type"><a href="..\classes\DataService.html" class="crosslink">DataService</a></span>
+                                    <span class="type"><a href="../classes/DataService.html" class="crosslink">DataService</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -4616,7 +4988,7 @@ may be set.</p>
                             <li class="param">
                                 
                                     <code class="param-name optional">[queryOptions]</code>
-                                    <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>
+                                    <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -4630,7 +5002,7 @@ may be set.</p>
                             <li class="param">
                                 
                                     <code class="param-name optional">[saveOptions]</code>
-                                    <span class="type"><a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a></span>
+                                    <span class="type"><a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -4644,7 +5016,7 @@ may be set.</p>
                             <li class="param">
                                 
                                     <code class="param-name optional">[validationOptions]</code>
-                                    <span class="type"><a href="..\classes\ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
+                                    <span class="type"><a href="../classes/ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -4706,7 +5078,7 @@ may be set.</p>
                 
                     <div id="property_dataService" class="property item">
     <h3 class="name"><code>dataService</code></h3>
-    <span class="type"><a href="..\classes\DataService.html" class="crosslink">DataService</a></span>
+    <span class="type"><a href="../classes/DataService.html" class="crosslink">DataService</a></span>
 
     
 
@@ -4727,7 +5099,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l148"><code>..\..\src\a50_entityManager.js:148</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l148"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:148</code></a>
         
         </p>
 
@@ -4773,7 +5145,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l183"><code>..\..\src\a50_entityManager.js:183</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l183"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:183</code></a>
         
         </p>
 
@@ -4798,7 +5170,7 @@ may be set.</p>
                 
                     <div id="property_metadataStore" class="property item">
     <h3 class="name"><code>metadataStore</code></h3>
-    <span class="type"><a href="..\classes\MetadataStore.html" class="crosslink">MetadataStore</a></span>
+    <span class="type"><a href="../classes/MetadataStore.html" class="crosslink">MetadataStore</a></span>
 
     
 
@@ -4819,7 +5191,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l155"><code>..\..\src\a50_entityManager.js:155</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l155"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:155</code></a>
         
         </p>
 
@@ -4829,7 +5201,7 @@ may be set.</p>
     </div>
 
     <div class="description">
-        <p>The <a href="..\classes\MetadataStore.html" class="crosslink">MetadataStore</a> associated with this EntityManager. </p>
+        <p>The <a href="../classes/MetadataStore.html" class="crosslink">MetadataStore</a> associated with this EntityManager. </p>
 <pre class="code prettyprint"><code>__readOnly__</code></pre>
 
     </div>
@@ -4844,7 +5216,7 @@ may be set.</p>
                 
                     <div id="property_queryOptions" class="property item">
     <h3 class="name"><code>queryOptions</code></h3>
-    <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>
+    <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>
 
     
 
@@ -4865,7 +5237,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l162"><code>..\..\src\a50_entityManager.js:162</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l162"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:162</code></a>
         
         </p>
 
@@ -4875,7 +5247,7 @@ may be set.</p>
     </div>
 
     <div class="description">
-        <p>The <a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a> associated with this EntityManager.</p>
+        <p>The <a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a> associated with this EntityManager.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -4890,7 +5262,7 @@ may be set.</p>
                 
                     <div id="property_saveOptions" class="property item">
     <h3 class="name"><code>saveOptions</code></h3>
-    <span class="type"><a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a></span>
+    <span class="type"><a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a></span>
 
     
 
@@ -4911,7 +5283,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l169"><code>..\..\src\a50_entityManager.js:169</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l169"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:169</code></a>
         
         </p>
 
@@ -4921,7 +5293,7 @@ may be set.</p>
     </div>
 
     <div class="description">
-        <p>The <a href="..\classes\SaveOptions.html" class="crosslink">SaveOptions</a> associated with this EntityManager.</p>
+        <p>The <a href="../classes/SaveOptions.html" class="crosslink">SaveOptions</a> associated with this EntityManager.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -4957,7 +5329,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l141"><code>..\..\src\a50_entityManager.js:141</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l141"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:141</code></a>
         
         </p>
 
@@ -4982,7 +5354,7 @@ may be set.</p>
                 
                     <div id="property_validationOptions" class="property item">
     <h3 class="name"><code>validationOptions</code></h3>
-    <span class="type"><a href="..\classes\ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
+    <span class="type"><a href="../classes/ValidationOptions.html" class="crosslink">ValidationOptions</a></span>
 
     
 
@@ -5003,7 +5375,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l176"><code>..\..\src\a50_entityManager.js:176</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l176"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:176</code></a>
         
         </p>
 
@@ -5013,7 +5385,7 @@ may be set.</p>
     </div>
 
     <div class="description">
-        <p>The <a href="..\classes\ValidationOptions.html" class="crosslink">ValidationOptions</a> associated with this EntityManager.</p>
+        <p>The <a href="../classes/ValidationOptions.html" class="crosslink">ValidationOptions</a> associated with this EntityManager.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -5059,7 +5431,7 @@ may be set.</p>
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l193"><code>..\..\src\a50_entityManager.js:193</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l193"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:193</code></a>
         
         </p>
 
@@ -5069,7 +5441,7 @@ may be set.</p>
     </div>
 
     <div class="description">
-        <p>An <a href="..\classes\Event.html" class="crosslink">Event</a> that fires whenever a change to any entity in this EntityManager occurs.</p>
+        <p>An <a href="../classes/Event.html" class="crosslink">Event</a> that fires whenever a change to any entity in this EntityManager occurs.</p>
 
     </div>
 
@@ -5082,13 +5454,13 @@ may be set.</p>
                 <li class="param">
                     
                         <code class="param-name">entityAction</code>
-                        <span class="type"><a href="..\classes\EntityAction.html" class="crosslink">EntityAction</a></span>
+                        <span class="type"><a href="../classes/EntityAction.html" class="crosslink">EntityAction</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The <a href="..\classes\EntityAction.html" class="crosslink">EntityAction</a> that occured.</p>
+                        <p>The <a href="../classes/EntityAction.html" class="crosslink">EntityAction</a> that occured.</p>
 
                     </div>
 
@@ -5175,7 +5547,7 @@ em.entityChanged.subscribe(function(changeArgs) {
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l1321"><code>..\..\src\a50_entityManager.js:1321</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l1400"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:1400</code></a>
         
         </p>
 
@@ -5185,7 +5557,7 @@ em.entityChanged.subscribe(function(changeArgs) {
     </div>
 
     <div class="description">
-        <p>An <a href="..\classes\Event.html" class="crosslink">Event</a> that fires whenever an EntityManager transitions to or from having changes.</p>
+        <p>An <a href="../classes/Event.html" class="crosslink">Event</a> that fires whenever an EntityManager transitions to or from having changes.</p>
 
     </div>
 
@@ -5198,7 +5570,7 @@ em.entityChanged.subscribe(function(changeArgs) {
                 <li class="param">
                     
                         <code class="param-name">entityManager</code>
-                        <span class="type"><a href="..\classes\EntityManager.html" class="crosslink">EntityManager</a></span>
+                        <span class="type"><a href="../classes/EntityManager.html" class="crosslink">EntityManager</a></span>
                     
 
                     
@@ -5273,7 +5645,7 @@ em.hasChangesChanged.subscribe(function(args) {
             
         
         
-        <a href="../files/.._.._src_a50_entityManager.js.html#l212"><code>..\..\src\a50_entityManager.js:212</code></a>
+        <a href="../files/.._.._src_a50_entityManager.js.html#l212"><code>..&#x2F;..&#x2F;src&#x2F;a50_entityManager.js:212</code></a>
         
         </p>
 
@@ -5283,7 +5655,7 @@ em.hasChangesChanged.subscribe(function(args) {
     </div>
 
     <div class="description">
-        <p>An <a href="..\classes\Event.html" class="crosslink">Event</a> that fires whenever validationErrors change for any entity in this EntityManager.</p>
+        <p>An <a href="../classes/Event.html" class="crosslink">Event</a> that fires whenever validationErrors change for any entity in this EntityManager.</p>
 
     </div>
 
@@ -5318,7 +5690,7 @@ em.hasChangesChanged.subscribe(function(args) {
                     
 
                     <div class="param-description">
-                        <p>An array containing any newly added <a href="..\classes\ValidationError.html" class="crosslink">ValidationError</a>s</p>
+                        <p>An array containing any newly added <a href="../classes/ValidationError.html" class="crosslink">ValidationError</a>s</p>
 
                     </div>
 
@@ -5334,7 +5706,7 @@ em.hasChangesChanged.subscribe(function(args) {
                     
 
                     <div class="param-description">
-                        <p>An array containing any newly removed <a href="..\classes\ValidationError.html" class="crosslink">ValidationError</a>s. This is those
+                        <p>An array containing any newly removed <a href="../classes/ValidationError.html" class="crosslink">ValidationError</a>s. This is those
 errors that have been &#39;fixed&#39;</p>
 
                     </div>

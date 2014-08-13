@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>..\..\src\a30_entityAspect.js</title>
+    <title>../../src/a30_entityAspect.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,7 +201,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: ..\..\src\a30_entityAspect.js</h1>
+                        <h1 class="file-heading">File: ../../src/a30_entityAspect.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -662,7 +662,9 @@ var EntityAspect = (function() {
                 if (p.isScalar) {
                     ok = validateTarget(value) &amp;&amp; ok;
                 } else {
-                    // TODO: do we want to iterate over all of the complexObject in this property?
+                    value.forEach( function(valueTarget) {
+                        ok = validateTarget(valueTarget) &amp;&amp; ok;
+                    });
                 }
             }
         });
@@ -670,7 +672,7 @@ var EntityAspect = (function() {
 
         // then entity level
         stype.validators.forEach(function (validator) {
-            ok = validate(entityAspect, validator, aspect.entity) &amp;&amp; ok;
+            ok = validate(entityAspect, validator, target) &amp;&amp; ok;
         });
         return ok;
     }
