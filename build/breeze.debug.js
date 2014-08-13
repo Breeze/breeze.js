@@ -14299,7 +14299,9 @@ var EntityManager = (function () {
         for (var i = 0; i < target.length; i++) {
 
             var itemTarget = target[i];
-            var origItem = target._origValues[i];
+            var origItem = null;
+            if (target._origValues && target._origValues.length > i )
+              origItem = target._origValues[i];
 
             if ( itemTarget === origItem ) {
                 changes = unwrapChangedValues(itemTarget, metadataStore, transformFn);
