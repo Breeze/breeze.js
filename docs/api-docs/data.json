@@ -422,7 +422,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 878,
+            "line": 882,
             "description": "A ValidationError is used to describe a failed validation."
         },
         "ValidationOptions": {
@@ -2142,7 +2142,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 884,
+            "line": 888,
             "description": "Constructs a new ValidationError",
             "itemtype": "method",
             "name": "<ctor> ValidationError",
@@ -2174,7 +2174,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 914,
+            "line": 918,
             "description": "The Validator associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validator",
@@ -2184,7 +2184,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 921,
+            "line": 925,
             "description": "A 'context' object associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "context",
@@ -2194,7 +2194,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 928,
+            "line": 932,
             "description": "The DataProperty or NavigationProperty associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "property",
@@ -2204,7 +2204,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 935,
+            "line": 939,
             "description": "The property name associated with this ValidationError. This will be a \"property path\" for any properties of a complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "propertyName",
@@ -2214,7 +2214,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 942,
+            "line": 946,
             "description": "The error message associated with the ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "errorMessage",
@@ -2224,7 +2224,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 949,
+            "line": 953,
             "description": "The key by which this validation error may be removed from a collection of ValidationErrors.\n\n__readOnly__",
             "itemtype": "property",
             "name": "key",
@@ -2234,7 +2234,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 956,
+            "line": 960,
             "description": "Whether this is a server error.  \n\n__readOnly__",
             "itemtype": "property",
             "name": "isServerError",
@@ -2244,7 +2244,7 @@
         },
         {
             "file": "..\\..\\src\\a25_validate.js",
-            "line": 964,
+            "line": 968,
             "description": "Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName",
             "itemtype": "method",
             "name": "getKey",

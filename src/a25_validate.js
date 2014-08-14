@@ -847,8 +847,11 @@ var Validator = (function () {
     }
 
     function intRangeValidatorCtor(validatorName, minValue, maxValue, context) {
-        ctor.messageTemplates[validatorName] = __formatString("'%displayName%' must be an integer between the values of %1 and %2",
+        var templateExists = (context && context.messageTemplate) || ctor.messageTemplates[validatorName];
+        if (!templateExists) {
+            ctor.messageTemplates[validatorName] = __formatString("'%displayName%' must be an integer between the values of %1 and %2",
             minValue, maxValue);
+        }
         return function () {
             var valFn = function (v, ctx) {
                 if (v == null) return true;
@@ -871,6 +874,7 @@ var Validator = (function () {
         };
     }
 
+    
     return ctor;
 }) ();
 

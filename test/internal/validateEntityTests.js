@@ -28,6 +28,41 @@
         }
     });
 
+    test("int32 validation with custom error", function () {
+        var em = newEm();
+        var emp = createNewEmp(em);
+        var errs = emp.entityAspect.getValidationErrors();
+        ok(errs.length == 0);
+        emp.setProperty("rowVersion", 9999999999999);
+        errs = emp.entityAspect.getValidationErrors();
+        ok(errs.length == 1);
+        ok(errs[0].errorMessage.indexOf("integer between the values") >= 0, "should be the default error message");
+        
+        breeze.Validator.messageTemplates["int32"] = "'%displayName%' must be an int32 value";
+        var newMs = MetadataStore.importMetadata(em.metadataStore.exportMetadata());
+        var em2 = newEm(newMs);
+        var emp2 = createNewEmp(em2);
+        emp2.setProperty("rowVersion", 8888888888888);
+        errs = emp2.entityAspect.getValidationErrors();
+        ok(errs.length == 1);
+        ok(errs[0].errorMessage.indexOf("must be an int32") >= 0, "should NOT be the default error message");
+
+        emp2.setProperty("rowVersion", 7);
+        errs = emp2.entityAspect.getValidationErrors();
+        ok(errs.length == 0);
+    });
+
+    function createNewEmp(em) {
+        var empType = em.metadataStore.getEntityType("Employee");
+        var employee = empType.createEntity(); // created but not attached
+        employee.setProperty(testFns.employeeKeyName, wellKnownData.dummyEmployeeID);
+        employee.setProperty("firstName", "John");
+        employee.setProperty("lastName", "Doe");
+        // enter the cache as 'Unchanged'
+        em.attachEntity(employee);
+        return employee;
+    }
+
     /*********************************************************
     * Can call getValidationErrors('someProperty) when have entity errors
     * Defect #2552 Null reference exception in getValidationErrors
