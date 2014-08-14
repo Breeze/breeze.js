@@ -180,6 +180,12 @@
             enumerable: true,
             configurable: true
         };
+
+        descr.set.rawSet = function(value) {
+            var bs = this._backingStore || getPendingBackingStore(this);
+            var accessorFn = getAccessorFn(bs, propName);
+            accessorFn(value);
+        };
         return descr;
         
     }
@@ -194,24 +200,6 @@
         };
     }
 
-    // caching version of the above code - perf gain is minimal or negative based on simple testing.
-
-    //function getAccessorFn(bs, propName) {
-    //    // check if fn is already cached 
-    //    var fns = bs.__fns || (bs.__fns = {});
-    //    var fn = fns[propName];
-    //    if (fn) return fn;
-        
-    //    fn = function () {
-    //        if (arguments.length == 0) {
-    //            return bs[propName];
-    //        } else {
-    //            bs[propName] = arguments[0];
-    //        }
-    //    };
-    //    fns[propName] = fn;
-    //    return fn;
-    //}
 
     function wrapPropDescription(proto, property) {
         if (!proto.hasOwnProperty(property.name)) {
@@ -227,14 +215,16 @@
         // if a read only property descriptor - no need to change it.
         if (!propDescr.set) return;
             
-        var getAccessorFn = function(entity) {
+        var localAccessorFn = function (entity) {
             return function() {
                 if (arguments.length == 0) {
                     return propDescr.get.bind(entity)();
                 } else {
-                    propDescr.set.bind(entity)(arguments[0]);
+                    var set = propDescr.set;
+                    var rawSet = set.rawSet || set;
+                    rawSet.bind(entity)(arguments[0]);
                 }
-            }
+            };
         };
             
         var newDescr = {
@@ -242,11 +232,12 @@
                 return propDescr.get.bind(this)();
             },
             set: function (value) {
-                this._$interceptor(property, value, getAccessorFn(this));
+                this._$interceptor(property, value, localAccessorFn(this));
             },
             enumerable: propDescr.enumerable,
             configurable: true
         };
+        newDescr.set.rawSet = propDescr.set;
         return newDescr;
     };
 

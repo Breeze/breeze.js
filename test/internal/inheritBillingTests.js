@@ -148,11 +148,20 @@
                 var owner = f.getProperty("owner");
                 return ido.length > 1 && ido == (id + ':' + owner);
             }), "every item has idAndOwner property == id:owner");
-            var f = r[0];
-            var owner = f.setProperty("owner", "foo");
-            var owner2= f.getProperty("owner");
-            ok(owner == owner2);
 
+            // used to debug reentrant setDpValueSimple
+            var f = r[0];
+            ok(f.entityAspect.entityState.isUnchanged(), "should be unchanged");
+            f.setProperty("owner", "foo");
+            ok(f.entityAspect.entityState.isModified(), "should be modified");
+            var x = f.getProperty("owner");
+            ok(x == "FOO", "should be FOO");
+            f.entityAspect.acceptChanges();
+            ok(f.entityAspect.entityState.isUnchanged(), "should be unchanged - 2");
+            f.setProperty("number", "foo2");
+            ok(f.entityAspect.entityState.isModified(), "should be modified 2");
+            x = f.getProperty("number");
+            ok(x == "foo2", "should be foo2");
         }).fail(function (e) {
             ok(false, e.message);
         }).fin(start);
