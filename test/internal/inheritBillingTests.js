@@ -43,17 +43,23 @@
         }
     });
 
-    function tweakMetadata(metadataStore) {
+    function tweakMetadataOnFetch(metadataStore, extn) {
         metadataStore.metadataFetched.subscribe(function (arg) {
-            var et = arg.metadataStore.getEntityType("BillingDetailTPH");
-            var prop = et.getProperty("owner");
-            prop.validators.push(Validator.maxLength({ maxLength: 25, message: "Owner must be < 26 in length." }));
+            tweakMetadata(arg.metadataStore, extn);
         });
+    }
+
+    function tweakMetadata(metadataStore, extn) {
+        var et = metadataStore.getEntityType("BillingDetail" + extn);
+        var prop = et.getProperty("owner");
+        prop.validators.push(Validator.maxLength({ maxLength: 25, message: "Owner must be < 26 in length." }));
+        prop = et.getProperty("number");
+        prop.validators.push(Validator.maxLength({ maxLength: 10, message: "Number must be <= 10 in length." }));
     }
 
     test("base class property validation - BillingDetailTPH", function () {
         var ms = testFns.newMs();
-        tweakMetadata(ms);
+        tweakMetadataOnFetch(ms, "TPH");
         var em = newEm(ms);
         
         var typeName = "BankAccountTPH";
@@ -118,8 +124,10 @@
 
 
     function queryBillingBaseWithES5(typeName) {
-        var em = newEmX();
         
+        var em = newEmX();
+        var extn = typeName.substring(typeName.length - 3);
+        tweakMetadata(em.metadataStore, extn);
         var baseType = registerBaseBillingDetailWithES5(em, typeName);
         
 
@@ -158,10 +166,13 @@
             ok(x == "FOO", "should be FOO");
             f.entityAspect.acceptChanges();
             ok(f.entityAspect.entityState.isUnchanged(), "should be unchanged - 2");
-            f.setProperty("number", "foo2");
+            f.setProperty("number", "1234567890123");
             ok(f.entityAspect.entityState.isModified(), "should be modified 2");
             x = f.getProperty("number");
-            ok(x == "foo2", "should be foo2");
+            ok(x == "1234567890123", "should be 1234567890123");
+            var ves = f.entityAspect.getValidationErrors();
+            ok(ves.length == 1);
+            ok(ves[0].errorMessage == "Number must be <= 10 in length.");
         }).fail(function (e) {
             ok(false, e.message);
         }).fin(start);
