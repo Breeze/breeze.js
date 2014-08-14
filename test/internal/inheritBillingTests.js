@@ -148,6 +148,10 @@
                 var owner = f.getProperty("owner");
                 return ido.length > 1 && ido == (id + ':' + owner);
             }), "every item has idAndOwner property == id:owner");
+            var f = r[0];
+            var owner = f.setProperty("owner", "foo");
+            var owner2= f.getProperty("owner");
+            ok(owner == owner2);
 
         }).fail(function (e) {
             ok(false, e.message);

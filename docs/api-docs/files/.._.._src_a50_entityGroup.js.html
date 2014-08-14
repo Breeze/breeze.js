@@ -245,7 +245,7 @@ var EntityGroup = (function () {
                 throw new Error(&quot;A MergeStrategy of &#x27;Disallowed&#x27; does not allow you to attach an entity when an entity with the same key is already attached: &quot; + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges &amp;&amp; wasUnchanged)) {
                 this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
-                targetEntity.entityAspect._setEntityState(entityState);
+                targetEntity.entityAspect.setEntityState(entityState);
             }
             return targetEntity;
         } else {

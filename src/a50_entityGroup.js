@@ -38,7 +38,7 @@ var EntityGroup = (function () {
                 throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
                 this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
-                targetEntity.entityAspect._setEntityState(entityState);
+                targetEntity.entityAspect.setEntityState(entityState);
             }
             return targetEntity;
         } else {

@@ -1803,7 +1803,7 @@ var EntityManager = (function () {
                     var wasUnchanged = targetEntityState.isUnchanged();
                     if (mergeStrategy === MergeStrategy.OverwriteChanges || wasUnchanged) {
                         entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                        targetEntity.entityAspect._setEntityState(entityState);
+                        targetEntity.entityAspect.setEntityState(entityState);
                         entityChanged.publish({ entityAction: EntityAction.MergeOnImport, entity: targetEntity });
                     } 
                 }
