@@ -2018,7 +2018,7 @@ var Validator = (function () {
     var rootContext = {
         displayName: function (context) {
             if (context.property) {
-                return context.property.displayName || context.propertyName || context.property.name;
+                return context.property.resolveProperty("displayName") || context.propertyName || context.property.name;
             } else {
                 return "Value";
             }
@@ -8634,6 +8634,16 @@ var DataProperty = (function () {
 
     proto.isDataProperty = true;
     proto.isNavigationProperty = false;
+
+    proto.resolveProperty = function (propName) {
+        var result = this[propName];
+        var baseProp = this.baseProperty;
+        while (result == undefined && baseProp != null) {
+            result = baseProp[propName];
+            baseProp = baseProp.baseProperty;
+        }
+        return result;
+    }
 
     proto.formatName = function () {
         return this.parentType.name + "--" + this.name;

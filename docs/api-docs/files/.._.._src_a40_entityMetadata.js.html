@@ -2781,6 +2781,16 @@ var DataProperty = (function () {
     proto.isDataProperty = true;
     proto.isNavigationProperty = false;
 
+    proto.resolveProperty = function (propName) {
+        var result = this[propName];
+        var baseProp = this.baseProperty;
+        while (result == undefined &amp;&amp; baseProp != null) {
+            result = baseProp[propName];
+            baseProp = baseProp.baseProperty;
+        }
+        return result;
+    }
+
     proto.formatName = function () {
         return this.parentType.name + &quot;--&quot; + this.name;
     }

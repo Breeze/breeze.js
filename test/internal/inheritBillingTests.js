@@ -52,9 +52,15 @@
     function tweakMetadata(metadataStore, extn) {
         var et = metadataStore.getEntityType("BillingDetail" + extn);
         var prop = et.getProperty("owner");
-        prop.validators.push(Validator.maxLength({ maxLength: 25, message: "Owner must be < 26 in length." }));
+        prop.validators.push(Validator.maxLength({ maxLength: 25, messageTemplate: "%displayName% must be > 0 and <= %maxLength% in length.",  }));
+        prop.displayName = "<Owner>";
         prop = et.getProperty("number");
-        prop.validators.push(Validator.maxLength({ maxLength: 10, message: "Number must be <= 10 in length." }));
+        prop.displayName = "<Number>";
+        prop.foo = "2nd sentence.";
+        var getFooValue= function(context) {
+            return context.property.resolveProperty("foo");
+        }
+        prop.validators.push(Validator.maxLength({ maxLength: 10, messageTemplate: "%displayName% must be <= %maxLength% in length. and %foo%", foo: getFooValue }));
     }
 
     test("base class property validation - BillingDetailTPH", function () {
@@ -75,7 +81,7 @@
             ba1.setProperty("owner", "test value that is too long");
             ves = ba1.entityAspect.getValidationErrors();
             ok(ves.length == 1);
-            ok(ves[0].errorMessage == "Owner must be < 26 in length.");
+            ok(ves[0].errorMessage == "<Owner> must be > 0 and <= 25 in length.");
         }).fail(testFns.handleFail).fin(start);
     });
 
@@ -172,7 +178,7 @@
             ok(x == "1234567890123", "should be 1234567890123");
             var ves = f.entityAspect.getValidationErrors();
             ok(ves.length == 1);
-            ok(ves[0].errorMessage == "Number must be <= 10 in length.");
+            ok(ves[0].errorMessage == "<Number> must be <= 10 in length. and 2nd sentence.");
         }).fail(function (e) {
             ok(false, e.message);
         }).fin(start);

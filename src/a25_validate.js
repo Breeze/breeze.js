@@ -17,7 +17,7 @@ var Validator = (function () {
     var rootContext = {
         displayName: function (context) {
             if (context.property) {
-                return context.property.displayName || context.propertyName || context.property.name;
+                return context.property.resolveProperty("displayName") || context.propertyName || context.property.name;
             } else {
                 return "Value";
             }
