@@ -3734,8 +3734,10 @@ var EntityAspect = (function() {
                 this.setEntityState(EntityState.Detached);
                 return true;
             } else {
-                removeFromRelations(entity, EntityState.Deleted);
                 // TODO: think about cascade deletes
+                // entityState needs to be set it early in this one case to insure that fk's are not cleared.
+                this.entityState = EntityState.Deleted;
+                removeFromRelations(entity, EntityState.Deleted);
             }
         } else if (entityState === EntityState.Modified) {
             // nothing extra needed

@@ -172,11 +172,12 @@
         var query = new EntityQuery("Customers")
             .where("companyName", "startsWith", "C")
             .orderBy("companyName")
-            .select(["companyName", "orders"])
+            // .select(["companyName", "orders"]) // also works
+            .select("companyName, city, orders")
             .expand("orders");
-        if (testFns.DEBUG_ODATA) {
-            query = query.expand("orders");
-        }        
+        //if (testFns.DEBUG_ODATA) {
+        //    query = query.expand("orders");
+        //}        
         var queryUrl = query._toUri(em.metadataStore);
         stop();
         em.executeQuery(query).then(function (data) {
@@ -186,7 +187,7 @@
             ok(data.results.length > 0, "empty data");
             var anons = data.results;
             anons.forEach(function (a) {
-                ok(Object.keys(a).length === 2, "should have 2 properties");
+                ok(Object.keys(a).length === 3, "should have 3 properties");
                 ok(a.companyName);
                 ok(Array.isArray(a.orders));
                 a.orders.forEach(function (order) {

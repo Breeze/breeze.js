@@ -705,6 +705,45 @@
             "parent has child after rejectChanges");
     });
 
+    test("rejectChanges of a child entity restores it to its parent - v2", function () {
+       
+        var em = newEm();
+
+        var parent = em.createEntity("Customer", { customerID: breeze.core.getUuid(), companyName: "Test 111" });
+        parent.entityAspect.acceptChanges();
+
+        var child = em.createEntity("Order", { orderID: 1 } );
+        child.setProperty("customerID", parent.getProperty("customerID"));
+        child.entityAspect.acceptChanges();
+        // parent and child are now unchanged ... as if freshly queried
+
+        ok(child.getProperty("customer") == parent, "order.customer should = customer");
+
+        
+        ok(!em.hasChanges(),
+            "manager should not have unsaved changes before delete");
+
+        child.entityAspect.setDeleted();
+
+        equal(parent.getProperty("customerID"), child.getProperty("customerID"),
+            "child's still has parent's FK Id after delete");
+        ok(null === child.getProperty("customer"), // Bug? Should deleted child still have parent?
+            "deleted child cannot navigate to former parent after delete");
+        equal(parent.getProperty("orders").length, 0,
+            "parent no longer has the chile after child delete");
+
+        em.rejectChanges();
+
+        ok(!em.hasChanges(),
+            "manager should not have unsaved changes after rejectChanges");
+        equal(parent.getProperty("customerID"), child.getProperty("customerID"),
+            "child's still has parent's FK Id after rejectChanges");
+        ok(parent === child.getProperty("customer"),
+            "child can navigate to parent after rejectChanges");
+        ok(parent.getProperty("orders")[0] === child,
+            "parent has child after rejectChanges");
+    });
+
 
     test("custom Customer type with createEntity", function () {
         var em = newEm(newMs());
