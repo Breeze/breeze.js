@@ -184,10 +184,14 @@
                 if (et && et._mappedPropertiesCount <= Object.keys(node).length - 1) {
                 // if (et && et._mappedPropertiesCount === Object.keys(node).length - 1) { // OLD
                     result.entityType = et;
-                    var baseUri = mappingContext.dataService.serviceName;
                     var uriKey = metadata.uri || metadata.id;
-                    if (core.stringStartsWith(uriKey, baseUri)) {
-                        uriKey = uriKey.substring(baseUri.length);
+                    if (uriKey) {
+                        // Strip baseUri to make uriKey a relative uri
+                        // Todo: why is this necessary when absolute works for every OData source tested?
+                        var baseUri = mappingContext.dataService.serviceName ;
+                        if (baseUriuriKey.indexOf(baseUri.toLowerCase()) === 0){
+                            uriKey = uriKey.substring(baseUri.length);
+                        }
                     }
                     result.extraMetadata = {
                         uriKey: uriKey,
