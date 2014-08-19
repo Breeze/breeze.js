@@ -377,8 +377,9 @@
         } else { // node
             parser = url.parse(dataService.serviceName);           
         }
-        var prefix = parser.pathname.substr(1);          // drop leading '/' 
-        if (prefix.substr(-1) !== '/'){ prefix += '/'; } // ensure trailing '/'
+        var prefix = parser.pathname;
+        if (prefix[0] === '/') { prefix = prefix.substr(1); } // drop leading '/'  (all but IE)      
+        if (prefix.substr(-1) !== '/'){ prefix += '/'; }      // ensure trailing '/'
         return prefix;
     }; 
 
