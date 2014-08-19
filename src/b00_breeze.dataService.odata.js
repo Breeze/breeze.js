@@ -188,10 +188,8 @@
                     if (uriKey) {
                         // Strip baseUri to make uriKey a relative uri
                         // Todo: why is this necessary when absolute works for every OData source tested?
-                        var baseUri = mappingContext.dataService.serviceName ;
-                        if (baseUriuriKey.indexOf(baseUri.toLowerCase()) === 0){
-                            uriKey = uriKey.substring(baseUri.length);
-                        }
+                        var re = new RegExp('^'+mappingContext.dataService.serviceName, 'i')
+                        uriKey = uriKey.replace(re,'');
                     }
                     result.extraMetadata = {
                         uriKey: uriKey,
