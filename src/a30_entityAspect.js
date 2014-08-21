@@ -328,7 +328,7 @@ var EntityAspect = (function() {
     }
 
     /**
-    Sets the entity to the specified EntityState. 
+    Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc. 
     @example
        // assume order is an order entity attached to an EntityManager.
        order.entityAspect.setEntityState(EntityState.Unchanged);
