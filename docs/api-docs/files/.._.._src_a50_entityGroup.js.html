@@ -244,7 +244,10 @@ var EntityGroup = (function () {
             } else if (mergeStrategy === MergeStrategy.Disallowed) {
                 throw new Error(&quot;A MergeStrategy of &#x27;Disallowed&#x27; does not allow you to attach an entity when an entity with the same key is already attached: &quot; + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges &amp;&amp; wasUnchanged)) {
-                this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
+                // unwrapInstance returns an entity with server side property names - so we need to use DataProperty.getRawValueFromServer these when we apply
+                // the property values back to the target.
+                var rawServerEntity = this.entityManager.helper.unwrapInstance(entity);
+                this.entityType._updateTargetFromRaw(targetEntity, rawServerEntity, DataProperty.getRawValueFromServer);
                 targetEntity.entityAspect.setEntityState(entityState);
             }
             return targetEntity;

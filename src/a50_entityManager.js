@@ -2165,7 +2165,8 @@ var EntityManager = (function () {
                 val = serializerFn ? serializerFn(dp, val) : val;
                 if (val !== undefined) {
                     if (dp.isUnmapped) {
-                        unmapped[dp.name] = __toJSONSafe(val);
+                        // unmapped[dp.name] = __toJSONSafe(val);
+                        unmapped[dp.nameOnServer] = __toJSONSafe(val);
                     } else {
                         rawObject[dp.nameOnServer] = val;
                     }

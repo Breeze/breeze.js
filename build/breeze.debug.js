@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.17",
+        version: "1.4.18",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -12051,7 +12051,10 @@ var EntityGroup = (function () {
             } else if (mergeStrategy === MergeStrategy.Disallowed) {
                 throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
             } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
-                this.entityType._updateTargetFromRaw(targetEntity, entity, DataProperty.getRawValueFromClient);
+                // unwrapInstance returns an entity with server side property names - so we need to use DataProperty.getRawValueFromServer these when we apply
+                // the property values back to the target.
+                var rawServerEntity = this.entityManager.helper.unwrapInstance(entity);
+                this.entityType._updateTargetFromRaw(targetEntity, rawServerEntity, DataProperty.getRawValueFromServer);
                 targetEntity.entityAspect.setEntityState(entityState);
             }
             return targetEntity;
@@ -14351,7 +14354,8 @@ var EntityManager = (function () {
                 val = serializerFn ? serializerFn(dp, val) : val;
                 if (val !== undefined) {
                     if (dp.isUnmapped) {
-                        unmapped[dp.name] = __toJSONSafe(val);
+                        // unmapped[dp.name] = __toJSONSafe(val);
+                        unmapped[dp.nameOnServer] = __toJSONSafe(val);
                     } else {
                         rawObject[dp.nameOnServer] = val;
                     }
