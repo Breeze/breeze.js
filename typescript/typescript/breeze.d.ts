@@ -7,8 +7,7 @@
 // Updated Aug 13 2013 - Steve Schmitt ( www.ideablade.com).
 // Updated Sep 26 2013 for Breeze 1.4.3 - Steve Schmitt ( www.ideablade.com).
 // Updated Jul 22 2014 for Breeze 1.4.16 - Steve Schmitt ( www.ideablade.com)
-
-/// <reference path="Q.d.ts" />
+// Updated Aug 22 2014 for Breeze 1.4.17 and removing Q dependency - Steve Schmitt ( www.ideablade.com)
 
 declare module breeze.core {
 
@@ -62,12 +61,12 @@ declare module breeze.core {
     export function extend(target: Object, source: Object): Object;
     export function propEq(propertyName: string, value: any): (obj: Object) => boolean;
     export function pluck(propertyName: string): (obj: Object) => any;
-    export function arrayEquals(a1: Array, a2: Array, equalsFn: (e1: any, e2: any) => boolean): boolean;
-    export function arrayFirst(a1: Array, predicate: (e: any) => boolean): any;
-    export function arrayIndexOf(a1: Array, predicate: (e: any) => boolean): number;
-    export function arrayRemoveItem(array: Array, item: any, shouldRemoveMultiple: boolean): any;
-    export function arrayRemoveItem(array: Array, predicate: (e: any) => boolean, shouldRemoveMultiple: boolean): any;
-    export function arrayZip(a1: Array, a2: Array, callback: (e1: any, e2: any) => any): Array;
+    export function arrayEquals(a1: Array<any>, a2: Array<any>, equalsFn: (e1: any, e2: any) => boolean): boolean;
+    export function arrayFirst(a1: Array<any>, predicate: (e: any) => boolean): any;
+    export function arrayIndexOf(a1: Array<any>, predicate: (e: any) => boolean): number;
+    export function arrayRemoveItem(array: Array<any>, item: any, shouldRemoveMultiple: boolean): any;
+    export function arrayRemoveItem(array: Array<any>, predicate: (e: any) => boolean, shouldRemoveMultiple: boolean): any;
+    export function arrayZip(a1: Array<any>, a2: Array<any>, callback: (e1: any, e2: any) => any): Array<any>;
 
     export function requireLib(libnames: string, errMessage: string): Object;
     export function using(obj: Object, property: string, tempValue: any, fn: () => any): any;
@@ -204,9 +203,9 @@ declare module breeze {
     class DataServiceAdapter {
         checkForRecomposition(interfaceInitializedArgs: { interfaceName: string; isDefault: boolean }): void;
         initialize(): void;
-        fetchMetadata(metadataStore: MetadataStore, dataService: DataService): Q.Promise<any>;
-        executeQuery(mappingContext: { getUrl: () => string; query: EntityQuery; dataService: DataService }): Q.Promise<any>;
-        saveChanges(saveContext: { resourceName: string; dataService: DataService }, saveBundle: Object): Q.Promise<SaveResult>;
+        fetchMetadata(metadataStore: MetadataStore, dataService: DataService): breeze.promises.IPromise<any>;
+        executeQuery(mappingContext: { getUrl: () => string; query: EntityQuery; dataService: DataService }): breeze.promises.IPromise<any>;
+        saveChanges(saveContext: { resourceName: string; dataService: DataService }, saveBundle: Object): breeze.promises.IPromise<SaveResult>;
         JsonResultsAdapter: JsonResultsAdapter;
     }
 
@@ -300,8 +299,8 @@ declare module breeze {
         getValidationErrors(property: IProperty): ValidationError[];
         hasValidationErrors: boolean;
 
-        loadNavigationProperty(navigationProperty: string, callback?: Function, errorCallback?: Function): Q.Promise<QueryResult>;
-        loadNavigationProperty(navigationProperty: NavigationProperty, callback?: Function, errorCallback?: Function): Q.Promise<QueryResult>;
+        loadNavigationProperty(navigationProperty: string, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
+        loadNavigationProperty(navigationProperty: NavigationProperty, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
 
         rejectChanges(): void;
 
@@ -310,10 +309,12 @@ declare module breeze {
         removeValidationError(validator: Validator, property: NavigationProperty): void;
         removeValidationError(validationError: ValidationError): void;
 
+        setAdded(): void;
         setDeleted(): void;
         setDetached(): void;
         setModified(): void;
         setUnchanged(): void;
+        setEntityState(entityState: EntityStateSymbol): void;
         validateEntity(): boolean;
 
         validateProperty(property: string, context?: any): boolean;
@@ -383,15 +384,15 @@ declare module breeze {
         createEntity(typeName: string, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         createEntity(entityType: EntityType, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         detachEntity(entity: Entity): boolean;
-        executeQuery(query: string, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Q.Promise<QueryResult>;
-        executeQuery(query: EntityQuery, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Q.Promise<QueryResult>;
+        executeQuery(query: string, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
+        executeQuery(query: EntityQuery, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
 
         executeQueryLocally(query: EntityQuery): Entity[];
         exportEntities(entities?: Entity[], includeMetadata?: boolean): string;
-        fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): Q.Promise<EntityByKeyResult>;
-        fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): Q.Promise<EntityByKeyResult>;
-        fetchEntityByKey(entityKey: EntityKey): Q.Promise<EntityByKeyResult>;
-        fetchMetadata(callback?: (schema: any) => void, errorCallback?: breeze.core.ErrorCallback): Q.Promise<any>;
+        fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
+        fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
+        fetchEntityByKey(entityKey: EntityKey): breeze.promises.IPromise<EntityByKeyResult>;
+        fetchMetadata(callback?: (schema: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
         generateTempKeyValue(entity: Entity): any;
         getChanges(): Entity[];
         getChanges(entityTypeName: string): Entity[];
@@ -425,7 +426,7 @@ declare module breeze {
         importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
-        saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): Q.Promise<SaveResult>;
+        saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): breeze.promises.IPromise<SaveResult>;
         setProperties(config: EntityManagerProperties): void;
     }
 
@@ -510,7 +511,7 @@ declare module breeze {
 
         constructor(resourceName?: string);
 
-        execute(callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Q.Promise<QueryResult>;
+        execute(callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
         executeLocally(): Entity[];
         expand(propertyPaths: string[]): EntityQuery;
         expand(propertyPaths: string): EntityQuery;
@@ -621,6 +622,7 @@ declare module breeze {
     }
 
     class FetchStrategySymbol extends breeze.core.EnumSymbol {
+        private foo; // to distinguish this class from MergeStrategySymbol
     }
     interface FetchStrategy extends breeze.core.IEnum {
         FromLocalCache: FetchStrategySymbol;
@@ -672,8 +674,8 @@ declare module breeze {
         addDataService(dataService: DataService, shouldOverwrite?: boolean): void;
         addEntityType(structuralType: IStructuralType): void;
         exportMetadata(): string;
-        fetchMetadata(dataService: string, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): Q.Promise<any>;
-        fetchMetadata(dataService: DataService, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): Q.Promise<any>;
+        fetchMetadata(dataService: string, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
+        fetchMetadata(dataService: DataService, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
         getDataService(serviceName: string): DataService;
         getEntityType(entityTypeName: string, okIfNotFound?: boolean): IStructuralType;
         getEntityTypes(): IStructuralType[];
@@ -1005,8 +1007,39 @@ declare module breeze.config {
     export function registerFunction(fn: Function, fnName: string): void;
     export function registerType(ctor: Function, typeName: string): void;
     //static setProperties(config: Object): void; //deprecated
+    /** 
+    Set the promise implementation, if Q.js is not found.
+    @param q - implementation of promise.  @see http://wiki.commonjs.org/wiki/Promises/A
+    */
+    export function setQ(q: breeze.promises.IPromiseService): void;
     var stringifyPad: string;
     var typeRegistry: Object;
 
+}
+
+/** Promises interface used by Breeze.  Usually implemented by Q (https://github.com/kriskowal/q) or angular.$q using breeze.config.setQ(impl) */
+declare module breeze.promises {
+    interface IPromise<T> {
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason) => U): IPromise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason) => U): IPromise<U>;
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason) => IPromise<U>): IPromise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason) => IPromise<U>): IPromise<U>;
+        catch<U>(onRejected: (reason) => U): IPromise<U>;
+        catch<U>(onRejected: (reason) => IPromise<U>): IPromise<U>;
+        finally(finallyCallback: () => any): IPromise<T>;
+    }
+
+    interface IDeferred<T> {
+        promise: IPromise<T>;
+        resolve(value: T): void;
+        reject(reason: any): void;
+    }
+
+    interface IPromiseService {
+        defer<T>(): IDeferred<T>;
+        reject(reason?): IPromise<any>;
+        resolve<T>(object: T): IPromise<T>;
+        resolve<T>(object: IPromise<T>): IPromise<T>;
+    }
 }
 
