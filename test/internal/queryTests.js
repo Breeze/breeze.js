@@ -741,6 +741,73 @@
         }).fail(testFns.handleFail).fin(start);
     });
 
+    test("retrievedEntities - nested expand 2 level", function () {
+        if (testFns.DEBUG_MONGO) {
+            ok(true, "NA for Mongo - expand not yet supported");
+            return;
+        }
+
+        var em = newEm();
+        var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
+        stop();
+
+        em.executeQuery(query).then(function (data) {
+            var entities = data.retrievedEntities;
+            ok(entities);
+            ok(entities.length == 9, "Should have 9 entities, but had " + entities.length);
+            
+            var details = data.results;
+            ok(entities.indexOf(details[0]) >= 0, "entities should have the orderDetail");
+            ok(entities.indexOf(details[1]) >= 0, "entities should have the orderDetail");
+            ok(entities.indexOf(details[2]) >= 0, "entities should have the orderDetail");
+            ok(entities.indexOf(details[3]) >= 0, "entities should have the orderDetail");
+            ok(entities.indexOf(details[4]) >= 0, "entities should have the orderDetail");
+
+            ok(entities.indexOf(details[0].getProperty("order")) >= 0, "entities should have the order");
+            ok(entities.indexOf(details[1].getProperty("order")) >= 0, "entities should have the order");
+            ok(entities.indexOf(details[2].getProperty("order")) >= 0, "entities should have the order");
+            ok(entities.indexOf(details[3].getProperty("order")) >= 0, "entities should have the order");
+            ok(entities.indexOf(details[4].getProperty("order")) >= 0, "entities should have the order");
+
+            ok(entities.indexOf(details[0].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+            ok(entities.indexOf(details[1].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+            ok(entities.indexOf(details[2].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+            ok(entities.indexOf(details[3].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+            ok(entities.indexOf(details[4].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+
+        }).fail(testFns.handleFail).fin(start);
+    });
+
+    test("retrievedEntities - nested expand 3 level", function () {
+        if (testFns.DEBUG_MONGO) {
+            ok(true, "NA for Mongo - expand not yet supported");
+            return;
+        }
+
+        var em = newEm();
+        var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
+        stop();
+
+        em.executeQuery(query).then(function (data) {
+            var entities = data.retrievedEntities;
+            ok(entities);
+            ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
+
+            var orders = data.results;
+            for (var i = 0, ilen = orders.length; i < ilen; i++) {
+                ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
+                var orderDetails = orders[i].getProperty("orderDetails");
+                for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
+                    ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
+                    ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
+                    ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
+                }
+            }
+            
+        }).fail(testFns.handleFail).fin(start);
+    });
+
+
     
     test("query using jsonResultsAdapter", function () {
         if (testFns.DEBUG_ODATA) {

@@ -2032,7 +2032,8 @@ var EntityManager = (function () {
                     mappingContext.processDeferred();
                     // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
                     markLoadedNavProps(results, query);
-                    return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount };
+                    var retrievedEntities = __objectMapToArray(mappingContext.refMap);
+                    return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
                 });
                 return Q.resolve(result);
             }, function (e) {

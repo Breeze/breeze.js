@@ -803,11 +803,18 @@ declare module breeze {
     }
 
     interface QueryResult {
+        /** Top level entities returned */
         results: Entity[];
+        /** Query that was executed */
         query: EntityQuery;
+        /** Raw response from the server */
         httpResponse: HttpResponse;
+        /** EntityManager that executed the query */
         entityManager?: EntityManager;
-        inlineCount?: number
+        /** Total number of results available on the server */
+        inlineCount?: number;
+        /** All entities returned by the query.  Differs from results when an expand is used. */
+        retrievedEntities?: Entity[]
     }
 
     class SaveOptions {

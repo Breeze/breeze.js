@@ -3706,7 +3706,7 @@ var EntityAspect = (function() {
     }
 
     /**
-    Sets the entity to the specified EntityState. 
+    Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc. 
     @example
        // assume order is an order entity attached to an EntityManager.
        order.entityAspect.setEntityState(EntityState.Unchanged);
@@ -14221,7 +14221,8 @@ var EntityManager = (function () {
                     mappingContext.processDeferred();
                     // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
                     markLoadedNavProps(results, query);
-                    return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount };
+                    var retrievedEntities = __objectMapToArray(mappingContext.refMap);
+                    return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
                 });
                 return Q.resolve(result);
             }, function (e) {
