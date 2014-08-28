@@ -8887,6 +8887,16 @@ var NavigationProperty = (function () {
         
     proto.isDataProperty = false;
     proto.isNavigationProperty = true;
+    
+    proto.resolveProperty = function (propName) {
+        var result = this[propName];
+        var baseProp = this.baseProperty;
+        while (result == undefined && baseProp != null) {
+            result = baseProp[propName];
+            baseProp = baseProp.baseProperty;
+        }
+        return result;
+    }
 
     __extend(proto, DataProperty.prototype, [
         "formatName", "getAllValidators"
