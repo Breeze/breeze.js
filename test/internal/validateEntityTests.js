@@ -28,6 +28,72 @@
         }
     });
 
+    test("scalar navigation property validation", function () {
+        var em = newEm();
+        var newMs = MetadataStore.importMetadata(em.metadataStore.exportMetadata());
+        em = newEm(newMs);
+        var orderType = em.metadataStore.getEntityType("Order");
+        var custProp = orderType.getProperty("customer");
+        var valFn = function (v) {
+            if (v == null) return true;
+            var companyName = v.getProperty("companyName");
+            return breeze.core.stringStartsWith(companyName, "C");
+        };
+        var customerValidator = new Validator("customerValidator", valFn, {  messageTemplate: "'%displayName%'.companyName must start with 'C'" });
+        custProp.validators.push(customerValidator);
+        var cust1 = em.createEntity("Customer");
+        cust1.setProperty("companyName", "ABC");
+        var cust2 = em.createEntity("Customer");
+        cust2.setProperty("companyName", "CDE");
+        var order1 = em.createEntity("Order", { customer: cust1 });
+        var isOk = order1.entityAspect.validateEntity();
+        ok(!isOk, "should not pass validation");
+        var valErrors = order1.entityAspect.getValidationErrors();
+        ok(valErrors.length == 1, "should be 1 error");
+        ok(breeze.core.stringEndsWith(valErrors[0].errorMessage, "with 'C'"), "should have the correct message");
+        order1.setProperty("customer", cust2);
+        valErrors = order1.entityAspect.getValidationErrors();
+        ok(valErrors.length == 0, "should be 0 errors now");
+
+
+    });
+
+    test("nonscalar navigation property validation", function () {
+        var em = newEm();
+        var newMs = MetadataStore.importMetadata(em.metadataStore.exportMetadata());
+        em = newEm(newMs);
+        
+        var customerType = em.metadataStore.getEntityType("Customer");
+        var ordersProp = customerType.getProperty("orders");
+        // create a validator that insures that all orders on a customer have a freight cost > $100
+        var valFn = function (v) {
+            // v will be a list of orders
+            if (v.length == 0) return true; // ok if no orders
+            return v.every(function(order) {
+                var freight = order.getProperty("freight");
+                return freight > 100;
+            });
+        };
+        var ordersValidator = new Validator("ordersValidator", valFn, { messageTemplate: "All of the orders for this customer must have a freight cost > 100" });
+        ordersProp.validators.push(ordersValidator);
+        var cust1 = em.createEntity("Customer");
+        cust1.setProperty("companyName", "ABC");
+        var order1 = em.createEntity("Order", { customer: cust1, freight: 200 });
+        var order2 = em.createEntity("Order", { customer: cust1, freight: 99 });
+        var isOk = cust1.entityAspect.validateEntity();
+        ok(!isOk, "should not pass validation");
+        var valErrors = cust1.entityAspect.getValidationErrors();
+        ok(valErrors.length == 1, "should be 1 error");
+        ok(breeze.core.stringStartsWith(valErrors[0].errorMessage, "All of the orders"), "should have the correct message");
+        order2.setProperty("freight", 101);
+        // need to force a customer validation error
+        cust1.entityAspect.validateEntity();
+        valErrors = cust1.entityAspect.getValidationErrors();
+        ok(valErrors.length == 0, "should be 0 errors now");
+
+
+    });
+
     test("int32 validation with custom error", function () {
         var em = newEm();
         var emp = createNewEmp(em);

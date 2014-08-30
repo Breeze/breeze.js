@@ -2848,7 +2848,7 @@
         {
             "file": "..\\..\\src\\a30_entityAspect.js",
             "line": 330,
-            "description": "Sets the entity to the specified EntityState.",
+            "description": "Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc.",
             "example": [
                 "\n   // assume order is an order entity attached to an EntityManager.\n   order.entityAspect.setEntityState(EntityState.Unchanged);\n   // The 'order' entity will now be in a 'Unchanged' state. "
             ],

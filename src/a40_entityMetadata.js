@@ -2826,7 +2826,7 @@ var NavigationProperty = (function () {
     proto.isNavigationProperty = true;
 
     __extend(proto, DataProperty.prototype, [
-        "formatName", "getAllValidators"
+        "formatName", "getAllValidators", "resolveProperty"
     ]);
 
     /**

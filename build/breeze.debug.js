@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.4.18",
+        version: "1.5.0",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -8889,7 +8889,7 @@ var NavigationProperty = (function () {
     proto.isNavigationProperty = true;
 
     __extend(proto, DataProperty.prototype, [
-        "formatName", "getAllValidators"
+        "formatName", "getAllValidators", "resolveProperty"
     ]);
 
     /**
