@@ -105,7 +105,8 @@ var QueryOptions = (function () {
     @method <ctor> QueryOptions
     @param [config] {Object}
     @param [config.fetchStrategy] {FetchStrategy}  
-    @param [config.mergeStrategy] {MergeStrategy}  
+    @param [config.mergeStrategy] {MergeStrategy} 
+    @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default) 
     **/
     var ctor = function (config) {
         updateWithConfig(this, config);
@@ -125,8 +126,15 @@ var QueryOptions = (function () {
     @property mergeStrategy {MergeStrategy}
     **/
 
+    /**
+    Whether to include cached deleted entities in a query result (false by default).
+
+    __readOnly__
+    @property includeDeleted {Boolean}
+    **/
+
     ctor.resolve = function (queryOptionsArray) {
-        return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy"]));
+        return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy", "includeDeleted"]));
     };
     
     /**
@@ -136,20 +144,28 @@ var QueryOptions = (function () {
     **/
     ctor.defaultInstance = new ctor({
         fetchStrategy: FetchStrategy.FromServer,
-        mergeStrategy: MergeStrategy.PreserveChanges
+        mergeStrategy: MergeStrategy.PreserveChanges,
+        includeDeleted: false
     });
 
     /**
-    Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}} 
-    or {{#crossLink "FetchStrategy"}}{{/crossLink}} applied.
+    Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}}, 
+    {{#crossLink "FetchStrategy"}}{{/crossLink}}, or 'includeDeleted' option applied.
     @example
-        var queryOptions = em1.queryOptions.using(MergeStrategy.PreserveChanges);
+        // Given an EntityManager instance, em
+        var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
     or
     @example
-        var queryOptions = em1.queryOptions.using(FetchStrategy.FromLocalCache);
+        var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
     or
     @example
-        var queryOptions = em1.queryOptions.using( { mergeStrategy: OverwriteChanges });
+        var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+    or
+    @example
+        var queryOptions = em.queryOptions.using({ 
+                includeDeleted: true,
+                fetchStrategy:  FetchStrategy.FromLocalCache 
+            });
     @method using
     @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
     @return {QueryOptions}
@@ -182,14 +198,16 @@ var QueryOptions = (function () {
     proto.toJSON = function () {
         return __toJson(this, {
             fetchStrategy: null,
-            mergeStrategy: null
+            mergeStrategy: null,
+            includeDeleted: false
         });
     };
 
     ctor.fromJSON = function (json) {
         return new QueryOptions({
             fetchStrategy: FetchStrategy.fromName(json.fetchStrategy),
-            mergeStrategy: MergeStrategy.fromName(json.mergeStrategy)
+            mergeStrategy: MergeStrategy.fromName(json.mergeStrategy),
+            includeDeleted: json.includeDeleted === true
         });       
     };
         
@@ -198,6 +216,7 @@ var QueryOptions = (function () {
             assertConfig(config)
                 .whereParam("fetchStrategy").isEnumOf(FetchStrategy).isOptional()
                 .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional()
+                .whereParam("includeDeleted").isBoolean().isOptional()
                 .applyAll(obj);
         }
         return obj;
