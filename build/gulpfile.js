@@ -22,13 +22,20 @@ var fileNames     = [ '_head.jsfrag', 'a??_*.js', 'b??_*.js', '_tail.jsfrag'];
 buildMinify('', fileNames);
 buildMinify('.base', baseFileNames);
 
-gulp.task('clean-yuidoc', function() {
+gulp.task('yuidoc-full', ['yuidoc-clean'], function() {
+  return gulp.src( mapPath(srcDir, fileNames))
+      .pipe(concat('foo'))  // just needed a method that would get n -> 1 would like something smaller.
+      .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));    
+});
+
+gulp.task('yuidoc-clean', function() {
   return gulp.src(yuidocDestDir, { read: false }) // much faster
     // .pipe(ignore('node_modules/**'))
     .pipe(rimraf( { force: true} ));
 });
 
 // for the time being we don't make yuidoc do a clean first - because then we lose the 'newer' effect
+// doesn't always work the first time;
 gulp.task('yuidoc', function() {
   return gulp.src( mapPath(srcDir, fileNames))
       .pipe(newer(yuidocDestDir + 'data.json'))

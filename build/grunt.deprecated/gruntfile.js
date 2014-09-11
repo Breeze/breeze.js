@@ -48,7 +48,7 @@ module.exports = function(grunt) {
         options: {
           paths:     srcDir,
           themedir:  '../../docs/api-docs-theme',
-          outdir:    '../../docs/api-docs-grunt'
+          outdir:    './docs/api-docs-grunt'
         }
       }
     },

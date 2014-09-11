@@ -303,6 +303,13 @@
                             </li>
                         
                             <li class="index-item property">
+                                <a href="#property_includeDeleted">includeDeleted</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
                                 <a href="#property_mergeStrategy">mergeStrategy</a>
 
                                 
@@ -430,6 +437,21 @@
                                 
                             </li>
                             
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[includeDeleted]</code>
+                                    <span class="type">Boolean</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>Whether query should return cached deleted entities (false by default)</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
                         </ul>
                     
                 </li>
@@ -495,7 +517,7 @@ em1.setProperties( { queryOptions: newQo });</code></pre>
             
         
         
-        <a href="../files/.._.._src_a45_queryOptions.js.html#l169"><code>..\..\src\a45_queryOptions.js:169</code></a>
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l185"><code>..\..\src\a45_queryOptions.js:185</code></a>
         
         </p>
 
@@ -577,7 +599,7 @@ newQo.setAsDefault();</code></pre>
             
         
         
-        <a href="../files/.._.._src_a45_queryOptions.js.html#l142"><code>..\..\src\a45_queryOptions.js:142</code></a>
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l151"><code>..\..\src\a45_queryOptions.js:151</code></a>
         
         </p>
 
@@ -588,8 +610,8 @@ newQo.setAsDefault();</code></pre>
     </div>
 
     <div class="description">
-        <p>Returns a copy of this QueryOptions with the specified <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a> 
-or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> applied.</p>
+        <p>Returns a copy of this QueryOptions with the specified <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a>, 
+<a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a>, or &#39;includeDeleted&#39; option applied.</p>
 
     </div>
 
@@ -638,11 +660,17 @@ or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> a
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var queryOptions = em1.queryOptions.using(MergeStrategy.PreserveChanges);</code></pre>
+                <pre class="code prettyprint"><code>// Given an EntityManager instance, em
+var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code></pre>
 <p>or</p>
-<pre class="code prettyprint"><code>var queryOptions = em1.queryOptions.using(FetchStrategy.FromLocalCache);</code></pre>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);</code></pre>
 <p>or</p>
-<pre class="code prettyprint"><code>var queryOptions = em1.queryOptions.using( { mergeStrategy: OverwriteChanges });</code></pre>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({ 
+        includeDeleted: true,
+        fetchStrategy:  FetchStrategy.FromLocalCache 
+    });</code></pre>
 
             </div>
         </div>
@@ -683,7 +711,7 @@ or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> a
             
         
         
-        <a href="../files/.._.._src_a45_queryOptions.js.html#l132"><code>..\..\src\a45_queryOptions.js:132</code></a>
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l140"><code>..\..\src\a45_queryOptions.js:140</code></a>
         
         </p>
 
@@ -728,7 +756,7 @@ or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> a
             
         
         
-        <a href="../files/.._.._src_a45_queryOptions.js.html#l116"><code>..\..\src\a45_queryOptions.js:116</code></a>
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l117"><code>..\..\src\a45_queryOptions.js:117</code></a>
         
         </p>
 
@@ -740,6 +768,52 @@ or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> a
     <div class="description">
         <p>A <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a>
 <strong>readOnly</strong></p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_includeDeleted" class="property item">
+    <h3 class="name"><code>includeDeleted</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l129"><code>..\..\src\a45_queryOptions.js:129</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Whether to include cached deleted entities in a query result (false by default).</p>
+<p><strong>readOnly</strong></p>
 
     </div>
 
@@ -774,7 +848,7 @@ or <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a> a
             
         
         
-        <a href="../files/.._.._src_a45_queryOptions.js.html#l122"><code>..\..\src\a45_queryOptions.js:122</code></a>
+        <a href="../files/.._.._src_a45_queryOptions.js.html#l123"><code>..\..\src\a45_queryOptions.js:123</code></a>
         
         </p>
 
