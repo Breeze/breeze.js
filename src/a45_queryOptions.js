@@ -8,7 +8,7 @@ var MergeStrategy = (function() {
     
     @class MergeStrategy
     @static
-    **/
+    **/ 
     var MergeStrategy = new Enum("MergeStrategy");
     /**
     MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed 

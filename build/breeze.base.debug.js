@@ -9525,7 +9525,7 @@ var NamingConvention = (function () {
 breeze.NamingConvention = NamingConvention;
 
 
-;    
+;     
 var EntityQuery = (function () {
     /**
     An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink "EntityManager"}}{{/crossLink}}. 
@@ -9758,14 +9758,28 @@ var EntityQuery = (function () {
             if (!(wherePredicate instanceof Predicate)) {
                 wherePredicate = Predicate.create(__arraySlice(arguments));
             }
-            if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
-            if (this.wherePredicate) {
-                wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
+            var state = this.state;
+            if (state.fromEntityType) wherePredicate.validate(state.fromEntityType);
+            if (state.where) {
+                state.where = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
             }
         }
-        return clone(this, "wherePredicate", wherePredicate);
-
+        return clone(this.state, "where", wherePredicate);
     };
+
+    //proto.where = function (wherePredicate) {
+    //   if (wherePredicate != null) {
+    //      if (!(wherePredicate instanceof Predicate)) {
+    //         wherePredicate = Predicate.create(__arraySlice(arguments));
+    //      }
+    //      if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
+    //      if (this.wherePredicate) {
+    //         wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
+    //      }
+    //   }
+    //   return clone(this, "wherePredicate", wherePredicate);
+
+    //};
 
     /**
     Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well. 
@@ -11775,7 +11789,7 @@ function getPropertyPathValue(obj, propertyPath) {
     }
 }
    
-function getComparableFn(dataType) {
+function getComparableFn(dataType)  {
     if (dataType && dataType.isDate) {
         // dates don't perform equality comparisons properly 
         return function (value) { return value && value.getTime(); };
@@ -11809,7 +11823,7 @@ var MergeStrategy = (function() {
     
     @class MergeStrategy
     @static
-    **/
+    **/ 
     var MergeStrategy = new Enum("MergeStrategy");
     /**
     MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed 

@@ -43,7 +43,7 @@ function test_entityAspect() {
     var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
     order.entityAspect.loadNavigationProperty("Orders").then(function (data) {
         var orders = data.results;
-    }).fail(function (exception) {
+    }).catch(function (exception) {
     });
     order.entityAspect.rejectChanges();
     order.entityAspect.setDeleted();
@@ -102,7 +102,7 @@ function test_metadataStore() {
     newMetadataStore.importMetadata(metadataFromStorage);
     var ms = new breeze.MetadataStore();
     ms.fetchMetadata("breeze/NorthwindIBModel").then(function (rawMetadata) {
-    }).fail(function (exception) {
+    }).catch(function (exception) {
     });
     var odType = em1.metadataStore.getEntityType("OrderDetail");
     var badType = em1.metadataStore.getEntityType("Foo", false);
@@ -169,7 +169,7 @@ function test_entityManager() {
     var query = new breeze.EntityQuery("Orders");
     em.executeQuery(query).then(function (data) {
         var orders = data.results;
-    }).fail(function (err) {
+    }).catch(function (err) {
     });
     var em = new breeze.EntityManager(serviceName);
     var query = new breeze.EntityQuery("Orders");
@@ -181,7 +181,7 @@ function test_entityManager() {
     var query = new breeze.EntityQuery("Orders").using(em);
     query.execute().then(function (data) {
         var orders = data.results;
-    }).fail(function (err) {
+    }).catch(function (err) {
     });
     var em = new breeze.EntityManager(serviceName);
     var query = new breeze.EntityQuery("Orders");
@@ -190,7 +190,7 @@ function test_entityManager() {
     var query = new breeze.EntityQuery("Orders").using(breeze.FetchStrategy.FromLocalCache);
     em.executeQuery(query).then(function (data) {
         var orders = data.results;
-    }).fail(function (err) {
+    }).catch(function (err) {
     });
     var bundle = em1.exportEntities();
     window.localStorage.setItem("myEntityManager", bundle);
@@ -206,7 +206,7 @@ function test_entityManager() {
     var em1 = new breeze.EntityManager("breeze/NorthwindIBModel");
     em1.fetchMetadata().then(function () {
         var metadataStore = em1.metadataStore;
-    }).fail(function (exception) {
+    }).catch(function (exception) {
     });
     var employeeType = em1.metadataStore.getEntityType("Employee");
     var employeeKey = new breeze.EntityKey(employeeType, 1);
@@ -260,14 +260,14 @@ function test_entityManager() {
     em.saveChanges().then(function (saveResult) {
         var savedEntities = saveResult.entities;
         var keyMappings = saveResult.keyMappings;
-    }).fail(function (e) {
+    }).catch(function (e) {
     });
     var saveOptions = new breeze.SaveOptions({ allowConcurrentSaves: true });
     var entitiesToSave;
     em.saveChanges(entitiesToSave, saveOptions).then(function (saveResult) {
         var savedEntities = saveResult.entities;
         var keyMappings = saveResult.keyMappings;
-    }).fail(function (e) {
+    }).catch(function (e) {
     });
     em.saveChanges(entitiesToSave, null, function (saveResult) {
         var savedEntities = saveResult.entities;
@@ -296,7 +296,7 @@ function test_entityQuery() {
     var em = new breeze.EntityManager(serviceName);
     var query = new breeze.EntityQuery("Orders").using(em);
     query.execute().then(function (data) {
-    }).fail(function (err) {
+    }).catch(function (err) {
     });
     var em = new breeze.EntityManager(serviceName);
     var query = new breeze.EntityQuery("Orders").using(em);
@@ -308,7 +308,7 @@ function test_entityQuery() {
     var query = new breeze.EntityQuery("Orders");
     em.executeQuery(query).then(function (data) {
         var orders = data.results;
-    }).fail(function (err) {
+    }).catch(function (err) {
     });
     var query = new breeze.EntityQuery("Orders").using(em);
     var orders = query.executeLocally();
@@ -847,3 +847,4 @@ function test_config() {
     s = config.stringifyPad;
     o = config.typeRegistry;
 }
+//# sourceMappingURL=breeze-tests.js.map
