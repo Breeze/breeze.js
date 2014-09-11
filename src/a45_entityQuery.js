@@ -227,32 +227,18 @@ var EntityQuery = (function () {
     @chainable
     **/
     proto.where = function (wherePredicate) {
-        if (wherePredicate != null) {
-            if (!(wherePredicate instanceof Predicate)) {
-                wherePredicate = Predicate.create(__arraySlice(arguments));
-            }
-            var state = this.state;
-            if (state.fromEntityType) wherePredicate.validate(state.fromEntityType);
-            if (state.where) {
-                state.where = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
-            }
-        }
-        return clone(this.state, "where", wherePredicate);
+       if (wherePredicate != null) {
+          if (!(wherePredicate instanceof Predicate)) {
+             wherePredicate = Predicate.create(__arraySlice(arguments));
+          }
+          if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
+          if (this.wherePredicate) {
+             wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
+          }
+       }
+       return clone(this, "wherePredicate", wherePredicate);
+
     };
-
-    //proto.where = function (wherePredicate) {
-    //   if (wherePredicate != null) {
-    //      if (!(wherePredicate instanceof Predicate)) {
-    //         wherePredicate = Predicate.create(__arraySlice(arguments));
-    //      }
-    //      if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
-    //      if (this.wherePredicate) {
-    //         wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
-    //      }
-    //   }
-    //   return clone(this, "wherePredicate", wherePredicate);
-
-    //};
 
     /**
     Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well. 
@@ -1846,8 +1832,8 @@ var SimplePredicate = (function () {
         if (!lqco.isCaseSensitive) {
             a = (a || "").toLowerCase();
             b = (b || "").toLowerCase();
-        }
-        return a === b;
+        } 
+        return a === b; 
     }
         
     function stringStartsWith(a, b, lqco) {

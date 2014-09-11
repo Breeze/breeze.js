@@ -9754,32 +9754,18 @@ var EntityQuery = (function () {
     @chainable
     **/
     proto.where = function (wherePredicate) {
-        if (wherePredicate != null) {
-            if (!(wherePredicate instanceof Predicate)) {
-                wherePredicate = Predicate.create(__arraySlice(arguments));
-            }
-            var state = this.state;
-            if (state.fromEntityType) wherePredicate.validate(state.fromEntityType);
-            if (state.where) {
-                state.where = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
-            }
-        }
-        return clone(this.state, "where", wherePredicate);
+       if (wherePredicate != null) {
+          if (!(wherePredicate instanceof Predicate)) {
+             wherePredicate = Predicate.create(__arraySlice(arguments));
+          }
+          if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
+          if (this.wherePredicate) {
+             wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
+          }
+       }
+       return clone(this, "wherePredicate", wherePredicate);
+
     };
-
-    //proto.where = function (wherePredicate) {
-    //   if (wherePredicate != null) {
-    //      if (!(wherePredicate instanceof Predicate)) {
-    //         wherePredicate = Predicate.create(__arraySlice(arguments));
-    //      }
-    //      if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
-    //      if (this.wherePredicate) {
-    //         wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
-    //      }
-    //   }
-    //   return clone(this, "wherePredicate", wherePredicate);
-
-    //};
 
     /**
     Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well. 
@@ -11373,8 +11359,8 @@ var SimplePredicate = (function () {
         if (!lqco.isCaseSensitive) {
             a = (a || "").toLowerCase();
             b = (b || "").toLowerCase();
-        }
-        return a === b;
+        } 
+        return a === b; 
     }
         
     function stringStartsWith(a, b, lqco) {
@@ -11920,7 +11906,8 @@ var QueryOptions = (function () {
     @method <ctor> QueryOptions
     @param [config] {Object}
     @param [config.fetchStrategy] {FetchStrategy}  
-    @param [config.mergeStrategy] {MergeStrategy}  
+    @param [config.mergeStrategy] {MergeStrategy} 
+    @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default) 
     **/
     var ctor = function (config) {
         updateWithConfig(this, config);
@@ -11940,8 +11927,15 @@ var QueryOptions = (function () {
     @property mergeStrategy {MergeStrategy}
     **/
 
+    /**
+    Whether to include cached deleted entities in a query result (false by default).
+
+    __readOnly__
+    @property includeDeleted {Boolean}
+    **/
+
     ctor.resolve = function (queryOptionsArray) {
-        return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy"]));
+        return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy", "includeDeleted"]));
     };
     
     /**
@@ -11951,20 +11945,28 @@ var QueryOptions = (function () {
     **/
     ctor.defaultInstance = new ctor({
         fetchStrategy: FetchStrategy.FromServer,
-        mergeStrategy: MergeStrategy.PreserveChanges
+        mergeStrategy: MergeStrategy.PreserveChanges,
+        includeDeleted: false
     });
 
     /**
-    Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}} 
-    or {{#crossLink "FetchStrategy"}}{{/crossLink}} applied.
+    Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}}, 
+    {{#crossLink "FetchStrategy"}}{{/crossLink}}, or 'includeDeleted' option applied.
     @example
-        var queryOptions = em1.queryOptions.using(MergeStrategy.PreserveChanges);
+        // Given an EntityManager instance, em
+        var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
     or
     @example
-        var queryOptions = em1.queryOptions.using(FetchStrategy.FromLocalCache);
+        var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
     or
     @example
-        var queryOptions = em1.queryOptions.using( { mergeStrategy: OverwriteChanges });
+        var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+    or
+    @example
+        var queryOptions = em.queryOptions.using({ 
+                includeDeleted: true,
+                fetchStrategy:  FetchStrategy.FromLocalCache 
+            });
     @method using
     @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
     @return {QueryOptions}
@@ -11997,14 +11999,16 @@ var QueryOptions = (function () {
     proto.toJSON = function () {
         return __toJson(this, {
             fetchStrategy: null,
-            mergeStrategy: null
+            mergeStrategy: null,
+            includeDeleted: false
         });
     };
 
     ctor.fromJSON = function (json) {
         return new QueryOptions({
             fetchStrategy: FetchStrategy.fromName(json.fetchStrategy),
-            mergeStrategy: MergeStrategy.fromName(json.mergeStrategy)
+            mergeStrategy: MergeStrategy.fromName(json.mergeStrategy),
+            includeDeleted: json.includeDeleted === true
         });       
     };
         
@@ -12013,6 +12017,7 @@ var QueryOptions = (function () {
             assertConfig(config)
                 .whereParam("fetchStrategy").isEnumOf(FetchStrategy).isOptional()
                 .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional()
+                .whereParam("includeDeleted").isBoolean().isOptional()
                 .applyAll(obj);
         }
         return obj;
@@ -12995,9 +13000,11 @@ var EntityManager = (function () {
         var groups = findOrCreateEntityGroups(this, entityType);
         // filter then order then skip then take
         var filterFunc = query._toFilterFunction(entityType);
+        var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
+        var includeDeleted = queryOptions.includeDeleted === true;
 
         var newFilterFunc = function(entity) {
-            return entity && (!entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
+            return entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
         };
 
         var result = [];
@@ -13395,19 +13402,20 @@ var EntityManager = (function () {
         var entityKey = tpl.entityKey;
         var checkLocalCacheFirst = tpl.remainingArgs.length === 0 ? false : !!tpl.remainingArgs[0];
         var entity;
-        var isDeleted = false;
+        var foundIt = false;
         if (checkLocalCacheFirst) {
             entity = em.getEntityByKey(entityKey);
-            isDeleted = entity && entity.entityAspect.entityState.isDeleted();
-            if (isDeleted) {
+            foundIt = !!entity;         
+            if (foundIt && 
+                // null the entity if it is deleted and we should exclude deleted entities  
+                !em.queryOptions.includeDeleted && entity.entityAspect.entityState.isDeleted()){
                 entity = null;
-                // entityManager.queryOptions is always  fully resolved 
-                if (em.queryOptions.mergeStrategy === MergeStrategy.OverwriteChanges) {
-                    isDeleted = false;
-                }
+                // but resume looking if we'd overwrite deleted entity with a remote entity
+                // note: em.queryOptions is always fully resolved by now
+                foundIt = em.queryOptions.mergeStrategy !== MergeStrategy.OverwriteChanges;
             }
         } 
-        if (entity || isDeleted) {
+        if (foundIt) {
             return Q.resolve({ entity: entity, entityKey: entityKey, fromCache: true });
         } else {
             return EntityQuery.fromEntityKey(entityKey).using(em).execute().then(function(data) {
