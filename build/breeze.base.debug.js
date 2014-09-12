@@ -12032,18 +12032,35 @@ breeze.MergeStrategy = MergeStrategy;
 
 
 ;var AltPredicate = (function () {
-
+    
+    
     var Predicate = function () {
         if (arguments.length == 1) {
+            // 3 possibilities: 
+            //      Predicate(aPredicate)
+            //      Predicate([ aPredicate ])
+            //      Predicate(["freight", ">", 100"])
+            //      Predicate( "freight gt 100" }  // odata string
+            //      Predicate( { freight: { ">": 100 } })
             var arg = arguments[0];
             if (Array.isArray(arg)) {
-                return createPredicateFromArray(arg);
-            } else if (typeof arguments[0] == 'string') {
+                if (arg.length == 1) {
+                    // recurse
+                    return Predicate(arg[0]);
+                } else {
+                    return createPredicateFromArray(arg);
+                }
+            } else if (arg instanceof BasePredicate) {
+                return arg;
+            } else if (typeof arg == 'string') {
                 return new ODataPredicate(arg);
             } else {
                 return createPredicateFromObject(arg);
             }
         } else {
+            // 2 possibilities
+            //      Predicate("freight", ">", 100");
+            //      Predicate("orders", "any", "freight",  ">", 950);
             return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
         }
     };
@@ -12051,15 +12068,17 @@ breeze.MergeStrategy = MergeStrategy;
     Predicate.create = Predicate;
 
     var createPredicateFromArray = function (arr) {
-        // TODO: assert that length of the array should be 3 ( maybe 2)
+        // TODO: assert that length of the array should be > 3 
         // Needs to handle:
-        //      Predicate.create("freigt", ">", 100");
-        //      Predicate.create("orders", "any", "freight",  ">", 950);
+        //      [ "freight", ">", 100"];
+        //      [ "orders", "any", "freight",  ">", 950 ]
+        //      [ "orders", "and", anotherPred ]
+        //      [ "orders", "and", [ "freight, ">", 950 ]
         var json = {};
         var value = {};
         json[arr[0]] = value;
         var op = arr[1];
-        op = op.operator || op;
+        op = op.operator || op;  // incoming op will be either a string or a FilterQueryOp 
         if (arr.length == 3) {
             value[op] = arr[2];
         } else {
@@ -12072,17 +12091,17 @@ breeze.MergeStrategy = MergeStrategy;
         if (obj instanceof BasePredicate) return obj;
         
         if (typeof obj != 'object') {
-            throw new Error("Unable to convert to a QueryNode: " + obj);
+            throw new Error("Unable to convert to a Predicate: " + obj);
         }
         var keys = Object.keys(obj);
         if (keys.length != 1) {
-            throw new Error("Unable to convert to a QueryNode ( object should only have a single key) " + obj);
+            throw new Error("Unable to convert to a Predicate ( object should only have a single key) " + obj);
         }
         var key = keys[0];
         var value = obj[key];
-        if (AndOrPredicate.prototype.aliasMap[key]) {
+        if (AndOrPredicate.prototype._resolveOp(key, true)) {
             return new AndOrPredicate(key, value);
-        } else if (UnaryPredicate.prototype.aliasMap[key]) {
+        } else if (UnaryPredicate.prototype._resolveOp(key, true)) {
             return new UnaryPredicate(key, value);  
         } else {
             var expr = key;
@@ -12095,7 +12114,7 @@ breeze.MergeStrategy = MergeStrategy;
             }
             var op = keys[0];
             var exprOrNode = value[op];
-            if (AnyAllPredicate.prototype.aliasMap[op]) {
+            if (AnyAllPredicate.prototype._resolveOp(op, true)) {
                 return new AnyAllPredicate(op, expr, exprOrNode);
             } else {
                 return new BinaryPredicate(op, expr, exprOrNode);
@@ -12108,43 +12127,45 @@ breeze.MergeStrategy = MergeStrategy;
             var aliasMap = {};
             for (var key in map) {
                 var value = map[key];
-                value.key = key;
                 // if not otherwise defined
                 if (!value.odataOperator) value.odataOperator = key;
-                aliasMap[key] = value;
+                var aliasKey = key.toLowerCase();
+                value.key = aliasKey;
+                aliasMap[aliasKey] = value;
                 // always support the key with a $ in front
-                aliasMap["$" + key] = value;
+                aliasMap["$" + aliasKey] = value;
                 value.aliases && value.aliases.forEach(function (alias) {
-                    aliasMap[alias] = value;
+                    aliasMap[alias.toLowerCase()] = value;
                 });
             }
             this.aliasMap = aliasMap;
         }
-        var proto = ctor.prototype;
-
-        proto.or = function(pred) {
-            var realPred = Predicate(pred);
-            return new AndOrPredicate("or", [this, realPred]);
-        };
         
-        proto.and = function (pred) {
-            var realPred = Predicate(pred);
+        var proto = ctor.prototype;
+        
+        proto.and = function () {
+            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
             return new AndOrPredicate("and", [this, realPred]);
         };
 
-        proto._resolveOp = function (op) {
-            var result;
-            if (typeof (op) == 'string') {
-                result = this.aliasMap[op];
-            } else if (op.operator) {
-                // handles if op is a FilterQueryOp;
-                result = this.aliasMap[op.name];
-            }
-            if (!result) {
+        proto.or = function () {
+            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
+            return new AndOrPredicate("or", [this, realPred]);
+        };
+        
+        proto.not = function () {
+            return new UnaryPredicate("not", this);
+        };
+        
+        proto._resolveOp = function (op, okIfNotFound) {
+            op = op.operator || op;
+            var result = this.aliasMap[op.toLowerCase()];           
+            if (!result && !okIfNotFound) {
                 throw new Error("Unable to resolve operator: " + op);
             }
             return result;
         };
+
         return ctor;
     })();
 
@@ -12152,7 +12173,19 @@ breeze.MergeStrategy = MergeStrategy;
         var ctor = function(odataExpr) {
             this.odataExpr = odataExpr;
         };
-        ctor.prototype = new BasePredicate({});
+        var proto = ctor.prototype = new BasePredicate({});
+
+        proto.validate = function(entityType) { };
+        
+        proto.toFunction = function (entityType) {
+            throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
+        };
+        
+        proto.toString = proto.toODataFragment = function (entityType, prefix) {
+            return this.odataExpr;
+        };
+        
+        return ctor;
     })(); 
 
     var UnaryPredicate = (function(op, node) {
@@ -12160,10 +12193,10 @@ breeze.MergeStrategy = MergeStrategy;
             this.op = this._resolveOp(op);
             this.node = Predicate(node);
         };
-        ctor.prototype = new BasePredicate({
-            'not': {}
+        var proto = ctor.prototype = new BasePredicate({
+            'not': { aliases: [ '!' ] }
         });
-        var proto = ctor.prototype;
+        
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
             this.node.validate(entityType);
@@ -12204,26 +12237,6 @@ breeze.MergeStrategy = MergeStrategy;
             // determined until validate is run
         };
 
-        ctor.create = function(obj) {
-            if (typeof obj != 'object') {
-                throw new Error("Unable to convert to a query predicate: " + obj);
-            }
-            var keys = Object.keys(obj);
-            if (keys.length != 1) {
-                throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
-            }
-            var key = keys[0];
-            var value = obj[key];
-            var expr1 = key;
-            var valueKeys = Object.keys(value);
-            if (valueKeys.length != 1) {
-                throw new Error("Unable to convert to a query predicate ( argument should be an object with single property with a value that is also an object with a single property): " + node);
-            }
-            var op = valueKeys[0];
-            var expr2 = value[op];
-            return new BinaryPredicate(op, expr1, expr2);
-        }
-
         var proto = ctor.prototype = new BasePredicate({
             'eq': {
                 aliases: ["=="]
@@ -12243,10 +12256,10 @@ breeze.MergeStrategy = MergeStrategy;
             'ge': {
                 aliases: [">=", "gte"]
             },
-            'startsWith': {
+            'startswith': {
                 isFunction: true
             },
-            'endsWith': {
+            'endswith': {
                 isFunction: true
             },
             'substringof': {
@@ -12299,10 +12312,7 @@ breeze.MergeStrategy = MergeStrategy;
             if (prefix) {
                 v1Expr = prefix + "/" + v1Expr;
             }
-
-            BasePredicate._next += 1;
-            prefix = "x" + BasePredicate._next;
-            
+           
             var v2Expr = this.expr2.toODataFragment(entityType);
             var op = this.op;
             if (op.isFunction) {
@@ -12429,16 +12439,16 @@ breeze.MergeStrategy = MergeStrategy;
     })();
 
     var AndOrPredicate = (function() {
-        var ctor = function(op, nodes) {
-            this.op = this._resolveOp(op);
-            // TODO: assert that nodes is an array
-            this.nodes = nodes.map(function(node) {
-                return Predicate(node);
-            });
-        };
-        var proto = ctor.prototype = new BasePredicate({
-            'and': {},
-            'or': {}
+            var ctor = function(op, nodes) {
+                this.op = this._resolveOp(op);
+                // TODO: assert that nodes is an array
+                this.nodes = nodes.map(function(node) {
+                    return Predicate(node);
+                });
+            };
+            var proto = ctor.prototype = new BasePredicate({
+                'and': { aliases: [ '&&' ] },
+                'or':  { aliases: [ '||' ] }
         });
 
         proto.validate = function (entityType) {
@@ -12494,18 +12504,21 @@ breeze.MergeStrategy = MergeStrategy;
 
     })();
 
-    var AnyAllPredicate = function() {
+    var AnyAllPredicate = function () {
+
         var ctor = function (op, expr, node) {
             this.op = this._resolveOp(op);
             this.exprSource = expr;
             // this.expr will not be resolved until validate is called
             this.node = Predicate(node);
         };
-        ctor.prototype = new BasePredicate({
-           'any': {},
-           'all': {}
+
+        var proto = ctor.prototype = new BasePredicate({
+           'any': { aliases: ["some"]},
+           'all': { aliases: ["every"] }
         });
-        var proto = ctor.prototype;
+
+        var _next = 0;
 
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
@@ -12529,10 +12542,10 @@ breeze.MergeStrategy = MergeStrategy;
             var v1Expr = this.expr.toODataFragment(entityType);
             if (prefix) {
                 v1Expr = prefix + "/" + v1Expr;
-            } 
-
-            BasePredicate._next += 1;
-            prefix = "x" + BasePredicate._next;
+                prefix = "x" + (parseInt(prefix.substring(1)) + 1);
+            } else {
+                prefix = "x1";
+            }
             
             return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.node.toODataFragment(this.expr.dataType, prefix) + ")";
         };
@@ -12544,7 +12557,7 @@ breeze.MergeStrategy = MergeStrategy;
         function getPredicateFn(op) {
             switch (op.key) {
                 case "any":
-                    return function(v1, v2) { return v1.some(function(v) { return v2(v); }); };
+                    return function(v1, v2) { return v1.some(function(v)  { return v2(v); }); };
                 case "all":
                     return function(v1, v2) { return v1.every(function(v) { return v2(v); }); };
                 default:
@@ -12556,7 +12569,8 @@ breeze.MergeStrategy = MergeStrategy;
 
     }();
 
-    var LitExpr = (function() {
+    var LitExpr = (function () {
+
         var ctor = function(value, isQuoted, dataType) {
             this.value = value;
             this.unquotedValue = (isQuoted) ?
@@ -12579,10 +12593,12 @@ breeze.MergeStrategy = MergeStrategy;
         proto.toString = function() {
             return this.value;
         }
+
         return ctor;
     })();
 
-    var PropExpr = (function() {
+    var PropExpr = (function () {
+
         var ctor = function(propertyPath) {
             this.propertyPath = propertyPath;
             this.jsFn = createPropFunction(propertyPath);
@@ -12627,6 +12643,7 @@ breeze.MergeStrategy = MergeStrategy;
                 };
             }
         }
+
         return ctor;
     })();
 
@@ -12679,7 +12696,6 @@ breeze.MergeStrategy = MergeStrategy;
         };
 
         var funcMap = ctor.funcMap = {
-
             toupper: { fn: function (source) { return source.toUpperCase(); }, dataType: DataType.String },
             tolower: { fn: function (source) { return source.toLowerCase(); }, dataType: DataType.String },
             substring: { fn: function (source, pos, length) { return source.substring(pos, length); }, dataType: DataType.String },
@@ -12705,15 +12721,19 @@ breeze.MergeStrategy = MergeStrategy;
     })();
 
     var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
-    // comma delimited expressions ignoring commas inside of quotes.
+    // comma delimited expressions ignoring commas inside of both single and double quotes.
     var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
     var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
 
 
     function createExpr(source, entityType) {
         if (typeof source !== 'string') {
-            return new LitExpr(source, false, DataType.fromValue(source));            
+            if (source != null && source.isLiteral) {
+                source = source.value;
+            }
+            return new LitExpr(source, false, DataType.fromValue(source));
         }
+    
         var regex = /\([^()]*\)/;
         var m;
         var tokens = [];
@@ -12735,7 +12755,7 @@ breeze.MergeStrategy = MergeStrategy;
         if (parts.length === 1) {
             return parseLitOrPropExpr(parts[0], entityType);
         } else {
-            return parseFnExpr(parts, tokens, entityType);
+            return parseFnExpr(source, parts, tokens, entityType);
         }
     }
 
@@ -12758,9 +12778,9 @@ breeze.MergeStrategy = MergeStrategy;
         }
     }
 
-    function parseFnExpr(parts, tokens, entityType) {
+    function parseFnExpr(source, parts, tokens, entityType) {
         try {
-            this.fnName = parts[0].trim().toLowerCase();
+            var fnName = parts[0].trim().toLowerCase();
 
             var argSource = tokens[parts[1]].trim();
             if (argSource.substr(0, 1) === "(") {
