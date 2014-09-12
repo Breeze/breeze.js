@@ -1,6 +1,6 @@
-﻿var createAltPredicate = (function () {
-    // test 12
-    var createPredicate = function()  {
+﻿var AltPredicate = (function () {
+
+    var Predicate = function () {
         if (arguments.length == 1) {
             var arg = arguments[0];
             if (Array.isArray(arg)) {
@@ -11,15 +11,27 @@
                 return createPredicateFromObject(arg);
             }
         } else {
-            return createPredicateFromArray(arguments);
+            return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
         }
     };
+    // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
+    Predicate.create = Predicate;
 
     var createPredicateFromArray = function (arr) {
+        // TODO: assert that length of the array should be 3 ( maybe 2)
+        // Needs to handle:
+        //      Predicate.create("freigt", ">", 100");
+        //      Predicate.create("orders", "any", "freight",  ">", 950);
         var json = {};
         var value = {};
         json[arr[0]] = value;
-        value[arr[1]] = arr[2];
+        var op = arr[1];
+        op = op.operator || op;
+        if (arr.length == 3) {
+            value[op] = arr[2];
+        } else {
+            value[op] = createPredicateFromArray(arr.splice(2));
+        }
         return createPredicateFromObject(json);
     };
 
@@ -76,16 +88,24 @@
             this.aliasMap = aliasMap;
         }
         var proto = ctor.prototype;
-        ctor.create = createPredicate;
+
+        proto.or = function(pred) {
+            var realPred = Predicate(pred);
+            return new AndOrPredicate("or", [this, realPred]);
+        };
         
-        proto.resolveOp = function (op) {
+        proto.and = function (pred) {
+            var realPred = Predicate(pred);
+            return new AndOrPredicate("and", [this, realPred]);
+        };
+
+        proto._resolveOp = function (op) {
             var result;
             if (typeof (op) == 'string') {
                 result = this.aliasMap[op];
-            } else {
-                if (op.name) {
-                    result = this.aliasMap[op.name];
-                }
+            } else if (op.operator) {
+                // handles if op is a FilterQueryOp;
+                result = this.aliasMap[op.name];
             }
             if (!result) {
                 throw new Error("Unable to resolve operator: " + op);
@@ -104,11 +124,11 @@
 
     var UnaryPredicate = (function(op, node) {
         var ctor = function(op, node) {
-            this.op = this.resolveOp(op);
-            this.node = BasePredicate.create(node);
+            this.op = this._resolveOp(op);
+            this.node = Predicate(node);
         };
         ctor.prototype = new BasePredicate({
-            '$not': {}
+            'not': {}
         });
         var proto = ctor.prototype;
         proto.validate = function (entityType) {
@@ -144,7 +164,7 @@
 
     var BinaryPredicate = (function() {
         var ctor = function (op, expr1, expr2) {
-            this.op = this.resolveOp(op);
+            this.op = this._resolveOp(op);
             this.expr1Source = expr1;
             this.expr2Source = expr2;
             // this.expr1 and this.expr2 won't be
@@ -173,10 +193,10 @@
 
         var proto = ctor.prototype = new BasePredicate({
             'eq': {
-                aliases: ["=="],
+                aliases: ["=="]
             },
             'ne': {
-                aliases: ["!="],
+                aliases: ["!="]
             },
             'lt': {
                 aliases: ["<" ]
@@ -194,22 +214,22 @@
                 isFunction: true
             },
             'endsWith': {
-                isFunction: true,
+                isFunction: true
             },
             'substringof': {
                 aliases: ["contains"],
-                isFunction: true,
+                isFunction: true
             }
         });
 
 
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
-            this.expr1 = createExpr(this.expr1Source, entityType, this.op);
+            this.expr1 = createExpr(this.expr1Source, entityType);
             if (this.expr1 == null) {
                 throw new Error("Unable to validate 1st expression: " + this.expr1Source);
             }
-            this.expr2 = createExpr(this.expr2Source, entityType, this.op);
+            this.expr2 = createExpr(this.expr2Source, entityType);
             if (this.expr2 == null) {
                 throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
             }
@@ -377,15 +397,15 @@
 
     var AndOrPredicate = (function() {
         var ctor = function(op, nodes) {
-            this.op = this.resolveOp(op);
+            this.op = this._resolveOp(op);
             // TODO: assert that nodes is an array
             this.nodes = nodes.map(function(node) {
-                return BasePredicate.create(node);
+                return Predicate(node);
             });
         };
         var proto = ctor.prototype = new BasePredicate({
-            '$and': {},
-            '$or': {}
+            'and': {},
+            'or': {}
         });
 
         proto.validate = function (entityType) {
@@ -443,14 +463,14 @@
 
     var AnyAllPredicate = function() {
         var ctor = function (op, expr, node) {
-            this.op = this.resolveOp(op);
+            this.op = this._resolveOp(op);
             this.exprSource = expr;
             // this.expr will not be resolved until validate is called
-            this.node = BasePredicate.create(node);
+            this.node = Predicate(node);
         };
         ctor.prototype = new BasePredicate({
-           '$any': {},
-           '$all': {}
+           'any': {},
+           'all': {}
         });
         var proto = ctor.prototype;
 
@@ -583,6 +603,9 @@
             this.fnName = fnName;
             this.exprArgs = exprArgs;
             var qf = funcMap[fnName];
+            if (qf == null) {
+                throw new Error("Unknown function: " + fnName);
+            }
             this.localFn = qf.fn;
             this.dataType = qf.dataType;
         };
@@ -654,8 +677,7 @@
     var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
 
 
-    function createExpr(source, entityType, operator) {
-
+    function createExpr(source, entityType) {
         if (typeof source !== 'string') {
             return new LitExpr(source, false, DataType.fromValue(source));            
         }
@@ -670,13 +692,8 @@
             source = source.replace(token, repl);
         }
 
-        var expr = parseExpr(source, tokens, operator ? null : entityType);
-        if (expr) {
-            if (!expr.dataType && operator && operator.isStringFn) {
-                expr.dataType = DataType.String;
-            }
-            expr.validate(entityType);
-        }
+        var expr = parseExpr(source, tokens, entityType);
+        expr.validate(entityType);
         return expr;
     }
 
@@ -685,14 +702,14 @@
         if (parts.length === 1) {
             return parseLitOrPropExpr(parts[0], entityType);
         } else {
-            return parseFnExpr(parts, tokens);
+            return parseFnExpr(parts, tokens, entityType);
         }
     }
 
     function parseLitOrPropExpr(value, entityType) {
         value = value.trim();
         // value is either a string, a quoted string, a number, a bool value, or a date
-        // if a string ( not a quoted string) then this represents a property name.
+        // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
         var firstChar = value.substr(0, 1);
         var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
         if (isQuoted) {
@@ -700,22 +717,15 @@
         } else {
             var mayBeIdentifier = RX_IDENTIFIER.test(value);
             if (mayBeIdentifier) {
-                if (entityType) {
-                    if (entityType.getProperty(value, false) == null) {
-                        // not an expr
-                        // ??? throw
-                        return null;
-                    }
-                }
-                return new PropExpr(value);
-            } else {
-                if (entityType) return null /// throw ???
-                return new LitExpr(value, false, DataType.fromValue(value));
-            }
+                if (entityType.getProperty(value, false) != null) {
+                    return new PropExpr(value);
+                } 
+            } 
+            return new LitExpr(value, false, DataType.String);
         }
     }
 
-    function parseFnExpr(parts, tokens) {
+    function parseFnExpr(parts, tokens, entityType) {
         try {
             this.fnName = parts[0].trim().toLowerCase();
 
@@ -726,7 +736,7 @@
             var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
             var args = argSource.match(commaMatchStr);
             var exprArgs = args.map(function (a) {
-                return parseExpr(a, tokens);
+                return parseExpr(a, tokens, entityType);
             });
             return new FnExpr(fnName, exprArgs);
         } catch (e) {
@@ -734,9 +744,9 @@
         }
     }
 
-    return createPredicate;
+    return Predicate;
 
 })();
 
-breeze.createAltPredicate = createAltPredicate;
+breeze.AltPredicate = AltPredicate;
 
