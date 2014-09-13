@@ -9525,6 +9525,825 @@ var NamingConvention = (function () {
 breeze.NamingConvention = NamingConvention;
 
 
+;var Predicate = (function () {
+    
+    var Predicate = function () {
+        if (arguments.length == 1) {
+            // 3 possibilities: 
+            //      Predicate(aPredicate)
+            //      Predicate([ aPredicate ])
+            //      Predicate(["freight", ">", 100"])
+            //      Predicate( "freight gt 100" }  // odata string
+            //      Predicate( { freight: { ">": 100 } })
+            var arg = arguments[0];
+            if (Array.isArray(arg)) {
+                if (arg.length == 1) {
+                    // recurse
+                    return Predicate(arg[0]);
+                } else {
+                    return createPredicateFromArray(arg);
+                }
+            } else if (arg instanceof BasePredicate) {
+                return arg;
+            } else if (typeof arg == 'string') {
+                return new ODataPredicate(arg);
+            } else {
+                return createPredicateFromObject(arg);
+            }
+        } else {
+            // 2 possibilities
+            //      Predicate("freight", ">", 100");
+            //      Predicate("orders", "any", "freight",  ">", 950);
+            return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
+        }
+    };
+    // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
+    Predicate.create = Predicate;
+
+    Predicate.and = function () {
+        return combinePreds(Array.prototype.slice.call(arguments, 0), function (p1, p2) {
+            return p1.and(p2);
+        });
+    }
+    
+    Predicate.or = function () {
+        return combinePreds(Array.prototype.slice.call(arguments, 0), function(p1, p2) {
+            return p1.or(p2);
+        });
+    }
+    
+    function combinePreds(preds, fn) {
+        if (preds.length === 1 && Array.isArray(preds[0])) {
+            preds = preds[0];
+        }
+        if (preds.length === 0) return null;
+        var result = preds.reduce(function (p1, p2) {
+            if (!p1) return p2;
+            if (!p2) return p1;
+            return fn(p1, p2);
+        });
+        return result;
+    }
+    
+
+    var createPredicateFromArray = function (arr) {
+        // TODO: assert that length of the array should be > 3 
+        // Needs to handle:
+        //      [ "freight", ">", 100"];
+        //      [ "orders", "any", "freight",  ">", 950 ]
+        //      [ "orders", "and", anotherPred ]
+        //      [ "orders", "and", [ "freight, ">", 950 ]
+        var json = {};
+        var value = {};
+        json[arr[0]] = value;
+        var op = arr[1];
+        op = op.operator || op;  // incoming op will be either a string or a FilterQueryOp 
+        if (arr.length == 3) {
+            value[op] = arr[2];
+        } else {
+            value[op] = createPredicateFromArray(arr.splice(2));
+        }
+        return createPredicateFromObject(json);
+    };
+
+    var createPredicateFromObject = function (obj) {
+        if (obj instanceof BasePredicate) return obj;
+        
+        if (typeof obj != 'object') {
+            throw new Error("Unable to convert to a Predicate: " + obj);
+        }
+        var keys = Object.keys(obj);
+        if (keys.length != 1) {
+            throw new Error("Unable to convert to a Predicate ( object should only have a single key) " + obj);
+        }
+        var key = keys[0];
+        var value = obj[key];
+        if (AndOrPredicate.prototype._resolveOp(key, true)) {
+            return new AndOrPredicate(key, value);
+        } else if (UnaryPredicate.prototype._resolveOp(key, true)) {
+            return new UnaryPredicate(key, value);  
+        } else {
+            var expr = key;
+            if (typeof value != 'object') {
+                throw new Error("Unable to convert to a query predicate: " + value);
+            }
+            keys = Object.keys(value);
+            if (keys.length != 1) {
+                throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
+            }
+            var op = keys[0];
+            var exprOrNode = value[op];
+            if (AnyAllPredicate.prototype._resolveOp(op, true)) {
+                return new AnyAllPredicate(op, expr, exprOrNode);
+            } else {
+                return new BinaryPredicate(op, expr, exprOrNode);
+            }
+        }
+    }
+    
+    var BasePredicate = (function() {
+        var ctor = function (map) {
+            var aliasMap = {};
+            for (var key in map) {
+                var value = map[key];
+                // if not otherwise defined
+                if (!value.odataOperator) value.odataOperator = key;
+                var aliasKey = key.toLowerCase();
+                value.key = aliasKey;
+                aliasMap[aliasKey] = value;
+                // always support the key with a $ in front
+                aliasMap["$" + aliasKey] = value;
+                value.aliases && value.aliases.forEach(function (alias) {
+                    aliasMap[alias.toLowerCase()] = value;
+                });
+            }
+            this.aliasMap = aliasMap;
+        }
+        
+        var proto = ctor.prototype;
+        
+        proto.and = function () {
+            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
+            return new AndOrPredicate("and", [this, realPred]);
+        };
+
+        proto.or = function () {
+            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
+            return new AndOrPredicate("or", [this, realPred]);
+        };
+        
+        proto.not = function () {
+            return new UnaryPredicate("not", this);
+        };
+        
+        proto._resolveOp = function (op, okIfNotFound) {
+            op = op.operator || op;
+            var result = this.aliasMap[op.toLowerCase()];           
+            if (!result && !okIfNotFound) {
+                throw new Error("Unable to resolve operator: " + op);
+            }
+            return result;
+        };
+
+        return ctor;
+    })();
+
+    var ODataPredicate = (function() {
+        var ctor = function(odataExpr) {
+            this.odataExpr = odataExpr;
+        };
+        var proto = ctor.prototype = new BasePredicate({});
+
+        proto.validate = function(entityType) { };
+        
+        proto.toFunction = function (entityType) {
+            throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
+        };
+        
+        proto.toString = proto.toODataFragment = function (entityType, prefix) {
+            return this.odataExpr;
+        };
+        
+        return ctor;
+    })(); 
+
+    var UnaryPredicate = (function() {
+        var ctor = function(op, node) {
+            this.op = this._resolveOp(op);
+            this.node = Predicate(node);
+        };
+        var proto = ctor.prototype = new BasePredicate({
+            'not': { aliases: [ '!' ] }
+        });
+        
+        proto.validate = function (entityType) {
+            if (this._validatedEntityType === entityType) return;
+            this.node.validate(entityType);
+            this._validatedEntityType = entityType;
+        };
+
+        proto.toFunction = function (entityType) {
+            this.validate(entityType);
+            switch (this.op.key) {
+                case "not": 
+                    var func = this.node.toFunction(entityType);
+                    return function(entity) {
+                        return !func(entity);
+                    };
+                default:
+                    throw new Error("Invalid unary operator:" + this.op.key);
+            }
+        };
+
+        proto.toODataFragment = function (entityType, prefix) {
+            this.validate(entityType);
+            return this.op.odataOperator + " " + "(" + this.node.toODataFragment(entityType, prefix) + ")";
+        };
+
+        proto.toString = function () {
+            return this.op.odataOperator + " " + "(" + this.node.toString() + ")";
+        };
+
+        return ctor;
+    })();
+
+    var BinaryPredicate = (function() {
+        var ctor = function (op, expr1, expr2) {
+            this.op = this._resolveOp(op);
+            this.expr1Source = expr1;
+            this.expr2Source = expr2;
+            // this.expr1 and this.expr2 won't be
+            // determined until validate is run
+        };
+
+        var proto = ctor.prototype = new BasePredicate({
+            'eq': {
+                aliases: ["=="]
+            },
+            'ne': {
+                aliases: ["!="]
+            },
+            'lt': {
+                aliases: ["<" ]
+            },
+            'le': {
+                aliases: ["<=", "lte"]
+            },
+            'gt': {
+                aliases: [">"]
+            },
+            'ge': {
+                aliases: [">=", "gte"]
+            },
+            'startswith': {
+                isFunction: true
+            },
+            'endswith': {
+                isFunction: true
+            },
+            'substringof': {
+                aliases: ["contains"],
+                isFunction: true
+            }
+        });
+
+
+        proto.validate = function (entityType) {
+            if (this._validatedEntityType === entityType) return;
+            this.expr1 = createExpr(this.expr1Source, entityType);
+            if (this.expr1 == null) {
+                throw new Error("Unable to validate 1st expression: " + this.expr1Source);
+            }
+            if (this.expr1 instanceof LitExpr) {
+                // lhs must be either a property or a function.
+                throw new Error("Not a valid property or function predicate expression: " + this.expr1Source);
+            }
+            if (entityType.isAnonymous) {
+                // with an anonymous entity type expr1 will always be a Prop of FnExpr and expr2 will always be literal.
+                this.expr2 = new LitExpr(this.expr2Source, DataType.fromValue(this.expr2Source));
+            } else {
+                this.expr2 = createExpr(this.expr2Source, entityType);
+                if (this.expr2 == null) {
+                    throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
+                }
+            }
+
+            
+            if (this.expr1.dataType != DataType.Undefined) {
+                this.expr2.dataType = this.expr1.dataType;
+            } else {
+                this.expr1.dataType = this.expr2.dataType;
+            }
+
+            this._validatedEntityType = entityType;
+        };
+
+        proto.toFunction = function (entityType) {
+
+            this.validate(entityType);
+
+            var dataType = this.expr1.dataType || this.expr2.dataType;
+            var predFn = getPredicateFn(entityType, this.op, dataType);
+            var v1Fn = this.expr1.toFunction();
+            var v2Fn = this.expr2.toFunction();
+            return function (entity) {
+                return predFn(v1Fn(entity), v2Fn(entity));
+            };
+        };
+
+        proto.toODataFragment = function (entityType, prefix) {
+            this.validate(entityType);
+
+            var v1Expr = this.expr1.toODataFragment(entityType);
+            if (prefix) {
+                v1Expr = prefix + "/" + v1Expr;
+            }
+           
+            var v2Expr = this.expr2.toODataFragment(entityType);
+            var op = this.op;
+            if (op.isFunction) {
+                if (op.key == "substringof") {
+                    return op.odataOperator + "(" + v2Expr + "," + v1Expr + ") eq true";
+                } else {
+                    return op.odataOperator + "(" + v1Expr + "," + v2Expr + ") eq true";
+                }
+            } else {
+                return v1Expr + " " + op.odataOperator + " " + v2Expr;
+            }
+
+        };
+
+        proto.toString = function () {
+            return __formatString("{%1} %2 {%3}", this.expr1Source, this.op.odataOperator, this.expr2Source);
+        };
+
+        function getPredicateFn(entityType, op, dataType) {
+            var lqco = entityType.metadataStore.localQueryComparisonOptions;
+            var mc = getComparableFn(dataType);
+            var predFn;
+            switch (op.key) {
+                case 'eq':
+                    predFn = function (v1, v2) {
+                        if (v1 && typeof v1 === 'string') {
+                            return stringEquals(v1, v2, lqco);
+                        } else {
+                            return mc(v1) == mc(v2);
+                        }
+                    };
+                    break;
+                case 'ne':
+                    predFn = function (v1, v2) {
+                        if (v1 && typeof v1 === 'string') {
+                            return !stringEquals(v1, v2, lqco);
+                        } else {
+                            return mc(v1) != mc(v2);
+                        }
+                    };
+                    break;
+                case 'gt':
+                    predFn = function (v1, v2) { return mc(v1) > mc(v2); };
+                    break;
+                case 'ge':
+                    predFn = function (v1, v2) { return mc(v1) >= mc(v2); };
+                    break;
+                case 'lt':
+                    predFn = function (v1, v2) { return mc(v1) < mc(v2); };
+                    break;
+                case 'le':
+                    predFn = function (v1, v2) { return mc(v1) <= mc(v2); };
+                    break;
+                case 'startswith':
+                    predFn = function (v1, v2) { return stringStartsWith(v1, v2, lqco); };
+                    break;
+                case 'endswith':
+                    predFn = function (v1, v2) { return stringEndsWith(v1, v2, lqco); };
+                    break;
+                case 'substringof':
+                    predFn = function (v1, v2) { return stringContains(v1, v2, lqco); };
+                    break;
+                default:
+                    throw new Error("Unknown operator: " + op.key);
+
+            }
+            return predFn;
+        }
+
+        function getComparableFn(dataType) {
+            if (dataType && dataType.isDate) {
+                // dates don't perform equality comparisons properly 
+                return function (value) { return value && value.getTime(); };
+            } else if (dataType === DataType.Time) {
+                // durations must be converted to compare them
+                return function (value) { return value && __durationToSeconds(value); };
+            } else {
+                return function (value) { return value; };
+            }
+         }
+
+        function stringEquals(a, b, lqco) {
+            if (b == null) return false;
+            if (typeof b !== 'string') {
+                b = b.toString();
+            }
+            if (lqco.usesSql92CompliantStringComparison) {
+                a = (a || "").trim();
+                b = (b || "").trim();
+            }
+            if (!lqco.isCaseSensitive) {
+                a = (a || "").toLowerCase();
+                b = (b || "").toLowerCase();
+            }
+            return a === b;
+        }
+
+        function stringStartsWith(a, b, lqco) {
+
+            if (!lqco.isCaseSensitive) {
+                a = (a || "").toLowerCase();
+                b = (b || "").toLowerCase();
+            }
+            return __stringStartsWith(a, b);
+        }
+
+        function stringEndsWith(a, b, lqco) {
+            if (!lqco.isCaseSensitive) {
+                a = (a || "").toLowerCase();
+                b = (b || "").toLowerCase();
+            }
+            return __stringEndsWith(a, b);
+        }
+
+        function stringContains(a, b, lqco) {
+            if (!lqco.isCaseSensitive) {
+                a = (a || "").toLowerCase();
+                b = (b || "").toLowerCase();
+            }
+            return a.indexOf(b) >= 0;
+        }
+    
+        return ctor;
+    })();
+
+    var AndOrPredicate = (function() {
+            var ctor = function(op, nodes) {
+                this.op = this._resolveOp(op);
+                // TODO: assert that nodes is an array
+                this.nodes = nodes.map(function(node) {
+                    return Predicate(node);
+                });
+            };
+            var proto = ctor.prototype = new BasePredicate({
+                'and': { aliases: [ '&&' ] },
+                'or':  { aliases: [ '||' ] }
+        });
+
+        proto.validate = function (entityType) {
+            if (this._validatedEntityType === entityType) return;
+            this.nodes.every(function (node) {
+                node.validate(entityType);
+            });
+            this._validatedEntityType = entityType;
+        };
+
+        proto.toFunction = function (entityType) {
+            return createFunction(entityType, this.op, this.nodes);
+        };
+        
+        proto.toODataFragment = function (entityType, prefix) {
+            this.validate(entityType);
+            var result = this.nodes.map(function (node) {
+                return "(" + node.toODataFragment(entityType, prefix) + ")";
+            }).join(" " + this.op.odataOperator + " ");
+            return result;
+        };
+
+        proto.toString = function () {
+            var result = this.nodes.map(function (node) {
+                return "(" + node.toString() + ")";
+            }).join(" " + this.op.odataOperator + " ");
+            return result;
+        };
+
+        function createFunction(entityType, op, nodes) {
+            var funcs = nodes.map(function (node) { return node.toFunction(entityType); });
+            switch (op.key) {
+                case "and":
+                    return function (entity) {
+                        var result = funcs.reduce(function (prev, cur) {
+                            return prev && cur(entity);
+                        }, true);
+                        return result;
+                    };
+                case "or":
+                    return function (entity) {
+                        var result = funcs.reduce(function (prev, cur) {
+                            return prev || cur(entity);
+                        }, false);
+                        return result;
+                    };
+                default:
+                    throw new Error("Invalid boolean operator:" + op.key);
+            }
+        }
+        
+        return ctor;
+
+    })();
+
+    var AnyAllPredicate = function () {
+
+        var ctor = function (op, expr, node) {
+            this.op = this._resolveOp(op);
+            this.exprSource = expr;
+            // this.expr will not be resolved until validate is called
+            this.node = Predicate(node);
+        };
+
+        var proto = ctor.prototype = new BasePredicate({
+           'any': { aliases: ["some"]},
+           'all': { aliases: ["every"] }
+        });
+
+        proto.validate = function (entityType) {
+            if (this._validatedEntityType === entityType) return;
+            this.expr = createExpr(this.exprSource, entityType);
+            this.node.validate(this.expr.dataType);
+            this._validatedEntityType = entityType;
+        };
+
+        proto.toFunction = function (entityType) {
+            this.validate(entityType);
+            var v1Fn = this.expr.toFunction();
+            var predFn = getPredicateFn(this.op);
+            var fn2 = this.node.toFunction(this.expr.dataType);
+            return function (entity) {
+                return predFn(v1Fn(entity), fn2);
+            };
+        };
+
+        proto.toODataFragment = function (entityType, prefix) {
+            this.validate(entityType);
+            var v1Expr = this.expr.toODataFragment(entityType);
+            if (prefix) {
+                v1Expr = prefix + "/" + v1Expr;
+                prefix = "x" + (parseInt(prefix.substring(1)) + 1);
+            } else {
+                prefix = "x1";
+            }
+            
+            return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.node.toODataFragment(this.expr.dataType, prefix) + ")";
+        };
+
+        proto.toString = function () {
+            return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.node.toString());
+        };
+
+        function getPredicateFn(op) {
+            switch (op.key) {
+                case "any":
+                    return function(v1, v2) { return v1.some(function(v)  { return v2(v); }); };
+                case "all":
+                    return function(v1, v2) { return v1.every(function(v) { return v2(v); }); };
+                default:
+                    throw new Error("Unknown operator: " + op.key);
+            }
+        }
+
+        return ctor;
+
+    }();
+
+    var LitExpr = (function () {
+
+        var ctor = function(value, dataType) {
+            this.value = value;
+            this.dataType = dataType;
+        };
+        var proto = ctor.prototype;
+        
+        proto.validate = function (entityType) {
+            return;
+        }
+        
+        proto.toFunction = function () {
+            var value = this.value;
+            return function (entity) { return value; };
+        }
+
+        proto.toODataFragment = function() {
+            return this.dataType.fmtOData(this.value);
+        }
+
+        proto.toString = function() {
+            return this.value;
+        }
+
+        return ctor;
+    })();
+
+    var PropExpr = (function () {
+
+        var ctor = function(propertyPath) {
+            this.propertyPath = propertyPath;
+            this.dataType = DataType.Undefined;
+            // this.dataType resolved after validate ( if not on an anon type }
+        };
+        var proto = ctor.prototype;
+
+        proto.validate = function (entityType) {
+            if (this._validatedEntityType === entityType) return;
+            if (entityType.isAnonymous) return;
+            var prop = entityType.getProperty(this.propertyPath, true);
+            if (!prop) {
+                var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
+                throw new Error(msg);
+            }
+            if (prop.isDataProperty) {
+                this.dataType = prop.dataType;
+            } else {
+                this.dataType = prop.entityType;
+            }
+            this._validatedEntityType = entityType;
+        }
+
+        proto.toODataFragment = function (entityType) {
+            this.validate(entityType);
+            return entityType._clientPropertyPathToServer(this.propertyPath);
+        }
+        
+        proto.toFunction = function () {
+            var propertyPath = this.propertyPath;
+            var properties = propertyPath.split('.');
+            if (properties.length === 1) {
+                return function (entity) {
+                    return entity.getProperty(propertyPath);
+                };
+            } else {
+                return function (entity) {
+                    return getPropertyPathValue(entity, properties);
+                };
+            }
+        }
+        
+        proto.toString = function () {
+            return this.propertyPath;
+        };
+        
+        return ctor;
+    })();
+
+    var FnExpr = (function() {
+
+        var ctor = function(fnName, exprArgs) {
+            this.fnName = fnName;
+            this.exprArgs = exprArgs;
+            var qf = funcMap[fnName];
+            if (qf == null) {
+                throw new Error("Unknown function: " + fnName);
+            }
+            this.localFn = qf.fn;
+            this.dataType = qf.dataType;
+        };
+        var proto = ctor.prototype;
+
+
+        proto.validate = function(entityType) {
+            if (this._validatedEntityType === entityType) return;
+            this.exprArgs.forEach(function(expr) {
+                expr.validate(entityType);
+            });
+            this._validatedEntityType = entityType;
+        }
+
+        proto.toFunction = function () {
+            var that = this;
+            return function(entity) {
+                var values = that.exprArgs.map(function(expr) {
+                    var value = expr.toFunction()(entity);
+                    return value;
+                });
+                var result = that.localFn.apply(null, values);
+                return result;
+            }
+        };
+    
+
+        proto.toODataFragment = function (entityType) {
+            this.validate(entityType);
+            var frags = this.exprArgs.map(function (expr) {
+                return expr.toODataFragment(entityType);
+            });
+            var result = this.fnName + "(" + frags.join(",") + ")";
+            return result;
+        }
+        
+        proto.toString = function () {
+            var args = this.exprArgs.map(function (expr) {
+                return expr.toString();
+            });
+            var uri = this.fnName + "(" + args.join(",") + ")";
+            return uri;
+        };
+        
+
+        var funcMap = ctor.funcMap = {
+            toupper: { fn: function (source) { return source.toUpperCase(); }, dataType: DataType.String },
+            tolower: { fn: function (source) { return source.toLowerCase(); }, dataType: DataType.String },
+            substring: { fn: function (source, pos, length) { return source.substring(pos, length); }, dataType: DataType.String },
+            substringof: { fn: function (find, source) { return source.indexOf(find) >= 0; }, dataType: DataType.Boolean },
+            length: { fn: function (source) { return source.length; }, dataType: DataType.Int32 },
+            trim: { fn: function (source) { return source.trim(); }, dataType: DataType.String },
+            concat: { fn: function (s1, s2) { return s1.concat(s2); }, dataType: DataType.String },
+            replace: { fn: function (source, find, replace) { return source.replace(find, replace); }, dataType: DataType.String },
+            startswith: { fn: function (source, find) { return __stringStartsWith(source, find); }, dataType: DataType.Boolean },
+            endswith: { fn: function (source, find) { return __stringEndsWith(source, find); }, dataType: DataType.Boolean },
+            indexof: { fn: function (source, find) { return source.indexOf(find); }, dataType: DataType.Int32 },
+            round: { fn: function (source) { return Math.round(source); }, dataType: DataType.Int32 },
+            ceiling: { fn: function (source) { return Math.ceil(source); }, dataType: DataType.Int32 },
+            floor: { fn: function (source) { return Math.floor(source); }, dataType: DataType.Int32 },
+            second: { fn: function (source) { return source.getSeconds(); }, dataType: DataType.Int32 },
+            minute: { fn: function (source) { return source.getMinutes(); }, dataType: DataType.Int32 },
+            day: { fn: function (source) { return source.getDate(); }, dataType: DataType.Int32 },
+            month: { fn: function (source) { return source.getMonth() + 1; }, dataType: DataType.Int32 },
+            year: { fn: function (source) { return source.getFullYear(); }, dataType: DataType.Int32 }
+        };
+
+        return ctor;
+    })();
+
+    var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
+    // comma delimited expressions ignoring commas inside of both single and double quotes.
+    var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
+    var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
+    var DELIM = String.fromCharCode(191);
+
+    function createExpr(source, entityType) {
+        if (typeof source !== 'string') {
+            if (source != null && source.isLiteral) {
+                source = source.value;
+            }
+            return new LitExpr(source, DataType.fromValue(source));
+        }
+    
+        var regex = /\([^()]*\)/;
+        var m;
+        var tokens = [];
+        var i = 0;
+        while (m = regex.exec(source)) {
+            var token = m[0];
+            tokens.push(token);
+            var repl = DELIM + i++;
+            source = source.replace(token, repl);
+        }
+        
+        
+        var expr = parseExpr(source, tokens, entityType);
+        expr.validate(entityType);
+        return expr;
+    }
+
+    function parseExpr(source, tokens, entityType) {
+        var parts = source.split(DELIM);
+        if (parts.length === 1) {
+            return parseLitOrPropExpr(parts[0], entityType);
+        } else {
+            return parseFnExpr(source, parts, tokens, entityType);
+        }
+    }
+
+    function parseLitOrPropExpr(value, entityType) {
+        value = value.trim();
+        // value is either a string, a quoted string, a number, a bool value, or a date
+        // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
+        var firstChar = value.substr(0, 1);
+        var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
+        if (isQuoted) {
+            var unquotedValue = value.substr(1, value.length - 2);
+            return new LitExpr(unquotedValue, DataType.String);
+        } else {
+            if (entityType.isAnonymous) {
+                // this fork will only be reached for an anon type on the LHS of an BinaryPredicate
+                return new PropExpr(value);
+            } else {
+                var mayBeIdentifier = RX_IDENTIFIER.test(value);
+                if (mayBeIdentifier) {
+                    if (entityType.getProperty(value, false) != null) {
+                        return new PropExpr(value);
+                    }
+                }
+            }
+            // we don't really know the datatype here because even though it comes in as a string
+            // its usually a string BUT it might be a number  i.e. the "1" or the "2" from an expr 
+            // like "toUpper(substring(companyName, 1, 2))"
+            return new LitExpr(value, DataType.Undefined);
+        }
+    }
+
+    function parseFnExpr(source, parts, tokens, entityType) {
+        try {
+            var fnName = parts[0].trim().toLowerCase();
+
+            var argSource = tokens[parts[1]].trim();
+            if (argSource.substr(0, 1) === "(") {
+                argSource = argSource.substr(1, argSource.length - 2);
+            }
+            var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
+            var args = argSource.match(commaMatchStr);
+            var exprArgs = args.map(function (a) {
+                return parseExpr(a, tokens, entityType);
+            });
+            return new FnExpr(fnName, exprArgs);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    return Predicate;
+
+})();
+
+breeze.Predicate = Predicate;
+
 ;     
 var EntityQuery = (function () {
     /**
@@ -9755,12 +10574,10 @@ var EntityQuery = (function () {
     **/
     proto.where = function (wherePredicate) {
        if (wherePredicate != null) {
-          if (!(wherePredicate instanceof Predicate)) {
-             wherePredicate = Predicate.create(__arraySlice(arguments));
-          }
+          wherePredicate = Predicate.create(__arraySlice(arguments));
           if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
           if (this.wherePredicate) {
-             wherePredicate = new CompositePredicate('and', [this.wherePredicate, wherePredicate]);
+              wherePredicate = this.wherePredicate.and(wherePredicate);
           }
        }
        return clone(this, "wherePredicate", wherePredicate);
@@ -10530,205 +11347,6 @@ var EntityQuery = (function () {
     return ctor;
 })();
 
-var QueryFuncs = (function() {
-    var obj = {
-        toupper:     { fn: function (source) { return source.toUpperCase(); }, dataType: DataType.String },
-        tolower:     { fn: function (source) { return source.toLowerCase(); }, dataType: DataType.String },
-        substring:   { fn: function (source, pos, length) { return source.substring(pos, length); }, dataType: DataType.String },
-        substringof: { fn: function (find, source) { return source.indexOf(find) >= 0;}, dataType: DataType.Boolean },
-        length:      { fn: function (source) { return source.length; }, dataType: DataType.Int32 },
-        trim:        { fn: function (source) { return source.trim(); }, dataType: DataType.String },
-        concat:      { fn: function (s1, s2) { return s1.concat(s2); }, dataType: DataType.String },
-        replace:     { fn: function (source, find, replace) { return source.replace(find, replace); }, dataType: DataType.String },
-        startswith:  { fn: function (source, find) { return __stringStartsWith(source, find); }, dataType: DataType.Boolean },
-        endswith:    { fn: function (source, find) { return __stringEndsWith(source, find); }, dataType: DataType.Boolean },
-        indexof:     { fn: function (source, find) { return source.indexOf(find); }, dataType: DataType.Int32 },
-        round:       { fn: function (source) { return Math.round(source); }, dataType: DataType.Int32 },
-        ceiling:     { fn: function (source) { return Math.ceil(source); }, dataType: DataType.Int32 },
-        floor:       { fn: function (source) { return Math.floor(source); }, dataType: DataType.Int32 },
-        second:      { fn: function (source) { return source.getSeconds(); }, dataType: DataType.Int32 },
-        minute:      { fn: function (source) { return source.getMinutes(); }, dataType: DataType.Int32 },
-        day:         { fn: function (source) { return source.getDate(); }, dataType: DataType.Int32 },
-        month:       { fn: function (source) { return source.getMonth() + 1; }, dataType: DataType.Int32 },
-        year:        { fn: function (source) { return source.getFullYear(); }, dataType: DataType.Int32 }
-    };
-        
-    return obj;
-})();
-    
-var FnNode = (function() {
-    // valid property name identifier
-    var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i ;
-    // comma delimited expressions ignoring commas inside of quotes.
-    var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g ;
-    var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g ;
-        
-    // entityType will only be passed in for rhs expr.
-    var ctor = function (source, tokens, entityType) {
-        var parts = source.split(":");
-        this.isRealNode = true;
-        if (parts.length === 1) {
-            var value = parts[0].trim();
-            this.value = value;
-            // value is either a string, a quoted string, a number, a bool value, or a date
-            // if a string ( not a quoted string) then this represents a property name.
-            var firstChar = value.substr(0,1);
-            var quoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
-            if (quoted) {
-                var unquoted = value.substr(1, value.length - 2);
-                this.fn = function (entity) { return unquoted; };
-                this.dataType = DataType.String;
-            } else {
-                var mayBeIdentifier = RX_IDENTIFIER.test(value);
-                if (mayBeIdentifier) {
-                    if (entityType) {
-                        if (entityType.getProperty(value, false) == null) {
-                            // not a real FnNode;
-                            this.isRealNode = false;
-                            return;
-                        }
-                    }
-                    this.propertyPath = value;
-                    this.fn = createPropFunction(value);
-                } else {
-                    if (entityType) {
-                        this.isRealNode = false;
-                        return;
-                    }
-                    this.fn = function (entity) { return value; };
-                    this.dataType = DataType.fromValue(value);
-                }
-            } 
-        } else {
-            try {
-                this.fnName = parts[0].trim().toLowerCase();
-                var qf = QueryFuncs[this.fnName];
-                this.localFn = qf.fn;
-                this.dataType = qf.dataType;
-                var that = this;
-                this.fn = function(entity) {
-                    var resolvedNodes = that.fnNodes.map(function(fnNode) {
-                        var argVal = fnNode.fn(entity);
-                        return argVal;
-                    });
-                    var val = that.localFn.apply(null, resolvedNodes);
-                    return val;
-                };
-                var argSource = tokens[parts[1]].trim();
-                if (argSource.substr(0, 1) === "(") {
-                    argSource = argSource.substr(1, argSource.length - 2);
-                }
-                var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
-                var args = argSource.match(commaMatchStr);
-                this.fnNodes = args.map(function(a) {
-                    return new FnNode(a, tokens );
-                });
-            } catch (e) {
-                this.isRealNode = false;
-            }
-        }
-    };
-    var proto = ctor.prototype;
-
-    ctor.create = function (source, entityType, operator) {
-        if (typeof source !== 'string') {
-            return null;
-        }
-        var regex = /\([^()]*\)/ ;
-        var m;
-        var tokens = [];
-        var i = 0;
-        while (m = regex.exec(source)) {
-            var token = m[0];
-            tokens.push(token);
-            var repl = ":" + i++;
-            source = source.replace(token, repl);
-        }
-        
-        var node = new FnNode(source, tokens, operator ? null : entityType);
-        if (node.isRealNode) {
-            if (!node.dataType && operator && operator.isStringFn) {
-                node.dataType = DataType.String;
-            }
-            node._validate(entityType);
-            return node;
-        } else {
-            return null;
-        }
-        
-        
-    };
-
-    proto.toString = function() {
-        if (this.fnName) {
-            var args = this.fnNodes.map(function(fnNode) {
-                return fnNode.toString();
-            });
-            var uri = this.fnName + "(" + args.join(",") + ")";
-            return uri;
-        } else {
-            return this.value;
-        }
-    };
-
-    proto.toODataFragment = function (entityType) {
-        this._validate(entityType);
-        if (this.fnName) {
-            var args = this.fnNodes.map(function(fnNode) {
-                return fnNode.toODataFragment(entityType);
-            });                
-            var uri = this.fnName + "(" + args.join(",") + ")";
-            return uri;
-        } else {
-            var firstChar = this.value.substr(0, 1);
-            if (firstChar === "'" || firstChar === '"') {
-                return this.value;                  
-            } else if (this.value == this.propertyPath) {
-                return entityType._clientPropertyPathToServer(this.propertyPath);
-            } else {
-                return this.value;
-            }
-        }
-    };
-
-    proto._validate = function(entityType) {
-        // will throw if not found;
-        if (this.isValidated) return;            
-        if (this.propertyPath) {
-            if (entityType.isAnonymous) return;
-            var prop = entityType.getProperty(this.propertyPath, true);
-            if (!prop) {
-                var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
-                throw new Error(msg);
-            }
-            if (prop.isDataProperty) {
-                this.dataType = prop.dataType;
-            } else {
-                this.dataType = prop.entityType;
-            }
-        } else if (this.fnNodes) {
-            this.fnNodes.forEach(function(node) {
-                node._validate(entityType);
-            });
-        }
-        this.isValidated = true;
-    };
-        
-    function createPropFunction(propertyPath) {
-        var properties = propertyPath.split('.');
-        if (properties.length === 1) {
-            return function (entity) {
-                return entity.getProperty(propertyPath);
-            };
-        } else {
-            return function (entity) {
-                return getPropertyPathValue(entity, properties);
-            };
-        }
-    }
-
-    return ctor;
-})();
    
 var FilterQueryOp = (function () {
     /**
@@ -10745,42 +11363,42 @@ var FilterQueryOp = (function () {
     @final
     @static
     **/
-    aEnum.Equals = aEnum.addSymbol({ operator: "eq", aliases: ["=="] });
+    aEnum.Equals = aEnum.addSymbol({ operator: "eq" });
     /**
     Aliases: "ne", "!="
     @property NotEquals {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.NotEquals = aEnum.addSymbol({ operator: "ne", aliases: ["!="] });
+    aEnum.NotEquals = aEnum.addSymbol({ operator: "ne" });
     /**
     Aliases: "gt", ">"
     @property GreaterThan {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.GreaterThan = aEnum.addSymbol({ operator: "gt", aliases: [">"] });
+    aEnum.GreaterThan = aEnum.addSymbol({ operator: "gt" });
     /**
     Aliases: "lt", "<"
     @property LessThan {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.LessThan = aEnum.addSymbol({ operator: "lt", aliases: ["<"] });
+    aEnum.LessThan = aEnum.addSymbol({ operator: "lt" });
     /**
     Aliases: "ge", ">="
     @property GreaterThanOrEqual {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.GreaterThanOrEqual = aEnum.addSymbol({ operator: "ge", aliases: [">="] });
+    aEnum.GreaterThanOrEqual = aEnum.addSymbol({ operator: "ge" });
     /**
     Aliases: "le", "<="
     @property LessThanOrEqual {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.LessThanOrEqual = aEnum.addSymbol({ operator: "le", aliases: ["<="] });
+    aEnum.LessThanOrEqual = aEnum.addSymbol({ operator: "le" });
     /**
     String operation: Is a string a substring of another string.
     Aliases: "substringof"
@@ -10788,19 +11406,19 @@ var FilterQueryOp = (function () {
     @final
     @static
     **/
-    aEnum.Contains = aEnum.addSymbol({ operator: "substringof", aliases: ["contains"], isFunction: true, isStringFn: true });
+    aEnum.Contains = aEnum.addSymbol({ operator: "substringof"  });
     /**
     @property StartsWith {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.StartsWith = aEnum.addSymbol({ operator: "startswith", isFunction: true, isStringFn: true });
+    aEnum.StartsWith = aEnum.addSymbol({ operator: "startswith" });
     /**
     @property EndsWith {FilterQueryOp}
     @final
     @static
     **/
-    aEnum.EndsWith = aEnum.addSymbol({ operator: "endswith", isFunction: true, isStringFn: true });
+    aEnum.EndsWith = aEnum.addSymbol({ operator: "endswith" });
 
     /**
     Aliases: "some"
@@ -10808,7 +11426,7 @@ var FilterQueryOp = (function () {
     @final
     @static
     **/
-    aEnum.Any = aEnum.addSymbol({ operator: "any", isAnyAll: true, aliases: ["some"] });
+    aEnum.Any = aEnum.addSymbol({ operator: "any" });
 
     /**
     Aliases: "every"
@@ -10816,9 +11434,9 @@ var FilterQueryOp = (function () {
     @final
     @static
     **/
-    aEnum.All = aEnum.addSymbol({ operator: "all", isAnyAll: true, aliases: ["every"] });
+    aEnum.All = aEnum.addSymbol({ operator: "all" });
 
-    aEnum.IsTypeOf = aEnum.addSymbol({ operator: "isof", isFunction: true, aliases: ["isTypeOf"] });
+    aEnum.IsTypeOf = aEnum.addSymbol({ operator: "isof" });
     
     aEnum.resolveSymbols();
     aEnum._map = function () {
@@ -10846,9 +11464,9 @@ var FilterQueryOp = (function () {
 
 var BooleanQueryOp = (function () {
     var aEnum = new Enum("BooleanQueryOp");
-    aEnum.And = aEnum.addSymbol({ operator: "and", aliases: ["&&"] });
-    aEnum.Or = aEnum.addSymbol({ operator: "or", aliases: ["||"] });
-    aEnum.Not = aEnum.addSymbol({ operator: "not", aliases: ["~", "!"] });
+    aEnum.And = aEnum.addSymbol({ operator: "and" });
+    aEnum.Or = aEnum.addSymbol({ operator: "or" });
+    aEnum.Not = aEnum.addSymbol({ operator: "not" });
 
     aEnum.resolveSymbols();
     aEnum._map = (function () {
@@ -10874,612 +11492,6 @@ var BooleanQueryOp = (function () {
     return aEnum;
 }) ();
 
-var Predicate = (function () {
-    /**  
-    Used to define a 'where' predicate for an EntityQuery.  Predicates are immutable, which means that any
-    method that would modify a Predicate actually returns a new Predicate. 
-    @class Predicate
-    **/
-        
-    /**
-    Predicate constructor
-    @example
-        var p1 = new Predicate("CompanyName", "StartsWith", "B");
-        var query = new EntityQuery("Customers").where(p1);
-    or 
-    @example
-        var p2 = new Predicate("Region", FilterQueryOp.Equals, null);
-        var query = new EntityQuery("Customers").where(p2);
-    @method <ctor> Predicate
-    @param property {String} A property name, a nested property name or an expression involving a property name.
-    @param operator {FilterQueryOp|String}
-    @param value {Object} - This will be treated as either a property expression or a literal depending on context.  In general, 
-                if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. 
-                In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.
-                Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set
-                to one of the breeze.DataType enumeration instances.
-    
-    **/
-    var ctor = function (propertyOrExpr, operator, value) {
-        // params above are just for doc purposes 
-        if (arguments[0].prototype === true) {
-            // used to construct prototype
-            return this;
-        }
-        return new SimplePredicate(__arraySlice(arguments));
-    };
-    var proto = ctor.prototype;
-
-    ///**  
-    //Returns whether an object is a Predicate
-    //@example
-    //    var p1 = new Predicate("CompanyName", "StartsWith", "B");
-    //    if (Predicate.isPredicate(p1)) {
-    //        // do something
-    //    }
-    //@method isPredicate
-    //@param o {Object}
-    //@static
-    //**/
-    //ctor.isPredicate = function (o) {
-    //    return o instanceof Predicate;
-    //};
-
-    /**  
-    Creates a new 'simple' Predicate.  Note that this method can also take its parameters as an array.
-    @example
-        var p1 = Predicate.create("Freight", "gt", 100);
-    or parameters can be passed as an array.
-    @example
-        var predArgs = ["Freight", "gt", 100];
-        var p1 = Predicate.create(predArgs);
-    both of these are the same as 
-    @example
-        var p1 = new Predicate("Freight", "gt", 100);
-    @method create 
-    @static
-    @param property {String} A property name, a nested property name or an expression involving a property name.
-    @param operator {FilterQueryOp|String}
-    @param value {Object} - This will be treated as either a property expression or a literal depending on context.  In general, 
-                if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. 
-                In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.
-                Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set
-                to one of the breeze.DataType enumeration instances.
-    
-    **/
-    ctor.create = function (property, operator, value) {
-        var args = Array.isArray(property) && arguments.length === 1 ? property : __arraySlice(arguments);
-        return new SimplePredicate(args);
-    };
-
-    /**  
-    Creates a 'composite' Predicate by 'and'ing a set of specified Predicates together.
-    @example
-        var dt = new Date(88, 9, 12);
-        var p1 = Predicate.create("OrderDate", "ne", dt);
-        var p2 = Predicate.create("ShipCity", "startsWith", "C");
-        var p3 = Predicate.create("Freight", ">", 100);
-        var newPred = Predicate.and(p1, p2, p3);
-    or
-    @example
-        var preds = [p1, p2, p3];
-        var newPred = Predicate.and(preds);
-    @method and
-    @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
-    @static
-    **/
-    ctor.and = function (predicates) {
-        predicates = argsToPredicates(arguments);
-        if (predicates.length === 0) {
-            return null;
-        } else if (predicates.length === 1) {
-            return predicates[0];
-        } else {
-            return new CompositePredicate("and", predicates);
-        }
-    };
-
-    /**  
-    Creates a 'composite' Predicate by 'or'ing a set of specified Predicates together.
-    @example
-        var dt = new Date(88, 9, 12);
-        var p1 = Predicate.create("OrderDate", "ne", dt);
-        var p2 = Predicate.create("ShipCity", "startsWith", "C");
-        var p3 = Predicate.create("Freight", ">", 100);
-        var newPred = Predicate.or(p1, p2, p3);
-    or
-    @example
-        var preds = [p1, p2, p3];
-        var newPred = Predicate.or(preds);
-    @method or
-    @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
-    @static
-    **/
-    ctor.or = function (predicates) {
-        predicates = argsToPredicates(arguments);
-        if (predicates.length === 0) {
-            return null;
-        } else if (predicates.length === 1) {
-            return predicates[0];
-        } else {
-            return new CompositePredicate("or", predicates);
-        }
-    };
-
-    /**  
-    Creates a 'composite' Predicate by 'negating' a specified predicate.
-    @example
-        var p1 = Predicate.create("Freight", "gt", 100);
-        var not_p1 = Predicate.not(p1);
-    This can also be accomplished using the 'instance' version of the 'not' method
-    @example
-        var not_p1 = p1.not();
-    Both of which would be the same as
-    @example
-        var not_p1 = Predicate.create("Freight", "le", 100);
-    @method not
-    @param predicate {Predicate}
-    @static
-    **/
-    ctor.not = function (predicate) {
-        return new CompositePredicate("not", [predicate]);
-    };
-
-    /**  
-    'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
-    @example
-        var dt = new Date(88, 9, 12);
-        var p1 = Predicate.create("OrderDate", "ne", dt);
-        var p2 = Predicate.create("ShipCity", "startsWith", "C");
-        var p3 = Predicate.create("Freight", ">", 100);
-        var newPred = p1.and(p2, p3);
-    or
-    @example
-        var preds = [p2, p3];
-        var newPred = p1.and(preds);
-    The 'and' method is also used to write "fluent" expressions
-    @example
-        var p4 = Predicate.create("ShipCity", "startswith", "F")
-            .and("Size", "gt", 2000);
-    @method and
-    @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
-    **/
-    proto.and = function (predicates) {
-        predicates = argsToPredicates(arguments);
-        predicates.unshift(this);
-        return ctor.and(predicates);
-    };
-
-    /**  
-    'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
-    @example
-        var dt = new Date(88, 9, 12);
-        var p1 = Predicate.create("OrderDate", "ne", dt);
-        var p2 = Predicate.create("ShipCity", "startsWith", "C");
-        var p3 = Predicate.create("Freight", ">", 100);
-        var newPred = p1.or(p2, p3);
-    or
-    @example
-        var preds = [p2, p3];
-        var newPred = p1.or(preds);
-    The 'or' method is also used to write "fluent" expressions
-    @example
-        var p4 = Predicate.create("ShipCity", "startswith", "F")
-            .or("Size", "gt", 2000);
-    @method or
-    @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
-    **/
-    proto.or = function (predicates) {
-        predicates = argsToPredicates(arguments);
-        predicates.unshift(this);
-        return ctor.or(predicates);
-    };
-
-    /**  
-    Returns the 'negated' version of this Predicate
-    @example
-        var p1 = Predicate.create("Freight", "gt", 100);
-        var not_p1 = p1.not();
-    This can also be accomplished using the 'static' version of the 'not' method
-    @example
-        var p1 = Predicate.create("Freight", "gt", 100);
-        var not_p1 = Predicate.not(p1);
-    which would be the same as
-    @example
-        var not_p1 = Predicate.create("Freight", "le", 100);
-    @method not
-    **/
-    proto.not = function () {
-        return new CompositePredicate("not", [this]);
-    };
-
-    // methods defined in both subclasses of Predicate
-
-    /**  
-    Returns the function that will be used to execute this Predicate against the local cache.
-    @method toFunction
-    @return {Function}
-    **/
-
-    /**  
-    Returns a human readable string for this Predicate.
-    @method toString
-    @return {String}
-    **/
-
-    /**  
-    Determines whether this Predicate is 'valid' for the specified EntityType; This method will throw an exception
-    if invalid.
-    @method validate
-    @param entityType {EntityType} The entityType to validate against.
-    **/
-
-    function argsToPredicates(argsx) {
-        var args;
-        if (argsx.length === 1 && Array.isArray(argsx[0])) {
-            args = argsx[0];
-        } else {
-            var args = __arraySlice(argsx);
-            if (! (args[0] instanceof Predicate)) {
-                args = [Predicate.create(args)];
-            }
-        }
-        // remove any null or undefined elements from the array.
-        return args.filter(function (arg) {
-            return arg != null;
-        });
-    }
-
-    return ctor;
-
-})();
-
-// Does not need to be exposed.
-var SimplePredicate = (function () {
-
-    var ctor = function (args) {
-    
-        if (args.length === 1) {
-            this._odataExpr = args[0];
-            return;
-        }
-    
-        var propertyOrExpr = args[0];
-        assertParam(propertyOrExpr, "propertyOrExpr").isString().isOptional().check();
-        
-        var operator = args[1];
-        assertParam(operator, "operator").isEnumOf(FilterQueryOp).or().isString().check();
-        var filterQueryOp = FilterQueryOp.from(operator);
-        if (!filterQueryOp) {
-            throw new Error("Unknown query operation: " + operator);
-        }
-        this._filterQueryOp = filterQueryOp;
-
-        if (propertyOrExpr) {
-            this._propertyOrExpr = propertyOrExpr;
-        } else {
-            if (filterQueryOp !== FilterQueryOp.IsTypeOf) {
-                throw new Error("propertyOrExpr cannot be null except when using the 'IsTypeOf' operator");
-            }
-        }
-
-        var value = args[2];
-        if (filterQueryOp && filterQueryOp.isAnyAll) {
-            this._value = (value instanceof Predicate) ? value : new SimplePredicate(args.slice(2));
-            this._isLiteral = undefined;
-            return;
-        } 
-        assertParam(value, "value").isRequired(true).check();
-        
-        // _datatype is just a guess here - it will only be used if we aren't certain from the rest of the expression.
-        if ((value != null) && (typeof (value) === "object") && value.value !== undefined) {
-            this._dataType = value.dataType || DataType.fromValue(value.value);
-            this._value = value.value;
-            this._isLiteral = value.isLiteral;
-        } else {
-            this._dataType = DataType.fromValue(value);
-            this._value = value;
-            this._isLiteral = undefined;
-        }
-    };
-        
-    var proto = new Predicate({ prototype: true });
-    ctor.prototype = proto;
-    
-
-    proto.toODataFragment = function (entityType, prefix) {
-        if (this._odataExpr) {
-            return this._odataExpr;
-        }
-        var filterQueryOp = this._filterQueryOp;
-        var value = this._value;
-        if (filterQueryOp == FilterQueryOp.IsTypeOf) {
-            var oftype = entityType.metadataStore.getEntityType(value);
-            var typeName = oftype.namespace + '.' + oftype.shortName;
-            return filterQueryOp.operator + "(" + DataType.String.fmtOData(typeName) + ")";
-        }
-
-        this.validate(entityType);
-
-        var v1Expr = this._fnNode1 && this._fnNode1.toODataFragment(entityType);
-        if (prefix) {
-            v1Expr = prefix + "/" + v1Expr;
-        } 
-
-        Predicate._next += 1;
-        prefix = "x" + Predicate._next;
-
-        if (filterQueryOp.isAnyAll) {
-            return v1Expr + "/" + filterQueryOp.operator + "(" + prefix + ": " + value.toODataFragment(this.dataType, prefix) + ")";
-        } else {
-            var v2Expr;
-            if (this._fnNode2) {
-                v2Expr = this._fnNode2.toODataFragment(entityType);
-            } else {
-                var dataType = this._fnNode1.dataType || this._dataType;
-                v2Expr = dataType.fmtOData(value);
-            }
-            if (filterQueryOp.isFunction) {
-                if (filterQueryOp == FilterQueryOp.Contains) {
-                    return filterQueryOp.operator + "(" + v2Expr + "," + v1Expr + ") eq true";
-                } else {
-                    return filterQueryOp.operator + "(" + v1Expr + "," + v2Expr + ") eq true";
-                }
-
-            } else {
-                return v1Expr + " " + filterQueryOp.operator + " " + v2Expr;
-            }
-        }
-    };
-
-    proto.toFunction = function (entityType) {
-        if (this._odataExpr) {
-            throw new Error("OData predicateexpressions cannot be interpreted locally");
-        }
-        this.validate(entityType);
-
-        var dataType = this._fnNode1.dataType || this._dataType;
-        var predFn = getPredicateFn(entityType, this._filterQueryOp, dataType);
-        var v1Fn = this._fnNode1.fn;
-            
-        if (this._fnNode2) {
-            var v2Fn = this._fnNode2.fn;
-            return function(entity) {
-                return predFn(v1Fn(entity), v2Fn(entity));
-            };
-        } else {
-            if (this._filterQueryOp && this._filterQueryOp.isAnyAll) {
-                var fn2 = this._value.toFunction(dataType);
-                return function (entity) {
-                    return predFn(v1Fn(entity), fn2);
-                };
-            } else {
-                var val = this._value;
-                return function (entity) {
-                    return predFn(v1Fn(entity), val);
-                };
-            }
-        }
-            
-    };
-
-    proto.toString = function () {
-        return __formatString("{%1} %2 {%3}", this._propertyOrExpr, this._filterQueryOp.operator, this._value);
-    };
-
-    proto.validate = function (entityType) {
-        var filterQueryOp = this._filterQueryOp;
-        if (this._fnNode1 === undefined && this._propertyOrExpr) {
-            this._fnNode1 = FnNode.create(this._propertyOrExpr, entityType, filterQueryOp);
-            this.dataType = this._fnNode1.dataType;
-        }
-
-        if (filterQueryOp && filterQueryOp.isAnyAll) {
-            this._value.validate(this.dataType);
-            return;
-        }
-
-        if (this._fnNode2 === undefined && !this._isLiteral) {
-           this._fnNode2 = FnNode.create(this._value, entityType);
-        }
-
-    };
-        
-    // internal functions
-
-    // TODO: still need to handle localQueryComparisonOptions for guids.
-
-        
-    function getPredicateFn(entityType, filterQueryOp, dataType) {
-        var lqco = entityType.metadataStore.localQueryComparisonOptions;
-        var mc = getComparableFn(dataType);
-        var predFn;
-        switch (filterQueryOp) {
-            case FilterQueryOp.Equals:
-                predFn = function(v1, v2) {
-                    if (v1 && typeof v1 === 'string') {
-                        return stringEquals(v1, v2, lqco);
-                    } else {
-                        return mc(v1) == mc(v2);
-                    }
-                };
-                break;
-            case FilterQueryOp.NotEquals:
-                predFn = function (v1, v2) {
-                    if (v1 && typeof v1 === 'string') {
-                        return !stringEquals(v1, v2, lqco);
-                    } else {
-                        return mc(v1) != mc(v2);
-                    }
-                };
-                break;
-            case FilterQueryOp.GreaterThan:
-                predFn = function (v1, v2) { return mc(v1) > mc(v2); };
-                break;
-            case FilterQueryOp.GreaterThanOrEqual:
-                predFn = function (v1, v2) { return mc(v1) >= mc(v2); };
-                break;
-            case FilterQueryOp.LessThan:
-                predFn = function (v1, v2) { return mc(v1) < mc(v2); };
-                break;
-            case FilterQueryOp.LessThanOrEqual:
-                predFn = function (v1, v2) { return mc(v1) <= mc(v2); };
-                break;
-            case FilterQueryOp.StartsWith:
-                predFn = function (v1, v2) { return stringStartsWith(v1, v2, lqco); };
-                break;
-            case FilterQueryOp.EndsWith:
-                predFn = function (v1, v2) { return stringEndsWith(v1, v2, lqco); };
-                break;
-            case FilterQueryOp.Contains:
-                predFn = function (v1, v2) { return stringContains(v1, v2, lqco); };
-                break;
-            case FilterQueryOp.Any: 
-                predFn = function (v1, v2) { return v1.some(function(v) { return v2(v); }); };
-                break;
-            case FilterQueryOp.All: 
-                predFn = function (v1, v2) { return v1.every(function(v) { return v2(v); }); };
-                break;
-            default:
-                throw new Error("Unknown FilterQueryOp: " + filterQueryOp);
-
-        }
-        return predFn;
-    }
-        
-    function stringEquals(a, b, lqco) {
-        if (b == null) return false;
-        if (typeof b !== 'string') {
-            b = b.toString();
-        }
-        if (lqco.usesSql92CompliantStringComparison) {
-            a = (a || "").trim();
-            b = (b || "").trim();
-        }
-        if (!lqco.isCaseSensitive) {
-            a = (a || "").toLowerCase();
-            b = (b || "").toLowerCase();
-        } 
-        return a === b; 
-    }
-        
-    function stringStartsWith(a, b, lqco) {
-            
-        if (!lqco.isCaseSensitive) {
-            a = (a || "").toLowerCase();
-            b = (b || "").toLowerCase();
-        }
-        return __stringStartsWith(a, b);
-    }
-
-    function stringEndsWith(a, b, lqco) {
-        if (!lqco.isCaseSensitive) {
-            a = (a || "").toLowerCase();
-            b = (b || "").toLowerCase();
-        }
-        return __stringEndsWith(a, b);
-    }
-        
-    function stringContains(a, b, lqco) {
-        if (!lqco.isCaseSensitive) {
-            a = (a || "").toLowerCase();
-            b = (b || "").toLowerCase();
-        }
-        return a.indexOf(b) >= 0;
-    }
-
-    return ctor;
-
-})();
-
-// Does not need to be exposed.
-var CompositePredicate = (function () {
-
-    var ctor = function (booleanOperator, predicates) {
-
-        if (!Array.isArray(predicates)) {
-            throw new Error("predicates parameter must be an array");
-        }
-
-        this._booleanQueryOp = BooleanQueryOp.from(booleanOperator);
-
-        if (!this._booleanQueryOp) {
-            throw new Error("Unknown query operation: " + booleanOperator);
-        }
-        if ((this._booleanQueryOp === BooleanQueryOp.Not && predicates.length !== 1)) {
-            throw new Error("Only a single predicate can be passed in with the 'Not' operator");
-        }
-        this._predicates = predicates;
-    };
-    var proto  = new Predicate({ prototype: true });
-    ctor.prototype = proto;
-
-    proto.toODataFragment = function (entityType, prefix) {
-        if (this._predicates.length == 1) {
-            return this._booleanQueryOp.operator + " " + "(" + this._predicates[0].toODataFragment(entityType, prefix) + ")";
-        } else {
-            var result = this._predicates.map(function (p) {
-                return "(" + p.toODataFragment(entityType, prefix) + ")";
-            }).join(" " + this._booleanQueryOp.operator + " ");
-            return result;
-        }
-    };
-
-    proto.toFunction = function (entityType) {
-        return createFunction(entityType, this._booleanQueryOp, this._predicates);
-    };
-
-    proto.toString = function () {
-        if (this._predicates.length == 1) {
-            return this._booleanQueryOp.operator + " " + "(" + this._predicates[0] + ")";
-        } else {
-            var result = this._predicates.map(function (p) {
-                return "(" + p.toString() + ")";
-            }).join(" " + this._booleanQueryOp.operator + " ");
-            return result;
-        }
-    };
-
-    proto.validate = function (entityType) {
-        // will throw if not found;
-        if (this._isValidated) return;
-        this._predicates.every(function (p) {
-            p.validate(entityType);
-        });
-        this._isValidated = true;
-    };
-
-    function createFunction(entityType, booleanQueryOp, predicates) {
-        var func, funcs;
-        switch (booleanQueryOp) {
-            case BooleanQueryOp.Not:
-                func = predicates[0].toFunction(entityType);
-                return function (entity) {
-                    return !func(entity);
-                };
-            case BooleanQueryOp.And:
-                funcs = predicates.map(function (p) { return p.toFunction(entityType); });
-                return function (entity) {
-                    var result = funcs.reduce(function (prev, cur) {
-                        return prev && cur(entity);
-                    }, true);
-                    return result;
-                };
-            case BooleanQueryOp.Or:
-                funcs = predicates.map(function (p) { return p.toFunction(entityType); });
-                return function (entity) {
-                    var result = funcs.reduce(function (prev, cur) {
-                        return prev || cur(entity);
-                    }, false);
-                    return result;
-                };
-            default:
-                throw new Error("Invalid boolean operator:" + booleanQueryOp);
-        }
-    }
-
-    return ctor;
-})();
 
 // Not exposed externally for now
 var OrderByClause = (function () {
@@ -11789,13 +11801,9 @@ function getComparableFn(dataType)  {
 }
 
 // expose
-// do not expose SimplePredicate and CompositePredicate 
-// Note: FnNode only exposed for testing purposes
-
 breeze.FilterQueryOp = FilterQueryOp;
-breeze.Predicate = Predicate;
 breeze.EntityQuery = EntityQuery;
-breeze.FnNode = FnNode;
+
 // Not documented - only exposed for testing purposes
 breeze.OrderByClause = OrderByClause;
 
@@ -12030,778 +12038,6 @@ breeze.QueryOptions= QueryOptions;
 breeze.FetchStrategy= FetchStrategy;
 breeze.MergeStrategy = MergeStrategy;
 
-
-;var AltPredicate = (function () {
-    
-    
-    var Predicate = function () {
-        if (arguments.length == 1) {
-            // 3 possibilities: 
-            //      Predicate(aPredicate)
-            //      Predicate([ aPredicate ])
-            //      Predicate(["freight", ">", 100"])
-            //      Predicate( "freight gt 100" }  // odata string
-            //      Predicate( { freight: { ">": 100 } })
-            var arg = arguments[0];
-            if (Array.isArray(arg)) {
-                if (arg.length == 1) {
-                    // recurse
-                    return Predicate(arg[0]);
-                } else {
-                    return createPredicateFromArray(arg);
-                }
-            } else if (arg instanceof BasePredicate) {
-                return arg;
-            } else if (typeof arg == 'string') {
-                return new ODataPredicate(arg);
-            } else {
-                return createPredicateFromObject(arg);
-            }
-        } else {
-            // 2 possibilities
-            //      Predicate("freight", ">", 100");
-            //      Predicate("orders", "any", "freight",  ">", 950);
-            return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
-        }
-    };
-    // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
-    Predicate.create = Predicate;
-
-    var createPredicateFromArray = function (arr) {
-        // TODO: assert that length of the array should be > 3 
-        // Needs to handle:
-        //      [ "freight", ">", 100"];
-        //      [ "orders", "any", "freight",  ">", 950 ]
-        //      [ "orders", "and", anotherPred ]
-        //      [ "orders", "and", [ "freight, ">", 950 ]
-        var json = {};
-        var value = {};
-        json[arr[0]] = value;
-        var op = arr[1];
-        op = op.operator || op;  // incoming op will be either a string or a FilterQueryOp 
-        if (arr.length == 3) {
-            value[op] = arr[2];
-        } else {
-            value[op] = createPredicateFromArray(arr.splice(2));
-        }
-        return createPredicateFromObject(json);
-    };
-
-    var createPredicateFromObject = function (obj) {
-        if (obj instanceof BasePredicate) return obj;
-        
-        if (typeof obj != 'object') {
-            throw new Error("Unable to convert to a Predicate: " + obj);
-        }
-        var keys = Object.keys(obj);
-        if (keys.length != 1) {
-            throw new Error("Unable to convert to a Predicate ( object should only have a single key) " + obj);
-        }
-        var key = keys[0];
-        var value = obj[key];
-        if (AndOrPredicate.prototype._resolveOp(key, true)) {
-            return new AndOrPredicate(key, value);
-        } else if (UnaryPredicate.prototype._resolveOp(key, true)) {
-            return new UnaryPredicate(key, value);  
-        } else {
-            var expr = key;
-            if (typeof value != 'object') {
-                throw new Error("Unable to convert to a query predicate: " + value);
-            }
-            keys = Object.keys(value);
-            if (keys.length != 1) {
-                throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
-            }
-            var op = keys[0];
-            var exprOrNode = value[op];
-            if (AnyAllPredicate.prototype._resolveOp(op, true)) {
-                return new AnyAllPredicate(op, expr, exprOrNode);
-            } else {
-                return new BinaryPredicate(op, expr, exprOrNode);
-            }
-        }
-    }
-    
-    var BasePredicate = (function() {
-        var ctor = function (map) {
-            var aliasMap = {};
-            for (var key in map) {
-                var value = map[key];
-                // if not otherwise defined
-                if (!value.odataOperator) value.odataOperator = key;
-                var aliasKey = key.toLowerCase();
-                value.key = aliasKey;
-                aliasMap[aliasKey] = value;
-                // always support the key with a $ in front
-                aliasMap["$" + aliasKey] = value;
-                value.aliases && value.aliases.forEach(function (alias) {
-                    aliasMap[alias.toLowerCase()] = value;
-                });
-            }
-            this.aliasMap = aliasMap;
-        }
-        
-        var proto = ctor.prototype;
-        
-        proto.and = function () {
-            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
-            return new AndOrPredicate("and", [this, realPred]);
-        };
-
-        proto.or = function () {
-            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
-            return new AndOrPredicate("or", [this, realPred]);
-        };
-        
-        proto.not = function () {
-            return new UnaryPredicate("not", this);
-        };
-        
-        proto._resolveOp = function (op, okIfNotFound) {
-            op = op.operator || op;
-            var result = this.aliasMap[op.toLowerCase()];           
-            if (!result && !okIfNotFound) {
-                throw new Error("Unable to resolve operator: " + op);
-            }
-            return result;
-        };
-
-        return ctor;
-    })();
-
-    var ODataPredicate = (function() {
-        var ctor = function(odataExpr) {
-            this.odataExpr = odataExpr;
-        };
-        var proto = ctor.prototype = new BasePredicate({});
-
-        proto.validate = function(entityType) { };
-        
-        proto.toFunction = function (entityType) {
-            throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
-        };
-        
-        proto.toString = proto.toODataFragment = function (entityType, prefix) {
-            return this.odataExpr;
-        };
-        
-        return ctor;
-    })(); 
-
-    var UnaryPredicate = (function(op, node) {
-        var ctor = function(op, node) {
-            this.op = this._resolveOp(op);
-            this.node = Predicate(node);
-        };
-        var proto = ctor.prototype = new BasePredicate({
-            'not': { aliases: [ '!' ] }
-        });
-        
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            this.node.validate(entityType);
-            this._validatedEntityType = entityType;
-        };
-
-        proto.toFunction = function (entityType) {
-            this.validate(entityType);
-            switch (this.op.key) {
-                case "not": 
-                    var func = node.toFunction(entityType);
-                    return function(entity) {
-                        return !func(entity);
-                    };
-                default:
-                    throw new Error("Invalid unary operator:" + this.op.key);
-            }
-        };
-
-        proto.toODataFragment = function (entityType, prefix) {
-            this.validate(entityType);
-            return this.op.odataOperator + " " + "(" + this.node.toODataFragment(entityType, prefix) + ")";
-        };
-
-        proto.toString = function () {
-            return this.op.odataOperator + " " + "(" + this.node.toString() + ")";
-        };
-
-        return ctor;
-    })();
-
-    var BinaryPredicate = (function() {
-        var ctor = function (op, expr1, expr2) {
-            this.op = this._resolveOp(op);
-            this.expr1Source = expr1;
-            this.expr2Source = expr2;
-            // this.expr1 and this.expr2 won't be
-            // determined until validate is run
-        };
-
-        var proto = ctor.prototype = new BasePredicate({
-            'eq': {
-                aliases: ["=="]
-            },
-            'ne': {
-                aliases: ["!="]
-            },
-            'lt': {
-                aliases: ["<" ]
-            },
-            'le': {
-                aliases: ["<=", "lte"]
-            },
-            'gt': {
-                aliases: [">"]
-            },
-            'ge': {
-                aliases: [">=", "gte"]
-            },
-            'startswith': {
-                isFunction: true
-            },
-            'endswith': {
-                isFunction: true
-            },
-            'substringof': {
-                aliases: ["contains"],
-                isFunction: true
-            }
-        });
-
-
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            this.expr1 = createExpr(this.expr1Source, entityType);
-            if (this.expr1 == null) {
-                throw new Error("Unable to validate 1st expression: " + this.expr1Source);
-            }
-            this.expr2 = createExpr(this.expr2Source, entityType);
-            if (this.expr2 == null) {
-                throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
-            }
-            
-            // TODO: think about passing expr1.dataType into createExpr
-            this.expr2.dataType = this.expr1.dataType;
-
-            this._validatedEntityType = entityType;
-        };
-
-        proto.toFunction = function (entityType) {
-            if (this._odataExpr) {
-                throw new Error("OData predicate expressions cannot be interpreted locally");
-            }
-            this.validate(entityType);
-
-            var dataType = this.expr1.dataType || this.expr2.dataType;
-            var predFn = getPredicateFn(entityType, this.op, dataType);
-            var v1Fn = this.expr1.jsFn;
-
-            var v2Fn = this.expr2.jsFn;
-            return function (entity) {
-                return predFn(v1Fn(entity), v2Fn(entity));
-            };
-        };
-
-        proto.toODataFragment = function (entityType, prefix) {
-            if (this._odataExpr) {
-                return this._odataExpr;
-            }
-            this.validate(entityType);
-
-            var v1Expr = this.expr1.toODataFragment(entityType);
-            if (prefix) {
-                v1Expr = prefix + "/" + v1Expr;
-            }
-           
-            var v2Expr = this.expr2.toODataFragment(entityType);
-            var op = this.op;
-            if (op.isFunction) {
-                if (op.key == "substringof") {
-                    return op.odataOperator + "(" + v2Expr + "," + v1Expr + ") eq true";
-                } else {
-                    return op.odataOperator + "(" + v1Expr + "," + v2Expr + ") eq true";
-                }
-            } else {
-                return v1Expr + " " + op.odataOperator + " " + v2Expr;
-            }
-
-        };
-
-        proto.toString = function () {
-            return __formatString("{%1} %2 {%3}", this._propertyOrExpr, this._filterQueryOp.operator, this._value);
-        };
-
-        function getPredicateFn(entityType, op, dataType) {
-            var lqco = entityType.metadataStore.localQueryComparisonOptions;
-            var mc = getComparableFn(dataType);
-            var predFn;
-            switch (op.key) {
-                case 'eq':
-                    predFn = function (v1, v2) {
-                        if (v1 && typeof v1 === 'string') {
-                            return stringEquals(v1, v2, lqco);
-                        } else {
-                            return mc(v1) == mc(v2);
-                        }
-                    };
-                    break;
-                case 'ne':
-                    predFn = function (v1, v2) {
-                        if (v1 && typeof v1 === 'string') {
-                            return !stringEquals(v1, v2, lqco);
-                        } else {
-                            return mc(v1) != mc(v2);
-                        }
-                    };
-                    break;
-                case 'gt':
-                    predFn = function (v1, v2) { return mc(v1) > mc(v2); };
-                    break;
-                case 'ge':
-                    predFn = function (v1, v2) { return mc(v1) >= mc(v2); };
-                    break;
-                case 'lt':
-                    predFn = function (v1, v2) { return mc(v1) < mc(v2); };
-                    break;
-                case 'le':
-                    predFn = function (v1, v2) { return mc(v1) <= mc(v2); };
-                    break;
-                case 'startsWith':
-                    predFn = function (v1, v2) { return stringStartsWith(v1, v2, lqco); };
-                    break;
-                case 'endsWith':
-                    predFn = function (v1, v2) { return stringEndsWith(v1, v2, lqco); };
-                    break;
-                case 'contains':
-                    predFn = function (v1, v2) { return stringContains(v1, v2, lqco); };
-                    break;
-                default:
-                    throw new Error("Unknown operator: " + op.key);
-
-            }
-            return predFn;
-        }
-
-        function getComparableFn(dataType) {
-            if (dataType && dataType.isDate) {
-                // dates don't perform equality comparisons properly 
-                return function (value) { return value && value.getTime(); };
-            } else if (dataType === DataType.Time) {
-                // durations must be converted to compare them
-                return function (value) { return value && __durationToSeconds(value); };
-            } else {
-                return function (value) { return value; };
-            }
-         }
-
-        function stringEquals(a, b, lqco) {
-            if (b == null) return false;
-            if (typeof b !== 'string') {
-                b = b.toString();
-            }
-            if (lqco.usesSql92CompliantStringComparison) {
-                a = (a || "").trim();
-                b = (b || "").trim();
-            }
-            if (!lqco.isCaseSensitive) {
-                a = (a || "").toLowerCase();
-                b = (b || "").toLowerCase();
-            }
-            return a === b;
-        }
-
-        function stringStartsWith(a, b, lqco) {
-
-            if (!lqco.isCaseSensitive) {
-                a = (a || "").toLowerCase();
-                b = (b || "").toLowerCase();
-            }
-            return __stringStartsWith(a, b);
-        }
-
-        function stringEndsWith(a, b, lqco) {
-            if (!lqco.isCaseSensitive) {
-                a = (a || "").toLowerCase();
-                b = (b || "").toLowerCase();
-            }
-            return __stringEndsWith(a, b);
-        }
-
-        function stringContains(a, b, lqco) {
-            if (!lqco.isCaseSensitive) {
-                a = (a || "").toLowerCase();
-                b = (b || "").toLowerCase();
-            }
-            return a.indexOf(b) >= 0;
-        }
-    
-        return ctor;
-    })();
-
-    var AndOrPredicate = (function() {
-            var ctor = function(op, nodes) {
-                this.op = this._resolveOp(op);
-                // TODO: assert that nodes is an array
-                this.nodes = nodes.map(function(node) {
-                    return Predicate(node);
-                });
-            };
-            var proto = ctor.prototype = new BasePredicate({
-                'and': { aliases: [ '&&' ] },
-                'or':  { aliases: [ '||' ] }
-        });
-
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            this.nodes.every(function (node) {
-                node.validate(entityType);
-            });
-            this._validatedEntityType = entityType;
-        };
-
-        proto.toFunction = function (entityType) {
-            return createFunction(entityType, this.op, this.nodes);
-        };
-        
-        proto.toODataFragment = function (entityType, prefix) {
-            this.validate(entityType);
-            var result = this.nodes.map(function (node) {
-                return "(" + node.toODataFragment(entityType, prefix) + ")";
-            }).join(" " + this.op.odataOperator + " ");
-            return result;
-        };
-
-        proto.toString = function () {
-            var result = this.nodes.map(function (node) {
-                return "(" + node.toString() + ")";
-            }).join(" " + this.op.odataOperator + " ");
-            return result;
-        };
-
-        function createFunction(entityType, op, nodes) {
-            var funcs = nodes.map(function (node) { return node.toFunction(entityType); });
-            switch (op.key) {
-                case "and":
-                    return function (entity) {
-                        var result = funcs.reduce(function (prev, cur) {
-                            return prev && cur(entity);
-                        }, true);
-                        return result;
-                    };
-                case "or":
-                    return function (entity) {
-                        var result = funcs.reduce(function (prev, cur) {
-                            return prev || cur(entity);
-                        }, false);
-                        return result;
-                    };
-                default:
-                    throw new Error("Invalid boolean operator:" + op.key);
-            }
-        }
-        
-        return ctor;
-
-    })();
-
-    var AnyAllPredicate = function () {
-
-        var ctor = function (op, expr, node) {
-            this.op = this._resolveOp(op);
-            this.exprSource = expr;
-            // this.expr will not be resolved until validate is called
-            this.node = Predicate(node);
-        };
-
-        var proto = ctor.prototype = new BasePredicate({
-           'any': { aliases: ["some"]},
-           'all': { aliases: ["every"] }
-        });
-
-        var _next = 0;
-
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            this.expr = createExpr(this.exprSource, entityType);
-            this.node.validate(this.expr.dataType);
-            this._validatedEntityType = entityType;
-        };
-
-        proto.toFunction = function (entityType) {
-            this.validate(entityType);
-            var v1Fn = this.expr1.jsFn;
-            var predFn = getPredicateFn(op);
-            var fn2 = this.node.toFunction(this.expr.dataType);
-            return function (entity) {
-                return predFn(v1Fn(entity), fn2);
-            };
-        };
-
-        proto.toODataFragment = function (entityType, prefix) {
-            this.validate(entityType);
-            var v1Expr = this.expr.toODataFragment(entityType);
-            if (prefix) {
-                v1Expr = prefix + "/" + v1Expr;
-                prefix = "x" + (parseInt(prefix.substring(1)) + 1);
-            } else {
-                prefix = "x1";
-            }
-            
-            return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.node.toODataFragment(this.expr.dataType, prefix) + ")";
-        };
-
-        proto.toString = function () {
-            return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.node.toString());
-        };
-
-        function getPredicateFn(op) {
-            switch (op.key) {
-                case "any":
-                    return function(v1, v2) { return v1.some(function(v)  { return v2(v); }); };
-                case "all":
-                    return function(v1, v2) { return v1.every(function(v) { return v2(v); }); };
-                default:
-                    throw new Error("Unknown operator: " + op.key);
-            }
-        }
-
-        return ctor;
-
-    }();
-
-    var LitExpr = (function () {
-
-        var ctor = function(value, isQuoted, dataType) {
-            this.value = value;
-            this.unquotedValue = (isQuoted) ?
-                value.substr(1, value.length - 2) :
-                value;
-            this.dataType = dataType;
-        };
-        var proto = ctor.prototype;
-
-        proto.validate = function (entityType) {
-            return;
-        }
-
-        proto.jsFn = function (entity) { return this.unquotedValue; };
-
-        proto.toODataFragment = function() {
-            return this.dataType.fmtOData(this.value);
-        }
-
-        proto.toString = function() {
-            return this.value;
-        }
-
-        return ctor;
-    })();
-
-    var PropExpr = (function () {
-
-        var ctor = function(propertyPath) {
-            this.propertyPath = propertyPath;
-            this.jsFn = createPropFunction(propertyPath);
-            // this.dataType resolved after validate;
-        };
-        var proto = ctor.prototype;
-
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            if (entityType.isAnonymous) return;
-            var prop = entityType.getProperty(this.propertyPath, true);
-            if (!prop) {
-                var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
-                throw new Error(msg);
-            }
-            if (prop.isDataProperty) {
-                this.dataType = prop.dataType;
-            } else {
-                this.dataType = prop.entityType;
-            }
-            this._validatedEntityType = entityType;
-        }
-
-        proto.toODataFragment = function (entityType) {
-            this.validate(entityType);
-            return entityType._clientPropertyPathToServer(this.propertyPath);
-        }
-        
-        proto.toString = function () {
-            return this.propertyPath;
-        };
-
-        function createPropFunction(propertyPath) {
-            var properties = propertyPath.split('.');
-            if (properties.length === 1) {
-                return function (entity) {
-                    return entity.getProperty(propertyPath);
-                };
-            } else {
-                return function (entity) {
-                    return getPropertyPathValue(entity, properties);
-                };
-            }
-        }
-
-        return ctor;
-    })();
-
-    var FnExpr = (function () {
-
-        var ctor = function (fnName, exprArgs) {
-            this.fnName = fnName;
-            this.exprArgs = exprArgs;
-            var qf = funcMap[fnName];
-            if (qf == null) {
-                throw new Error("Unknown function: " + fnName);
-            }
-            this.localFn = qf.fn;
-            this.dataType = qf.dataType;
-        };
-        var proto = ctor.prototype;
-
-        proto.validate = function (entityType) {
-            if (this._validatedEntityType === entityType) return;
-            this.exprArgs.forEach(function (expr) {
-                expr.validate(entityType);
-            });
-            this._validatedEntityType = entityType;
-        }
-
-        proto.jsFn = function (entity) {
-            var values = this.exprArgs.map(function (expr) {
-                var value = expr.jsFn(entity);
-                return value;
-            });
-            var result = this.localFn.apply(null, values);
-            return result;
-        };
-
-        proto.toODataFragment = function (entityType) {
-            this.validate(entityType);
-            var frags = this.exprArgs.map(function (expr) {
-                return expr.toODataFragment(entityType);
-            });
-            var result = this.fnName + "(" + frags.join(",") + ")";
-            return result;
-        }
-        
-        proto.toString = function () {
-            var args = this.exprArgs.map(function (expr) {
-                return expr.toString();
-            });
-            var uri = this.fnName + "(" + args.join(",") + ")";
-            return uri;
-        };
-
-        var funcMap = ctor.funcMap = {
-            toupper: { fn: function (source) { return source.toUpperCase(); }, dataType: DataType.String },
-            tolower: { fn: function (source) { return source.toLowerCase(); }, dataType: DataType.String },
-            substring: { fn: function (source, pos, length) { return source.substring(pos, length); }, dataType: DataType.String },
-            substringof: { fn: function (find, source) { return source.indexOf(find) >= 0; }, dataType: DataType.Boolean },
-            length: { fn: function (source) { return source.length; }, dataType: DataType.Int32 },
-            trim: { fn: function (source) { return source.trim(); }, dataType: DataType.String },
-            concat: { fn: function (s1, s2) { return s1.concat(s2); }, dataType: DataType.String },
-            replace: { fn: function (source, find, replace) { return source.replace(find, replace); }, dataType: DataType.String },
-            startswith: { fn: function (source, find) { return __stringStartsWith(source, find); }, dataType: DataType.Boolean },
-            endswith: { fn: function (source, find) { return __stringEndsWith(source, find); }, dataType: DataType.Boolean },
-            indexof: { fn: function (source, find) { return source.indexOf(find); }, dataType: DataType.Int32 },
-            round: { fn: function (source) { return Math.round(source); }, dataType: DataType.Int32 },
-            ceiling: { fn: function (source) { return Math.ceil(source); }, dataType: DataType.Int32 },
-            floor: { fn: function (source) { return Math.floor(source); }, dataType: DataType.Int32 },
-            second: { fn: function (source) { return source.getSeconds(); }, dataType: DataType.Int32 },
-            minute: { fn: function (source) { return source.getMinutes(); }, dataType: DataType.Int32 },
-            day: { fn: function (source) { return source.getDate(); }, dataType: DataType.Int32 },
-            month: { fn: function (source) { return source.getMonth() + 1; }, dataType: DataType.Int32 },
-            year: { fn: function (source) { return source.getFullYear(); }, dataType: DataType.Int32 }
-        };
-
-        return ctor;
-    })();
-
-    var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
-    // comma delimited expressions ignoring commas inside of both single and double quotes.
-    var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
-    var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
-
-
-    function createExpr(source, entityType) {
-        if (typeof source !== 'string') {
-            if (source != null && source.isLiteral) {
-                source = source.value;
-            }
-            return new LitExpr(source, false, DataType.fromValue(source));
-        }
-    
-        var regex = /\([^()]*\)/;
-        var m;
-        var tokens = [];
-        var i = 0;
-        while (m = regex.exec(source)) {
-            var token = m[0];
-            tokens.push(token);
-            var repl = ":" + i++;
-            source = source.replace(token, repl);
-        }
-
-        var expr = parseExpr(source, tokens, entityType);
-        expr.validate(entityType);
-        return expr;
-    }
-
-    function parseExpr(source, tokens, entityType) {
-        var parts = source.split(":");
-        if (parts.length === 1) {
-            return parseLitOrPropExpr(parts[0], entityType);
-        } else {
-            return parseFnExpr(source, parts, tokens, entityType);
-        }
-    }
-
-    function parseLitOrPropExpr(value, entityType) {
-        value = value.trim();
-        // value is either a string, a quoted string, a number, a bool value, or a date
-        // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
-        var firstChar = value.substr(0, 1);
-        var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
-        if (isQuoted) {
-            return new LitExpr(value, true, DataType.String);
-        } else {
-            var mayBeIdentifier = RX_IDENTIFIER.test(value);
-            if (mayBeIdentifier) {
-                if (entityType.getProperty(value, false) != null) {
-                    return new PropExpr(value);
-                } 
-            } 
-            return new LitExpr(value, false, DataType.String);
-        }
-    }
-
-    function parseFnExpr(source, parts, tokens, entityType) {
-        try {
-            var fnName = parts[0].trim().toLowerCase();
-
-            var argSource = tokens[parts[1]].trim();
-            if (argSource.substr(0, 1) === "(") {
-                argSource = argSource.substr(1, argSource.length - 2);
-            }
-            var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
-            var args = argSource.match(commaMatchStr);
-            var exprArgs = args.map(function (a) {
-                return parseExpr(a, tokens, entityType);
-            });
-            return new FnExpr(fnName, exprArgs);
-        } catch (e) {
-            return null;
-        }
-    }
-
-    return Predicate;
-
-})();
-
-breeze.AltPredicate = AltPredicate;
 
 ;/**
 @module breeze

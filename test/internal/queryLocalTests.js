@@ -189,7 +189,7 @@
     test("local query with two fields & contains literal forced", function () {
         var em = newEm();
         var q = EntityQuery.from("Employees")
-            .where("lastName", "startsWith", "firstName", true)
+            .where("lastName", "startsWith", { value: "firstName", isLiteral: true })
             .take(20);
         stop();
         em.executeQuery(q).then(function (data) {

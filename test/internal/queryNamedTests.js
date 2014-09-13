@@ -238,7 +238,7 @@
                 return r.getProperty("companyName").toUpperCase().substr(0, 1) === "C";
             });
             ok(allok, "all customers should have company names starting with 'c'");
-            q2 = q.where("fax", "!=", null);
+            q2 = q.toType("Customer").where("fax", "!=", null);
             return em.executeQuery(q2);
         }).then(function(data2) {
             var r2 = data2.results;

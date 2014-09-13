@@ -26,14 +26,6 @@
         }
     });
 
-    test("create alt predicate", function() {
-        var em1 = newEm();
-        var em2 = newEm();
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var p = breeze.createAltPredicate("freight", ">", 100);
-        var frag = p.toOdataFragment(orderType);
-
-    });
 
     //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
     //Using EntityManager em2, query A and change it's nav property to B2. Save the change.

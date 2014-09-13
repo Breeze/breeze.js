@@ -44,8 +44,9 @@
     <Compile Include="src\a40_localQueryComparisionOptions.js" />
     <Compile Include="src\a40_namingConvention.js" />
     <Compile Include="src\a45_entityQuery.js" />
+    <Compile Include="src\a45.entityQuery.js" />
     <Compile Include="src\a45_queryOptions.js" />
-    <Compile Include="src\a46_altPredicate.js" />
+    <Compile Include="src\a44_predicate.js" />
     <Compile Include="src\a50_entityGroup.js" />
     <Compile Include="src\a50_entityManager.js" />
     <Compile Include="src\a55_mappingContext.js" />
