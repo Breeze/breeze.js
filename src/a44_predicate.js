@@ -68,11 +68,14 @@
             throw new Error("Unable to convert to a Predicate: " + obj);
         }
         var keys = Object.keys(obj);
-        if (keys.length != 1) {
-            throw new Error("Unable to convert to a Predicate ( object should only have a single key) " + obj);
-        }
-        var key = keys[0];
-        var value = obj[key];
+        var preds = keys.map(function(key) {
+            return createPredicateFromKeyValue(key, obj[key]);
+        });
+        return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
+    }
+    
+    function createPredicateFromKeyValue(key, value) {
+
         // { and: [a,b] } key='and', value = {a,b}
         if (AndOrPredicate.prototype._resolveOp(key, true)) {
             return new AndOrPredicate(key, value);
@@ -88,24 +91,25 @@
         }
 
         var expr = key;
-        keys = Object.keys(value);
-        if (keys.length != 1) {
-            throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
-        }
-        var op = keys[0];
-        
-        // { a: { any: b } op = 'any', expr=a, exprOrPred = b
-        if (AnyAllPredicate.prototype._resolveOp(op, true)) {
-            return new AnyAllPredicate(op, expr, value[op]);
-        }
+        var keys = Object.keys(value);
+        var preds = keys.map(function(op) {
+            
+            // { a: { any: b } op = 'any', expr=a, exprOrPred = b
+            if (AnyAllPredicate.prototype._resolveOp(op, true)) {
+                return new AnyAllPredicate(op, expr, value[op]);
+            }
 
-        // { a: { ">": b }} op = ">", expr=a, exprOrPred = b
-        if (BinaryPredicate.prototype._resolveOp(op, true)) {
-            return new BinaryPredicate(op, expr, value[op]);
-        }
+            // { a: { ">": b }} op = ">", expr=a, exprOrPred = b
+            if (BinaryPredicate.prototype._resolveOp(op, true)) {
+                return new BinaryPredicate(op, expr, value[op]);
+            }
 
-        throw new Error("Unable to convert to a query predicate: " + JSON.stringify(obj));
+            throw new Error("Unable to resolve predicate for operator: " + op + " and value: " + value[op]);
 
+        });
+
+        return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
+    
     }
     
     var BasePredicate = (function() {
