@@ -34,31 +34,13 @@
     Predicate.create = Predicate;
 
     Predicate.and = function () {
-        return combinePreds(Array.prototype.slice.call(arguments, 0), function (p1, p2) {
-            return p1.and(p2);
-        });
+        return new AndOrPredicate("and", __arraySlice(arguments));
     }
     
     Predicate.or = function () {
-        return combinePreds(Array.prototype.slice.call(arguments, 0), function(p1, p2) {
-            return p1.or(p2);
-        });
+        return new AndOrPredicate("or", __arraySlice(arguments));
     }
     
-    function combinePreds(preds, fn) {
-        if (preds.length === 1 && Array.isArray(preds[0])) {
-            preds = preds[0];
-        }
-        if (preds.length === 0) return null;
-        var result = preds.reduce(function (p1, p2) {
-            if (!p1) return p2;
-            if (!p2) return p1;
-            return fn(p1, p2);
-        });
-        return result;
-    }
-    
-
     var createPredicateFromArray = function (arr) {
         // TODO: assert that length of the array should be > 3 
         // Needs to handle:
@@ -91,27 +73,39 @@
         }
         var key = keys[0];
         var value = obj[key];
+        // { and: [a,b] } key='and', value = {a,b}
         if (AndOrPredicate.prototype._resolveOp(key, true)) {
             return new AndOrPredicate(key, value);
-        } else if (UnaryPredicate.prototype._resolveOp(key, true)) {
-            return new UnaryPredicate(key, value);  
-        } else {
-            var expr = key;
-            if (typeof value != 'object') {
-                throw new Error("Unable to convert to a query predicate: " + value);
-            }
-            keys = Object.keys(value);
-            if (keys.length != 1) {
-                throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
-            }
-            var op = keys[0];
-            var exprOrNode = value[op];
-            if (AnyAllPredicate.prototype._resolveOp(op, true)) {
-                return new AnyAllPredicate(op, expr, exprOrNode);
-            } else {
-                return new BinaryPredicate(op, expr, exprOrNode);
-            }
         }
+
+        // { not: a }  key= 'not', value = a
+        if (UnaryPredicate.prototype._resolveOp(key, true)) {
+            return new UnaryPredicate(key, value);  
+        } 
+        
+        if ((typeof value !== 'object') || value == null || __isDate(value)) {
+            return new BinaryPredicate("==", key, value);
+        }
+
+        var expr = key;
+        keys = Object.keys(value);
+        if (keys.length != 1) {
+            throw new Error("Unable to convert to a query predicate ( argument should be an object with a single property): " + obj);
+        }
+        var op = keys[0];
+        
+        // { a: { any: b } op = 'any', expr=a, exprOrPred = b
+        if (AnyAllPredicate.prototype._resolveOp(op, true)) {
+            return new AnyAllPredicate(op, expr, value[op]);
+        }
+
+        // { a: { ">": b }} op = ">", expr=a, exprOrPred = b
+        if (BinaryPredicate.prototype._resolveOp(op, true)) {
+            return new BinaryPredicate(op, expr, value[op]);
+        }
+
+        throw new Error("Unable to convert to a query predicate: " + JSON.stringify(obj));
+
     }
     
     var BasePredicate = (function() {
@@ -136,13 +130,13 @@
         var proto = ctor.prototype;
         
         proto.and = function () {
-            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
-            return new AndOrPredicate("and", [this, realPred]);
+            var pred = Predicate(__arraySlice(arguments));
+            return new AndOrPredicate("and", [this, pred]);
         };
 
         proto.or = function () {
-            var realPred = Predicate(Array.prototype.slice.call(arguments, 0));
-            return new AndOrPredicate("or", [this, realPred]);
+            var pred = Predicate(__arraySlice(arguments));
+            return new AndOrPredicate("or", [this, pred]);
         };
         
         proto.not = function () {
@@ -181,9 +175,9 @@
     })(); 
 
     var UnaryPredicate = (function() {
-        var ctor = function(op, node) {
+        var ctor = function(op, pred) {
             this.op = this._resolveOp(op);
-            this.node = Predicate(node);
+            this.pred = Predicate(pred);
         };
         var proto = ctor.prototype = new BasePredicate({
             'not': { aliases: [ '!' ] }
@@ -191,7 +185,7 @@
         
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
-            this.node.validate(entityType);
+            this.pred.validate(entityType);
             this._validatedEntityType = entityType;
         };
 
@@ -199,7 +193,7 @@
             this.validate(entityType);
             switch (this.op.key) {
                 case "not": 
-                    var func = this.node.toFunction(entityType);
+                    var func = this.pred.toFunction(entityType);
                     return function(entity) {
                         return !func(entity);
                     };
@@ -210,11 +204,11 @@
 
         proto.toODataFragment = function (entityType, prefix) {
             this.validate(entityType);
-            return this.op.odataOperator + " " + "(" + this.node.toODataFragment(entityType, prefix) + ")";
+            return this.op.odataOperator + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
         };
 
         proto.toString = function () {
-            return this.op.odataOperator + " " + "(" + this.node.toString() + ")";
+            return this.op.odataOperator + " " + "(" + this.pred.toString() + ")";
         };
 
         return ctor;
@@ -438,47 +432,52 @@
     })();
 
     var AndOrPredicate = (function() {
-            var ctor = function(op, nodes) {
-                this.op = this._resolveOp(op);
-                // TODO: assert that nodes is an array
-                this.nodes = nodes.map(function(node) {
-                    return Predicate(node);
-                });
-            };
-            var proto = ctor.prototype = new BasePredicate({
+        var ctor = function(op, preds) {
+            this.op = this._resolveOp(op);
+            if (preds.length == 1 && Array.isArray(preds[0])) {
+                preds = preds[0];
+            }
+            this.preds = preds.filter(function(pred) {
+                return pred != null;
+            }).map(function(pred) {
+                return Predicate(pred);
+            });
+        };
+
+        var proto = ctor.prototype = new BasePredicate({
                 'and': { aliases: [ '&&' ] },
                 'or':  { aliases: [ '||' ] }
         });
 
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
-            this.nodes.every(function (node) {
-                node.validate(entityType);
+            this.preds.every(function (pred) {
+                pred.validate(entityType);
             });
             this._validatedEntityType = entityType;
         };
 
         proto.toFunction = function (entityType) {
-            return createFunction(entityType, this.op, this.nodes);
+            return createFunction(entityType, this.op, this.preds);
         };
         
         proto.toODataFragment = function (entityType, prefix) {
             this.validate(entityType);
-            var result = this.nodes.map(function (node) {
-                return "(" + node.toODataFragment(entityType, prefix) + ")";
+            var result = this.preds.map(function (pred) {
+                return "(" + pred.toODataFragment(entityType, prefix) + ")";
             }).join(" " + this.op.odataOperator + " ");
             return result;
         };
 
         proto.toString = function () {
-            var result = this.nodes.map(function (node) {
-                return "(" + node.toString() + ")";
+            var result = this.preds.map(function (pred) {
+                return "(" + pred.toString() + ")";
             }).join(" " + this.op.odataOperator + " ");
             return result;
         };
 
-        function createFunction(entityType, op, nodes) {
-            var funcs = nodes.map(function (node) { return node.toFunction(entityType); });
+        function createFunction(entityType, op, preds) {
+            var funcs = preds.map(function (pred) { return pred.toFunction(entityType); });
             switch (op.key) {
                 case "and":
                     return function (entity) {
@@ -505,11 +504,11 @@
 
     var AnyAllPredicate = function () {
 
-        var ctor = function (op, expr, node) {
+        var ctor = function (op, expr, pred) {
             this.op = this._resolveOp(op);
             this.exprSource = expr;
             // this.expr will not be resolved until validate is called
-            this.node = Predicate(node);
+            this.pred = Predicate(pred);
         };
 
         var proto = ctor.prototype = new BasePredicate({
@@ -520,7 +519,7 @@
         proto.validate = function (entityType) {
             if (this._validatedEntityType === entityType) return;
             this.expr = createExpr(this.exprSource, entityType);
-            this.node.validate(this.expr.dataType);
+            this.pred.validate(this.expr.dataType);
             this._validatedEntityType = entityType;
         };
 
@@ -528,7 +527,7 @@
             this.validate(entityType);
             var v1Fn = this.expr.toFunction();
             var predFn = getPredicateFn(this.op);
-            var fn2 = this.node.toFunction(this.expr.dataType);
+            var fn2 = this.pred.toFunction(this.expr.dataType);
             return function (entity) {
                 return predFn(v1Fn(entity), fn2);
             };
@@ -544,11 +543,11 @@
                 prefix = "x1";
             }
             
-            return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.node.toODataFragment(this.expr.dataType, prefix) + ")";
+            return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
         };
 
         proto.toString = function () {
-            return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.node.toString());
+            return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
         };
 
         function getPredicateFn(op) {

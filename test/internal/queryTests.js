@@ -1173,7 +1173,8 @@
     test("query with two fields & contains literal", function () {
         var em = newEm();
         var q = EntityQuery.from("Employees")
-            .where("lastName", "startsWith", "Dav")
+            // .where("lastName", "startsWith", "Dav")
+            .where({ lastName: { "startsWith": "Dav" } })
             .take(20);
         stop();
         em.executeQuery(q).then(function (data) {
@@ -2436,7 +2437,8 @@
 
         var query = new EntityQuery()
             .from("Customers")
-            .where("toLower(companyName)", "startsWith", "c");
+            // .where("toLower(companyName)", "startsWith", "c");
+            .where({ "toLower(companyName)": { startsWith: "C" } });
         var queryUrl = query._toUri(em.metadataStore);
         stop();
         em.executeQuery(query).then(function(data) {

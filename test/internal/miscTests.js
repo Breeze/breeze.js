@@ -11207,37 +11207,7 @@
         // var dt1a = core.dateFromIsoString(dt1AsString);
         ok(dt1.getTime() === dt1a.getTime());
     });
-
-    test("regex function matching", function () {
-        // hacking into FnNode - just for testing - this is not the way these would ever get used in a real app.
-        var entity = new TestEntity();
-        var ms = new MetadataStore();
-        var mt = new EntityType(ms);
-        var fo = breeze.FilterQueryOp.Equals;
-
-        // fo is only needed in this one case.
-        var node0 = breeze.FnNode.create("CompanyName", mt, fo);
-        var val0 = node0.fn(entity);
-        ok(val0 == "Test Company 1");
-        
-        var node1 = breeze.FnNode.create("substring(toUpper(CompanyName), length('adfasdf'))", mt);
-        var val1 = node1.fn(entity);
-        ok(val1 === 'MPANY 1');
-        var url1 = node1.toODataFragment(mt);
-
-        var node2 = breeze.FnNode.create("substring(toUpper(toLower(CompanyName)), length('adfa,sdf'))", mt);
-        var val2 = node2.fn(entity);
-        var url2 = node2.toODataFragment(mt);
-        
-        var node3 = breeze.FnNode.create("substring(substring(toLower(CompanyName), length('adf,asdf')),5)", mt);
-        var val3 = node3.fn(entity);
-        var url3 = node3.toODataFragment(mt);
-
-        var node4 = breeze.FnNode.create("substring(CompanyName, length(substring('xxxxxxx', 4)))", mt);
-        var val4 = node4.fn(entity);
-        var url4 = node4.toODataFragment(mt);
-        
-    });
+    
 
     var TestEntity = function() {
         this.CompanyName = "Test Company 1";

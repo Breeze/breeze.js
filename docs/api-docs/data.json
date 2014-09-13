@@ -188,22 +188,10 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a45.entityQuery.js": {
-            "name": "..\\src\\a45.entityQuery.js",
-            "modules": {},
-            "classes": {
-                "Predicate": 1
-            },
-            "fors": {},
-            "namespaces": {}
-        },
         "..\\src\\a45_entityQuery.js": {
             "name": "..\\src\\a45_entityQuery.js",
             "modules": {},
-            "classes": {
-                "EntityQuery": 1,
-                "FilterQueryOp": 1
-            },
+            "classes": {},
             "fors": {},
             "namespaces": {}
         },
@@ -284,6 +272,17 @@
             },
             "fors": {},
             "namespaces": {}
+        },
+        "..\\src\\old..entityQuery.js": {
+            "name": "..\\src\\old..entityQuery.js",
+            "modules": {},
+            "classes": {
+                "EntityQuery": 1,
+                "FilterQueryOp": 1,
+                "Predicate": 1
+            },
+            "fors": {},
+            "namespaces": {}
         }
     },
     "modules": {
@@ -330,7 +329,6 @@
                 "NamingConvention": 1,
                 "EntityQuery": 1,
                 "FilterQueryOp": 1,
-                "Predicate": 1,
                 "MergeStrategy": 1,
                 "FetchStrategy": 1,
                 "QueryOptions": 1,
@@ -339,13 +337,14 @@
                 "ↈ_ajax_interface": 1,
                 "HttpResponse": 1,
                 "ↈ_keyGenerator_interface": 1,
-                "Promise": 1
+                "Promise": 1,
+                "Predicate": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
-            "file": "..\\src\\iface.promise.js",
-            "line": 5
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1351
         }
     },
     "classes": {
@@ -728,7 +727,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "..\\src\\old..entityQuery.js",
             "line": 3,
             "description": "An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink \"EntityManager\"}}{{/crossLink}}. \n\nEntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that \nEntityQueries can be 'modified' without affecting any current instances."
         },
@@ -742,24 +741,10 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_entityQuery.js",
-            "line": 1006,
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1207,
             "description": "FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink \"Predicate\"}}{{/crossLink}} \nfilter operators for an {{#crossLink \"EntityQuery\"}}{{/crossLink}}.",
             "static": 1
-        },
-        "Predicate": {
-            "name": "Predicate",
-            "shortname": "Predicate",
-            "classitems": [],
-            "plugins": [],
-            "extensions": [],
-            "plugin_for": [],
-            "extension_for": [],
-            "module": "breeze",
-            "namespace": "",
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1351,
-            "description": "Used to define a 'where' predicate for an EntityQuery.  Predicates are immutable, which means that any\nmethod that would modify a Predicate actually returns a new Predicate."
         },
         "MergeStrategy": {
             "name": "MergeStrategy",
@@ -888,6 +873,20 @@
             "file": "..\\src\\iface.promise.js",
             "line": 5,
             "description": "This is an simply api documentation for the CommonJS A Promises specification as it is used within Breeze."
+        },
+        "Predicate": {
+            "name": "Predicate",
+            "shortname": "Predicate",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "breeze",
+            "namespace": "",
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1351,
+            "description": "Used to define a 'where' predicate for an EntityQuery.  Predicates are immutable, which means that any\nmethod that would modify a Predicate actually returns a new Predicate."
         }
     },
     "classitems": [
@@ -5889,1049 +5888,6 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 12,
-            "example": [
-                "                    \n    var query = new EntityQuery(\"Customers\")\n\nUsually this constructor will be followed by calls to filtering, ordering or selection methods",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .orderBy(\"Region\");"
-            ],
-            "itemtype": "method",
-            "name": "<ctor> EntityQuery",
-            "params": [
-                {
-                    "name": "resourceName",
-                    "description": "",
-                    "type": "String",
-                    "optional": true
-                }
-            ],
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 47,
-            "description": "The resource name used by this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "resourceName",
-            "type": "String",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 54,
-            "description": "The entityType that is associated with the 'from' clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query \nhas been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.\nThis value may be null if the entityType cannot be associated with a resourceName.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "fromEntityType",
-            "type": "EntityType",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 63,
-            "description": "The entityType that will be returned by this query. This property will only be set if the 'toType' method was called. \n\n__readOnly__",
-            "itemtype": "property",
-            "name": "resultEntityType",
-            "type": "EntityType",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 70,
-            "description": "The 'where' predicate used by this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "wherePredicate",
-            "type": "Predicate",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 77,
-            "description": "The {{#crossLink \"OrderByClause\"}}{{/crossLink}} used by this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "orderByClause",
-            "type": "OrderByClause",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 84,
-            "description": "The number of entities to 'skip' for this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "skipCount",
-            "type": "Integer",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 91,
-            "description": "The number of entities to 'take' for this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "takeCount",
-            "type": "Integer",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 98,
-            "description": "Any additional parameters that were added to the query via the 'withParameters' method. \n\n__readOnly__",
-            "itemtype": "property",
-            "name": "parameters",
-            "type": "Object",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 105,
-            "description": "The {{#crossLink \"QueryOptions\"}}{{/crossLink}} for this query.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "queryOptions",
-            "type": "QueryOptions",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 112,
-            "description": "The {{#crossLink \"EntityManager\"}}{{/crossLink}} for this query. This may be null and can be set via the 'using' method.\n\n__readOnly__",
-            "itemtype": "property",
-            "name": "entityManager",
-            "type": "EntityManager",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 121,
-            "description": "Specifies the resource to query for this EntityQuery.",
-            "example": [
-                "                    \n    var query = new EntityQuery()\n        .from(\"Customers\");\nis the same as ",
-                "\n    var query = new EntityQuery(\"Customers\");"
-            ],
-            "itemtype": "method",
-            "name": "from",
-            "params": [
-                {
-                    "name": "resourceName",
-                    "description": "The resource to query.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 140,
-            "description": "This is a static version of the \"from\" method and it creates a 'base' entityQuery for the specified resource name.",
-            "example": [
-                "                    \n    var query = EntityQuery.from(\"Customers\");\nis the same as ",
-                "\n    var query = new EntityQuery(\"Customers\");"
-            ],
-            "itemtype": "method",
-            "name": "from",
-            "static": 1,
-            "params": [
-                {
-                    "name": "resourceName",
-                    "description": "The resource to query.",
-                    "type": "String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 158,
-            "description": "Specifies the top level EntityType that this query will return.  Only needed when a query returns a json result that does not include type information.",
-            "example": [
-                "                    \n    var query = new EntityQuery()\n        .from(\"MyCustomMethod\")\n        .toType(\"Customer\")"
-            ],
-            "itemtype": "method",
-            "name": "toType",
-            "params": [
-                {
-                    "name": "entityType",
-                    "description": "The top level entityType that this query will return.  This method is only needed when a query returns a json result that \ndoes not include type information.  If the json result consists of more than a simple entity or array of entities, consider using a JsonResultsAdapter instead.",
-                    "type": "String|EntityType"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 177,
-            "description": "Returns a new query with an added filter criteria. Can be called multiple times which means to 'and' with any existing Predicate.",
-            "example": [
-                "                    \n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\");\nThis can also be expressed using an explicit {{#crossLink \"FilterQueryOp\"}}{{/crossLink}} as",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", FilterQueryOp.StartsWith, \"C\");\nor a preconstructed {{#crossLink \"Predicate\"}}{{/crossLink}} may be used",
-                "\n    var pred = new Predicate(\"CompanyName\", FilterQueryOp.StartsWith, \"C\");\n    var query = new EntityQuery(\"Customers\")\n        .where(pred);\nPredicates are often useful when you want to combine multiple conditions in a single filter, such as",
-                "\n    var pred = Predicate.create(\"CompanyName\", \"startswith\", \"C\").and(\"Region\", FilterQueryOp.Equals, null);\n    var query = new EntityQuery(\"Customers\")\n        .where(pred);",
-                "\nMore complicated queries can make use of nested property paths",
-                "\n    var query = new EntityQuery(\"Products\")\n        .where(\"Category.CategoryName\", \"startswith\", \"S\");\nor OData functions - A list of valid OData functions can be found within the {{#crossLink \"Predicate\"}}{{/crossLink}} documentation.",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"toLower(CompanyName)\", \"startsWith\", \"c\");\nor to be even more baroque",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"toUpper(substring(CompanyName, 1, 2))\", FilterQueryOp.Equals, \"OM\");"
-            ],
-            "itemtype": "method",
-            "name": "where",
-            "params": [
-                {
-                    "name": "predicate",
-                    "description": "Can be either\n    \n- a single {{#crossLink \"Predicate\"}}{{/crossLink}}\n\n- or the parameters to create a 'simple' Predicate\n\n    - a property name, a property path with '.' as path seperators or a property expression {String}\n    - an operator {FilterQueryOp|String} Either a  {{#crossLink \"FilterQueryOp\"}}{{/crossLink}} or it's string representation. Case is ignored\n            when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.\n    - a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.       \n- or a null or undefined ( this causes any existing where clause to be removed)",
-                    "type": "Predicate|property|property path, operator, value"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 243,
-            "description": "Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.",
-            "example": [
-                "\n        var query = new EntityQuery(\"Customers\")\n            .orderBy(\"CompanyName\");\n\nor to sort across multiple properties",
-                "\n        var query = new EntityQuery(\"Customers\")\n            .orderBy(\"Region, CompanyName\");\n\nNested property paths are also supported",
-                "\n        var query = new EntityQuery(\"Products\")\n        .orderBy(\"Category.CategoryName\");\n\nSorting in descending order is supported via the addition of ' desc' to the end of any property path.",
-                "\n        var query = new EntityQuery(\"Customers\")\n        .orderBy(\"CompanyName desc\");\n\nor",
-                "\n        var query = new EntityQuery(\"Customers\")\n        .orderBy(\"Region desc, CompanyName desc\");"
-            ],
-            "itemtype": "method",
-            "name": "orderBy",
-            "params": [
-                {
-                    "name": "propertyPaths",
-                    "description": "A comma-separated (',') string of property paths or an array of property paths. \nEach property path can optionally end with \" desc\" to force a descending sort order. If 'propertyPaths' is either null or omitted then all ordering is removed.",
-                    "type": "String|Array of String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 279,
-            "description": "Returns a new query that orders the results of the query by property name in descending order.",
-            "example": [
-                "\n        var query = new EntityQuery(\"Customers\")\n            .orderByDesc(\"CompanyName\");\n\nor to sort across multiple properties",
-                "\n        var query = new EntityQuery(\"Customers\")\n            .orderByDesc(\"Region, CompanyName\");\n\nNested property paths are also supported",
-                "\n        var query = new EntityQuery(\"Products\")\n        .orderByDesc(\"Category.CategoryName\");"
-            ],
-            "itemtype": "method",
-            "name": "orderByDesc",
-            "params": [
-                {
-                    "name": "propertyPaths",
-                    "description": "A comma-separated (',') string of property paths or an array of property paths. \nIf 'propertyPaths' is either null or omitted then all ordering is removed.",
-                    "type": "String|Array of String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 305,
-            "description": "Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This\nwill be referred to as a projection. \nIf the result of this selection \"projection\" contains entities, these entities will automatically be added to EntityManager's cache and will \nbe made 'observable'.\nAny simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made 'observable'.",
-            "example": [
-                "\nSimple data properties can be projected",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"CompanyName\");\nThis will return an array of objects each with a single \"CompanyName\" property of type string.\nA similar query could return a navigation property instead",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"Orders\");\nwhere the result would be an array of objects each with a single \"Orders\" property that would itself be an array of \"Order\" entities.\nComposite projections are also possible:",
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"CompanyName, Orders\");\nAs well as projections involving nested property paths",
-                "\n    var query = EntityQuery(\"Orders\")\n        .where(\"Customer.CompanyName\", \"startsWith\", \"C\")         \n        .select(\"Customer.CompanyName, Customer, OrderDate\");"
-            ],
-            "itemtype": "method",
-            "name": "select",
-            "params": [
-                {
-                    "name": "propertyPaths",
-                    "description": "A comma-separated (',') string of property paths or an array of property paths.\nIf 'propertyPaths' is either null or omitted then any existing projection on the query is removed.",
-                    "type": "String|Array of String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 347,
-            "description": "Returns a new query that skips the specified number of entities when returning results.\nAny existing 'skip' can be cleared by calling 'skip' with no arguments.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .skip(5);"
-            ],
-            "itemtype": "method",
-            "name": "skip",
-            "params": [
-                {
-                    "name": "count",
-                    "description": "The number of entities to return. If omitted or null any existing skip count on the query is removed.",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 364,
-            "description": "Returns a new query that returns only the specified number of entities when returning results. - Same as 'take'.\nAny existing 'top' can be cleared by calling 'top' with no arguments.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .top(5);"
-            ],
-            "itemtype": "method",
-            "name": "top",
-            "params": [
-                {
-                    "name": "count",
-                    "description": "The number of entities to return. \nIf 'count' is either null or omitted then any existing 'top' count on the query is removed.",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 380,
-            "description": "Returns a new query that returns only the specified number of entities when returning results - Same as 'top'.  \nAny existing take can be cleared by calling take with no arguments.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .take(5);"
-            ],
-            "itemtype": "method",
-            "name": "take",
-            "params": [
-                {
-                    "name": "count",
-                    "description": "The number of entities to return.\nIf 'count' is either null or omitted then any existing 'take' count on the query is removed.",
-                    "type": "Number"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 397,
-            "description": "Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property\nnames such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are 'expanded'.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .expand(\"Orders\");\nwill return the filtered customers each with its \"Orders\" properties fully resolved.\nMultiple paths may be specified by separating the paths by a ','",
-                "\n    var query = new EntityQuery(\"Orders\")\n        .expand(\"Customer, Employee\")\nand nested property paths my be specified as well",
-                "\n    var query = new EntityQuery(\"Orders\")\n        .expand(\"Customer, OrderDetails, OrderDetails.Product\")"
-            ],
-            "itemtype": "method",
-            "name": "expand",
-            "params": [
-                {
-                    "name": "propertyPaths",
-                    "description": "A comma-separated list of navigation property names or an array of navigation property names. Each Navigation Property name can be followed\nby a '.' and another navigation property name to enable identifying a multi-level relationship. \nIf 'propertyPaths' is either null or omitted then any existing 'expand' clause on the query is removed.",
-                    "type": "String|Array of String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 425,
-            "description": "Returns a new query that includes a collection of parameters to pass to the server.",
-            "example": [
-                "\n    var query = EntityQuery.from(\"EmployeesFilteredByCountryAndBirthdate\")\n        .withParameters({ BirthDate: \"1/1/1960\", Country: \"USA\" });\nwill call the 'EmployeesFilteredByCountryAndBirthdate' method on the server and pass in 2 parameters. This\nquery will be uri encoded as \n\n    {serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&country=USA\n    \nParameters may also be mixed in with other query criteria.",
-                "\n        var query = EntityQuery.from(\"EmployeesFilteredByCountryAndBirthdate\")\n        .withParameters({ BirthDate: \"1/1/1960\", Country: \"USA\" })\n        .where(\"LastName\", \"startsWith\", \"S\")\n        .orderBy(\"BirthDate\");"
-            ],
-            "itemtype": "method",
-            "name": "withParameters",
-            "params": [
-                {
-                    "name": "parameters",
-                    "description": "A parameters object where the keys are the parameter names and the values are the parameter values.",
-                    "type": "Object"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 452,
-            "description": "Returns a query with the 'inlineCount' capability either enabled or disabled.  With 'inlineCount' enabled, an additional 'inlineCount' property\nwill be returned with the query results that will contain the number of entities that would have been returned by this\nquery with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .take(20)\n        .orderBy(\"CompanyName\")\n        .inlineCount(true);\nwill return the first 20 customers as well as a count of all of the customers in the remote store."
-            ],
-            "itemtype": "method",
-            "name": "inlineCount",
-            "params": [
-                {
-                    "name": "enabled",
-                    "description": "Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.",
-                    "type": "Boolean=true"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 475,
-            "description": "Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query\nwill not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.",
-            "example": [
-                "\n    var query = new EntityQuery(\"Customers\")\n        .take(20)\n        .orderBy(\"CompanyName\")\n        .noTracking(true);"
-            ],
-            "itemtype": "method",
-            "name": "noTracking",
-            "params": [
-                {
-                    "name": "enabled",
-                    "description": "Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.",
-                    "type": "Boolean=true"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 497,
-            "description": "Returns a copy of this EntityQuery with the specified {{#crossLink \"EntityManager\"}}{{/crossLink}}, {{#crossLink \"DataService\"}}{{/crossLink}}, \n{{#crossLink \"JsonResultsAdapter\"}}{{/crossLink}}, {{#crossLink \"MergeStrategy\"}}{{/crossLink}} or {{#crossLink \"FetchStrategy\"}}{{/crossLink}} applied.",
-            "example": [
-                "\n'using' can be used to return a new query with a specified EntityManager.",
-                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\")\n            .using(em);\nor with a specified {{#crossLink \"MergeStrategy\"}}{{/crossLink}} ",
-                "\n    var em = new EntityManager(serviceName);\n    var query = new EntityQuery(\"Orders\")\n        .using(MergeStrategy.PreserveChanges);\nor with a specified {{#crossLink \"FetchStrategy\"}}{{/crossLink}} ",
-                "\n    var em = new EntityManager(serviceName);\n    var query = new EntityQuery(\"Orders\")\n        .using(FetchStrategy.FromLocalCache);",
-                ""
-            ],
-            "itemtype": "method",
-            "name": "using",
-            "params": [
-                {
-                    "name": "obj",
-                    "description": "The object to update in creating a new EntityQuery from an existing one.",
-                    "type": "EntityManager|QueryOptions|DataService|MergeStrategy|FetchStrategy|JsonResultsAdapter|config object"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 558,
-            "description": "Executes this query.  This method requires that an EntityManager has been previously specified via the \"using\" method.",
-            "example": [
-                "\nThis method can be called using a 'promises' syntax ( recommended)",
-                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\").using(em);\n        query.execute()\n        .then( function(data) {\n            ... query results processed here\n        }).fail( function(err) {\n            ... query failure processed here\n        });\nor with callbacks",
-                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\").using(em);\n        query.execute(\n        function(data) {\n            var orders = data.results;\n            ... query results processed here\n        },\n        function(err) {\n            ... query failure processed here\n        });\nEither way this method is the same as calling the EntityManager 'execute' method.",
-                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\");\n        em.executeQuery(query)\n        .then( function(data) {\n            var orders = data.results;\n            ... query results processed here\n        }).fail( function(err) {\n            ... query failure processed here\n        });"
-            ],
-            "itemtype": "method",
-            "name": "execute",
-            "async": 1,
-            "params": [
-                {
-                    "name": "callback",
-                    "description": "Function called on success.\n    \n    successFunction([data])",
-                    "type": "Function",
-                    "props": [
-                        {
-                            "name": "data",
-                            "description": "",
-                            "type": "Object",
-                            "optional": true,
-                            "props": [
-                                {
-                                    "name": "results",
-                                    "description": "",
-                                    "type": "Array of Entity"
-                                },
-                                {
-                                    "name": "query",
-                                    "description": "The original query",
-                                    "type": "EntityQuery"
-                                },
-                                {
-                                    "name": "httpResponse",
-                                    "description": "The HttpResponse returned from the server.",
-                                    "type": "HttpResponse"
-                                },
-                                {
-                                    "name": "inlineCount",
-                                    "description": "Only available if 'inlineCount(true)' was applied to the query.  Returns the count of \n    items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates\n    would have been applied.",
-                                    "type": "Integer"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "errorCallback",
-                    "description": "Function called on failure.\n        \n    failureFunction([error])",
-                    "type": "Function",
-                    "props": [
-                        {
-                            "name": "error",
-                            "description": "Any error that occured wrapped into an Error object.",
-                            "type": "Error",
-                            "optional": true,
-                            "props": [
-                                {
-                                    "name": "query",
-                                    "description": "The query that caused the error.",
-                                    "optional": true
-                                },
-                                {
-                                    "name": "httpResponse",
-                                    "description": "The raw XMLHttpRequest returned from the server.",
-                                    "type": "HttpResponse",
-                                    "optional": true
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "Promise"
-            },
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 625,
-            "description": "Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the \"using\" method.",
-            "example": [
-                "\n    // assume em is an entityManager already filled with order entities;\n    var query = new EntityQuery(\"Orders\").using(em);\n    var orders = query.executeLocally();\n    \nNote that calling this method is the same as calling {{#crossLink \"EntityManager/executeQueryLocally\"}}{{/crossLink}}."
-            ],
-            "itemtype": "method",
-            "name": "executeLocally",
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 643,
-            "description": "Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful\nto force a requery of selected entities, or to restrict an existing collection of entities according to some filter.",
-            "example": [
-                "\n    // assuming 'customers' is an array of 'Customer' entities retrieved earlier.\n    var customersQuery = EntityQuery.fromEntities(customers);\nThe resulting query can, of course, be extended",
-                "\n    // assuming 'customers' is an array of 'Customer' entities retrieved earlier.\n    var customersQuery = EntityQuery.fromEntities(customers)\n        .where(\"Region\", FilterQueryOp.NotEquals, null);\nSingle entities can requeried as well.",
-                "\n    // assuming 'customer' is a 'Customer' entity retrieved earlier.\n    var customerQuery = EntityQuery.fromEntities(customer);\nwill create a query that will return an array containing a single customer entity."
-            ],
-            "itemtype": "method",
-            "name": "fromEntities",
-            "static": 1,
-            "params": [
-                {
-                    "name": "entities",
-                    "description": "The entities for which we want to create an EntityQuery.",
-                    "type": "Entity|Array of Entity"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 684,
-            "description": "Creates an EntityQuery for the specified {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
-            "example": [
-                "\n    var empType = metadataStore.getEntityType(\"Employee\");\n    var entityKey = new EntityKey(empType, 1);\n    var query = EntityQuery.fromEntityKey(entityKey);\nor",
-                "\n    // 'employee' is a previously queried employee\n    var entityKey = employee.entityAspect.getKey();\n    var query = EntityQuery.fromEntityKey(entityKey);"
-            ],
-            "itemtype": "method",
-            "name": "fromEntityKey",
-            "static": 1,
-            "params": [
-                {
-                    "name": "entityKey",
-                    "description": "The {{#crossLink \"EntityKey\"}}{{/crossLink}} for which a query will be created.",
-                    "type": "EntityKey"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 709,
-            "description": "Creates an EntityQuery for the specified entity and {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
-            "example": [
-                "\n    // 'employee' is a previously queried employee\n    var ordersNavProp = employee.entityType.getProperty(\"Orders\");\n    var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);\nwill return a query for the \"Orders\" of the specified 'employee'."
-            ],
-            "itemtype": "method",
-            "name": "fromEntityNavigation",
-            "static": 1,
-            "params": [
-                {
-                    "name": "entity",
-                    "description": "The Entity whose navigation property will be queried.",
-                    "type": "Entity"
-                },
-                {
-                    "name": "navigationProperty",
-                    "description": "The {{#crossLink \"NavigationProperty\"}}{{/crossLink}} or name of the NavigationProperty to be queried.",
-                    "type": "NavigationProperty|String"
-                }
-            ],
-            "return": {
-                "description": "",
-                "type": "EntityQuery"
-            },
-            "chainable": 1,
-            "class": "EntityQuery",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1215,
-            "description": "Aliases: \"eq\", \"==\"",
-            "itemtype": "property",
-            "name": "Equals",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1222,
-            "description": "Aliases: \"ne\", \"!=\"",
-            "itemtype": "property",
-            "name": "NotEquals",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1229,
-            "description": "Aliases: \"gt\", \">\"",
-            "itemtype": "property",
-            "name": "GreaterThan",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1236,
-            "description": "Aliases: \"lt\", \"<\"",
-            "itemtype": "property",
-            "name": "LessThan",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1243,
-            "description": "Aliases: \"ge\", \">=\"",
-            "itemtype": "property",
-            "name": "GreaterThanOrEqual",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1250,
-            "description": "Aliases: \"le\", \"<=\"",
-            "itemtype": "property",
-            "name": "LessThanOrEqual",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1257,
-            "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
-            "itemtype": "property",
-            "name": "Contains",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1265,
-            "itemtype": "property",
-            "name": "StartsWith",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1271,
-            "itemtype": "property",
-            "name": "EndsWith",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1278,
-            "description": "Aliases: \"some\"",
-            "itemtype": "property",
-            "name": "Any",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1286,
-            "description": "Aliases: \"every\"",
-            "itemtype": "property",
-            "name": "All",
-            "type": "FilterQueryOp",
-            "final": 1,
-            "static": 1,
-            "class": "FilterQueryOp",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1357,
-            "description": "Predicate constructor",
-            "example": [
-                "\n    var p1 = new Predicate(\"CompanyName\", \"StartsWith\", \"B\");\n    var query = new EntityQuery(\"Customers\").where(p1);\nor ",
-                "\n    var p2 = new Predicate(\"Region\", FilterQueryOp.Equals, null);\n    var query = new EntityQuery(\"Customers\").where(p2);"
-            ],
-            "itemtype": "method",
-            "name": "<ctor> Predicate",
-            "params": [
-                {
-                    "name": "property",
-                    "description": "A property name, a nested property name or an expression involving a property name.",
-                    "type": "String"
-                },
-                {
-                    "name": "operator",
-                    "description": "",
-                    "type": "FilterQueryOp|String"
-                },
-                {
-                    "name": "value",
-                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.",
-                    "type": "Object"
-                }
-            ],
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1401,
-            "description": "Creates a new 'simple' Predicate.  Note that this method can also take its parameters as an array.",
-            "example": [
-                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\nor parameters can be passed as an array.",
-                "\n    var predArgs = [\"Freight\", \"gt\", 100];\n    var p1 = Predicate.create(predArgs);\nboth of these are the same as ",
-                "\n    var p1 = new Predicate(\"Freight\", \"gt\", 100);"
-            ],
-            "itemtype": "method",
-            "name": "create",
-            "static": 1,
-            "params": [
-                {
-                    "name": "property",
-                    "description": "A property name, a nested property name or an expression involving a property name.",
-                    "type": "String"
-                },
-                {
-                    "name": "operator",
-                    "description": "",
-                    "type": "FilterQueryOp|String"
-                },
-                {
-                    "name": "value",
-                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.",
-                    "type": "Object"
-                }
-            ],
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1428,
-            "description": "Creates a 'composite' Predicate by 'and'ing a set of specified Predicates together.",
-            "example": [
-                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.and(p1, p2, p3);\nor",
-                "\n    var preds = [p1, p2, p3];\n    var newPred = Predicate.and(preds);"
-            ],
-            "itemtype": "method",
-            "name": "and",
-            "params": [
-                {
-                    "name": "predicates",
-                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
-                    "type": "Multiple Predicates|Array of Predicate",
-                    "multiple": true
-                }
-            ],
-            "static": 1,
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1455,
-            "description": "Creates a 'composite' Predicate by 'or'ing a set of specified Predicates together.",
-            "example": [
-                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.or(p1, p2, p3);\nor",
-                "\n    var preds = [p1, p2, p3];\n    var newPred = Predicate.or(preds);"
-            ],
-            "itemtype": "method",
-            "name": "or",
-            "params": [
-                {
-                    "name": "predicates",
-                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
-                    "type": "Multiple Predicates|Array of Predicate",
-                    "multiple": true
-                }
-            ],
-            "static": 1,
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1482,
-            "description": "Creates a 'composite' Predicate by 'negating' a specified predicate.",
-            "example": [
-                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = Predicate.not(p1);\nThis can also be accomplished using the 'instance' version of the 'not' method",
-                "\n    var not_p1 = p1.not();\nBoth of which would be the same as",
-                "\n    var not_p1 = Predicate.create(\"Freight\", \"le\", 100);"
-            ],
-            "itemtype": "method",
-            "name": "not",
-            "params": [
-                {
-                    "name": "predicate",
-                    "description": "",
-                    "type": "Predicate"
-                }
-            ],
-            "static": 1,
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1501,
-            "description": "'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
-            "example": [
-                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.and(p2, p3);\nor",
-                "\n    var preds = [p2, p3];\n    var newPred = p1.and(preds);\nThe 'and' method is also used to write \"fluent\" expressions",
-                "\n    var p4 = Predicate.create(\"ShipCity\", \"startswith\", \"F\")\n        .and(\"Size\", \"gt\", 2000);"
-            ],
-            "itemtype": "method",
-            "name": "and",
-            "params": [
-                {
-                    "name": "predicates",
-                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
-                    "type": "Multiple Predicates|Array of Predicate",
-                    "multiple": true
-                }
-            ],
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1526,
-            "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
-            "example": [
-                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.or(p2, p3);\nor",
-                "\n    var preds = [p2, p3];\n    var newPred = p1.or(preds);\nThe 'or' method is also used to write \"fluent\" expressions",
-                "\n    var p4 = Predicate.create(\"ShipCity\", \"startswith\", \"F\")\n        .or(\"Size\", \"gt\", 2000);"
-            ],
-            "itemtype": "method",
-            "name": "or",
-            "params": [
-                {
-                    "name": "predicates",
-                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
-                    "type": "Multiple Predicates|Array of Predicate",
-                    "multiple": true
-                }
-            ],
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1551,
-            "description": "Returns the 'negated' version of this Predicate",
-            "example": [
-                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = p1.not();\nThis can also be accomplished using the 'static' version of the 'not' method",
-                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = Predicate.not(p1);\nwhich would be the same as",
-                "\n    var not_p1 = Predicate.create(\"Freight\", \"le\", 100);"
-            ],
-            "itemtype": "method",
-            "name": "not",
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1571,
-            "description": "Returns the function that will be used to execute this Predicate against the local cache.",
-            "itemtype": "method",
-            "name": "toFunction",
-            "return": {
-                "description": "",
-                "type": "Function"
-            },
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1577,
-            "description": "Returns a human readable string for this Predicate.",
-            "itemtype": "method",
-            "name": "toString",
-            "return": {
-                "description": "",
-                "type": "String"
-            },
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a45.entityQuery.js",
-            "line": 1583,
-            "description": "Determines whether this Predicate is 'valid' for the specified EntityType; This method will throw an exception\nif invalid.",
-            "itemtype": "method",
-            "name": "validate",
-            "params": [
-                {
-                    "name": "entityType",
-                    "description": "The entityType to validate against.",
-                    "type": "EntityType"
-                }
-            ],
-            "class": "Predicate",
-            "module": "breeze"
-        },
-        {
             "file": "..\\src\\a45_entityQuery.js",
             "line": 12,
             "example": [
@@ -9435,6 +8391,1049 @@
                 }
             ],
             "class": "Promise",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 12,
+            "example": [
+                "                    \n    var query = new EntityQuery(\"Customers\")\n\nUsually this constructor will be followed by calls to filtering, ordering or selection methods",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .orderBy(\"Region\");"
+            ],
+            "itemtype": "method",
+            "name": "<ctor> EntityQuery",
+            "params": [
+                {
+                    "name": "resourceName",
+                    "description": "",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 47,
+            "description": "The resource name used by this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "resourceName",
+            "type": "String",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 54,
+            "description": "The entityType that is associated with the 'from' clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query \nhas been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.\nThis value may be null if the entityType cannot be associated with a resourceName.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "fromEntityType",
+            "type": "EntityType",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 63,
+            "description": "The entityType that will be returned by this query. This property will only be set if the 'toType' method was called. \n\n__readOnly__",
+            "itemtype": "property",
+            "name": "resultEntityType",
+            "type": "EntityType",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 70,
+            "description": "The 'where' predicate used by this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "wherePredicate",
+            "type": "Predicate",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 77,
+            "description": "The {{#crossLink \"OrderByClause\"}}{{/crossLink}} used by this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "orderByClause",
+            "type": "OrderByClause",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 84,
+            "description": "The number of entities to 'skip' for this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "skipCount",
+            "type": "Integer",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 91,
+            "description": "The number of entities to 'take' for this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "takeCount",
+            "type": "Integer",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 98,
+            "description": "Any additional parameters that were added to the query via the 'withParameters' method. \n\n__readOnly__",
+            "itemtype": "property",
+            "name": "parameters",
+            "type": "Object",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 105,
+            "description": "The {{#crossLink \"QueryOptions\"}}{{/crossLink}} for this query.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "queryOptions",
+            "type": "QueryOptions",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 112,
+            "description": "The {{#crossLink \"EntityManager\"}}{{/crossLink}} for this query. This may be null and can be set via the 'using' method.\n\n__readOnly__",
+            "itemtype": "property",
+            "name": "entityManager",
+            "type": "EntityManager",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 121,
+            "description": "Specifies the resource to query for this EntityQuery.",
+            "example": [
+                "                    \n    var query = new EntityQuery()\n        .from(\"Customers\");\nis the same as ",
+                "\n    var query = new EntityQuery(\"Customers\");"
+            ],
+            "itemtype": "method",
+            "name": "from",
+            "params": [
+                {
+                    "name": "resourceName",
+                    "description": "The resource to query.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 140,
+            "description": "This is a static version of the \"from\" method and it creates a 'base' entityQuery for the specified resource name.",
+            "example": [
+                "                    \n    var query = EntityQuery.from(\"Customers\");\nis the same as ",
+                "\n    var query = new EntityQuery(\"Customers\");"
+            ],
+            "itemtype": "method",
+            "name": "from",
+            "static": 1,
+            "params": [
+                {
+                    "name": "resourceName",
+                    "description": "The resource to query.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 158,
+            "description": "Specifies the top level EntityType that this query will return.  Only needed when a query returns a json result that does not include type information.",
+            "example": [
+                "                    \n    var query = new EntityQuery()\n        .from(\"MyCustomMethod\")\n        .toType(\"Customer\")"
+            ],
+            "itemtype": "method",
+            "name": "toType",
+            "params": [
+                {
+                    "name": "entityType",
+                    "description": "The top level entityType that this query will return.  This method is only needed when a query returns a json result that \ndoes not include type information.  If the json result consists of more than a simple entity or array of entities, consider using a JsonResultsAdapter instead.",
+                    "type": "String|EntityType"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 177,
+            "description": "Returns a new query with an added filter criteria. Can be called multiple times which means to 'and' with any existing Predicate.",
+            "example": [
+                "                    \n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\");\nThis can also be expressed using an explicit {{#crossLink \"FilterQueryOp\"}}{{/crossLink}} as",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", FilterQueryOp.StartsWith, \"C\");\nor a preconstructed {{#crossLink \"Predicate\"}}{{/crossLink}} may be used",
+                "\n    var pred = new Predicate(\"CompanyName\", FilterQueryOp.StartsWith, \"C\");\n    var query = new EntityQuery(\"Customers\")\n        .where(pred);\nPredicates are often useful when you want to combine multiple conditions in a single filter, such as",
+                "\n    var pred = Predicate.create(\"CompanyName\", \"startswith\", \"C\").and(\"Region\", FilterQueryOp.Equals, null);\n    var query = new EntityQuery(\"Customers\")\n        .where(pred);",
+                "\nMore complicated queries can make use of nested property paths",
+                "\n    var query = new EntityQuery(\"Products\")\n        .where(\"Category.CategoryName\", \"startswith\", \"S\");\nor OData functions - A list of valid OData functions can be found within the {{#crossLink \"Predicate\"}}{{/crossLink}} documentation.",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"toLower(CompanyName)\", \"startsWith\", \"c\");\nor to be even more baroque",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"toUpper(substring(CompanyName, 1, 2))\", FilterQueryOp.Equals, \"OM\");"
+            ],
+            "itemtype": "method",
+            "name": "where",
+            "params": [
+                {
+                    "name": "predicate",
+                    "description": "Can be either\n    \n- a single {{#crossLink \"Predicate\"}}{{/crossLink}}\n\n- or the parameters to create a 'simple' Predicate\n\n    - a property name, a property path with '.' as path seperators or a property expression {String}\n    - an operator {FilterQueryOp|String} Either a  {{#crossLink \"FilterQueryOp\"}}{{/crossLink}} or it's string representation. Case is ignored\n            when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.\n    - a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.       \n- or a null or undefined ( this causes any existing where clause to be removed)",
+                    "type": "Predicate|property|property path, operator, value"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 243,
+            "description": "Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.",
+            "example": [
+                "\n        var query = new EntityQuery(\"Customers\")\n            .orderBy(\"CompanyName\");\n\nor to sort across multiple properties",
+                "\n        var query = new EntityQuery(\"Customers\")\n            .orderBy(\"Region, CompanyName\");\n\nNested property paths are also supported",
+                "\n        var query = new EntityQuery(\"Products\")\n        .orderBy(\"Category.CategoryName\");\n\nSorting in descending order is supported via the addition of ' desc' to the end of any property path.",
+                "\n        var query = new EntityQuery(\"Customers\")\n        .orderBy(\"CompanyName desc\");\n\nor",
+                "\n        var query = new EntityQuery(\"Customers\")\n        .orderBy(\"Region desc, CompanyName desc\");"
+            ],
+            "itemtype": "method",
+            "name": "orderBy",
+            "params": [
+                {
+                    "name": "propertyPaths",
+                    "description": "A comma-separated (',') string of property paths or an array of property paths. \nEach property path can optionally end with \" desc\" to force a descending sort order. If 'propertyPaths' is either null or omitted then all ordering is removed.",
+                    "type": "String|Array of String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 279,
+            "description": "Returns a new query that orders the results of the query by property name in descending order.",
+            "example": [
+                "\n        var query = new EntityQuery(\"Customers\")\n            .orderByDesc(\"CompanyName\");\n\nor to sort across multiple properties",
+                "\n        var query = new EntityQuery(\"Customers\")\n            .orderByDesc(\"Region, CompanyName\");\n\nNested property paths are also supported",
+                "\n        var query = new EntityQuery(\"Products\")\n        .orderByDesc(\"Category.CategoryName\");"
+            ],
+            "itemtype": "method",
+            "name": "orderByDesc",
+            "params": [
+                {
+                    "name": "propertyPaths",
+                    "description": "A comma-separated (',') string of property paths or an array of property paths. \nIf 'propertyPaths' is either null or omitted then all ordering is removed.",
+                    "type": "String|Array of String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 305,
+            "description": "Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This\nwill be referred to as a projection. \nIf the result of this selection \"projection\" contains entities, these entities will automatically be added to EntityManager's cache and will \nbe made 'observable'.\nAny simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made 'observable'.",
+            "example": [
+                "\nSimple data properties can be projected",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"CompanyName\");\nThis will return an array of objects each with a single \"CompanyName\" property of type string.\nA similar query could return a navigation property instead",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"Orders\");\nwhere the result would be an array of objects each with a single \"Orders\" property that would itself be an array of \"Order\" entities.\nComposite projections are also possible:",
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .select(\"CompanyName, Orders\");\nAs well as projections involving nested property paths",
+                "\n    var query = EntityQuery(\"Orders\")\n        .where(\"Customer.CompanyName\", \"startsWith\", \"C\")         \n        .select(\"Customer.CompanyName, Customer, OrderDate\");"
+            ],
+            "itemtype": "method",
+            "name": "select",
+            "params": [
+                {
+                    "name": "propertyPaths",
+                    "description": "A comma-separated (',') string of property paths or an array of property paths.\nIf 'propertyPaths' is either null or omitted then any existing projection on the query is removed.",
+                    "type": "String|Array of String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 347,
+            "description": "Returns a new query that skips the specified number of entities when returning results.\nAny existing 'skip' can be cleared by calling 'skip' with no arguments.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .skip(5);"
+            ],
+            "itemtype": "method",
+            "name": "skip",
+            "params": [
+                {
+                    "name": "count",
+                    "description": "The number of entities to return. If omitted or null any existing skip count on the query is removed.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 364,
+            "description": "Returns a new query that returns only the specified number of entities when returning results. - Same as 'take'.\nAny existing 'top' can be cleared by calling 'top' with no arguments.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .top(5);"
+            ],
+            "itemtype": "method",
+            "name": "top",
+            "params": [
+                {
+                    "name": "count",
+                    "description": "The number of entities to return. \nIf 'count' is either null or omitted then any existing 'top' count on the query is removed.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 380,
+            "description": "Returns a new query that returns only the specified number of entities when returning results - Same as 'top'.  \nAny existing take can be cleared by calling take with no arguments.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .take(5);"
+            ],
+            "itemtype": "method",
+            "name": "take",
+            "params": [
+                {
+                    "name": "count",
+                    "description": "The number of entities to return.\nIf 'count' is either null or omitted then any existing 'take' count on the query is removed.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 397,
+            "description": "Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property\nnames such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are 'expanded'.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .where(\"CompanyName\", \"startsWith\", \"C\")\n        .expand(\"Orders\");\nwill return the filtered customers each with its \"Orders\" properties fully resolved.\nMultiple paths may be specified by separating the paths by a ','",
+                "\n    var query = new EntityQuery(\"Orders\")\n        .expand(\"Customer, Employee\")\nand nested property paths my be specified as well",
+                "\n    var query = new EntityQuery(\"Orders\")\n        .expand(\"Customer, OrderDetails, OrderDetails.Product\")"
+            ],
+            "itemtype": "method",
+            "name": "expand",
+            "params": [
+                {
+                    "name": "propertyPaths",
+                    "description": "A comma-separated list of navigation property names or an array of navigation property names. Each Navigation Property name can be followed\nby a '.' and another navigation property name to enable identifying a multi-level relationship. \nIf 'propertyPaths' is either null or omitted then any existing 'expand' clause on the query is removed.",
+                    "type": "String|Array of String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 425,
+            "description": "Returns a new query that includes a collection of parameters to pass to the server.",
+            "example": [
+                "\n    var query = EntityQuery.from(\"EmployeesFilteredByCountryAndBirthdate\")\n        .withParameters({ BirthDate: \"1/1/1960\", Country: \"USA\" });\nwill call the 'EmployeesFilteredByCountryAndBirthdate' method on the server and pass in 2 parameters. This\nquery will be uri encoded as \n\n    {serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&country=USA\n    \nParameters may also be mixed in with other query criteria.",
+                "\n        var query = EntityQuery.from(\"EmployeesFilteredByCountryAndBirthdate\")\n        .withParameters({ BirthDate: \"1/1/1960\", Country: \"USA\" })\n        .where(\"LastName\", \"startsWith\", \"S\")\n        .orderBy(\"BirthDate\");"
+            ],
+            "itemtype": "method",
+            "name": "withParameters",
+            "params": [
+                {
+                    "name": "parameters",
+                    "description": "A parameters object where the keys are the parameter names and the values are the parameter values.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 452,
+            "description": "Returns a query with the 'inlineCount' capability either enabled or disabled.  With 'inlineCount' enabled, an additional 'inlineCount' property\nwill be returned with the query results that will contain the number of entities that would have been returned by this\nquery with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .take(20)\n        .orderBy(\"CompanyName\")\n        .inlineCount(true);\nwill return the first 20 customers as well as a count of all of the customers in the remote store."
+            ],
+            "itemtype": "method",
+            "name": "inlineCount",
+            "params": [
+                {
+                    "name": "enabled",
+                    "description": "Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.",
+                    "type": "Boolean=true"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 475,
+            "description": "Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query\nwill not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.",
+            "example": [
+                "\n    var query = new EntityQuery(\"Customers\")\n        .take(20)\n        .orderBy(\"CompanyName\")\n        .noTracking(true);"
+            ],
+            "itemtype": "method",
+            "name": "noTracking",
+            "params": [
+                {
+                    "name": "enabled",
+                    "description": "Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.",
+                    "type": "Boolean=true"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 497,
+            "description": "Returns a copy of this EntityQuery with the specified {{#crossLink \"EntityManager\"}}{{/crossLink}}, {{#crossLink \"DataService\"}}{{/crossLink}}, \n{{#crossLink \"JsonResultsAdapter\"}}{{/crossLink}}, {{#crossLink \"MergeStrategy\"}}{{/crossLink}} or {{#crossLink \"FetchStrategy\"}}{{/crossLink}} applied.",
+            "example": [
+                "\n'using' can be used to return a new query with a specified EntityManager.",
+                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\")\n            .using(em);\nor with a specified {{#crossLink \"MergeStrategy\"}}{{/crossLink}} ",
+                "\n    var em = new EntityManager(serviceName);\n    var query = new EntityQuery(\"Orders\")\n        .using(MergeStrategy.PreserveChanges);\nor with a specified {{#crossLink \"FetchStrategy\"}}{{/crossLink}} ",
+                "\n    var em = new EntityManager(serviceName);\n    var query = new EntityQuery(\"Orders\")\n        .using(FetchStrategy.FromLocalCache);",
+                ""
+            ],
+            "itemtype": "method",
+            "name": "using",
+            "params": [
+                {
+                    "name": "obj",
+                    "description": "The object to update in creating a new EntityQuery from an existing one.",
+                    "type": "EntityManager|QueryOptions|DataService|MergeStrategy|FetchStrategy|JsonResultsAdapter|config object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 558,
+            "description": "Executes this query.  This method requires that an EntityManager has been previously specified via the \"using\" method.",
+            "example": [
+                "\nThis method can be called using a 'promises' syntax ( recommended)",
+                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\").using(em);\n        query.execute()\n        .then( function(data) {\n            ... query results processed here\n        }).fail( function(err) {\n            ... query failure processed here\n        });\nor with callbacks",
+                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\").using(em);\n        query.execute(\n        function(data) {\n            var orders = data.results;\n            ... query results processed here\n        },\n        function(err) {\n            ... query failure processed here\n        });\nEither way this method is the same as calling the EntityManager 'execute' method.",
+                "\n        var em = new EntityManager(serviceName);\n        var query = new EntityQuery(\"Orders\");\n        em.executeQuery(query)\n        .then( function(data) {\n            var orders = data.results;\n            ... query results processed here\n        }).fail( function(err) {\n            ... query failure processed here\n        });"
+            ],
+            "itemtype": "method",
+            "name": "execute",
+            "async": 1,
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "Function called on success.\n    \n    successFunction([data])",
+                    "type": "Function",
+                    "props": [
+                        {
+                            "name": "data",
+                            "description": "",
+                            "type": "Object",
+                            "optional": true,
+                            "props": [
+                                {
+                                    "name": "results",
+                                    "description": "",
+                                    "type": "Array of Entity"
+                                },
+                                {
+                                    "name": "query",
+                                    "description": "The original query",
+                                    "type": "EntityQuery"
+                                },
+                                {
+                                    "name": "httpResponse",
+                                    "description": "The HttpResponse returned from the server.",
+                                    "type": "HttpResponse"
+                                },
+                                {
+                                    "name": "inlineCount",
+                                    "description": "Only available if 'inlineCount(true)' was applied to the query.  Returns the count of \n    items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates\n    would have been applied.",
+                                    "type": "Integer"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "errorCallback",
+                    "description": "Function called on failure.\n        \n    failureFunction([error])",
+                    "type": "Function",
+                    "props": [
+                        {
+                            "name": "error",
+                            "description": "Any error that occured wrapped into an Error object.",
+                            "type": "Error",
+                            "optional": true,
+                            "props": [
+                                {
+                                    "name": "query",
+                                    "description": "The query that caused the error.",
+                                    "optional": true
+                                },
+                                {
+                                    "name": "httpResponse",
+                                    "description": "The raw XMLHttpRequest returned from the server.",
+                                    "type": "HttpResponse",
+                                    "optional": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 625,
+            "description": "Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the \"using\" method.",
+            "example": [
+                "\n    // assume em is an entityManager already filled with order entities;\n    var query = new EntityQuery(\"Orders\").using(em);\n    var orders = query.executeLocally();\n    \nNote that calling this method is the same as calling {{#crossLink \"EntityManager/executeQueryLocally\"}}{{/crossLink}}."
+            ],
+            "itemtype": "method",
+            "name": "executeLocally",
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 643,
+            "description": "Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful\nto force a requery of selected entities, or to restrict an existing collection of entities according to some filter.",
+            "example": [
+                "\n    // assuming 'customers' is an array of 'Customer' entities retrieved earlier.\n    var customersQuery = EntityQuery.fromEntities(customers);\nThe resulting query can, of course, be extended",
+                "\n    // assuming 'customers' is an array of 'Customer' entities retrieved earlier.\n    var customersQuery = EntityQuery.fromEntities(customers)\n        .where(\"Region\", FilterQueryOp.NotEquals, null);\nSingle entities can requeried as well.",
+                "\n    // assuming 'customer' is a 'Customer' entity retrieved earlier.\n    var customerQuery = EntityQuery.fromEntities(customer);\nwill create a query that will return an array containing a single customer entity."
+            ],
+            "itemtype": "method",
+            "name": "fromEntities",
+            "static": 1,
+            "params": [
+                {
+                    "name": "entities",
+                    "description": "The entities for which we want to create an EntityQuery.",
+                    "type": "Entity|Array of Entity"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 684,
+            "description": "Creates an EntityQuery for the specified {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
+            "example": [
+                "\n    var empType = metadataStore.getEntityType(\"Employee\");\n    var entityKey = new EntityKey(empType, 1);\n    var query = EntityQuery.fromEntityKey(entityKey);\nor",
+                "\n    // 'employee' is a previously queried employee\n    var entityKey = employee.entityAspect.getKey();\n    var query = EntityQuery.fromEntityKey(entityKey);"
+            ],
+            "itemtype": "method",
+            "name": "fromEntityKey",
+            "static": 1,
+            "params": [
+                {
+                    "name": "entityKey",
+                    "description": "The {{#crossLink \"EntityKey\"}}{{/crossLink}} for which a query will be created.",
+                    "type": "EntityKey"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 709,
+            "description": "Creates an EntityQuery for the specified entity and {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
+            "example": [
+                "\n    // 'employee' is a previously queried employee\n    var ordersNavProp = employee.entityType.getProperty(\"Orders\");\n    var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);\nwill return a query for the \"Orders\" of the specified 'employee'."
+            ],
+            "itemtype": "method",
+            "name": "fromEntityNavigation",
+            "static": 1,
+            "params": [
+                {
+                    "name": "entity",
+                    "description": "The Entity whose navigation property will be queried.",
+                    "type": "Entity"
+                },
+                {
+                    "name": "navigationProperty",
+                    "description": "The {{#crossLink \"NavigationProperty\"}}{{/crossLink}} or name of the NavigationProperty to be queried.",
+                    "type": "NavigationProperty|String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "EntityQuery"
+            },
+            "chainable": 1,
+            "class": "EntityQuery",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1215,
+            "description": "Aliases: \"eq\", \"==\"",
+            "itemtype": "property",
+            "name": "Equals",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1222,
+            "description": "Aliases: \"ne\", \"!=\"",
+            "itemtype": "property",
+            "name": "NotEquals",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1229,
+            "description": "Aliases: \"gt\", \">\"",
+            "itemtype": "property",
+            "name": "GreaterThan",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1236,
+            "description": "Aliases: \"lt\", \"<\"",
+            "itemtype": "property",
+            "name": "LessThan",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1243,
+            "description": "Aliases: \"ge\", \">=\"",
+            "itemtype": "property",
+            "name": "GreaterThanOrEqual",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1250,
+            "description": "Aliases: \"le\", \"<=\"",
+            "itemtype": "property",
+            "name": "LessThanOrEqual",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1257,
+            "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
+            "itemtype": "property",
+            "name": "Contains",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1265,
+            "itemtype": "property",
+            "name": "StartsWith",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1271,
+            "itemtype": "property",
+            "name": "EndsWith",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1278,
+            "description": "Aliases: \"some\"",
+            "itemtype": "property",
+            "name": "Any",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1286,
+            "description": "Aliases: \"every\"",
+            "itemtype": "property",
+            "name": "All",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1357,
+            "description": "Predicate constructor",
+            "example": [
+                "\n    var p1 = new Predicate(\"CompanyName\", \"StartsWith\", \"B\");\n    var query = new EntityQuery(\"Customers\").where(p1);\nor ",
+                "\n    var p2 = new Predicate(\"Region\", FilterQueryOp.Equals, null);\n    var query = new EntityQuery(\"Customers\").where(p2);"
+            ],
+            "itemtype": "method",
+            "name": "<ctor> Predicate",
+            "params": [
+                {
+                    "name": "property",
+                    "description": "A property name, a nested property name or an expression involving a property name.",
+                    "type": "String"
+                },
+                {
+                    "name": "operator",
+                    "description": "",
+                    "type": "FilterQueryOp|String"
+                },
+                {
+                    "name": "value",
+                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.",
+                    "type": "Object"
+                }
+            ],
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1401,
+            "description": "Creates a new 'simple' Predicate.  Note that this method can also take its parameters as an array.",
+            "example": [
+                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\nor parameters can be passed as an array.",
+                "\n    var predArgs = [\"Freight\", \"gt\", 100];\n    var p1 = Predicate.create(predArgs);\nboth of these are the same as ",
+                "\n    var p1 = new Predicate(\"Freight\", \"gt\", 100);"
+            ],
+            "itemtype": "method",
+            "name": "create",
+            "static": 1,
+            "params": [
+                {
+                    "name": "property",
+                    "description": "A property name, a nested property name or an expression involving a property name.",
+                    "type": "String"
+                },
+                {
+                    "name": "operator",
+                    "description": "",
+                    "type": "FilterQueryOp|String"
+                },
+                {
+                    "name": "value",
+                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general, \n            if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. \n            In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.\n            Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set\n            to one of the breeze.DataType enumeration instances.",
+                    "type": "Object"
+                }
+            ],
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1428,
+            "description": "Creates a 'composite' Predicate by 'and'ing a set of specified Predicates together.",
+            "example": [
+                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.and(p1, p2, p3);\nor",
+                "\n    var preds = [p1, p2, p3];\n    var newPred = Predicate.and(preds);"
+            ],
+            "itemtype": "method",
+            "name": "and",
+            "params": [
+                {
+                    "name": "predicates",
+                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
+                    "type": "Multiple Predicates|Array of Predicate",
+                    "multiple": true
+                }
+            ],
+            "static": 1,
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1455,
+            "description": "Creates a 'composite' Predicate by 'or'ing a set of specified Predicates together.",
+            "example": [
+                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.or(p1, p2, p3);\nor",
+                "\n    var preds = [p1, p2, p3];\n    var newPred = Predicate.or(preds);"
+            ],
+            "itemtype": "method",
+            "name": "or",
+            "params": [
+                {
+                    "name": "predicates",
+                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
+                    "type": "Multiple Predicates|Array of Predicate",
+                    "multiple": true
+                }
+            ],
+            "static": 1,
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1482,
+            "description": "Creates a 'composite' Predicate by 'negating' a specified predicate.",
+            "example": [
+                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = Predicate.not(p1);\nThis can also be accomplished using the 'instance' version of the 'not' method",
+                "\n    var not_p1 = p1.not();\nBoth of which would be the same as",
+                "\n    var not_p1 = Predicate.create(\"Freight\", \"le\", 100);"
+            ],
+            "itemtype": "method",
+            "name": "not",
+            "params": [
+                {
+                    "name": "predicate",
+                    "description": "",
+                    "type": "Predicate"
+                }
+            ],
+            "static": 1,
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1501,
+            "description": "'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
+            "example": [
+                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.and(p2, p3);\nor",
+                "\n    var preds = [p2, p3];\n    var newPred = p1.and(preds);\nThe 'and' method is also used to write \"fluent\" expressions",
+                "\n    var p4 = Predicate.create(\"ShipCity\", \"startswith\", \"F\")\n        .and(\"Size\", \"gt\", 2000);"
+            ],
+            "itemtype": "method",
+            "name": "and",
+            "params": [
+                {
+                    "name": "predicates",
+                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
+                    "type": "Multiple Predicates|Array of Predicate",
+                    "multiple": true
+                }
+            ],
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1526,
+            "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
+            "example": [
+                "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.or(p2, p3);\nor",
+                "\n    var preds = [p2, p3];\n    var newPred = p1.or(preds);\nThe 'or' method is also used to write \"fluent\" expressions",
+                "\n    var p4 = Predicate.create(\"ShipCity\", \"startswith\", \"F\")\n        .or(\"Size\", \"gt\", 2000);"
+            ],
+            "itemtype": "method",
+            "name": "or",
+            "params": [
+                {
+                    "name": "predicates",
+                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
+                    "type": "Multiple Predicates|Array of Predicate",
+                    "multiple": true
+                }
+            ],
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1551,
+            "description": "Returns the 'negated' version of this Predicate",
+            "example": [
+                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = p1.not();\nThis can also be accomplished using the 'static' version of the 'not' method",
+                "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = Predicate.not(p1);\nwhich would be the same as",
+                "\n    var not_p1 = Predicate.create(\"Freight\", \"le\", 100);"
+            ],
+            "itemtype": "method",
+            "name": "not",
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1571,
+            "description": "Returns the function that will be used to execute this Predicate against the local cache.",
+            "itemtype": "method",
+            "name": "toFunction",
+            "return": {
+                "description": "",
+                "type": "Function"
+            },
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1577,
+            "description": "Returns a human readable string for this Predicate.",
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "Predicate",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\old..entityQuery.js",
+            "line": 1583,
+            "description": "Determines whether this Predicate is 'valid' for the specified EntityType; This method will throw an exception\nif invalid.",
+            "itemtype": "method",
+            "name": "validate",
+            "params": [
+                {
+                    "name": "entityType",
+                    "description": "The entityType to validate against.",
+                    "type": "EntityType"
+                }
+            ],
+            "class": "Predicate",
             "module": "breeze"
         }
     ],
