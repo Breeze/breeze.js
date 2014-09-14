@@ -9,6 +9,7 @@
     "gulp-rename": "^1.2.0",
     "gulp-rimraf": "^0.1.0",
     "gulp-shell": "^0.2.9",
-    "gulp-uglify": "^1.0.1"
+    "gulp-uglify": "^1.0.1",
+    "yuidocjs": "^0.3.50"
   }
 }
