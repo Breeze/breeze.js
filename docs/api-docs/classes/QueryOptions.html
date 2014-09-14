@@ -412,7 +412,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[fetchStrategy]</code>
-                                    <span class="type"><a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
+                                    <span class="type"><a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -426,7 +426,7 @@
                             <li class="param">
                                 
                                     <code class="param-name optional">[mergeStrategy]</code>
-                                    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+                                    <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -470,10 +470,12 @@
                 <pre class="code prettyprint"><code>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
 // assume em1 is a preexisting EntityManager
 em1.setProperties( { queryOptions: newQo });</code></pre>
-<p>Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e. 
--  from query.queryOptions 
--  to   entityManager.queryOptions 
--  to   QueryOptions.defaultInstance;</p>
+<p>Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e. </p>
+<ul>
+<li>from query.queryOptions </li>
+<li>to   entityManager.queryOptions </li>
+<li>to   QueryOptions.defaultInstance;</li>
+</ul>
 
             </div>
         </div>
@@ -568,7 +570,7 @@ newQo.setAsDefault();</code></pre>
 
     
         <span class="returns-inline">
-            <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>
+            <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>
         </span>
     
 
@@ -608,8 +610,8 @@ newQo.setAsDefault();</code></pre>
     </div>
 
     <div class="description">
-        <p>Returns a copy of this QueryOptions with the specified <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a>, 
-<a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a>, or &#39;includeDeleted&#39; option applied.</p>
+        <p>Returns a copy of this QueryOptions with the specified <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a>, 
+<a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a>, or &#39;includeDeleted&#39; option applied.</p>
 
     </div>
 
@@ -622,7 +624,7 @@ newQo.setAsDefault();</code></pre>
                 <li class="param">
                     
                         <code class="param-name">config</code>
-                        <span class="type">Configuration Object | <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a> | <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
+                        <span class="type">Configuration Object | <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> | <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
                     
 
                     
@@ -646,7 +648,7 @@ newQo.setAsDefault();</code></pre>
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>:
+                        <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>:
                     
                 
             </div>
@@ -686,7 +688,7 @@ var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code><
                 
                     <div id="property_defaultInstance" class="property item">
     <h3 class="name"><code>defaultInstance</code></h3>
-    <span class="type"><a href="..\classes\QueryOptions.html" class="crosslink">QueryOptions</a></span>
+    <span class="type"><a href="../classes/QueryOptions.html" class="crosslink">QueryOptions</a></span>
 
     
 
@@ -733,7 +735,7 @@ var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code><
                 
                     <div id="property_fetchStrategy" class="property item">
     <h3 class="name"><code>fetchStrategy</code></h3>
-    <span class="type"><a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
+    <span class="type"><a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a></span>
 
     
 
@@ -764,7 +766,7 @@ var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code><
     </div>
 
     <div class="description">
-        <p>A <a href="..\classes\FetchStrategy.html" class="crosslink">FetchStrategy</a>
+        <p>A <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a>
 <strong>readOnly</strong></p>
 
     </div>
@@ -825,7 +827,7 @@ var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code><
                 
                     <div id="property_mergeStrategy" class="property item">
     <h3 class="name"><code>mergeStrategy</code></h3>
-    <span class="type"><a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
+    <span class="type"><a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></span>
 
     
 
@@ -856,7 +858,7 @@ var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code><
     </div>
 
     <div class="description">
-        <p>A <a href="..\classes\MergeStrategy.html" class="crosslink">MergeStrategy</a>
+        <p>A <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a>
 <strong>readOnly</strong></p>
 
     </div>

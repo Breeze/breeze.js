@@ -76,7 +76,7 @@
     
     function createPredicateFromKeyValue(key, value) {
 
-        // { and: [a,b] } key='and', value = {a,b}
+        // { and: [a,b] } key='and', value = [a,b]
         if (AndOrPredicate.prototype._resolveOp(key, true)) {
             return new AndOrPredicate(key, value);
         }
@@ -86,6 +86,7 @@
             return new UnaryPredicate(key, value);  
         } 
         
+        // { foo: bar } key='foo', value = bar ( where bar is a literal i.e. a string, a number, a boolean or a date.
         if ((typeof value !== 'object') || value == null || __isDate(value)) {
             return new BinaryPredicate("==", key, value);
         }
@@ -94,12 +95,12 @@
         var keys = Object.keys(value);
         var preds = keys.map(function(op) {
             
-            // { a: { any: b } op = 'any', expr=a, exprOrPred = b
+            // { a: { any: b } op = 'any', expr=a, value[op] = b
             if (AnyAllPredicate.prototype._resolveOp(op, true)) {
                 return new AnyAllPredicate(op, expr, value[op]);
             }
 
-            // { a: { ">": b }} op = ">", expr=a, exprOrPred = b
+            // { a: { ">": b }} op = ">", expr=a, value[op] = b
             if (BinaryPredicate.prototype._resolveOp(op, true)) {
                 return new BinaryPredicate(op, expr, value[op]);
             }
@@ -497,6 +498,7 @@
         
         proto.toODataFragment = function (entityType, prefix) {
             this.validate(entityType);
+            if (this.preds.length === 0) return;
             var result = this.preds.map(function (pred) {
                 return "(" + pred.toODataFragment(entityType, prefix) + ")";
             }).join(" " + this.op.odataOperator + " ");
