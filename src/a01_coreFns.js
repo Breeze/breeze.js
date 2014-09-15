@@ -491,6 +491,10 @@ function __isFunction(o) {
     return __classof(o) === "function";
 }
 
+function __isString(o) {
+  return (typeof o === "string");
+}
+
 function __isGuid(value) {
     return (typeof value === "string") && /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
 }

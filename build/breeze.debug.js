@@ -519,6 +519,10 @@ function __isFunction(o) {
     return __classof(o) === "function";
 }
 
+function __isString(o) {
+  return (typeof o === "string");
+}
+
 function __isGuid(value) {
     return (typeof value === "string") && /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
 }
@@ -9913,7 +9917,7 @@ breeze.NamingConvention = NamingConvention;
     var ctor = function (fnName, exprArgs) {
       this.fnName = fnName;
       this.exprArgs = exprArgs;
-      var qf = funcMap[fnName];
+      var qf = _funcMap[fnName];
       if (qf == null) {
         throw new Error("Unknown function: " + fnName);
       }
@@ -9929,7 +9933,7 @@ breeze.NamingConvention = NamingConvention;
       });
     });
 
-    var funcMap = ctor.funcMap = {
+    var _funcMap = ctor.funcMap = {
       toupper: { fn: function (source) {
         return source.toUpperCase();
       }, dataType: DataType.String },
@@ -9992,6 +9996,7 @@ breeze.NamingConvention = NamingConvention;
     return ctor;
   })();
 
+  // toFunction visitor
   Predicate.attachVisitor(function() {
     var visitor = {
       fnName: "toFunction",
@@ -10240,6 +10245,7 @@ breeze.NamingConvention = NamingConvention;
     return visitor;
   }());
 
+  // toODataFragment visitor
   Predicate.attachVisitor(function() {
     var visitor = {
       fnName: "toODataFragment",
@@ -10333,57 +10339,80 @@ breeze.NamingConvention = NamingConvention;
     return visitor;
   }());
 
-  Predicate.attachVisitor( {
-    fnName: "toJSON",
-    passthruPredicate: function() {
-      return this.value;
-    },
-    unaryPredicate: function() {
-      var json = {};
-      json[this.op.key] = this.pred.toJSON();
-      return json;
-    },
-    binaryPredicate: function()  {
-      var json = {};
-      if (this.op.key === "eq") {
-        json[this.expr1Source] = this.expr2Source;
-      } else {
+  // toJSON visitor
+  Predicate.attachVisitor(function() {
+    var visitor = {
+      fnName: "toJSON",
+      passthruPredicate: function () {
+        return this.value;
+      },
+      unaryPredicate: function () {
+        var json = {};
+        json[this.op.key] = this.pred.toJSON();
+        return json;
+      },
+      binaryPredicate: function () {
+        var json = {};
+        if (this.op.key === "eq") {
+          json[this.expr1Source] = this.expr2Source;
+        } else {
+          var value = {};
+          json[this.expr1Source] = value;
+          value[this.op.key] = this.expr2Source;
+        }
+        return json;
+      },
+      andOrPredicate: function () {
+
+        var json;
+        var jsonValues = this.preds.map(function (pred) {
+          return pred.toJSON();
+        });
+        // passthru predicate will appear as string and their 'ands' can't be 'normalized'
+        if (this.op.key == 'or' || jsonValues.some(__isString)) {
+          json = {};
+          json[this.op.key] = jsonValues;
+        } else {
+          // normalize 'and' clauses
+          json = jsonValues.reduce(combine);
+        }
+        return json;
+      },
+      anyAllPredicate: function () {
+        var json = {};
         var value = {};
-        json[this.expr1Source] = value;
-        value[this.op.key] = this.expr2Source;
+        value[this.op.key] = this.pred.toJSON();
+        json[this.exprSource] = value;
+        return json;
+      },
+      litExpr: function () {
+        return value;
+      },
+      propExpr: function () {
+        return this.propertyPath;
+      },
+      fnExpr: function () {
+        var frags = this.exprArgs.map(function (expr) {
+          return expr.toJSON();
+        });
+        var result = this.fnName + "(" + frags.join(",") + ")";
+        return result;
       }
-      return json;
-    },
-    andOrPredicate: function() {
-      var json = {};
-      var value = this.preds.map(function (pred) {
-        return pred.toJSON();
-      });
-      json[this.op.key] = value;
-      return json;
-    },
-    anyAllPredicate: function() {
-      var json = {};
-      var value = {};
-      value[this.op.key] = this.pred.toJSON();
-      json[this.exprSource] = value;
-      return json;
-    },
-    litExpr:  function() {
-      return value;
-    },
-    propExpr: function() {
-      return this.propertyPath;
-    },
-    fnExpr: function() {
-      var frags = this.exprArgs.map(function (expr) {
-        return expr.toJSON();
-      });
-      var result = this.fnName + "(" + frags.join(",") + ")";
-      return result;
+    };
+
+    function combine(j1, j2) {
+      Object.keys(j2).forEach(function (key) {
+        if (j1.hasOwnProperty(key)) {
+          combine(j1[key], j2[key]);
+        } else {
+          j1[key] = j2[key];
+        }
+      })
+      return j1;
     }
 
-  });
+    return visitor;
+  }());
 
   function cacheValidation(fn) {
     return function(entityType) {
