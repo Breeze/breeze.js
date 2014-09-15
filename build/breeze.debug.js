@@ -9537,7 +9537,7 @@ breeze.NamingConvention = NamingConvention;
         //      Predicate(aPredicate)
         //      Predicate([ aPredicate ])
         //      Predicate(["freight", ">", 100"])
-        //      Predicate( "freight gt 100" }  // odata string
+        //      Predicate( "freight gt 100" }  // passthru ( i.e. maybe an odata string)
         //      Predicate( { freight: { ">": 100 } })
         var arg = arguments[0];
         if (Array.isArray(arg)) {
@@ -9550,7 +9550,7 @@ breeze.NamingConvention = NamingConvention;
         } else if (arg instanceof Predicate) {
           return arg;
         } else if (typeof arg == 'string') {
-          return new ODataPredicate(arg);
+          return new PassthruPredicate(arg);
         } else {
           return createPredicateFromObject(arg);
         }
@@ -9617,8 +9617,7 @@ breeze.NamingConvention = NamingConvention;
       var aliasMap = {};
       for (var key in (map || {})) {
         var value = map[key];
-        // if not otherwise defined
-        if (!value.odataOperator) value.odataOperator = key;
+
         var aliasKey = key.toLowerCase();
         value.key = aliasKey;
         aliasMap[aliasKey] = value;
@@ -9718,12 +9717,12 @@ breeze.NamingConvention = NamingConvention;
     return ctor;
   })();
 
-  var ODataPredicate = (function () {
-    var ctor = function (odataExpr) {
-      this.odataExpr = odataExpr;
+  var PassthruPredicate = (function () {
+    var ctor = function (value) {
+      this.value = value;
     };
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('ODataPredicate');
+    proto._initialize('PassthruPredicate');
     proto.validate = function (entityType) {  };
 
     return ctor;
@@ -9737,7 +9736,7 @@ breeze.NamingConvention = NamingConvention;
 
     var proto = ctor.prototype = new Predicate();
     proto._initialize('UnaryPredicate', {
-      'not': { aliases: [ '!' ] }
+      'not': { aliases: [ '!', '~' ] }
     });
 
     proto.validate = cacheValidation(function (entityType) {
@@ -9762,19 +9761,19 @@ breeze.NamingConvention = NamingConvention;
         aliases: ["=="]
       },
       'ne': {
-        aliases: ["!="]
+        aliases: ["!=", '~=']
       },
       'lt': {
         aliases: ["<" ]
       },
       'le': {
-        aliases: ["<=", "lte"]
+        aliases: ["<=" ]
       },
       'gt': {
         aliases: [">"]
       },
       'ge': {
-        aliases: [">=", "gte"]
+        aliases: [">=" ]
       },
       'startswith': {
         isFunction: true
@@ -9782,8 +9781,8 @@ breeze.NamingConvention = NamingConvention;
       'endswith': {
         isFunction: true
       },
-      'substringof': {
-        aliases: ["contains"],
+      'contains': {
+        aliases: ["substringof"],
         isFunction: true
       }
     });
@@ -9994,10 +9993,10 @@ breeze.NamingConvention = NamingConvention;
   })();
 
   Predicate.attachVisitor(function() {
-    return {
+    var visitor = {
       fnName: "toFunction",
-      odataPredicate: function (entityType) {
-        throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
+      passthruPredicate: function (entityType) {
+        throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
 
       unaryPredicate: function (entityType) {
@@ -10167,7 +10166,7 @@ breeze.NamingConvention = NamingConvention;
             return stringEndsWith(v1, v2, lqco);
           };
           break;
-        case 'substringof':
+        case 'contains':
           predFn = function (v1, v2) {
             return stringContains(v1, v2, lqco);
           };
@@ -10238,84 +10237,106 @@ breeze.NamingConvention = NamingConvention;
       return a.indexOf(b) >= 0;
     }
 
+    return visitor;
   }());
 
-  Predicate.attachVisitor({
-    fnName: "toODataFragment",
-    odataPredicate: function () {
-      return this.odataExpr;
-    },
+  Predicate.attachVisitor(function() {
+    var visitor = {
+      fnName: "toODataFragment",
+      passthruPredicate: function () {
+        return this.value;
+      },
 
-    unaryPredicate: function (entityType, prefix) {
-      this.validate(entityType);
-      return this.op.odataOperator + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
-    },
+      unaryPredicate: function (entityType, prefix) {
+        this.validate(entityType);
+        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
+      },
 
-    binaryPredicate: function (entityType, prefix) {
-      this.validate(entityType);
+      binaryPredicate: function (entityType, prefix) {
+        this.validate(entityType);
 
-      var v1Expr = this.expr1.toODataFragment(entityType);
-      if (prefix) {
-        v1Expr = prefix + "/" + v1Expr;
-      }
-
-      var v2Expr = this.expr2.toODataFragment(entityType);
-      var op = this.op;
-      if (op.isFunction) {
-        if (op.key == "substringof") {
-          return op.odataOperator + "(" + v2Expr + "," + v1Expr + ") eq true";
-        } else {
-          return op.odataOperator + "(" + v1Expr + "," + v2Expr + ") eq true";
+        var v1Expr = this.expr1.toODataFragment(entityType);
+        if (prefix) {
+          v1Expr = prefix + "/" + v1Expr;
         }
-      } else {
-        return v1Expr + " " + op.odataOperator + " " + v2Expr;
+
+        var v2Expr = this.expr2.toODataFragment(entityType);
+
+        var odataOp = odataOpFrom(this);
+
+        if (this.op.isFunction) {
+          if (odataOp == "substringof") {
+            return odataOp + "(" + v2Expr + "," + v1Expr + ") eq true";
+          } else {
+            return odataOp + "(" + v1Expr + "," + v2Expr + ") eq true";
+          }
+        } else {
+          return v1Expr + " " + odataOp + " " + v2Expr;
+        }
+      },
+
+      andOrPredicate: function (entityType, prefix) {
+        this.validate(entityType);
+        if (this.preds.length === 0) return;
+        var result = this.preds.map(function (pred) {
+          return "(" + pred.toODataFragment(entityType, prefix) + ")";
+        }).join(" " + odataOpFrom(this) + " ");
+        return result;
+      },
+
+      anyAllPredicate: function (entityType, prefix) {
+        this.validate(entityType);
+        var v1Expr = this.expr.toODataFragment(entityType);
+        if (prefix) {
+          v1Expr = prefix + "/" + v1Expr;
+          prefix = "x" + (parseInt(prefix.substring(1)) + 1);
+        } else {
+          prefix = "x1";
+        }
+        return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
+      },
+
+      litExpr:  function () {
+        return this.dataType.fmtOData(this.value);
+      },
+
+      propExpr:  function (entityType) {
+        this.validate(entityType);
+        return entityType._clientPropertyPathToServer(this.propertyPath);
+      },
+
+      fnExpr: function (entityType) {
+        this.validate(entityType);
+        var frags = this.exprArgs.map(function (expr) {
+          return expr.toODataFragment(entityType);
+        });
+        var result = this.fnName + "(" + frags.join(",") + ")";
+        return result;
       }
-    },
+    };
 
-    andOrPredicate: function (entityType, prefix) {
-      this.validate(entityType);
-      if (this.preds.length === 0) return;
-      var result = this.preds.map(function (pred) {
-        return "(" + pred.toODataFragment(entityType, prefix) + ")";
-      }).join(" " + this.op.odataOperator + " ");
-      return result;
-    },
-
-    anyAllPredicate: function (entityType, prefix) {
-      this.validate(entityType);
-      var v1Expr = this.expr.toODataFragment(entityType);
-      if (prefix) {
-        v1Expr = prefix + "/" + v1Expr;
-        prefix = "x" + (parseInt(prefix.substring(1)) + 1);
-      } else {
-        prefix = "x1";
-      }
-      return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
-    },
-
-    litExpr:  function () {
-      return this.dataType.fmtOData(this.value);
-    },
-
-    propExpr:  function (entityType) {
-      this.validate(entityType);
-      return entityType._clientPropertyPathToServer(this.propertyPath);
-    },
-
-    fnExpr: function (entityType) {
-      this.validate(entityType);
-      var frags = this.exprArgs.map(function (expr) {
-        return expr.toODataFragment(entityType);
-      });
-      var result = this.fnName + "(" + frags.join(",") + ")";
-      return result;
+    var _operatorMap = {
+      'contains': 'substringof'
+      // ops where op.key === odataOperator
+      // not
+      // eq, ne, gt, ge, lt, le,
+      // any, all, and, or
+      // startswith, endswith
     }
-  });
+
+    function odataOpFrom(node) {
+      var op = node.op.key;
+      var odataOp = _operatorMap[op];
+      return odataOp || op;
+    }
+
+    return visitor;
+  }());
 
   Predicate.attachVisitor( {
     fnName: "toJSON",
-    odataPredicate: function() {
-      return this.odataExpr;
+    passthruPredicate: function() {
+      return this.value;
     },
     unaryPredicate: function() {
       var json = {};
