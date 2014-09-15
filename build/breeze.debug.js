@@ -9590,7 +9590,7 @@ breeze.NamingConvention = NamingConvention;
 
     ctor._registerProto = function(name, proto) {
       _nodeMap[name.toLowerCase()] = proto;
-    }
+    };
 
     var proto = ctor.prototype;
 
@@ -9610,7 +9610,7 @@ breeze.NamingConvention = NamingConvention;
 
     proto.toString = function() {
       return JSON.stringify(this.toJSON());
-    }
+    };
 
     proto._initialize = function (name, map) {
       ctor._registerProto(name, this);
@@ -9628,7 +9628,7 @@ breeze.NamingConvention = NamingConvention;
         });
       }
       this.aliasMap = aliasMap;
-    }
+    };
 
     proto._resolveOp = function (op, okIfNotFound) {
       op = op.operator || op;
@@ -9724,7 +9724,7 @@ breeze.NamingConvention = NamingConvention;
     };
     var proto = ctor.prototype = new Predicate();
     proto._initialize('ODataPredicate');
-    proto.validate = function (entityType) {     };
+    proto.validate = function (entityType) {  };
 
     return ctor;
   })();
@@ -9740,11 +9740,9 @@ breeze.NamingConvention = NamingConvention;
       'not': { aliases: [ '!' ] }
     });
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
-      this.pred.validate(entityType);
-      this._validatedEntityType = entityType;
-    };
+    proto.validate = cacheValidation(function (entityType) {
+        this.pred.validate(entityType);
+    });
 
     return ctor;
   })();
@@ -9790,8 +9788,7 @@ breeze.NamingConvention = NamingConvention;
       }
     });
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
+    proto.validate = cacheValidation(function(entityType) {
       this.expr1 = createExpr(this.expr1Source, entityType);
       if (this.expr1 == null) {
         throw new Error("Unable to validate 1st expression: " + this.expr1Source);
@@ -9815,9 +9812,7 @@ breeze.NamingConvention = NamingConvention;
       } else {
         this.expr1.dataType = this.expr2.dataType;
       }
-
-      this._validatedEntityType = entityType;
-    };
+    });
 
     return ctor;
   })();
@@ -9841,13 +9836,11 @@ breeze.NamingConvention = NamingConvention;
       'or': { aliases: [ '||' ] }
     });
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
+    proto.validate = cacheValidation(function (entityType) {
       this.preds.every(function (pred) {
         pred.validate(entityType);
       });
-      this._validatedEntityType = entityType;
-    };
+    });
 
     return ctor;
   })();
@@ -9867,12 +9860,10 @@ breeze.NamingConvention = NamingConvention;
       'all': { aliases: ["every"] }
     });
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
+    proto.validate = cacheValidation(function (entityType) {
       this.expr = createExpr(this.exprSource, entityType);
       this.pred.validate(this.expr.dataType);
-      this._validatedEntityType = entityType;
-    };
+    });
 
     return ctor;
   })();
@@ -9886,9 +9877,7 @@ breeze.NamingConvention = NamingConvention;
     var proto = ctor.prototype;
     Predicate._registerProto('LitExpr', proto);
 
-    proto.validate = function (entityType) {
-      return;
-    }
+    proto.validate = function(entityType) {};
 
     return ctor;
   })();
@@ -9903,8 +9892,7 @@ breeze.NamingConvention = NamingConvention;
     var proto = ctor.prototype;
     Predicate._registerProto('PropExpr', proto);
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
+    proto.validate = cacheValidation(function(entityType) {
       if (entityType.isAnonymous) return;
       var prop = entityType.getProperty(this.propertyPath, true);
       if (!prop) {
@@ -9916,8 +9904,7 @@ breeze.NamingConvention = NamingConvention;
       } else {
         this.dataType = prop.entityType;
       }
-      this._validatedEntityType = entityType;
-    }
+    });
 
     return ctor;
   })();
@@ -9937,13 +9924,11 @@ breeze.NamingConvention = NamingConvention;
     var proto = ctor.prototype;
     Predicate._registerProto('FnExpr', proto);
 
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
+    proto.validate = cacheValidation(function (entityType) {
       this.exprArgs.forEach(function (expr) {
         expr.validate(entityType);
       });
-      this._validatedEntityType = entityType;
-    }
+    });
 
     var funcMap = ctor.funcMap = {
       toupper: { fn: function (source) {
@@ -10378,6 +10363,16 @@ breeze.NamingConvention = NamingConvention;
     }
 
   });
+
+  function cacheValidation(fn) {
+    return function(entityType) {
+      // don't both rerunning the validation if its already been run for this entityType
+      if (this._entityType === entityType) return;
+      // don't need to capture return value because validation fn doesn't have one.
+      fn.bind(this)(entityType);
+      this._entityType = entityType;
+    }
+  }
 
   var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
   // comma delimited expressions ignoring commas inside of both single and double quotes.
