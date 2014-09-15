@@ -1,149 +1,59 @@
 ﻿var Predicate = (function () {
 
-  var Predicate = function () {
-    if (arguments.length == 1) {
-      // 3 possibilities:
-      //      Predicate(aPredicate)
-      //      Predicate([ aPredicate ])
-      //      Predicate(["freight", ">", 100"])
-      //      Predicate( "freight gt 100" }  // odata string
-      //      Predicate( { freight: { ">": 100 } })
-      var arg = arguments[0];
-      if (Array.isArray(arg)) {
-        if (arg.length == 1) {
-          // recurse
-          return Predicate(arg[0]);
+  var Predicate = (function () {
+
+    var ctor = function () {
+      // empty ctor is used by all subclasses.
+      if (arguments.length === 0) return;
+      if (arguments.length === 1) {
+        // 3 possibilities:
+        //      Predicate(aPredicate)
+        //      Predicate([ aPredicate ])
+        //      Predicate(["freight", ">", 100"])
+        //      Predicate( "freight gt 100" }  // odata string
+        //      Predicate( { freight: { ">": 100 } })
+        var arg = arguments[0];
+        if (Array.isArray(arg)) {
+          if (arg.length === 1) {
+            // recurse
+            return Predicate(arg[0]);
+          } else {
+            return createPredicateFromArray(arg);
+          }
+        } else if (arg instanceof Predicate) {
+          return arg;
+        } else if (typeof arg == 'string') {
+          return new ODataPredicate(arg);
         } else {
-          return createPredicateFromArray(arg);
+          return createPredicateFromObject(arg);
         }
-      } else if (arg instanceof BasePredicate) {
-        return arg;
-      } else if (typeof arg == 'string') {
-        return new ODataPredicate(arg);
       } else {
-        return createPredicateFromObject(arg);
+        // 2 possibilities
+        //      Predicate("freight", ">", 100");
+        //      Predicate("orders", "any", "freight",  ">", 950);
+        return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
       }
-    } else {
-      // 2 possibilities
-      //      Predicate("freight", ">", 100");
-      //      Predicate("orders", "any", "freight",  ">", 950);
-      return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
-    }
-  };
-  // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
-  Predicate.create = Predicate;
+    };
+    // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
+    ctor.create = ctor;
 
-  Predicate.and = function () {
-    return new AndOrPredicate("and", __arraySlice(arguments));
-  }
-
-  Predicate.or = function () {
-    return new AndOrPredicate("or", __arraySlice(arguments));
-  }
-
-  var createPredicateFromArray = function (arr) {
-    // TODO: assert that length of the array should be > 3
-    // Needs to handle:
-    //      [ "freight", ">", 100"];
-    //      [ "orders", "any", "freight",  ">", 950 ]
-    //      [ "orders", "and", anotherPred ]
-    //      [ "orders", "and", [ "freight, ">", 950 ]
-    var json = {};
-    var value = {};
-    json[arr[0]] = value;
-    var op = arr[1];
-    op = op.operator || op;  // incoming op will be either a string or a FilterQueryOp
-    if (arr.length == 3) {
-      value[op] = arr[2];
-    } else {
-      value[op] = createPredicateFromArray(arr.splice(2));
-    }
-    return createPredicateFromObject(json);
-  };
-
-  var createPredicateFromObject = function (obj) {
-    if (obj instanceof BasePredicate) return obj;
-
-    if (typeof obj != 'object') {
-      throw new Error("Unable to convert to a Predicate: " + obj);
-    }
-    var keys = Object.keys(obj);
-    var preds = keys.map(function (key) {
-      return createPredicateFromKeyValue(key, obj[key]);
-    });
-    return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
-  }
-
-  function createPredicateFromKeyValue(key, value) {
-
-    // { and: [a,b] } key='and', value = [a,b]
-    if (AndOrPredicate.prototype._resolveOp(key, true)) {
-      return new AndOrPredicate(key, value);
-    }
-
-    // { not: a }  key= 'not', value = a
-    if (UnaryPredicate.prototype._resolveOp(key, true)) {
-      return new UnaryPredicate(key, value);
-    }
-
-    // { foo: bar } key='foo', value = bar ( where bar is a literal i.e. a string, a number, a boolean or a date.
-    if ((typeof value !== 'object') || value == null || __isDate(value)) {
-      return new BinaryPredicate("==", key, value);
-    }
-
-    var expr = key;
-    var keys = Object.keys(value);
-    var preds = keys.map(function (op) {
-
-      // { a: { any: b } op = 'any', expr=a, value[op] = b
-      if (AnyAllPredicate.prototype._resolveOp(op, true)) {
-        return new AnyAllPredicate(op, expr, value[op]);
+    ctor.prefix = function(prefix) {
+      ctor = function() {
+        
       }
-
-      // { a: { ">": b }} op = ">", expr=a, value[op] = b
-      if (BinaryPredicate.prototype._resolveOp(op, true)) {
-        return new BinaryPredicate(op, expr, value[op]);
-      }
-
-      throw new Error("Unable to resolve predicate for operator: " + op + " and value: " + value[op]);
-
-    });
-
-    return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
-
-  }
-
-  var BasePredicate = (function () {
-
-    var ctor = function (map) {
-      var aliasMap = {};
-      for (var key in map) {
-        var value = map[key];
-        // if not otherwise defined
-        if (!value.odataOperator) value.odataOperator = key;
-        var aliasKey = key.toLowerCase();
-        value.key = aliasKey;
-        aliasMap[aliasKey] = value;
-        // always support the key with a $ in front
-        aliasMap["$" + aliasKey] = value;
-        value.aliases && value.aliases.forEach(function (alias) {
-          aliasMap[alias.toLowerCase()] = value;
-        });
-      }
-      this.aliasMap = aliasMap;
     }
 
-    var proto = ctor.prototype;
-
-    var _nodeMap = {};
-
-    ctor.registerNode = function(name, proto) {
-      _nodeMap[name.toLowerCase()] = proto;
+    ctor.and = function () {
+      return new AndOrPredicate("and", __arraySlice(arguments));
     }
 
-    ctor.attachVisitor = function(visitor) {
+    ctor.or = function () {
+      return new AndOrPredicate("or", __arraySlice(arguments));
+    }
+
+    ctor.attachVisitor = function (visitor) {
       var fnName = visitor.fnName;
-      Object.keys(visitor).forEach(function(key) {
+      Object.keys(visitor).forEach(function (key) {
         var lcKey = key.toLowerCase();
         if (lcKey == "fnname") return;
         var proto = _nodeMap[lcKey];
@@ -155,10 +65,13 @@
       });
     };
 
-    // TODO: do we need this.
-//    ctor.detachVisitor = function(name) {
-//
-//    }
+    var _nodeMap = {};
+
+    ctor._registerProto = function(name, proto) {
+      _nodeMap[name.toLowerCase()] = proto;
+    }
+
+    var proto = ctor.prototype;
 
     proto.and = function () {
       var pred = Predicate(__arraySlice(arguments));
@@ -174,6 +87,29 @@
       return new UnaryPredicate("not", this);
     };
 
+    proto.toString = function() {
+      return JSON.stringify(this.toJSON());
+    }
+
+    proto._initialize = function (name, map) {
+      ctor._registerProto(name, this);
+      var aliasMap = {};
+      for (var key in (map || {})) {
+        var value = map[key];
+        // if not otherwise defined
+        if (!value.odataOperator) value.odataOperator = key;
+        var aliasKey = key.toLowerCase();
+        value.key = aliasKey;
+        aliasMap[aliasKey] = value;
+        // always support the key with a $ in front
+        aliasMap["$" + aliasKey] = value;
+        value.aliases && value.aliases.forEach(function (alias) {
+          aliasMap[alias.toLowerCase()] = value;
+        });
+      }
+      this.aliasMap = aliasMap;
+    }
+
     proto._resolveOp = function (op, okIfNotFound) {
       op = op.operator || op;
       var result = this.aliasMap[op.toLowerCase()];
@@ -183,6 +119,77 @@
       return result;
     };
 
+    function createPredicateFromArray(arr) {
+      // TODO: assert that length of the array should be > 3
+      // Needs to handle:
+      //      [ "freight", ">", 100"];
+      //      [ "orders", "any", "freight",  ">", 950 ]
+      //      [ "orders", "and", anotherPred ]
+      //      [ "orders", "and", [ "freight, ">", 950 ]
+      var json = {};
+      var value = {};
+      json[arr[0]] = value;
+      var op = arr[1];
+      op = op.operator || op;  // incoming op will be either a string or a FilterQueryOp
+      if (arr.length == 3) {
+        value[op] = arr[2];
+      } else {
+        value[op] = createPredicateFromArray(arr.splice(2));
+      }
+      return createPredicateFromObject(json);
+    };
+
+    function createPredicateFromObject(obj) {
+      if (obj instanceof Predicate) return obj;
+
+      if (typeof obj != 'object') {
+        throw new Error("Unable to convert to a Predicate: " + obj);
+      }
+      var keys = Object.keys(obj);
+      var preds = keys.map(function (key) {
+        return createPredicateFromKeyValue(key, obj[key]);
+      });
+      return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
+    }
+
+    function createPredicateFromKeyValue(key, value) {
+
+      // { and: [a,b] } key='and', value = [a,b]
+      if (AndOrPredicate.prototype._resolveOp(key, true)) {
+        return new AndOrPredicate(key, value);
+      }
+
+      // { not: a }  key= 'not', value = a
+      if (UnaryPredicate.prototype._resolveOp(key, true)) {
+        return new UnaryPredicate(key, value);
+      }
+
+      // { foo: bar } key='foo', value = bar ( where bar is a literal i.e. a string, a number, a boolean or a date.
+      if ((typeof value !== 'object') || value == null || __isDate(value)) {
+        return new BinaryPredicate("==", key, value);
+      }
+
+      var expr = key;
+      var keys = Object.keys(value);
+      var preds = keys.map(function (op) {
+
+        // { a: { any: b } op = 'any', expr=a, value[op] = b
+        if (AnyAllPredicate.prototype._resolveOp(op, true)) {
+          return new AnyAllPredicate(op, expr, value[op]);
+        }
+
+        // { a: { ">": b }} op = ">", expr=a, value[op] = b
+        if (BinaryPredicate.prototype._resolveOp(op, true)) {
+          return new BinaryPredicate(op, expr, value[op]);
+        }
+
+        throw new Error("Unable to resolve predicate for operator: " + op + " and value: " + value[op]);
+
+      });
+
+      return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
+
+    }
 
     return ctor;
   })();
@@ -191,13 +198,9 @@
     var ctor = function (odataExpr) {
       this.odataExpr = odataExpr;
     };
-    var proto = ctor.prototype = new BasePredicate({});
-    BasePredicate.registerNode('ODataPredicate', proto);
+    var proto = ctor.prototype = new Predicate();
+    proto._initialize('ODataPredicate');
     proto.validate = function (entityType) {     };
-
-    proto.toString =  function (entityType ) {
-      return this.odataExpr;
-    };
 
     return ctor;
   })();
@@ -207,19 +210,16 @@
       this.op = this._resolveOp(op);
       this.pred = Predicate(pred);
     };
-    var proto = ctor.prototype = new BasePredicate({
+
+    var proto = ctor.prototype = new Predicate();
+    proto._initialize('UnaryPredicate', {
       'not': { aliases: [ '!' ] }
     });
-    BasePredicate.registerNode('UnaryPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
       this.pred.validate(entityType);
       this._validatedEntityType = entityType;
-    };
-
-    proto.toString = function () {
-      return this.op.odataOperator + " " + "(" + this.pred.toString() + ")";
     };
 
     return ctor;
@@ -234,7 +234,8 @@
       // determined until validate is run
     };
 
-    var proto = ctor.prototype = new BasePredicate({
+    var proto = ctor.prototype = new Predicate();
+    proto._initialize('BinaryPredicate', {
       'eq': {
         aliases: ["=="]
       },
@@ -264,7 +265,6 @@
         isFunction: true
       }
     });
-    BasePredicate.registerNode('BinaryPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -295,10 +295,6 @@
       this._validatedEntityType = entityType;
     };
 
-    proto.toString = function () {
-      return __formatString("{%1} %2 {%3}", this.expr1Source, this.op.odataOperator, this.expr2Source);
-    };
-
     return ctor;
   })();
 
@@ -315,11 +311,11 @@
       });
     };
 
-    var proto = ctor.prototype = new BasePredicate({
+    var proto = ctor.prototype = new Predicate();
+    proto._initialize("AndOrPredicate", {
       'and': { aliases: [ '&&' ] },
       'or': { aliases: [ '||' ] }
     });
-    BasePredicate.registerNode('AndOrPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -329,18 +325,10 @@
       this._validatedEntityType = entityType;
     };
 
-    proto.toString = function () {
-      var result = this.preds.map(function (pred) {
-        return "(" + pred.toString() + ")";
-      }).join(" " + this.op.odataOperator + " ");
-      return result;
-    };
-
     return ctor;
-
   })();
 
-  var AnyAllPredicate = function () {
+  var AnyAllPredicate = (function () {
 
     var ctor = function (op, expr, pred) {
       this.op = this._resolveOp(op);
@@ -349,11 +337,11 @@
       this.pred = Predicate(pred);
     };
 
-    var proto = ctor.prototype = new BasePredicate({
-      'any': { aliases: ["some"]},
+    var proto = ctor.prototype = new Predicate();
+    proto._initialize("AnyAllPredicate", {
+      'any': { aliases: ['some']},
       'all': { aliases: ["every"] }
     });
-    BasePredicate.registerNode('AnyAllPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -362,12 +350,8 @@
       this._validatedEntityType = entityType;
     };
 
-    proto.toString = function () {
-      return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
-    };
-
     return ctor;
-  }();
+  })();
 
   var LitExpr = (function () {
 
@@ -376,14 +360,10 @@
       this.dataType = dataType;
     };
     var proto = ctor.prototype;
-    BasePredicate.registerNode('LitExpr', proto);
+    Predicate._registerProto('LitExpr', proto);
 
     proto.validate = function (entityType) {
       return;
-    }
-
-    proto.toString = function () {
-      return this.value;
     }
 
     return ctor;
@@ -397,7 +377,7 @@
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype;
-    BasePredicate.registerNode('PropExpr', proto);
+    Predicate._registerProto('PropExpr', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -415,10 +395,6 @@
       this._validatedEntityType = entityType;
     }
 
-    proto.toString = function () {
-      return this.propertyPath;
-    };
-
     return ctor;
   })();
 
@@ -435,7 +411,7 @@
       this.dataType = qf.dataType;
     };
     var proto = ctor.prototype;
-    BasePredicate.registerNode('FnExpr', proto);
+    Predicate._registerProto('FnExpr', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -444,14 +420,6 @@
       });
       this._validatedEntityType = entityType;
     }
-
-    proto.toString = function () {
-      var args = this.exprArgs.map(function (expr) {
-        return expr.toString();
-      });
-      var uri = this.fnName + "(" + args.join(",") + ")";
-      return uri;
-    };
 
     var funcMap = ctor.funcMap = {
       toupper: { fn: function (source) {
@@ -516,8 +484,8 @@
     return ctor;
   })();
 
-  (function() {
-    BasePredicate.attachVisitor({
+  Predicate.attachVisitor(function() {
+    return {
       fnName: "toFunction",
       odataPredicate: function (entityType) {
         throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
@@ -616,7 +584,7 @@
           return result;
         }
       }
-    });
+    };
 
     function getAnyAllPredicateFn(op) {
       switch (op.key) {
@@ -761,9 +729,9 @@
       return a.indexOf(b) >= 0;
     }
 
-  })();
+  }());
 
-  BasePredicate.attachVisitor({
+  Predicate.attachVisitor({
     fnName: "toODataFragment",
     odataPredicate: function () {
       return this.odataExpr;
@@ -835,7 +803,7 @@
     }
   });
 
-  BasePredicate.attachVisitor( {
+  Predicate.attachVisitor( {
     fnName: "toJSON",
     odataPredicate: function() {
       return this.odataExpr;
@@ -911,7 +879,6 @@
       var repl = DELIM + i++;
       source = source.replace(token, repl);
     }
-
 
     var expr = parseExpr(source, tokens, entityType);
     expr.validate(entityType);
