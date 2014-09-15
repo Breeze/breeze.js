@@ -9727,7 +9727,7 @@ breeze.NamingConvention = NamingConvention;
       throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
     };
 
-    proto.toString = proto.toODataFragment = function (entityType, prefix) {
+    proto.toString =  function (entityType ) {
       return this.odataExpr;
     };
 
@@ -9762,11 +9762,6 @@ breeze.NamingConvention = NamingConvention;
         default:
           throw new Error("Invalid unary operator:" + this.op.key);
       }
-    };
-
-    proto.toODataFragment = function (entityType, prefix) {
-      this.validate(entityType);
-      return this.op.odataOperator + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
     };
 
     proto.toString = function () {
@@ -9837,7 +9832,6 @@ breeze.NamingConvention = NamingConvention;
         }
       }
 
-
       if (this.expr1.dataType != DataType.Undefined) {
         this.expr2.dataType = this.expr1.dataType;
       } else {
@@ -9859,29 +9853,6 @@ breeze.NamingConvention = NamingConvention;
         return predFn(v1Fn(entity), v2Fn(entity));
       };
     };
-
-    proto.toODataFragment = function (entityType, prefix) {
-      this.validate(entityType);
-
-      var v1Expr = this.expr1.toODataFragment(entityType);
-      if (prefix) {
-        v1Expr = prefix + "/" + v1Expr;
-      }
-
-      var v2Expr = this.expr2.toODataFragment(entityType);
-      var op = this.op;
-      if (op.isFunction) {
-        if (op.key == "substringof") {
-          return op.odataOperator + "(" + v2Expr + "," + v1Expr + ") eq true";
-        } else {
-          return op.odataOperator + "(" + v1Expr + "," + v2Expr + ") eq true";
-        }
-      } else {
-        return v1Expr + " " + op.odataOperator + " " + v2Expr;
-      }
-
-    };
-
 
     proto.toString = function () {
       return __formatString("{%1} %2 {%3}", this.expr1Source, this.op.odataOperator, this.expr2Source);
@@ -10045,14 +10016,7 @@ breeze.NamingConvention = NamingConvention;
       return createFunction(entityType, this.op, this.preds);
     };
 
-    proto.toODataFragment = function (entityType, prefix) {
-      this.validate(entityType);
-      if (this.preds.length === 0) return;
-      var result = this.preds.map(function (pred) {
-        return "(" + pred.toODataFragment(entityType, prefix) + ")";
-      }).join(" " + this.op.odataOperator + " ");
-      return result;
-    };
+
 
     proto.toString = function () {
       var result = this.preds.map(function (pred) {
@@ -10121,18 +10085,7 @@ breeze.NamingConvention = NamingConvention;
       };
     };
 
-    proto.toODataFragment = function (entityType, prefix) {
-      this.validate(entityType);
-      var v1Expr = this.expr.toODataFragment(entityType);
-      if (prefix) {
-        v1Expr = prefix + "/" + v1Expr;
-        prefix = "x" + (parseInt(prefix.substring(1)) + 1);
-      } else {
-        prefix = "x1";
-      }
 
-      return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
-    };
 
     proto.toString = function () {
       return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
@@ -10181,9 +10134,7 @@ breeze.NamingConvention = NamingConvention;
       };
     }
 
-    proto.toODataFragment = function () {
-      return this.dataType.fmtOData(this.value);
-    }
+
 
     proto.toString = function () {
       return this.value;
@@ -10216,11 +10167,6 @@ breeze.NamingConvention = NamingConvention;
         this.dataType = prop.entityType;
       }
       this._validatedEntityType = entityType;
-    }
-
-    proto.toODataFragment = function (entityType) {
-      this.validate(entityType);
-      return entityType._clientPropertyPathToServer(this.propertyPath);
     }
 
     proto.toFunction = function () {
@@ -10279,16 +10225,6 @@ breeze.NamingConvention = NamingConvention;
       }
     };
 
-
-    proto.toODataFragment = function (entityType) {
-      this.validate(entityType);
-      var frags = this.exprArgs.map(function (expr) {
-        return expr.toODataFragment(entityType);
-      });
-      var result = this.fnName + "(" + frags.join(",") + ")";
-      return result;
-    }
-
     proto.toString = function () {
       var args = this.exprArgs.map(function (expr) {
         return expr.toString();
@@ -10296,7 +10232,6 @@ breeze.NamingConvention = NamingConvention;
       var uri = this.fnName + "(" + args.join(",") + ")";
       return uri;
     };
-
 
     var funcMap = ctor.funcMap = {
       toupper: { fn: function (source) {
@@ -10360,6 +10295,78 @@ breeze.NamingConvention = NamingConvention;
 
     return ctor;
   })();
+
+  BasePredicate.attachVisitor({
+    fnName: "toODataFragment",
+    odataPredicate: function () {
+      return this.odataExpr;
+    },
+
+    unaryPredicate: function (entityType, prefix) {
+      this.validate(entityType);
+      return this.op.odataOperator + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
+    },
+
+    binaryPredicate: function (entityType, prefix) {
+      this.validate(entityType);
+
+      var v1Expr = this.expr1.toODataFragment(entityType);
+      if (prefix) {
+        v1Expr = prefix + "/" + v1Expr;
+      }
+
+      var v2Expr = this.expr2.toODataFragment(entityType);
+      var op = this.op;
+      if (op.isFunction) {
+        if (op.key == "substringof") {
+          return op.odataOperator + "(" + v2Expr + "," + v1Expr + ") eq true";
+        } else {
+          return op.odataOperator + "(" + v1Expr + "," + v2Expr + ") eq true";
+        }
+      } else {
+        return v1Expr + " " + op.odataOperator + " " + v2Expr;
+      }
+    },
+
+    andOrPredicate: function (entityType, prefix) {
+      this.validate(entityType);
+      if (this.preds.length === 0) return;
+      var result = this.preds.map(function (pred) {
+        return "(" + pred.toODataFragment(entityType, prefix) + ")";
+      }).join(" " + this.op.odataOperator + " ");
+      return result;
+    },
+
+    anyAllPredicate: function (entityType, prefix) {
+      this.validate(entityType);
+      var v1Expr = this.expr.toODataFragment(entityType);
+      if (prefix) {
+        v1Expr = prefix + "/" + v1Expr;
+        prefix = "x" + (parseInt(prefix.substring(1)) + 1);
+      } else {
+        prefix = "x1";
+      }
+      return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
+    },
+
+    litExpr:  function () {
+      return this.dataType.fmtOData(this.value);
+    },
+
+    propExpr:  function (entityType) {
+      this.validate(entityType);
+      return entityType._clientPropertyPathToServer(this.propertyPath);
+    },
+
+    fnExpr: function (entityType) {
+      this.validate(entityType);
+      var frags = this.exprArgs.map(function (expr) {
+        return expr.toODataFragment(entityType);
+      });
+      var result = this.fnName + "(" + frags.join(",") + ")";
+      return result;
+    }
+  });
 
   BasePredicate.attachVisitor( {
     fnName: "toJSON",
