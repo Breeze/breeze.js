@@ -148,7 +148,7 @@
         if (lcKey == "fnname") return;
         var proto = _nodeMap[lcKey];
         if (proto == null) {
-          throw new Error("Unable to locate a visitor node for: " + key);
+          throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
         }
         // add function to the Predicate or Expr node.
         proto[fnName] = visitor[key];
@@ -193,17 +193,11 @@
     };
     var proto = ctor.prototype = new BasePredicate({});
     BasePredicate.registerNode('ODataPredicate', proto);
-    proto.validate = function (entityType) {
-    };
-
-    proto.toFunction = function (entityType) {
-      throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
-    };
+    proto.validate = function (entityType) {     };
 
     proto.toString =  function (entityType ) {
       return this.odataExpr;
     };
-
 
     return ctor;
   })();
@@ -222,19 +216,6 @@
       if (this._validatedEntityType === entityType) return;
       this.pred.validate(entityType);
       this._validatedEntityType = entityType;
-    };
-
-    proto.toFunction = function (entityType) {
-      this.validate(entityType);
-      switch (this.op.key) {
-        case "not":
-          var func = this.pred.toFunction(entityType);
-          return function (entity) {
-            return !func(entity);
-          };
-        default:
-          throw new Error("Invalid unary operator:" + this.op.key);
-      }
     };
 
     proto.toString = function () {
@@ -314,24 +295,349 @@
       this._validatedEntityType = entityType;
     };
 
-    proto.toFunction = function (entityType) {
-
-      this.validate(entityType);
-
-      var dataType = this.expr1.dataType || this.expr2.dataType;
-      var predFn = getPredicateFn(entityType, this.op, dataType);
-      var v1Fn = this.expr1.toFunction();
-      var v2Fn = this.expr2.toFunction();
-      return function (entity) {
-        return predFn(v1Fn(entity), v2Fn(entity));
-      };
-    };
-
     proto.toString = function () {
       return __formatString("{%1} %2 {%3}", this.expr1Source, this.op.odataOperator, this.expr2Source);
     };
 
-    function getPredicateFn(entityType, op, dataType) {
+    return ctor;
+  })();
+
+  var AndOrPredicate = (function () {
+    var ctor = function (op, preds) {
+      this.op = this._resolveOp(op);
+      if (preds.length == 1 && Array.isArray(preds[0])) {
+        preds = preds[0];
+      }
+      this.preds = preds.filter(function (pred) {
+        return pred != null;
+      }).map(function (pred) {
+        return Predicate(pred);
+      });
+    };
+
+    var proto = ctor.prototype = new BasePredicate({
+      'and': { aliases: [ '&&' ] },
+      'or': { aliases: [ '||' ] }
+    });
+    BasePredicate.registerNode('AndOrPredicate', proto);
+
+    proto.validate = function (entityType) {
+      if (this._validatedEntityType === entityType) return;
+      this.preds.every(function (pred) {
+        pred.validate(entityType);
+      });
+      this._validatedEntityType = entityType;
+    };
+
+    proto.toString = function () {
+      var result = this.preds.map(function (pred) {
+        return "(" + pred.toString() + ")";
+      }).join(" " + this.op.odataOperator + " ");
+      return result;
+    };
+
+    return ctor;
+
+  })();
+
+  var AnyAllPredicate = function () {
+
+    var ctor = function (op, expr, pred) {
+      this.op = this._resolveOp(op);
+      this.exprSource = expr;
+      // this.expr will not be resolved until validate is called
+      this.pred = Predicate(pred);
+    };
+
+    var proto = ctor.prototype = new BasePredicate({
+      'any': { aliases: ["some"]},
+      'all': { aliases: ["every"] }
+    });
+    BasePredicate.registerNode('AnyAllPredicate', proto);
+
+    proto.validate = function (entityType) {
+      if (this._validatedEntityType === entityType) return;
+      this.expr = createExpr(this.exprSource, entityType);
+      this.pred.validate(this.expr.dataType);
+      this._validatedEntityType = entityType;
+    };
+
+    proto.toString = function () {
+      return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
+    };
+
+    return ctor;
+  }();
+
+  var LitExpr = (function () {
+
+    var ctor = function (value, dataType) {
+      this.value = value;
+      this.dataType = dataType;
+    };
+    var proto = ctor.prototype;
+    BasePredicate.registerNode('LitExpr', proto);
+
+    proto.validate = function (entityType) {
+      return;
+    }
+
+    proto.toString = function () {
+      return this.value;
+    }
+
+    return ctor;
+  })();
+
+  var PropExpr = (function () {
+
+    var ctor = function (propertyPath) {
+      this.propertyPath = propertyPath;
+      this.dataType = DataType.Undefined;
+      // this.dataType resolved after validate ( if not on an anon type }
+    };
+    var proto = ctor.prototype;
+    BasePredicate.registerNode('PropExpr', proto);
+
+    proto.validate = function (entityType) {
+      if (this._validatedEntityType === entityType) return;
+      if (entityType.isAnonymous) return;
+      var prop = entityType.getProperty(this.propertyPath, true);
+      if (!prop) {
+        var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
+        throw new Error(msg);
+      }
+      if (prop.isDataProperty) {
+        this.dataType = prop.dataType;
+      } else {
+        this.dataType = prop.entityType;
+      }
+      this._validatedEntityType = entityType;
+    }
+
+    proto.toString = function () {
+      return this.propertyPath;
+    };
+
+    return ctor;
+  })();
+
+  var FnExpr = (function () {
+
+    var ctor = function (fnName, exprArgs) {
+      this.fnName = fnName;
+      this.exprArgs = exprArgs;
+      var qf = funcMap[fnName];
+      if (qf == null) {
+        throw new Error("Unknown function: " + fnName);
+      }
+      this.localFn = qf.fn;
+      this.dataType = qf.dataType;
+    };
+    var proto = ctor.prototype;
+    BasePredicate.registerNode('FnExpr', proto);
+
+    proto.validate = function (entityType) {
+      if (this._validatedEntityType === entityType) return;
+      this.exprArgs.forEach(function (expr) {
+        expr.validate(entityType);
+      });
+      this._validatedEntityType = entityType;
+    }
+
+    proto.toString = function () {
+      var args = this.exprArgs.map(function (expr) {
+        return expr.toString();
+      });
+      var uri = this.fnName + "(" + args.join(",") + ")";
+      return uri;
+    };
+
+    var funcMap = ctor.funcMap = {
+      toupper: { fn: function (source) {
+        return source.toUpperCase();
+      }, dataType: DataType.String },
+      tolower: { fn: function (source) {
+        return source.toLowerCase();
+      }, dataType: DataType.String },
+      substring: { fn: function (source, pos, length) {
+        return source.substring(pos, length);
+      }, dataType: DataType.String },
+      substringof: { fn: function (find, source) {
+        return source.indexOf(find) >= 0;
+      }, dataType: DataType.Boolean },
+      length: { fn: function (source) {
+        return source.length;
+      }, dataType: DataType.Int32 },
+      trim: { fn: function (source) {
+        return source.trim();
+      }, dataType: DataType.String },
+      concat: { fn: function (s1, s2) {
+        return s1.concat(s2);
+      }, dataType: DataType.String },
+      replace: { fn: function (source, find, replace) {
+        return source.replace(find, replace);
+      }, dataType: DataType.String },
+      startswith: { fn: function (source, find) {
+        return __stringStartsWith(source, find);
+      }, dataType: DataType.Boolean },
+      endswith: { fn: function (source, find) {
+        return __stringEndsWith(source, find);
+      }, dataType: DataType.Boolean },
+      indexof: { fn: function (source, find) {
+        return source.indexOf(find);
+      }, dataType: DataType.Int32 },
+      round: { fn: function (source) {
+        return Math.round(source);
+      }, dataType: DataType.Int32 },
+      ceiling: { fn: function (source) {
+        return Math.ceil(source);
+      }, dataType: DataType.Int32 },
+      floor: { fn: function (source) {
+        return Math.floor(source);
+      }, dataType: DataType.Int32 },
+      second: { fn: function (source) {
+        return source.getSeconds();
+      }, dataType: DataType.Int32 },
+      minute: { fn: function (source) {
+        return source.getMinutes();
+      }, dataType: DataType.Int32 },
+      day: { fn: function (source) {
+        return source.getDate();
+      }, dataType: DataType.Int32 },
+      month: { fn: function (source) {
+        return source.getMonth() + 1;
+      }, dataType: DataType.Int32 },
+      year: { fn: function (source) {
+        return source.getFullYear();
+      }, dataType: DataType.Int32 }
+    };
+
+    return ctor;
+  })();
+
+  (function() {
+    BasePredicate.attachVisitor({
+      fnName: "toFunction",
+      odataPredicate: function (entityType) {
+        throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
+      },
+
+      unaryPredicate: function (entityType) {
+        this.validate(entityType);
+        switch (this.op.key) {
+          case "not":
+            var func = this.pred.toFunction(entityType);
+            return function (entity) {
+              return !func(entity);
+            };
+          default:
+            throw new Error("Invalid unary operator:" + this.op.key);
+        }
+      },
+
+      binaryPredicate: function (entityType) {
+
+        this.validate(entityType);
+
+        var dataType = this.expr1.dataType || this.expr2.dataType;
+        var predFn = getBinaryPredicateFn(entityType, this.op, dataType);
+        var v1Fn = this.expr1.toFunction();
+        var v2Fn = this.expr2.toFunction();
+        return function (entity) {
+          return predFn(v1Fn(entity), v2Fn(entity));
+        };
+      },
+
+      andOrPredicate: function (entityType) {
+        var funcs = this.preds.map(function (pred) {
+          return pred.toFunction(entityType);
+        });
+        switch (this.op.key) {
+          case "and":
+            return function (entity) {
+              var result = funcs.reduce(function (prev, cur) {
+                return prev && cur(entity);
+              }, true);
+              return result;
+            };
+          case "or":
+            return function (entity) {
+              var result = funcs.reduce(function (prev, cur) {
+                return prev || cur(entity);
+              }, false);
+              return result;
+            };
+          default:
+            throw new Error("Invalid boolean operator:" + op.key);
+        }
+      },
+
+      anyAllPredicate: function (entityType) {
+        this.validate(entityType);
+        var v1Fn = this.expr.toFunction();
+
+        var predFn = getAnyAllPredicateFn(this.op);
+        var fn2 = this.pred.toFunction(this.expr.dataType);
+        return function (entity) {
+          return predFn(v1Fn(entity), fn2);
+        };
+      },
+
+      litExpr: function () {
+        var value = this.value;
+        return function (entity) {
+          return value;
+        };
+      },
+
+      propExpr: function () {
+        var propertyPath = this.propertyPath;
+        var properties = propertyPath.split('.');
+        if (properties.length === 1) {
+          return function (entity) {
+            return entity.getProperty(propertyPath);
+          };
+        } else {
+          return function (entity) {
+            return getPropertyPathValue(entity, properties);
+          };
+        }
+      },
+
+      fnExpr:  function () {
+        var that = this;
+        return function (entity) {
+          var values = that.exprArgs.map(function (expr) {
+            var value = expr.toFunction()(entity);
+            return value;
+          });
+          var result = that.localFn.apply(null, values);
+          return result;
+        }
+      }
+    });
+
+    function getAnyAllPredicateFn(op) {
+      switch (op.key) {
+        case "any":
+          return function (v1, v2) {
+            return v1.some(function (v) {
+              return v2(v);
+            });
+          };
+        case "all":
+          return function (v1, v2) {
+            return v1.every(function (v) {
+              return v2(v);
+            });
+          };
+        default:
+          throw new Error("Unknown operator: " + op.key);
+      }
+    }
+
+    function getBinaryPredicateFn(entityType, op, dataType) {
       var lqco = entityType.metadataStore.localQueryComparisonOptions;
       var mc = getComparableFn(dataType);
       var predFn;
@@ -455,318 +761,6 @@
       return a.indexOf(b) >= 0;
     }
 
-    return ctor;
-  })();
-
-  var AndOrPredicate = (function () {
-    var ctor = function (op, preds) {
-      this.op = this._resolveOp(op);
-      if (preds.length == 1 && Array.isArray(preds[0])) {
-        preds = preds[0];
-      }
-      this.preds = preds.filter(function (pred) {
-        return pred != null;
-      }).map(function (pred) {
-        return Predicate(pred);
-      });
-    };
-
-    var proto = ctor.prototype = new BasePredicate({
-      'and': { aliases: [ '&&' ] },
-      'or': { aliases: [ '||' ] }
-    });
-    BasePredicate.registerNode('AndOrPredicate', proto);
-
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
-      this.preds.every(function (pred) {
-        pred.validate(entityType);
-      });
-      this._validatedEntityType = entityType;
-    };
-
-    proto.toFunction = function (entityType) {
-      return createFunction(entityType, this.op, this.preds);
-    };
-
-
-
-    proto.toString = function () {
-      var result = this.preds.map(function (pred) {
-        return "(" + pred.toString() + ")";
-      }).join(" " + this.op.odataOperator + " ");
-      return result;
-    };
-
-    function createFunction(entityType, op, preds) {
-      var funcs = preds.map(function (pred) {
-        return pred.toFunction(entityType);
-      });
-      switch (op.key) {
-        case "and":
-          return function (entity) {
-            var result = funcs.reduce(function (prev, cur) {
-              return prev && cur(entity);
-            }, true);
-            return result;
-          };
-        case "or":
-          return function (entity) {
-            var result = funcs.reduce(function (prev, cur) {
-              return prev || cur(entity);
-            }, false);
-            return result;
-          };
-        default:
-          throw new Error("Invalid boolean operator:" + op.key);
-      }
-    }
-
-    return ctor;
-
-  })();
-
-  var AnyAllPredicate = function () {
-
-    var ctor = function (op, expr, pred) {
-      this.op = this._resolveOp(op);
-      this.exprSource = expr;
-      // this.expr will not be resolved until validate is called
-      this.pred = Predicate(pred);
-    };
-
-    var proto = ctor.prototype = new BasePredicate({
-      'any': { aliases: ["some"]},
-      'all': { aliases: ["every"] }
-    });
-    BasePredicate.registerNode('AnyAllPredicate', proto);
-
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
-      this.expr = createExpr(this.exprSource, entityType);
-      this.pred.validate(this.expr.dataType);
-      this._validatedEntityType = entityType;
-    };
-
-    proto.toFunction = function (entityType) {
-      this.validate(entityType);
-      var v1Fn = this.expr.toFunction();
-      var predFn = getPredicateFn(this.op);
-      var fn2 = this.pred.toFunction(this.expr.dataType);
-      return function (entity) {
-        return predFn(v1Fn(entity), fn2);
-      };
-    };
-
-
-
-    proto.toString = function () {
-      return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
-    };
-
-    function getPredicateFn(op) {
-      switch (op.key) {
-        case "any":
-          return function (v1, v2) {
-            return v1.some(function (v) {
-              return v2(v);
-            });
-          };
-        case "all":
-          return function (v1, v2) {
-            return v1.every(function (v) {
-              return v2(v);
-            });
-          };
-        default:
-          throw new Error("Unknown operator: " + op.key);
-      }
-    }
-
-    return ctor;
-
-  }();
-
-  var LitExpr = (function () {
-
-    var ctor = function (value, dataType) {
-      this.value = value;
-      this.dataType = dataType;
-    };
-    var proto = ctor.prototype;
-    BasePredicate.registerNode('LitExpr', proto);
-
-    proto.validate = function (entityType) {
-      return;
-    }
-
-    proto.toFunction = function () {
-      var value = this.value;
-      return function (entity) {
-        return value;
-      };
-    }
-
-
-
-    proto.toString = function () {
-      return this.value;
-    }
-
-    return ctor;
-  })();
-
-  var PropExpr = (function () {
-
-    var ctor = function (propertyPath) {
-      this.propertyPath = propertyPath;
-      this.dataType = DataType.Undefined;
-      // this.dataType resolved after validate ( if not on an anon type }
-    };
-    var proto = ctor.prototype;
-    BasePredicate.registerNode('PropExpr', proto);
-
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
-      if (entityType.isAnonymous) return;
-      var prop = entityType.getProperty(this.propertyPath, true);
-      if (!prop) {
-        var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
-        throw new Error(msg);
-      }
-      if (prop.isDataProperty) {
-        this.dataType = prop.dataType;
-      } else {
-        this.dataType = prop.entityType;
-      }
-      this._validatedEntityType = entityType;
-    }
-
-    proto.toFunction = function () {
-      var propertyPath = this.propertyPath;
-      var properties = propertyPath.split('.');
-      if (properties.length === 1) {
-        return function (entity) {
-          return entity.getProperty(propertyPath);
-        };
-      } else {
-        return function (entity) {
-          return getPropertyPathValue(entity, properties);
-        };
-      }
-    }
-
-    proto.toString = function () {
-      return this.propertyPath;
-    };
-
-    return ctor;
-  })();
-
-  var FnExpr = (function () {
-
-    var ctor = function (fnName, exprArgs) {
-      this.fnName = fnName;
-      this.exprArgs = exprArgs;
-      var qf = funcMap[fnName];
-      if (qf == null) {
-        throw new Error("Unknown function: " + fnName);
-      }
-      this.localFn = qf.fn;
-      this.dataType = qf.dataType;
-    };
-    var proto = ctor.prototype;
-    BasePredicate.registerNode('FnExpr', proto);
-
-    proto.validate = function (entityType) {
-      if (this._validatedEntityType === entityType) return;
-      this.exprArgs.forEach(function (expr) {
-        expr.validate(entityType);
-      });
-      this._validatedEntityType = entityType;
-    }
-
-    proto.toFunction = function () {
-      var that = this;
-      return function (entity) {
-        var values = that.exprArgs.map(function (expr) {
-          var value = expr.toFunction()(entity);
-          return value;
-        });
-        var result = that.localFn.apply(null, values);
-        return result;
-      }
-    };
-
-    proto.toString = function () {
-      var args = this.exprArgs.map(function (expr) {
-        return expr.toString();
-      });
-      var uri = this.fnName + "(" + args.join(",") + ")";
-      return uri;
-    };
-
-    var funcMap = ctor.funcMap = {
-      toupper: { fn: function (source) {
-        return source.toUpperCase();
-      }, dataType: DataType.String },
-      tolower: { fn: function (source) {
-        return source.toLowerCase();
-      }, dataType: DataType.String },
-      substring: { fn: function (source, pos, length) {
-        return source.substring(pos, length);
-      }, dataType: DataType.String },
-      substringof: { fn: function (find, source) {
-        return source.indexOf(find) >= 0;
-      }, dataType: DataType.Boolean },
-      length: { fn: function (source) {
-        return source.length;
-      }, dataType: DataType.Int32 },
-      trim: { fn: function (source) {
-        return source.trim();
-      }, dataType: DataType.String },
-      concat: { fn: function (s1, s2) {
-        return s1.concat(s2);
-      }, dataType: DataType.String },
-      replace: { fn: function (source, find, replace) {
-        return source.replace(find, replace);
-      }, dataType: DataType.String },
-      startswith: { fn: function (source, find) {
-        return __stringStartsWith(source, find);
-      }, dataType: DataType.Boolean },
-      endswith: { fn: function (source, find) {
-        return __stringEndsWith(source, find);
-      }, dataType: DataType.Boolean },
-      indexof: { fn: function (source, find) {
-        return source.indexOf(find);
-      }, dataType: DataType.Int32 },
-      round: { fn: function (source) {
-        return Math.round(source);
-      }, dataType: DataType.Int32 },
-      ceiling: { fn: function (source) {
-        return Math.ceil(source);
-      }, dataType: DataType.Int32 },
-      floor: { fn: function (source) {
-        return Math.floor(source);
-      }, dataType: DataType.Int32 },
-      second: { fn: function (source) {
-        return source.getSeconds();
-      }, dataType: DataType.Int32 },
-      minute: { fn: function (source) {
-        return source.getMinutes();
-      }, dataType: DataType.Int32 },
-      day: { fn: function (source) {
-        return source.getDate();
-      }, dataType: DataType.Int32 },
-      month: { fn: function (source) {
-        return source.getMonth() + 1;
-      }, dataType: DataType.Int32 },
-      year: { fn: function (source) {
-        return source.getFullYear();
-      }, dataType: DataType.Int32 }
-    };
-
-    return ctor;
   })();
 
   BasePredicate.attachVisitor({
