@@ -9622,8 +9622,7 @@ breeze.NamingConvention = NamingConvention;
         var aliasKey = key.toLowerCase();
         value.key = aliasKey;
         aliasMap[aliasKey] = value;
-        // always support the key with a $ in front
-        aliasMap["$" + aliasKey] = value;
+
         value.aliases && value.aliases.forEach(function (alias) {
           aliasMap[alias.toLowerCase()] = value;
         });
@@ -9690,6 +9689,10 @@ breeze.NamingConvention = NamingConvention;
         return new BinaryPredicate("==", key, value);
       }
 
+      if (Array.isArray(value)) {
+        throw new Error("Unable to resolve predicate after the phrase: " + key);
+      }
+
       var expr = key;
       var keys = Object.keys(value);
       var preds = keys.map(function (op) {
@@ -9704,7 +9707,7 @@ breeze.NamingConvention = NamingConvention;
           return new BinaryPredicate(op, expr, value[op]);
         }
 
-        throw new Error("Unable to resolve predicate for operator: " + op + " and value: " + value[op]);
+        throw new Error("Unable to resolve predicate after the phrase: " + expr + " for operator: " + op + " and value: " + value[op]);
 
       });
 
@@ -10331,7 +10334,7 @@ breeze.NamingConvention = NamingConvention;
     },
     unaryPredicate: function() {
       var json = {};
-      json["$" + this.op.key] = this.pred.toJSON();
+      json[this.op.key] = this.pred.toJSON();
       return json;
     },
     binaryPredicate: function()  {
@@ -10341,7 +10344,7 @@ breeze.NamingConvention = NamingConvention;
       } else {
         var value = {};
         json[this.expr1Source] = value;
-        value["$" + this.op.key] = this.expr2Source;
+        value[this.op.key] = this.expr2Source;
       }
       return json;
     },
@@ -10350,13 +10353,13 @@ breeze.NamingConvention = NamingConvention;
       var value = this.preds.map(function (pred) {
         return pred.toJSON();
       });
-      json["$" + this.op.key] = value;
+      json[this.op.key] = value;
       return json;
     },
     anyAllPredicate: function() {
       var json = {};
       var value = {};
-      value["$" + this.op.key] = this.pred.toJSON();
+      value[this.op.key] = this.pred.toJSON();
       json[this.exprSource] = value;
       return json;
     },

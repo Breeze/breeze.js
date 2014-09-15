@@ -37,12 +37,6 @@
     // so you can either say new Predicate(a, b, c) or Predicate.create(a, b, c);
     ctor.create = ctor;
 
-    ctor.prefix = function(prefix) {
-      ctor = function() {
-        
-      }
-    }
-
     ctor.and = function () {
       return new AndOrPredicate("and", __arraySlice(arguments));
     }
@@ -101,8 +95,7 @@
         var aliasKey = key.toLowerCase();
         value.key = aliasKey;
         aliasMap[aliasKey] = value;
-        // always support the key with a $ in front
-        aliasMap["$" + aliasKey] = value;
+
         value.aliases && value.aliases.forEach(function (alias) {
           aliasMap[alias.toLowerCase()] = value;
         });
@@ -169,6 +162,10 @@
         return new BinaryPredicate("==", key, value);
       }
 
+      if (Array.isArray(value)) {
+        throw new Error("Unable to resolve predicate after the phrase: " + key);
+      }
+
       var expr = key;
       var keys = Object.keys(value);
       var preds = keys.map(function (op) {
@@ -183,7 +180,7 @@
           return new BinaryPredicate(op, expr, value[op]);
         }
 
-        throw new Error("Unable to resolve predicate for operator: " + op + " and value: " + value[op]);
+        throw new Error("Unable to resolve predicate after the phrase: " + expr + " for operator: " + op + " and value: " + value[op]);
 
       });
 
@@ -810,7 +807,7 @@
     },
     unaryPredicate: function() {
       var json = {};
-      json["$" + this.op.key] = this.pred.toJSON();
+      json[this.op.key] = this.pred.toJSON();
       return json;
     },
     binaryPredicate: function()  {
@@ -820,7 +817,7 @@
       } else {
         var value = {};
         json[this.expr1Source] = value;
-        value["$" + this.op.key] = this.expr2Source;
+        value[this.op.key] = this.expr2Source;
       }
       return json;
     },
@@ -829,13 +826,13 @@
       var value = this.preds.map(function (pred) {
         return pred.toJSON();
       });
-      json["$" + this.op.key] = value;
+      json[this.op.key] = value;
       return json;
     },
     anyAllPredicate: function() {
       var json = {};
       var value = {};
-      value["$" + this.op.key] = this.pred.toJSON();
+      value[this.op.key] = this.pred.toJSON();
       json[this.exprSource] = value;
       return json;
     },
