@@ -114,6 +114,7 @@
   }
 
   var BasePredicate = (function () {
+
     var ctor = function (map) {
       var aliasMap = {};
       for (var key in map) {
@@ -133,6 +134,31 @@
     }
 
     var proto = ctor.prototype;
+
+    var _nodeMap = {};
+
+    ctor.registerNode = function(name, proto) {
+      _nodeMap[name.toLowerCase()] = proto;
+    }
+
+    ctor.attachVisitor = function(visitor) {
+      var fnName = visitor.fnName;
+      Object.keys(visitor).forEach(function(key) {
+        var lcKey = key.toLowerCase();
+        if (lcKey == "fnname") return;
+        var proto = _nodeMap[lcKey];
+        if (proto == null) {
+          throw new Error("Unable to locate a visitor node for: " + key);
+        }
+        // add function to the Predicate or Expr node.
+        proto[fnName] = visitor[key];
+      });
+    };
+
+    // TODO: do we need this.
+//    ctor.detachVisitor = function(name) {
+//
+//    }
 
     proto.and = function () {
       var pred = Predicate(__arraySlice(arguments));
@@ -166,17 +192,13 @@
       this.odataExpr = odataExpr;
     };
     var proto = ctor.prototype = new BasePredicate({});
-
+    BasePredicate.registerNode('ODataPredicate', proto);
     proto.validate = function (entityType) {
     };
 
     proto.toFunction = function (entityType) {
       throw new Error("Cannot execute an OData expression against the local cache: " + this.odataExpr);
     };
-
-    proto.toJSON = function () {
-      return this.odataExpr;
-    }
 
     proto.toString = proto.toODataFragment = function (entityType, prefix) {
       return this.odataExpr;
@@ -194,6 +216,7 @@
     var proto = ctor.prototype = new BasePredicate({
       'not': { aliases: [ '!' ] }
     });
+    BasePredicate.registerNode('UnaryPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -218,12 +241,6 @@
       this.validate(entityType);
       return this.op.odataOperator + " " + "(" + this.pred.toODataFragment(entityType, prefix) + ")";
     };
-
-    proto.toJSON = function () {
-      var json = {};
-      json["$" + this.op.key] = this.pred.toJSON();
-      return json;
-    }
 
     proto.toString = function () {
       return this.op.odataOperator + " " + "(" + this.pred.toString() + ")";
@@ -271,7 +288,7 @@
         isFunction: true
       }
     });
-
+    BasePredicate.registerNode('BinaryPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -338,23 +355,6 @@
 
     };
 
-    proto.toJSON = function () {
-      var json = {};
-      if (this.op.key === "eq") {
-        json[this.expr1Source] = this.expr2Source;
-      } else {
-        var value = {};
-        json[this.expr1Source] = value;
-        value["$" + this.op.key] = this.expr2Source;
-        //if (this.expr2 == null) {
-        //    // TODO: need to rework this.
-        //    this.validate(null);
-        //}
-        // value["$" + this.op.key] = this.expr2.toJSON();
-
-      }
-      return json;
-    }
 
     proto.toString = function () {
       return __formatString("{%1} %2 {%3}", this.expr1Source, this.op.odataOperator, this.expr2Source);
@@ -504,6 +504,7 @@
       'and': { aliases: [ '&&' ] },
       'or': { aliases: [ '||' ] }
     });
+    BasePredicate.registerNode('AndOrPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -525,16 +526,6 @@
       }).join(" " + this.op.odataOperator + " ");
       return result;
     };
-
-
-    proto.toJSON = function () {
-      var json = {};
-      var value = this.preds.map(function (pred) {
-        return pred.toJSON();
-      });
-      json["$" + this.op.key] = value;
-      return json;
-    }
 
     proto.toString = function () {
       var result = this.preds.map(function (pred) {
@@ -584,6 +575,7 @@
       'any': { aliases: ["some"]},
       'all': { aliases: ["every"] }
     });
+    BasePredicate.registerNode('AnyAllPredicate', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -614,14 +606,6 @@
 
       return v1Expr + "/" + this.op.odataOperator + "(" + prefix + ": " + this.pred.toODataFragment(this.expr.dataType, prefix) + ")";
     };
-
-    proto.toJSON = function () {
-      var json = {};
-      var value = {};
-      value["$" + this.op.key] = this.pred.toJSON();
-      json[this.exprSource] = value;
-      return json;
-    }
 
     proto.toString = function () {
       return __formatString("{%1} %2 {%3}", this.expr.toString(), this.op.odataOperator, this.pred.toString());
@@ -657,6 +641,7 @@
       this.dataType = dataType;
     };
     var proto = ctor.prototype;
+    BasePredicate.registerNode('LitExpr', proto);
 
     proto.validate = function (entityType) {
       return;
@@ -671,10 +656,6 @@
 
     proto.toODataFragment = function () {
       return this.dataType.fmtOData(this.value);
-    }
-
-    proto.toJSON = function () {
-      return value;
     }
 
     proto.toString = function () {
@@ -692,6 +673,7 @@
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype;
+    BasePredicate.registerNode('PropExpr', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -728,10 +710,6 @@
       }
     }
 
-    proto.toJSON = function () {
-      return this.propertyPath;
-    }
-
     proto.toString = function () {
       return this.propertyPath;
     };
@@ -752,7 +730,7 @@
       this.dataType = qf.dataType;
     };
     var proto = ctor.prototype;
-
+    BasePredicate.registerNode('FnExpr', proto);
 
     proto.validate = function (entityType) {
       if (this._validatedEntityType === entityType) return;
@@ -779,14 +757,6 @@
       this.validate(entityType);
       var frags = this.exprArgs.map(function (expr) {
         return expr.toODataFragment(entityType);
-      });
-      var result = this.fnName + "(" + frags.join(",") + ")";
-      return result;
-    }
-
-    proto.toJSON = function () {
-      var frags = this.exprArgs.map(function (expr) {
-        return expr.toJSON();
       });
       var result = this.fnName + "(" + frags.join(",") + ")";
       return result;
@@ -863,6 +833,58 @@
 
     return ctor;
   })();
+
+  BasePredicate.attachVisitor( {
+    fnName: "toJSON",
+    odataPredicate: function() {
+      return this.odataExpr;
+    },
+    unaryPredicate: function() {
+      var json = {};
+      json["$" + this.op.key] = this.pred.toJSON();
+      return json;
+    },
+    binaryPredicate: function()  {
+      var json = {};
+      if (this.op.key === "eq") {
+        json[this.expr1Source] = this.expr2Source;
+      } else {
+        var value = {};
+        json[this.expr1Source] = value;
+        value["$" + this.op.key] = this.expr2Source;
+      }
+      return json;
+    },
+    andOrPredicate: function() {
+      var json = {};
+      var value = this.preds.map(function (pred) {
+        return pred.toJSON();
+      });
+      json["$" + this.op.key] = value;
+      return json;
+    },
+    anyAllPredicate: function() {
+      var json = {};
+      var value = {};
+      value["$" + this.op.key] = this.pred.toJSON();
+      json[this.exprSource] = value;
+      return json;
+    },
+    litExpr:  function() {
+      return value;
+    },
+    propExpr: function() {
+      return this.propertyPath;
+    },
+    fnExpr: function() {
+      var frags = this.exprArgs.map(function (expr) {
+        return expr.toJSON();
+      });
+      var result = this.fnName + "(" + frags.join(",") + ")";
+      return result;
+    }
+
+  });
 
   var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
   // comma delimited expressions ignoring commas inside of both single and double quotes.
