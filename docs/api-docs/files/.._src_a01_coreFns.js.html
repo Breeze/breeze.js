@@ -702,6 +702,10 @@ function __isString(o) {
   return (typeof o === &quot;string&quot;);
 }
 
+function __isObject(o) {
+  return (typeof o === &quot;object&quot;);
+}
+
 function __isGuid(value) {
     return (typeof value === &quot;string&quot;) &amp;&amp; /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
 }

@@ -267,16 +267,12 @@
       }
       if (this.expr1 instanceof LitExpr) {
         // lhs must be either a property or a function.
-        throw new Error("Not a valid property or function predicate expression: " + this.expr1Source);
+        throw new Error("The left hand side of a binary predicate cannot be a literal expression, it must be a valid property or functional predicate expression: " + this.expr1Source);
       }
-      if (entityType.isAnonymous) {
-        // with an anonymous entity type expr1 will always be a Prop of FnExpr and expr2 will always be literal.
-        this.expr2 = new LitExpr(this.expr2Source, DataType.fromValue(this.expr2Source));
-      } else {
-        this.expr2 = createExpr(this.expr2Source, entityType);
-        if (this.expr2 == null) {
-          throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
-        }
+
+      this.expr2 = createExpr(this.expr2Source, entityType, true);
+      if (this.expr2 == null) {
+        throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
       }
 
       if (this.expr1.dataType != DataType.Undefined) {
@@ -899,12 +895,26 @@
   var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
   var DELIM = String.fromCharCode(191);
 
-  function createExpr(source, entityType) {
-    if (typeof source !== 'string') {
-      if (source != null && source.isLiteral) {
-        source = source.value;
+  function createExpr(source, entityType, is2ndExpr) {
+    if (!__isString(source)) {
+      if (source != null && __isObject(source) && (!__isDate(source))) {
+        if (source.value === undefined) {
+          throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + entityType.name);
+        }
+        if (source.isProperty) {
+          return new PropExpr(source.value);
+        } else {
+          var dt = source.dataType;
+          return new LitExpr(source.value, dt ? dt : DataType.fromValue(source.value));
+        }
+      } else {
+        return new LitExpr(source, DataType.fromValue(source));
       }
-      return new LitExpr(source, DataType.fromValue(source));
+    }
+
+    // TODO: get rid of isAnonymous below when we get the chance.
+    if (is2ndExpr && (entityType == null || entityType.isAnonymous)) {
+      return new LitExpr(source, DataType.fromValue(source))
     }
 
     var regex = /\([^()]*\)/;
@@ -942,8 +952,10 @@
       var unquotedValue = value.substr(1, value.length - 2);
       return new LitExpr(unquotedValue, DataType.String);
     } else {
-      if (entityType.isAnonymous) {
-        // this fork will only be reached for an anon type on the LHS of an BinaryPredicate
+      // TODO: get rid of isAnonymous below when we get the chance.
+      if (entityType == null || entityType.isAnonymous) {
+        // this fork will only be reached on the LHS of an BinaryPredicate -
+        // a RHS expr cannot get here.
         return new PropExpr(value);
       } else {
         var mayBeIdentifier = RX_IDENTIFIER.test(value);
