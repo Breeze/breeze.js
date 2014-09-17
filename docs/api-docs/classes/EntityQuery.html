@@ -659,7 +659,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l555"><code>..\src\a45_entityQuery.js:555</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l558"><code>..\src\a45_entityQuery.js:558</code></a>
         
         </p>
 
@@ -921,7 +921,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l622"><code>..\src\a45_entityQuery.js:622</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l625"><code>..\src\a45_entityQuery.js:625</code></a>
         
         </p>
 
@@ -1004,7 +1004,7 @@ var orders = query.executeLocally();</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l394"><code>..\src\a45_entityQuery.js:394</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l397"><code>..\src\a45_entityQuery.js:397</code></a>
         
         </p>
 
@@ -1373,7 +1373,7 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l640"><code>..\src\a45_entityQuery.js:640</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l643"><code>..\src\a45_entityQuery.js:643</code></a>
         
         </p>
 
@@ -1501,7 +1501,7 @@ var customerQuery = EntityQuery.fromEntities(customer);</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l681"><code>..\src\a45_entityQuery.js:681</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l684"><code>..\src\a45_entityQuery.js:684</code></a>
         
         </p>
 
@@ -1631,7 +1631,7 @@ var query = EntityQuery.fromEntityKey(entityKey);</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l706"><code>..\src\a45_entityQuery.js:706</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l709"><code>..\src\a45_entityQuery.js:709</code></a>
         
         </p>
 
@@ -1766,7 +1766,7 @@ var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);</code></p
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l449"><code>..\src\a45_entityQuery.js:449</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l452"><code>..\src\a45_entityQuery.js:452</code></a>
         
         </p>
 
@@ -1888,7 +1888,7 @@ query with only the &#39;where&#39;/&#39;filter&#39; clauses applied, i.e. witho
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l472"><code>..\src\a45_entityQuery.js:472</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l475"><code>..\src\a45_entityQuery.js:475</code></a>
         
         </p>
 
@@ -1973,6 +1973,12 @@ will not be coerced into entities but will instead look like raw javascript proj
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code>isDescending</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
@@ -2040,6 +2046,24 @@ will not be coerced into entities but will instead look like raw javascript proj
                     <div class="param-description">
                         <p>A comma-separated (&#39;,&#39;) string of property paths or an array of property paths. 
 Each property path can optionally end with &quot; desc&quot; to force a descending sort order. If &#39;propertyPaths&#39; is either null or omitted then all ordering is removed.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">isDescending</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <ul>
+<li>If specified, overrides all of the embedded &#39;desc&#39; tags in the previously specified property paths.</li>
+</ul>
 
                     </div>
 
@@ -2138,7 +2162,7 @@ Each property path can optionally end with &quot; desc&quot; to force a descendi
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l276"><code>..\src\a45_entityQuery.js:276</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l279"><code>..\src\a45_entityQuery.js:279</code></a>
         
         </p>
 
@@ -2262,7 +2286,7 @@ If &#39;propertyPaths&#39; is either null or omitted then all ordering is remove
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l302"><code>..\src\a45_entityQuery.js:302</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l305"><code>..\src\a45_entityQuery.js:305</code></a>
         
         </p>
 
@@ -2400,7 +2424,7 @@ Composite projections are also possible:</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l344"><code>..\src\a45_entityQuery.js:344</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l347"><code>..\src\a45_entityQuery.js:347</code></a>
         
         </p>
 
@@ -2519,7 +2543,7 @@ Any existing &#39;skip&#39; can be cleared by calling &#39;skip&#39; with no arg
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l377"><code>..\src\a45_entityQuery.js:377</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l380"><code>..\src\a45_entityQuery.js:380</code></a>
         
         </p>
 
@@ -2637,7 +2661,7 @@ If &#39;count&#39; is either null or omitted then any existing &#39;take&#39; co
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l361"><code>..\src\a45_entityQuery.js:361</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l364"><code>..\src\a45_entityQuery.js:364</code></a>
         
         </p>
 
@@ -2875,7 +2899,7 @@ does not include type information.  If the json result consists of more than a s
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l494"><code>..\src\a45_entityQuery.js:494</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l497"><code>..\src\a45_entityQuery.js:497</code></a>
         
         </p>
 
@@ -3157,7 +3181,7 @@ var query = new EntityQuery(&quot;Customers&quot;)
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l422"><code>..\src\a45_entityQuery.js:422</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l425"><code>..\src\a45_entityQuery.js:425</code></a>
         
         </p>
 

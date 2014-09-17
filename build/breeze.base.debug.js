@@ -10760,16 +10760,19 @@ breeze.Predicate = Predicate;
             .orderBy("Region desc, CompanyName desc");
     @method orderBy
     @param propertyPaths {String|Array of String} A comma-separated (',') string of property paths or an array of property paths. 
-    Each property path can optionally end with " desc" to force a descending sort order. If 'propertyPaths' is either null or omitted then all ordering is removed. 
+    Each property path can optionally end with " desc" to force a descending sort order. If 'propertyPaths' is either null or omitted then all ordering is removed.
+    @param isDescending {Boolean} - If specified, overrides all of the embedded 'desc' tags in the previously specified property paths.
     @return {EntityQuery}
     @chainable
     **/
-    proto.orderBy = function (propertyPaths) {
-        // deliberately don't pass in isDesc
-        return orderByCore(this, propertyPaths);
-    };
+    proto.orderBy = function (propertyPaths, isDescending) {
+    // propertyPaths: can pass in create("A.X,B") or create("A.X desc, B") or create("A.X desc,B", true])
+    // isDesc parameter trumps isDesc in propertyName.
+      var orderByClause = propertyPaths == null ? null : new OrderByClause(normalizePropertyPaths(propertyPaths), isDescending);
+      return clone(this, "orderByClause", orderByClause);
+    }
 
-    /**
+  /**
     Returns a new query that orders the results of the query by property name in descending order.
     @example
             var query = new EntityQuery("Customers")
@@ -10792,7 +10795,7 @@ breeze.Predicate = Predicate;
     @chainable
     **/
     proto.orderByDesc = function (propertyPaths) {
-        return orderByCore(this, propertyPaths, true);
+        return this.orderBy(propertyPaths, true);
     };
         
     /**
@@ -11332,7 +11335,6 @@ breeze.Predicate = Predicate;
         return propertyPaths;
     }
 
-
     function buildPredicate(entity) {
         var entityType = entity.entityType;
         var predParts = entityType.keyProperties.map(function (kp) {
@@ -11342,24 +11344,6 @@ breeze.Predicate = Predicate;
         return pred;
     }
 
-    // propertyPaths: can pass in create("A.X,B") or create("A.X desc, B") or create("A.X desc,B", true])
-    // isDesc parameter trumps isDesc in propertyName.
-
-    function orderByCore(that, propertyPaths, isDesc) {
-        var orderByClause;
-        if (propertyPaths == null) {
-            orderByClause = null;
-        } else {
-            propertyPaths = normalizePropertyPaths(propertyPaths);
-            orderByClause = OrderByClause.create(propertyPaths, isDesc);
-            if (that.orderByClause) {
-                orderByClause = that.orderByClause.addClause(orderByClause);
-            }
-        }
-        return clone(that, "orderByClause", orderByClause);
-    }
-                
-        
     function buildKeyPredicate(entityKey) {
         var keyProps = entityKey.entityType.keyProperties;
         var preds = __arrayZip(keyProps, entityKey.values, function (kp, v) {
@@ -11535,226 +11519,137 @@ var BooleanQueryOp = (function () {
     };
     return aEnum;
 }) ();
-// Not exposed externally for now
-var OrderByClause = (function () {
-    /*
-    An OrderByClause is a description of the properties and direction that the result 
-    of a query should be sorted in.  OrderByClauses are immutable, which means that any
-    method that would modify an OrderByClause actually returns a new OrderByClause. 
 
-    For example for an Employee object with properties of 'Company' and 'LastName' the following would be valid expressions:
+/*
+ An OrderByClause is a description of the properties and direction that the result
+ of a query should be sorted in.  OrderByClauses are immutable, which means that any
+ method that would modify an OrderByClause actually returns a new OrderByClause.
 
-        var obc = new OrderByClause("Company.CompanyName, LastName") 
-            or 
-        var obc = new OrderByClause("Company.CompanyName desc, LastName") 
-            or 
-        var obc = new OrderByClause("Company.CompanyName, LastName", true);
-    @class OrderByClause
-    */
-        
-    /*
-    @method <ctor> OrderByClause
-    @param propertyPaths {String|Array or String} A ',' delimited string of 'propertyPaths' or an array of property path string. Each 'propertyPath'
-    should be a valid property name or property path for the EntityType of the query associated with this clause. 
-    @param [isDesc=false] {Boolean}
-    */
-    var ctor = function (propertyPaths, isDesc) {
-        if (propertyPaths.prototype === true) {
-            // used to construct prototype
-            return this;
+ For example for an Employee object with properties of 'Company' and 'LastName' the following would be valid expressions:
+
+ var obc = new OrderByClause("Company.CompanyName, LastName")
+ or
+ var obc = new OrderByClause("Company.CompanyName desc, LastName")
+ or
+ var obc = new OrderByClause("Company.CompanyName, LastName", true);
+ @class OrderByClause
+ */
+var OrderByClause = (function() {
+
+  var ctor = function (propertyPaths, isDesc) {
+    if (propertyPaths.length > 1) {
+      var items = propertyPaths.map(function (pp) {
+        return new OrderByItem(pp, isDesc);
+      });
+    } else {
+      var items = [new OrderByItem(propertyPaths[0], isDesc)];
+    }
+    this.items = items;
+  };
+  var proto = ctor.prototype;
+
+  proto.validate = function(entityType) {
+    this.items.forEach(function(item)  { item.validate(entityType) } );
+  };
+
+  proto.toODataFragment = function (config) {
+    var strings = this.items.map(function (obc) {
+      return obc.toODataFragment(config);
+    });
+    // should return something like CompanyName,Address/City desc
+    return strings.join(',');
+  };
+
+  proto.getComparer = function (entityType) {
+    var orderByFuncs = this.items.map(function (obc) {
+      return obc.getComparer(entityType);
+    });
+    return function (entity1, entity2) {
+      for (var i = 0; i < orderByFuncs.length; i++) {
+        var result = orderByFuncs[i](entity1, entity2);
+        if (result !== 0) {
+          return result;
         }
-        return ctor.create(propertyPaths, isDesc);
+      }
+      return 0;
     };
-    var proto = ctor.prototype;
+  };
 
-    /*
-    Alternative method of creating an OrderByClause. 
-    Example for an Employee object with properties of 'Company' and 'LastName': 
+  var OrderByItem = function (propertyPath, isDesc) {
+    if (!(typeof propertyPath === 'string')) {
+        throw new Error("propertyPath is not a string");
+    }
+    propertyPath = propertyPath.trim();
 
-        var obc = OrderByClause.create("Company.CompanyName, LastName") 
-            or 
-        var obc = OrderByClause.create("Company.CompanyName desc, LastName") 
-            or 
-        var obc = OrderByClause.create("Company.CompanyName, LastName", true);
-    @method create 
-    @static
-    @param propertyPaths {Array of String} An array of 'propertyPaths'. Each 'propertyPaths' 
-    parameter should be a valid property name or property path for the EntityType of the query associated with this clause. 
-    @param [isDesc=false] {Boolean}
-    */
-    ctor.create = function (propertyPaths, isDesc) {
-        if (propertyPaths.length > 1) {
-            var clauses = propertyPaths.map(function (pp) {
-                return new SimpleOrderByClause(pp, isDesc);
-            });
-            return new CompositeOrderByClause(clauses);
-        } else {
-            return new SimpleOrderByClause(propertyPaths[0], isDesc);
+    var parts = propertyPath.split(' ');
+    // parts[0] is the propertyPath; [1] would be whether descending or not.
+    if (parts.length > 1 && isDesc !== true && isDesc !== false) {
+        isDesc = __stringStartsWith(parts[1].toLowerCase(), "desc");
+        if (!isDesc) {
+            // isDesc is false but check to make sure its intended.
+            var isAsc = __stringStartsWith(parts[1].toLowerCase(), "asc");
+            if (!isAsc) {
+                throw new Error("the second word in the propertyPath must begin with 'desc' or 'asc'");
+            }
+
         }
-    };
+    }
+    this.propertyPath = parts[0];
+    this.isDesc = isDesc;
+  };
 
-    /*
-    Returns a 'composite' OrderByClause by combining other OrderByClauses.
-    @method combine
-    @static
-    @param orderByClauses {Array of OrderByClause}
-    */
-    ctor.combine = function (orderByClauses) {
-        return new CompositeOrderByClause(orderByClauses);
-    };
+  var itemProto = OrderByItem.prototype;
 
-    /*
-    Returns whether an object is an OrderByClause.
-    @method isOrderByClause
-    @static
-    @param obj {Object}
-    */
-    ctor.isOrderByClause = function (obj) {
-        return obj instanceof OrderByClause;
-    };
+  itemProto.validate = function (entityType) {
+      if (!entityType) return;  // can't validate yet
+      // will throw an exception on bad propertyPath
+      this.lastProperty = entityType.getProperty(this.propertyPath, true);
+  };
 
-    /*
-    Returns whether a new OrderByClause with a specified clause add to the end of this one. 
-    @method addClause
-    @param orderByClause {OrderByClause}
-    */
-    proto.addClause = function (orderByClause) {
-        return new CompositeOrderByClause([this, orderByClause]);
-    };
+  itemProto.toODataFragment = function (config) {
+      var entityType = config.entityType;
+      return entityType._clientPropertyPathToServer(this.propertyPath) + (this.isDesc ? " desc" : "");
+  };
 
-    return ctor;
+  itemProto.getComparer = function (entityType) {
+      if (!this.lastProperty) this.validate(entityType);
+      if (this.lastProperty) {
+          var propDataType = this.lastProperty.dataType;
+          var isCaseSensitive = this.lastProperty.parentType.metadataStore.localQueryComparisonOptions.isCaseSensitive;
+      }
+      var propertyPath = this.propertyPath;
+      var isDesc = this.isDesc;
+
+      return function (entity1, entity2) {
+          var value1 = getPropertyPathValue(entity1, propertyPath);
+          var value2 = getPropertyPathValue(entity2, propertyPath);
+          var dataType = propDataType || (value1 && DataType.fromValue(value1)) || DataType.fromValue(value2);
+          if (dataType === DataType.String) {
+              if (isCaseSensitive) {
+                  value1 = value1 || "";
+                  value2 = value2 || "";
+              } else {
+                  value1 = (value1 || "").toLowerCase();
+                  value2 = (value2 || "").toLowerCase();
+              }
+          } else {
+              var normalize = DataType.getComparableFn(dataType);
+              value1 = normalize(value1);
+              value2 = normalize(value2);
+          }
+          if (value1 === value2) {
+              return 0;
+          } else if (value1 > value2 || value2 === undefined) {
+              return isDesc ? -1 : 1;
+          } else {
+              return isDesc ? 1 : -1;
+          }
+      };
+  };
+
+  return ctor;
 })();
 
-// Does not need to be exposed.
-var SimpleOrderByClause = (function () {
-
-    var ctor = function (propertyPath, isDesc) {
-        if (!(typeof propertyPath === 'string')) {
-            throw new Error("propertyPath is not a string");
-        }
-        propertyPath = propertyPath.trim();
-
-        var parts = propertyPath.split(' ');
-        // parts[0] is the propertyPath; [1] would be whether descending or not.
-        if (parts.length > 1 && isDesc !== true && isDesc !== false) {
-            isDesc = __stringStartsWith(parts[1].toLowerCase(), "desc");
-            if (!isDesc) {
-                // isDesc is false but check to make sure its intended.
-                var isAsc = __stringStartsWith(parts[1].toLowerCase(), "asc");
-                if (!isAsc) {
-                    throw new Error("the second word in the propertyPath must begin with 'desc' or 'asc'");
-                }
-                    
-            }
-        }
-        this.propertyPath = parts[0];
-        this.isDesc = isDesc;
-    };
-    var proto = new OrderByClause({ prototype: true });
-    ctor.prototype = proto;
-
-    proto.validate = function (entityType) {
-        if (!entityType) return;  // can't validate yet
-        // will throw an exception on bad propertyPath
-        this.lastProperty = entityType.getProperty(this.propertyPath, true);
-    };
-
-    proto.toODataFragment = function (config) {
-        var entityType = config.entityType;
-        return entityType._clientPropertyPathToServer(this.propertyPath) + (this.isDesc ? " desc" : "");
-    };
-
-    proto.getComparer = function (entityType) {
-        if (!this.lastProperty) this.validate(entityType);
-        if (this.lastProperty) {
-            var propDataType = this.lastProperty.dataType;
-            var isCaseSensitive = this.lastProperty.parentType.metadataStore.localQueryComparisonOptions.isCaseSensitive;
-        }
-        var propertyPath = this.propertyPath;
-        var isDesc = this.isDesc;
-
-        return function (entity1, entity2) {
-            var value1 = getPropertyPathValue(entity1, propertyPath);
-            var value2 = getPropertyPathValue(entity2, propertyPath);
-            var dataType = propDataType || (value1 && DataType.fromValue(value1)) || DataType.fromValue(value2);
-            if (dataType === DataType.String) {
-                if (isCaseSensitive) {
-                    value1 = value1 || "";
-                    value2 = value2 || "";
-                } else {
-                    value1 = (value1 || "").toLowerCase();
-                    value2 = (value2 || "").toLowerCase();
-                } 
-            } else {
-                var normalize = DataType.getComparableFn(dataType);
-                value1 = normalize(value1);
-                value2 = normalize(value2);
-            }
-            if (value1 === value2) {
-                return 0;
-            } else if (value1 > value2 || value2 === undefined) {
-                return isDesc ? -1 : 1;
-            } else {
-                return isDesc ? 1 : -1;
-            } 
-        };
-    };
-
-
-    return ctor;
-})();
-
-// Does not need to be exposed.
-var CompositeOrderByClause = (function () {
-    var ctor = function (orderByClauses) {
-        var resultClauses = [];
-        orderByClauses.forEach(function (obc) {
-            if (obc instanceof CompositeOrderByClause) {
-                resultClauses = resultClauses.concat(obc.orderByClauses);
-            } else if (obc instanceof SimpleOrderByClause) {
-                resultClauses.push(obc);
-            } else {
-                throw new Error("Invalid argument to CompositeOrderByClause ctor.");
-            }
-        });
-        this._orderByClauses = resultClauses;
-
-    };
-    var proto = new OrderByClause({ prototype: true });
-    ctor.prototype = proto;
-
-
-    proto.validate = function (entityType) {
-        this._orderByClauses.forEach(function (obc) {
-            obc.validate(entityType);
-        });
-    };
-
-    proto.toODataFragment = function (config) {
-        var strings = this._orderByClauses.map(function (obc) {
-            return obc.toODataFragment(config);
-        });
-        // should return something like CompanyName,Address/City desc
-        return strings.join(',');
-    };
-
-    proto.getComparer = function (entityType) {
-        var orderByFuncs = this._orderByClauses.map(function (obc) {
-            return obc.getComparer(entityType);
-        });
-        return function (entity1, entity2) {
-            for (var i = 0; i < orderByFuncs.length; i++) {
-                var result = orderByFuncs[i](entity1, entity2);
-                if (result !== 0) {
-                    return result;
-                }
-            }
-            return 0;
-        };
-    };
-    return ctor;
-})();
-    
 // Not exposed
 var SelectClause = (function () {
         
