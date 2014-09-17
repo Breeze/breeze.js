@@ -9,8 +9,8 @@
 
 
     var queryOptions = {};
-    queryOptions["$filter"] = toODataFragment(entityQuery.wherePredicate);
-    queryOptions["$orderby"] = toODataFragment(entityQuery.orderByClause);
+    queryOptions["$filter"] = toWhereODataFragment(entityQuery.wherePredicate);
+    queryOptions["$orderby"] = toOrderByODataFragment(entityQuery.orderByClause);
 
     if (entityQuery.skipCount) {
       queryOptions["$skip"] = entityQuery.skipCount;
@@ -20,8 +20,8 @@
       queryOptions["$top"] = entityQuery.takeCount;
     }
 
-    queryOptions["$expand"] = toODataFragment(entityQuery.expandClause);
-    queryOptions["$select"] = toODataFragment(entityQuery.selectClause);
+    queryOptions["$expand"] = toExpandODataFragment(entityQuery.expandClause);
+    queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
 
     if (entityQuery.inlineCountEnabled) {
       queryOptions["$inlinecount"] = "allpages";
@@ -32,13 +32,40 @@
 
     // private methods to this func.
 
-    function toODataFragment(clause) {
-      if (!clause) return;
-      if (clause.validate && !entityType.isAnonymous) {
-        clause.validate(entityType);
-      }
-      return clause.toODataFragment({ entityType: entityType});
+    function toWhereODataFragment(wherePredicate) {
+      if (!wherePredicate) return;
+      // validation occurs inside of the toODataFragment call here.
+      return wherePredicate.toODataFragment({ entityType: entityType});
     }
+
+    function toOrderByODataFragment(orderByClause) {
+      if (!orderByClause) return;
+      orderByClause.validate(entityType);
+        var strings = orderByClause.items.map(function (item) {
+          return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
+        });
+        // should return something like CompanyName,Address/City desc
+        return strings.join(',');
+    };
+
+    function toSelectODataFragment(selectClause ) {
+      if (!selectClause) return;
+      selectClause.validate(entityType);
+      var frag = selectClause.propertyPaths.map(function (pp) {
+        return entityType._clientPropertyPathToServer(pp);
+      }).join(",");
+      return frag;
+    };
+
+    function toExpandODataFragment(expandClause) {
+      if (!expandClause) return;
+      // no validate on expand clauses currently.
+      // expandClause.validate(entityType);
+      var frag = expandClause.propertyPaths.map(function(pp) {
+        return entityType._clientPropertyPathToServer(pp);
+      }).join(",");
+      return frag;
+    };
 
     function toQueryOptionsString(queryOptions) {
       var qoStrings = [];
@@ -63,7 +90,6 @@
     }
 
   };
-
 
   // toODataFragment visitor
   Predicate.attachVisitor(function () {

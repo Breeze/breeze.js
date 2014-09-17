@@ -792,18 +792,22 @@
         em.executeQuery(query).then(function (data) {
             var entities = data.retrievedEntities;
             ok(entities);
-            ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
+          // removed because may change with structure of db.
+          // ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
 
             var orders = data.results;
             for (var i = 0, ilen = orders.length; i < ilen; i++) {
                 ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
                 var orderDetails = orders[i].getProperty("orderDetails");
+                
                 for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
                     ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
                     ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
                     ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
                 }
             }
+            var allEntities = em.getEntities();
+            ok(allEntities.length == entities.length, "should have filled the cache with the same number of entities - i.e. no dups")
             
         }).fail(testFns.handleFail).fin(start);
     });
@@ -2122,7 +2126,7 @@
             
         }).fail(function(err) {
             if (testFns.DEBUG_WEBAPI) {
-                ok(err.message.indexOf("OrderDetails") >= 1, " message should be about missing OrderDetails property");
+                ok(err.message.indexOf("orderDetails") >= 1, " message should be about missing OrderDetails property");
             } else if (testFns.DEBUG_ODATA) {
                 ok(err.message.indexOf("Product") >= 1, "should be an error message about the Product query");
             }
@@ -2328,7 +2332,7 @@
             .from("Orders")
             .where("employeeID", "eq", null);
 
-        query = query.expand("Employee, Employee.Manager, Employee.DirectReports")
+        query = query.expand("employee, employee.manager, employee.directReports")
             .take(5);
         stop();
         em.executeQuery(query).then(function (data) {

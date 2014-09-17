@@ -207,7 +207,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l2649"><code>..\src\a40_entityMetadata.js:2649</code></a>
+            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l2712"><code>..\src\a40_entityMetadata.js:2712</code></a>
         </div>
     
 
@@ -223,7 +223,7 @@
 
 
 <div class="box intro">
-    <p>A NavigationProperty describes the metadata for a single property of an  <a href="../classes/EntityType.html" class="crosslink">EntityType</a> that return instances of other EntityTypes. </p>
+    <p>A NavigationProperty describes the metadata for a single property of an  <a href="../classes/EntityType.html" class="crosslink">EntityType</a> that return instances of other EntityTypes.</p>
 <p>Instances of the NavigationProperty class are constructed automatically during Metadata retrieval.   However it is also possible to construct them
 directly via the constructor.</p>
 
@@ -357,6 +357,13 @@ directly via the constructor.</p>
                             </li>
                         
                             <li class="index-item property">
+                                <a href="#property_parentType">parentType</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
                                 <a href="#property_relatedDataProperties">relatedDataProperties</a>
 
                                 
@@ -426,7 +433,7 @@ directly via the constructor.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2657"><code>..\src\a40_entityMetadata.js:2657</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2720"><code>..\src\a40_entityMetadata.js:2720</code></a>
         
         </p>
 
@@ -600,20 +607,20 @@ the NamingConvention on the MetadataStore associated with the EntityType to whic
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var homeAddressProp = new NavigationProperty( {
-    name: &quot;homeAddress&quot;,
-    entityTypeName: &quot;Address:#myNamespace&quot;,
-    isScalar: true,
-    associationName: &quot;address_person&quot;,
-    foreignKeyNames: [&quot;homeAddressId&quot;]
-});
+                <p>var homeAddressProp = new NavigationProperty( {
+         name: &quot;homeAddress&quot;,
+         entityTypeName: &quot;Address:#myNamespace&quot;,
+         isScalar: true,
+         associationName: &quot;address_person&quot;,
+         foreignKeyNames: [&quot;homeAddressId&quot;]
+     });
 var homeAddressIdProp = new DataProperty( {
-    name: &quot;homeAddressId&quot;
-    dataType: DataType.Integer
-});
+         name: &quot;homeAddressId&quot;
+         dataType: DataType.Integer
+     });
 // assuming personEntityType is a newly constructed EntityType
 personEntityType.addProperty(homeAddressProp);
-personEntityType.addProperty(homeAddressIdProp);</code></pre>
+personEntityType.addProperty(homeAddressIdProp);</p>
 
             </div>
         </div>
@@ -663,7 +670,7 @@ personEntityType.addProperty(homeAddressIdProp);</code></pre>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2819"><code>..\src\a40_entityMetadata.js:2819</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2888"><code>..\src\a40_entityMetadata.js:2888</code></a>
         
         </p>
 
@@ -743,11 +750,11 @@ personEntityType.addProperty(homeAddressIdProp);</code></pre>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume myEntityType is an EntityType
+                <p>// assume myEntityType is an EntityType
 var prop = myEntityType.getProperty(&quot;myProperty&quot;);
 prop.setProperties( {
-    custom: { foo: 7, bar: &quot;test&quot; }
-});</code></pre>
+         custom: { foo: 7, bar: &quot;test&quot; }
+     });</p>
 
             </div>
         </div>
@@ -786,7 +793,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2749"><code>..\src\a40_entityMetadata.js:2749</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2818"><code>..\src\a40_entityMetadata.js:2818</code></a>
         
         </p>
 
@@ -796,7 +803,7 @@ prop.setProperties( {
     </div>
 
     <div class="description">
-        <p>The name of the association to which that this property belongs.  This associationName will be shared with this 
+        <p>The name of the association to which that this property belongs.  This associationName will be shared with this
 properties &#39;inverse&#39;.</p>
 <p><strong>readOnly</strong></p>
 
@@ -833,7 +840,7 @@ properties &#39;inverse&#39;.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2742"><code>..\src\a40_entityMetadata.js:2742</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2811"><code>..\src\a40_entityMetadata.js:2811</code></a>
         
         </p>
 
@@ -879,7 +886,7 @@ properties &#39;inverse&#39;.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2789"><code>..\src\a40_entityMetadata.js:2789</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2858"><code>..\src\a40_entityMetadata.js:2858</code></a>
         
         </p>
 
@@ -889,7 +896,7 @@ properties &#39;inverse&#39;.</p>
     </div>
 
     <div class="description">
-        <p>A free form object that can be used to define any custom metadata for this NavigationProperty. </p>
+        <p>A free form object that can be used to define any custom metadata for this NavigationProperty.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -925,7 +932,7 @@ properties &#39;inverse&#39;.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2728"><code>..\src\a40_entityMetadata.js:2728</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2797"><code>..\src\a40_entityMetadata.js:2797</code></a>
         
         </p>
 
@@ -971,7 +978,7 @@ properties &#39;inverse&#39;.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2757"><code>..\src\a40_entityMetadata.js:2757</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2826"><code>..\src\a40_entityMetadata.js:2826</code></a>
         
         </p>
 
@@ -981,7 +988,7 @@ properties &#39;inverse&#39;.</p>
     </div>
 
     <div class="description">
-        <p>The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated 
+        <p>The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
 with a Navigation property except in the case of entities with multipart keys.</p>
 <p><strong>readOnly</strong></p>
 
@@ -1018,7 +1025,7 @@ with a Navigation property except in the case of entities with multipart keys.</
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2773"><code>..\src\a40_entityMetadata.js:2773</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2842"><code>..\src\a40_entityMetadata.js:2842</code></a>
         
         </p>
 
@@ -1065,7 +1072,7 @@ to this NavigationProperty.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2796"><code>..\src\a40_entityMetadata.js:2796</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2865"><code>..\src\a40_entityMetadata.js:2865</code></a>
         
         </p>
 
@@ -1075,7 +1082,7 @@ to this NavigationProperty.</p>
     </div>
 
     <div class="description">
-        <p>Is this a DataProperty? - always false here 
+        <p>Is this a DataProperty? - always false here
 Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
 <p><strong>readOnly</strong></p>
 
@@ -1112,7 +1119,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2804"><code>..\src\a40_entityMetadata.js:2804</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2873"><code>..\src\a40_entityMetadata.js:2873</code></a>
         
         </p>
 
@@ -1122,7 +1129,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
     </div>
 
     <div class="description">
-        <p>Is this a NavigationProperty? - always true here 
+        <p>Is this a NavigationProperty? - always true here
 Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
 <p><strong>readOnly</strong></p>
 
@@ -1159,7 +1166,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2735"><code>..\src\a40_entityMetadata.js:2735</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2804"><code>..\src\a40_entityMetadata.js:2804</code></a>
         
         </p>
 
@@ -1205,7 +1212,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2721"><code>..\src\a40_entityMetadata.js:2721</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2790"><code>..\src\a40_entityMetadata.js:2790</code></a>
         
         </p>
 
@@ -1251,7 +1258,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2715"><code>..\src\a40_entityMetadata.js:2715</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2784"><code>..\src\a40_entityMetadata.js:2784</code></a>
         
         </p>
 
@@ -1262,6 +1269,52 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
 
     <div class="description">
         <p>The <a href="../classes/EntityType.html" class="crosslink">EntityType</a> that this property belongs to.
+<strong>readOnly</strong></p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_parentType" class="property item">
+    <h3 class="name"><code>parentType</code></h3>
+    <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2778"><code>..\src\a40_entityMetadata.js:2778</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The <a href="../classes/EntityType.html" class="crosslink">EntityType</a> that this property belongs to. ( same as parentEntityType).
 <strong>readOnly</strong></p>
 
     </div>
@@ -1297,7 +1350,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2765"><code>..\src\a40_entityMetadata.js:2765</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2834"><code>..\src\a40_entityMetadata.js:2834</code></a>
         
         </p>
 
@@ -1307,7 +1360,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
     </div>
 
     <div class="description">
-        <p>The &#39;foreign key&#39; DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated 
+        <p>The &#39;foreign key&#39; DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
 with a Navigation property except in the case of entities with multipart keys.</p>
 <p><strong>readOnly</strong></p>
 
@@ -1344,7 +1397,7 @@ with a Navigation property except in the case of entities with multipart keys.</
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2781"><code>..\src\a40_entityMetadata.js:2781</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2850"><code>..\src\a40_entityMetadata.js:2850</code></a>
         
         </p>
 

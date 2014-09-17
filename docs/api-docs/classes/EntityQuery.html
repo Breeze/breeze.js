@@ -223,8 +223,8 @@
 
 
 <div class="box intro">
-    <p>An EntityQuery instance is used to query entities either from a remote datasource or from a local <a href="../classes/EntityManager.html" class="crosslink">EntityManager</a>. </p>
-<p>EntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that 
+    <p>An EntityQuery instance is used to query entities either from a remote datasource or from a local <a href="../classes/EntityManager.html" class="crosslink">EntityManager</a>.</p>
+<p>EntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that
 EntityQueries can be &#39;modified&#39; without affecting any current instances.</p>
 
 </div>
@@ -593,11 +593,11 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)</p>
 <p>Usually this constructor will be followed by calls to filtering, ordering or selection methods</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .orderBy(&quot;Region&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.orderBy(&quot;Region&quot;);</p>
 
             </div>
         </div>
@@ -659,7 +659,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l558"><code>..\src\a45_entityQuery.js:558</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l562"><code>..\src\a45_entityQuery.js:562</code></a>
         
         </p>
 
@@ -690,7 +690,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
 
                     <div class="param-description">
                         <p>Function called on success.</p>
-<pre><code>successFunction([data])</code></pre>
+<p>successFunction([data])</p>
 
                     </div>
 
@@ -751,9 +751,9 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
                                             
 
                                             <div class="param-description">
-                                                Only available if 'inlineCount(true)' was applied to the query.  Returns the count of 
-    items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-    would have been applied.
+                                                Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
+items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+would have been applied.
                                             </div>
                                         </li>
                                         
@@ -775,7 +775,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
 
                     <div class="param-description">
                         <p>Function called on failure.</p>
-<pre><code>failureFunction([error])</code></pre>
+<p>failureFunction([error])</p>
 
                     </div>
 
@@ -853,35 +853,35 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
 
             <div class="example-content">
                 <p>This method can be called using a &#39;promises&#39; syntax ( recommended)</p>
-<pre class="code prettyprint"><code>    var em = new EntityManager(serviceName);
-    var query = new EntityQuery(&quot;Orders&quot;).using(em);
-    query.execute()
-    .then( function(data) {
-        ... query results processed here
-    }).fail( function(err) {
-        ... query failure processed here
-    });</code></pre>
-<p>or with callbacks</p>
-<pre class="code prettyprint"><code>    var em = new EntityManager(serviceName);
-    var query = new EntityQuery(&quot;Orders&quot;).using(em);
-    query.execute(
-    function(data) {
-        var orders = data.results;
-        ... query results processed here
-    },
-    function(err) {
-        ... query failure processed here
-    });</code></pre>
-<p>Either way this method is the same as calling the EntityManager &#39;execute&#39; method.</p>
-<pre class="code prettyprint"><code>    var em = new EntityManager(serviceName);
-    var query = new EntityQuery(&quot;Orders&quot;);
-    em.executeQuery(query)
-    .then( function(data) {
-        var orders = data.results;
-        ... query results processed here
-    }).fail( function(err) {
-        ... query failure processed here
-    });</code></pre>
+<p>var em = new EntityManager(serviceName);
+var query = new EntityQuery(&quot;Orders&quot;).using(em);
+query.execute()
+.then( function(data) {
+             ... query results processed here
+         }).fail( function(err) {
+             ... query failure processed here
+         });
+or with callbacks</p>
+<p>var em = new EntityManager(serviceName);
+var query = new EntityQuery(&quot;Orders&quot;).using(em);
+query.execute(
+function(data) {
+             var orders = data.results;
+             ... query results processed here
+         },
+function(err) {
+             ... query failure processed here
+         });
+Either way this method is the same as calling the EntityManager &#39;execute&#39; method.</p>
+<p>var em = new EntityManager(serviceName);
+var query = new EntityQuery(&quot;Orders&quot;);
+em.executeQuery(query)
+.then( function(data) {
+             var orders = data.results;
+             ... query results processed here
+         }).fail( function(err) {
+             ... query failure processed here
+         });</p>
 
             </div>
         </div>
@@ -921,7 +921,7 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l625"><code>..\src\a45_entityQuery.js:625</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l629"><code>..\src\a45_entityQuery.js:629</code></a>
         
         </p>
 
@@ -945,9 +945,9 @@ EntityQueries can be &#39;modified&#39; without affecting any current instances.
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume em is an entityManager already filled with order entities;
+                <p>// assume em is an entityManager already filled with order entities;
 var query = new EntityQuery("Orders").using(em);
-var orders = query.executeLocally();</code></pre>
+var orders = query.executeLocally();</p>
 <p>Note that calling this method is the same as calling <a href="../classes/EntityManager.html#method_executeQueryLocally" class="crosslink">executeQueryLocally</a>.</p>
 
             </div>
@@ -1004,7 +1004,7 @@ var orders = query.executeLocally();</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l397"><code>..\src\a45_entityQuery.js:397</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l395"><code>..\src\a45_entityQuery.js:395</code></a>
         
         </p>
 
@@ -1036,7 +1036,7 @@ names such that a graph of entities may be retrieved with a single request. Any 
 
                     <div class="param-description">
                         <p>A comma-separated list of navigation property names or an array of navigation property names. Each Navigation Property name can be followed
-by a &#39;.&#39; and another navigation property name to enable identifying a multi-level relationship. 
+by a &#39;.&#39; and another navigation property name to enable identifying a multi-level relationship.
 If &#39;propertyPaths&#39; is either null or omitted then any existing &#39;expand&#39; clause on the query is removed.</p>
 
                     </div>
@@ -1067,16 +1067,16 @@ If &#39;propertyPaths&#39; is either null or omitted then any existing &#39;expa
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .expand(&quot;Orders&quot;);</code></pre>
-<p>will return the filtered customers each with its &quot;Orders&quot; properties fully resolved.
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.expand(&quot;Orders&quot;);
+will return the filtered customers each with its &quot;Orders&quot; properties fully resolved.
 Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Orders&quot;)
-    .expand(&quot;Customer, Employee&quot;)</code></pre>
-<p>and nested property paths my be specified as well</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Orders&quot;)
-    .expand(&quot;Customer, OrderDetails, OrderDetails.Product&quot;)</code></pre>
+<p>var query = new EntityQuery(&quot;Orders&quot;)
+.expand(&quot;Customer, Employee&quot;)
+and nested property paths my be specified as well</p>
+<p>var query = new EntityQuery(&quot;Orders&quot;)
+.expand(&quot;Customer, OrderDetails, OrderDetails.Product&quot;)</p>
 
             </div>
         </div>
@@ -1134,7 +1134,7 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l139"><code>..\src\a45_entityQuery.js:139</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l138"><code>..\src\a45_entityQuery.js:138</code></a>
         
         </p>
 
@@ -1194,9 +1194,9 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = EntityQuery.from(&quot;Customers&quot;);</code></pre>
-<p>is the same as </p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;);</code></pre>
+                <p>var query = EntityQuery.from(&quot;Customers&quot;);
+is the same as</p>
+<p>var query = new EntityQuery(&quot;Customers&quot;);</p>
 
             </div>
         </div>
@@ -1252,7 +1252,7 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l120"><code>..\src\a45_entityQuery.js:120</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l119"><code>..\src\a45_entityQuery.js:119</code></a>
         
         </p>
 
@@ -1312,10 +1312,10 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery()
-    .from(&quot;Customers&quot;);</code></pre>
-<p>is the same as </p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;);</code></pre>
+                <p>var query = new EntityQuery()
+.from(&quot;Customers&quot;);
+is the same as</p>
+<p>var query = new EntityQuery(&quot;Customers&quot;);</p>
 
             </div>
         </div>
@@ -1373,7 +1373,7 @@ Multiple paths may be specified by separating the paths by a &#39;,&#39;</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l643"><code>..\src\a45_entityQuery.js:643</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l647"><code>..\src\a45_entityQuery.js:647</code></a>
         
         </p>
 
@@ -1434,16 +1434,16 @@ to force a requery of selected entities, or to restrict an existing collection o
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assuming &#39;customers&#39; is an array of &#39;Customer&#39; entities retrieved earlier.
-var customersQuery = EntityQuery.fromEntities(customers);</code></pre>
-<p>The resulting query can, of course, be extended</p>
-<pre class="code prettyprint"><code>// assuming &#39;customers&#39; is an array of &#39;Customer&#39; entities retrieved earlier.
+                <p>// assuming &#39;customers&#39; is an array of &#39;Customer&#39; entities retrieved earlier.
+var customersQuery = EntityQuery.fromEntities(customers);
+The resulting query can, of course, be extended</p>
+<p>// assuming &#39;customers&#39; is an array of &#39;Customer&#39; entities retrieved earlier.
 var customersQuery = EntityQuery.fromEntities(customers)
-    .where(&quot;Region&quot;, FilterQueryOp.NotEquals, null);</code></pre>
-<p>Single entities can requeried as well.</p>
-<pre class="code prettyprint"><code>// assuming &#39;customer&#39; is a &#39;Customer&#39; entity retrieved earlier.
-var customerQuery = EntityQuery.fromEntities(customer);</code></pre>
-<p>will create a query that will return an array containing a single customer entity.</p>
+.where(&quot;Region&quot;, FilterQueryOp.NotEquals, null);
+Single entities can requeried as well.</p>
+<p>// assuming &#39;customer&#39; is a &#39;Customer&#39; entity retrieved earlier.
+var customerQuery = EntityQuery.fromEntities(customer);
+will create a query that will return an array containing a single customer entity.</p>
 
             </div>
         </div>
@@ -1501,7 +1501,7 @@ var customerQuery = EntityQuery.fromEntities(customer);</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l684"><code>..\src\a45_entityQuery.js:684</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l688"><code>..\src\a45_entityQuery.js:688</code></a>
         
         </p>
 
@@ -1561,13 +1561,13 @@ var customerQuery = EntityQuery.fromEntities(customer);</code></pre>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var empType = metadataStore.getEntityType(&quot;Employee&quot;);
+                <p>var empType = metadataStore.getEntityType(&quot;Employee&quot;);
 var entityKey = new EntityKey(empType, 1);
-var query = EntityQuery.fromEntityKey(entityKey);</code></pre>
-<p>or</p>
-<pre class="code prettyprint"><code>// &#39;employee&#39; is a previously queried employee
+var query = EntityQuery.fromEntityKey(entityKey);
+or</p>
+<p>// &#39;employee&#39; is a previously queried employee
 var entityKey = employee.entityAspect.getKey();
-var query = EntityQuery.fromEntityKey(entityKey);</code></pre>
+var query = EntityQuery.fromEntityKey(entityKey);</p>
 
             </div>
         </div>
@@ -1631,7 +1631,7 @@ var query = EntityQuery.fromEntityKey(entityKey);</code></pre>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l709"><code>..\src\a45_entityQuery.js:709</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l713"><code>..\src\a45_entityQuery.js:713</code></a>
         
         </p>
 
@@ -1707,10 +1707,10 @@ var query = EntityQuery.fromEntityKey(entityKey);</code></pre>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// &#39;employee&#39; is a previously queried employee
+                <p>// &#39;employee&#39; is a previously queried employee
 var ordersNavProp = employee.entityType.getProperty(&quot;Orders&quot;);
-var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);</code></pre>
-<p>will return a query for the &quot;Orders&quot; of the specified &#39;employee&#39;.</p>
+var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);
+will return a query for the &quot;Orders&quot; of the specified &#39;employee&#39;.</p>
 
             </div>
         </div>
@@ -1766,7 +1766,7 @@ var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);</code></p
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l452"><code>..\src\a45_entityQuery.js:452</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l450"><code>..\src\a45_entityQuery.js:450</code></a>
         
         </p>
 
@@ -1828,11 +1828,11 @@ query with only the &#39;where&#39;/&#39;filter&#39; clauses applied, i.e. witho
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .take(20)
-    .orderBy(&quot;CompanyName&quot;)
-    .inlineCount(true);</code></pre>
-<p>will return the first 20 customers as well as a count of all of the customers in the remote store.</p>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.take(20)
+.orderBy(&quot;CompanyName&quot;)
+.inlineCount(true);
+will return the first 20 customers as well as a count of all of the customers in the remote store.</p>
 
             </div>
         </div>
@@ -1888,7 +1888,7 @@ query with only the &#39;where&#39;/&#39;filter&#39; clauses applied, i.e. witho
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l475"><code>..\src\a45_entityQuery.js:475</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l473"><code>..\src\a45_entityQuery.js:473</code></a>
         
         </p>
 
@@ -1949,10 +1949,10 @@ will not be coerced into entities but will instead look like raw javascript proj
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .take(20)
-    .orderBy(&quot;CompanyName&quot;)
-    .noTracking(true);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.take(20)
+.orderBy(&quot;CompanyName&quot;)
+.noTracking(true);</p>
 
             </div>
         </div>
@@ -2014,7 +2014,7 @@ will not be coerced into entities but will instead look like raw javascript proj
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l240"><code>..\src\a45_entityQuery.js:240</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l239"><code>..\src\a45_entityQuery.js:239</code></a>
         
         </p>
 
@@ -2044,7 +2044,7 @@ will not be coerced into entities but will instead look like raw javascript proj
                     
 
                     <div class="param-description">
-                        <p>A comma-separated (&#39;,&#39;) string of property paths or an array of property paths. 
+                        <p>A comma-separated (&#39;,&#39;) string of property paths or an array of property paths.
 Each property path can optionally end with &quot; desc&quot; to force a descending sort order. If &#39;propertyPaths&#39; is either null or omitted then all ordering is removed.</p>
 
                     </div>
@@ -2093,20 +2093,20 @@ Each property path can optionally end with &quot; desc&quot; to force a descendi
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-        .orderBy(&quot;CompanyName&quot;);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderBy(&quot;CompanyName&quot;);</p>
 <p>or to sort across multiple properties</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-        .orderBy(&quot;Region, CompanyName&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderBy(&quot;Region, CompanyName&quot;);</p>
 <p>Nested property paths are also supported</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Products&quot;)
-    .orderBy(&quot;Category.CategoryName&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Products&quot;)
+.orderBy(&quot;Category.CategoryName&quot;);</p>
 <p>Sorting in descending order is supported via the addition of &#39; desc&#39; to the end of any property path.</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-    .orderBy(&quot;CompanyName desc&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderBy(&quot;CompanyName desc&quot;);</p>
 <p>or</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-    .orderBy(&quot;Region desc, CompanyName desc&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderBy(&quot;Region desc, CompanyName desc&quot;);</p>
 
             </div>
         </div>
@@ -2162,7 +2162,7 @@ Each property path can optionally end with &quot; desc&quot; to force a descendi
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l279"><code>..\src\a45_entityQuery.js:279</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l278"><code>..\src\a45_entityQuery.js:278</code></a>
         
         </p>
 
@@ -2192,7 +2192,7 @@ Each property path can optionally end with &quot; desc&quot; to force a descendi
                     
 
                     <div class="param-description">
-                        <p>A comma-separated (&#39;,&#39;) string of property paths or an array of property paths. 
+                        <p>A comma-separated (&#39;,&#39;) string of property paths or an array of property paths.
 If &#39;propertyPaths&#39; is either null or omitted then all ordering is removed.</p>
 
                     </div>
@@ -2223,14 +2223,14 @@ If &#39;propertyPaths&#39; is either null or omitted then all ordering is remove
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-        .orderByDesc(&quot;CompanyName&quot;);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderByDesc(&quot;CompanyName&quot;);</p>
 <p>or to sort across multiple properties</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Customers&quot;)
-        .orderByDesc(&quot;Region, CompanyName&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.orderByDesc(&quot;Region, CompanyName&quot;);</p>
 <p>Nested property paths are also supported</p>
-<pre class="code prettyprint"><code>    var query = new EntityQuery(&quot;Products&quot;)
-    .orderByDesc(&quot;Category.CategoryName&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Products&quot;)
+.orderByDesc(&quot;Category.CategoryName&quot;);</p>
 
             </div>
         </div>
@@ -2286,7 +2286,7 @@ If &#39;propertyPaths&#39; is either null or omitted then all ordering is remove
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l305"><code>..\src\a45_entityQuery.js:305</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l304"><code>..\src\a45_entityQuery.js:304</code></a>
         
         </p>
 
@@ -2298,8 +2298,8 @@ If &#39;propertyPaths&#39; is either null or omitted then all ordering is remove
 
     <div class="description">
         <p>Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This
-will be referred to as a projection. 
-If the result of this selection &quot;projection&quot; contains entities, these entities will automatically be added to EntityManager&#39;s cache and will 
+will be referred to as a projection.
+If the result of this selection &quot;projection&quot; contains entities, these entities will automatically be added to EntityManager&#39;s cache and will
 be made &#39;observable&#39;.
 Any simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made &#39;observable&#39;.</p>
 
@@ -2352,23 +2352,23 @@ If &#39;propertyPaths&#39; is either null or omitted then any existing projectio
 
             <div class="example-content">
                 <p>Simple data properties can be projected</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .select(&quot;CompanyName&quot;);</code></pre>
-<p>This will return an array of objects each with a single &quot;CompanyName&quot; property of type string.
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.select(&quot;CompanyName&quot;);
+This will return an array of objects each with a single &quot;CompanyName&quot; property of type string.
 A similar query could return a navigation property instead</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .select(&quot;Orders&quot;);</code></pre>
-<p>where the result would be an array of objects each with a single &quot;Orders&quot; property that would itself be an array of &quot;Order&quot; entities.
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.select(&quot;Orders&quot;);
+where the result would be an array of objects each with a single &quot;Orders&quot; property that would itself be an array of &quot;Order&quot; entities.
 Composite projections are also possible:</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .select(&quot;CompanyName, Orders&quot;);</code></pre>
-<p>As well as projections involving nested property paths</p>
-<pre class="code prettyprint"><code>var query = EntityQuery(&quot;Orders&quot;)
-    .where(&quot;Customer.CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)         
-    .select(&quot;Customer.CompanyName, Customer, OrderDate&quot;);</code></pre>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.select(&quot;CompanyName, Orders&quot;);
+As well as projections involving nested property paths</p>
+<p>var query = EntityQuery(&quot;Orders&quot;)
+.where(&quot;Customer.CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.select(&quot;Customer.CompanyName, Customer, OrderDate&quot;);</p>
 
             </div>
         </div>
@@ -2424,7 +2424,7 @@ Composite projections are also possible:</p>
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l347"><code>..\src\a45_entityQuery.js:347</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l345"><code>..\src\a45_entityQuery.js:345</code></a>
         
         </p>
 
@@ -2485,9 +2485,9 @@ Any existing &#39;skip&#39; can be cleared by calling &#39;skip&#39; with no arg
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-    .skip(5);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+.skip(5);</p>
 
             </div>
         </div>
@@ -2543,7 +2543,7 @@ Any existing &#39;skip&#39; can be cleared by calling &#39;skip&#39; with no arg
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l380"><code>..\src\a45_entityQuery.js:380</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l378"><code>..\src\a45_entityQuery.js:378</code></a>
         
         </p>
 
@@ -2554,7 +2554,8 @@ Any existing &#39;skip&#39; can be cleared by calling &#39;skip&#39; with no arg
     </div>
 
     <div class="description">
-        <p>Returns a new query that returns only the specified number of entities when returning results - Same as &#39;top&#39;.<br>Any existing take can be cleared by calling take with no arguments.</p>
+        <p>Returns a new query that returns only the specified number of entities when returning results - Same as &#39;top&#39;.
+Any existing take can be cleared by calling take with no arguments.</p>
 
     </div>
 
@@ -2604,8 +2605,8 @@ If &#39;count&#39; is either null or omitted then any existing &#39;take&#39; co
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .take(5);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.take(5);</p>
 
             </div>
         </div>
@@ -2661,7 +2662,7 @@ If &#39;count&#39; is either null or omitted then any existing &#39;take&#39; co
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l364"><code>..\src\a45_entityQuery.js:364</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l362"><code>..\src\a45_entityQuery.js:362</code></a>
         
         </p>
 
@@ -2692,7 +2693,7 @@ Any existing &#39;top&#39; can be cleared by calling &#39;top&#39; with no argum
                     
 
                     <div class="param-description">
-                        <p>The number of entities to return. 
+                        <p>The number of entities to return.
 If &#39;count&#39; is either null or omitted then any existing &#39;top&#39; count on the query is removed.</p>
 
                     </div>
@@ -2723,8 +2724,8 @@ If &#39;count&#39; is either null or omitted then any existing &#39;top&#39; cou
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .top(5);</code></pre>
+                <p>var query = new EntityQuery(&quot;Customers&quot;)
+.top(5);</p>
 
             </div>
         </div>
@@ -2780,7 +2781,7 @@ If &#39;count&#39; is either null or omitted then any existing &#39;top&#39; cou
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l157"><code>..\src\a45_entityQuery.js:157</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l156"><code>..\src\a45_entityQuery.js:156</code></a>
         
         </p>
 
@@ -2810,7 +2811,7 @@ If &#39;count&#39; is either null or omitted then any existing &#39;top&#39; cou
                     
 
                     <div class="param-description">
-                        <p>The top level entityType that this query will return.  This method is only needed when a query returns a json result that 
+                        <p>The top level entityType that this query will return.  This method is only needed when a query returns a json result that
 does not include type information.  If the json result consists of more than a simple entity or array of entities, consider using a JsonResultsAdapter instead.</p>
 
                     </div>
@@ -2841,9 +2842,9 @@ does not include type information.  If the json result consists of more than a s
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery()
-    .from(&quot;MyCustomMethod&quot;)
-    .toType(&quot;Customer&quot;)</code></pre>
+                <p>var query = new EntityQuery()
+.from(&quot;MyCustomMethod&quot;)
+.toType(&quot;Customer&quot;)</p>
 
             </div>
         </div>
@@ -2899,7 +2900,7 @@ does not include type information.  If the json result consists of more than a s
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l497"><code>..\src\a45_entityQuery.js:497</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l495"><code>..\src\a45_entityQuery.js:495</code></a>
         
         </p>
 
@@ -2910,7 +2911,7 @@ does not include type information.  If the json result consists of more than a s
     </div>
 
     <div class="description">
-        <p>Returns a copy of this EntityQuery with the specified <a href="../classes/EntityManager.html" class="crosslink">EntityManager</a>, <a href="../classes/DataService.html" class="crosslink">DataService</a>, 
+        <p>Returns a copy of this EntityQuery with the specified <a href="../classes/EntityManager.html" class="crosslink">EntityManager</a>, <a href="../classes/DataService.html" class="crosslink">DataService</a>,
 <a href="../classes/JsonResultsAdapter.html" class="crosslink">JsonResultsAdapter</a>, <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> or <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a> applied.</p>
 
     </div>
@@ -2961,17 +2962,17 @@ does not include type information.  If the json result consists of more than a s
 
             <div class="example-content">
                 <p>&#39;using&#39; can be used to return a new query with a specified EntityManager.</p>
-<pre class="code prettyprint"><code>    var em = new EntityManager(serviceName);
-    var query = new EntityQuery("Orders")
-        .using(em);</code></pre>
-<p>or with a specified <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a> </p>
-<pre class="code prettyprint"><code>var em = new EntityManager(serviceName);
+<p>var em = new EntityManager(serviceName);
 var query = new EntityQuery("Orders")
-    .using(MergeStrategy.PreserveChanges);</code></pre>
-<p>or with a specified <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a> </p>
-<pre class="code prettyprint"><code>var em = new EntityManager(serviceName);
+.using(em);
+or with a specified <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a></p>
+<p>var em = new EntityManager(serviceName);
+var query = new EntityQuery("Orders")
+.using(MergeStrategy.PreserveChanges);
+or with a specified <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a></p>
+<p>var em = new EntityManager(serviceName);
 var query = new EntityQuery(&quot;Orders&quot;)
-    .using(FetchStrategy.FromLocalCache);</code></pre>
+.using(FetchStrategy.FromLocalCache);</p>
 
             </div>
         </div>
@@ -3027,7 +3028,7 @@ var query = new EntityQuery(&quot;Orders&quot;)
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l176"><code>..\src\a45_entityQuery.js:176</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l175"><code>..\src\a45_entityQuery.js:175</code></a>
         
         </p>
 
@@ -3062,17 +3063,16 @@ var query = new EntityQuery(&quot;Orders&quot;)
 <li><p>a single Predicate</p>
 </li>
 <li><p>or the parameters to create a &#39;simple&#39; Predicate</p>
-<ul>
-<li>a property name, a property path with &#39;.&#39; as path seperators or a property expression {String}</li>
-<li>an operator {FilterQueryOp|String} Either a  <a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> or it&#39;s string representation. Case is ignored<pre><code>  when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.</code></pre>
 </li>
-<li>a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general, <pre><code>  if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. 
-  In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#39;value&#39; property and an &#39;isLiteral&#39; property set to either true or false.
-  Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a &#39;value&#39; property and a &#39;dataType&#39;property set
-  to one of the breeze.DataType enumeration instances.       </code></pre>
+<li><p>a property name, a property path with &#39;.&#39; as path seperators or a property expression {String}</p>
 </li>
-</ul>
-</li>
+<li>an operator {FilterQueryOp|String} Either a  <a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> or it&#39;s string representation. Case is ignored
+when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.</li>
+<li>a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general,
+if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.
+In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#39;value&#39; property and an &#39;isLiteral&#39; property set to either true or false.
+Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a &#39;value&#39; property and a &#39;dataType&#39;property set
+to one of the breeze.DataType enumeration instances.</li>
 <li>or a null or undefined ( this causes any existing where clause to be removed)</li>
 </ul>
 
@@ -3104,28 +3104,28 @@ var query = new EntityQuery(&quot;Orders&quot;)
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = new EntityQuery("Customers")
-    .where("CompanyName", "startsWith", "C");</code></pre>
-<p>This can also be expressed using an explicit <a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> as</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery("Customers")
-    .where("CompanyName", FilterQueryOp.StartsWith, "C");</code></pre>
-<p>or a preconstructed Predicate may be used</p>
-<pre class="code prettyprint"><code>var pred = new Predicate(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
+                <p>var query = new EntityQuery("Customers")
+.where("CompanyName", "startsWith", "C");
+This can also be expressed using an explicit <a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> as</p>
+<p>var query = new EntityQuery("Customers")
+.where("CompanyName", FilterQueryOp.StartsWith, "C");
+or a preconstructed Predicate may be used</p>
+<p>var pred = new Predicate(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
 var query = new EntityQuery(&quot;Customers&quot;)
-    .where(pred);</code></pre>
-<p>Predicates are often useful when you want to combine multiple conditions in a single filter, such as</p>
-<pre class="code prettyprint"><code>var pred = Predicate.create(&quot;CompanyName&quot;, &quot;startswith&quot;, &quot;C&quot;).and(&quot;Region&quot;, FilterQueryOp.Equals, null);
+.where(pred);
+Predicates are often useful when you want to combine multiple conditions in a single filter, such as</p>
+<p>var pred = Predicate.create(&quot;CompanyName&quot;, &quot;startswith&quot;, &quot;C&quot;).and(&quot;Region&quot;, FilterQueryOp.Equals, null);
 var query = new EntityQuery(&quot;Customers&quot;)
-    .where(pred);</code></pre>
+.where(pred);</p>
 <p>More complicated queries can make use of nested property paths</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery("Products")
-    .where("Category.CategoryName", "startswith", "S");</code></pre>
-<p>or OData functions - A list of valid OData functions can be found within the Predicate documentation.</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;toLower(CompanyName)&quot;, &quot;startsWith&quot;, &quot;c&quot;);</code></pre>
-<p>or to be even more baroque</p>
-<pre class="code prettyprint"><code>var query = new EntityQuery(&quot;Customers&quot;)
-    .where(&quot;toUpper(substring(CompanyName, 1, 2))&quot;, FilterQueryOp.Equals, &quot;OM&quot;);</code></pre>
+<p>var query = new EntityQuery("Products")
+.where("Category.CategoryName", "startswith", "S");
+or OData functions - A list of valid OData functions can be found within the Predicate documentation.</p>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;toLower(CompanyName)&quot;, &quot;startsWith&quot;, &quot;c&quot;);
+or to be even more baroque</p>
+<p>var query = new EntityQuery(&quot;Customers&quot;)
+.where(&quot;toUpper(substring(CompanyName, 1, 2))&quot;, FilterQueryOp.Equals, &quot;OM&quot;);</p>
 
             </div>
         </div>
@@ -3181,7 +3181,7 @@ var query = new EntityQuery(&quot;Customers&quot;)
             
         
         
-        <a href="../files/.._src_a45_entityQuery.js.html#l425"><code>..\src\a45_entityQuery.js:425</code></a>
+        <a href="../files/.._src_a45_entityQuery.js.html#l423"><code>..\src\a45_entityQuery.js:423</code></a>
         
         </p>
 
@@ -3241,16 +3241,16 @@ var query = new EntityQuery(&quot;Customers&quot;)
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
-    .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; });</code></pre>
-<p>will call the &#39;EmployeesFilteredByCountryAndBirthdate&#39; method on the server and pass in 2 parameters. This
-query will be uri encoded as </p>
-<pre class="code prettyprint"><code>{serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&amp;country=USA</code></pre>
+                <p>var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
+.withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; });
+will call the &#39;EmployeesFilteredByCountryAndBirthdate&#39; method on the server and pass in 2 parameters. This
+query will be uri encoded as</p>
+<p>{serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&amp;country=USA</p>
 <p>Parameters may also be mixed in with other query criteria.</p>
-<pre class="code prettyprint"><code>    var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
-    .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; })
-    .where(&quot;LastName&quot;, &quot;startsWith&quot;, &quot;S&quot;)
-    .orderBy(&quot;BirthDate&quot;);</code></pre>
+<p>var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
+.withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; })
+.where(&quot;LastName&quot;, &quot;startsWith&quot;, &quot;S&quot;)
+.orderBy(&quot;BirthDate&quot;);</p>
 
             </div>
         </div>
@@ -3345,7 +3345,7 @@ query will be uri encoded as </p>
     </div>
 
     <div class="description">
-        <p>The entityType that is associated with the &#39;from&#39; clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query 
+        <p>The entityType that is associated with the &#39;from&#39; clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query
 has been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.
 This value may be null if the entityType cannot be associated with a resourceName.</p>
 <p><strong>readOnly</strong></p>
@@ -3439,7 +3439,7 @@ This value may be null if the entityType cannot be associated with a resourceNam
     </div>
 
     <div class="description">
-        <p>Any additional parameters that were added to the query via the &#39;withParameters&#39; method. </p>
+        <p>Any additional parameters that were added to the query via the &#39;withParameters&#39; method.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -3577,7 +3577,7 @@ This value may be null if the entityType cannot be associated with a resourceNam
     </div>
 
     <div class="description">
-        <p>The entityType that will be returned by this query. This property will only be set if the &#39;toType&#39; method was called. </p>
+        <p>The entityType that will be returned by this query. This property will only be set if the &#39;toType&#39; method was called.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
