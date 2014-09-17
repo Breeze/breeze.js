@@ -511,7 +511,7 @@
 
         var query = new EntityQuery()
             .from("CustomersStartingWithA");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             ok(data.results.length > 0, "should have some results");
@@ -532,7 +532,7 @@
             .where("companyName", "startsWith", "A")
             .orderBy("companyName")
             .take(4);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
 
         em.executeQuery(query, function (data) {
             var customers = data.results;
@@ -614,7 +614,7 @@
             .where("companyName", "startsWith", "A")
             .orderBy("companyName")
             .take(4);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
 
         em.executeQuery(query).then(function (data) {
             var customers = data.results;
@@ -670,7 +670,7 @@
             .orderBy("companyName")
             .expand("orders")
             .take(4);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
 
         em.executeQuery(query, function (data) {
             var customers = data.results;

@@ -175,6 +175,7 @@ var DataType = (function () {
         return "binary'" + val + "'";
     };
 
+    // TODO: __identity;
     var fmtUndefined = function (val) {
         return val;
     };
@@ -329,6 +330,25 @@ var DataType = (function () {
     **/
     DataType.Undefined = DataType.addSymbol({ defaultValue: undefined , fmtOData: fmtUndefined});
     DataType.resolveSymbols();
+
+    DataType.getComparableFn = function(dataType) {
+      if (dataType && dataType.isDate) {
+        // dates don't perform equality comparisons properly
+        return function (value) {
+          return value && value.getTime();
+        };
+      } else if (dataType === DataType.Time) {
+        // durations must be converted to compare them
+        return function (value) {
+          return value && __durationToSeconds(value);
+        };
+      } else {
+        // TODO: __identity
+        return function (value) {
+          return value;
+        };
+      }
+    };
 
     /**
     Returns the DataType for a specified EDM type name.

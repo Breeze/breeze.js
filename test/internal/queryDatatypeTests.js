@@ -595,7 +595,7 @@
             .where("region", FilterQueryOp.Equals, null)
             .take(20);
 
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var customers = data.results;
@@ -615,7 +615,7 @@
             .where("region", FilterQueryOp.NotEquals, null)
             .take(10);
 
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var customers = data.results;

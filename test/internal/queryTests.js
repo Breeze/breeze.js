@@ -1914,7 +1914,7 @@
             .from("Customers")
             .where("companyName", "startsWith", "C")
             .orderBy("companyName");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function (data) {
             var customers = data.results;
@@ -1936,7 +1936,7 @@
         var query = EntityQuery.from("Orders")
             .where("freight", ">", 100);
 
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var orders = data.results;
@@ -1953,7 +1953,7 @@
         var pred1 = new Predicate("freight", ">", 100);
         var pred2 = new Predicate("orderDate", ">", new Date(1998, 3, 1));
         var query = baseQuery.where(pred1.and(pred2));
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var orders = data.results;
@@ -2001,7 +2001,7 @@
         var pred2 = Predicate.create("orderDate", ">", new Date(1998, 3, 1));
         var newPred = Predicate.and([pred1, pred2]);
         var query = baseQuery.where(newPred);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var orders = data.results;
@@ -2017,7 +2017,7 @@
         var pred = Predicate.create("freight", ">", 100)
             .and("orderDate", ">", new Date(1998, 3, 1));
         var query = baseQuery.where(pred);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function(data) {
             var orders = data.results;
@@ -2037,7 +2037,7 @@
             .where(pred)
             .take(10);
 
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query, function (data) {
             var customers = data.results;
@@ -2159,7 +2159,7 @@
              .from("Products")
              .where("category.categoryName", "startswith", "S")
              .expand("category");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var products = data.results;
@@ -2183,7 +2183,7 @@
          var query = new EntityQuery()
              .from("Orders")
              .where("customer.region", "==", "CA");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var customers = data.results;
@@ -2409,21 +2409,21 @@
             var products = data.results;
 
             var newq1 = query.skip(skipTakeCount);
-            var newq1Url = newq1._toUri(em.metadataStore);
+            var newq1Url = newq1._toUri(em);
             var p1 = em.executeQuery(newq1).then(function (data1) {
                 var custs1 = data1.results;
                 equal(custs1.length, products.length - skipTakeCount);
             });
 
             var newq2 = query.take(skipTakeCount);
-            var newq2Url = newq1._toUri(em.metadataStore);
+            var newq2Url = newq1._toUri(em);
             var p2 = em.executeQuery(newq2).then(function (data2) {
                 var custs2 = data2.results;
                 equal(custs2.length, skipTakeCount);
             });
 
             var newq3 = query.skip(skipTakeCount).take(skipTakeCount);
-            var newq3Url = newq1._toUri(em.metadataStore);
+            var newq3Url = newq1._toUri(em);
             var p3 = em.executeQuery(newq3).then(function (data3) {
                 var custs3 = data3.results;
                 equal(custs3.length, skipTakeCount);
@@ -2439,7 +2439,7 @@
             .from("Customers")
             // .where("toLower(companyName)", "startsWith", "c");
             .where({ "toLower(companyName)": { startsWith: "C" } });
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var custs = data.results;
@@ -2458,7 +2458,7 @@
         var query = new EntityQuery()
             .from("Customers")
             .where("toUpper(substring(companyName, 1, 2))", "startsWith", "OM");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var custs = data.results;
@@ -2476,7 +2476,7 @@
         var query = new EntityQuery()
             .from("Customers")
             .where("length(companyName)", ">", 20);
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var custs = data.results;
@@ -2500,7 +2500,7 @@
             .from("Orders")
             .where("length(customer.companyName)", ">", 30)
             .expand("customer");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             var orders = data.results;
@@ -2519,7 +2519,7 @@
         var query = new EntityQuery()
             .from("Orders")
             .where("length(customer.fooName)", ">", 30);
-        // var queryUrl = query._toUri(em.metadataStore);
+        // var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             ok(false, "should not get here");
@@ -2552,7 +2552,7 @@
         var query = new EntityQuery()
             .from("Customers")
             .where("badCompanyName", "startsWith", "C");
-        // var queryUrl = query._toUri(em.metadataStore);
+        // var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             ok(false, "shouldn't get here");
@@ -2571,7 +2571,7 @@
             .from("Customers")
             .where("companyName", FilterQueryOp.StartsWith, "C")
             .orderBy("badCompanyName");
-        // var queryUrl = query._toUri(em.metadataStore);
+        // var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             ok(false, "shouldn't get here");

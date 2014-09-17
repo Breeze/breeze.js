@@ -182,7 +182,7 @@
         var query = EntityQuery.from("Employees")
            .where("orders", "any", p)
            .expand("orders");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
@@ -211,7 +211,7 @@
         var query = EntityQuery.from("Employees")
            .where(p)
            .expand("orders");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             var emps = data.results;
@@ -246,7 +246,7 @@
            .where("orders", "some", "orderDetails", "any", p2)
            .expand("orders.orderDetails");
 
-        var queryUrl = q2._toUri(em.metadataStore);
+        var queryUrl = q2._toUri(em);
         stop();
         var custs, l0, l2;
         em.executeQuery(q1).then(function (data) {
@@ -276,7 +276,7 @@
            .where("orders", "some", "orderDetails", "any", p2)
            .expand("orders.orderDetails");
         
-        var queryUrl = q2._toUri(em.metadataStore);
+        var queryUrl = q2._toUri(em);
         var s = q2.wherePredicate.toString();
         
         ok(s.length > 0);
@@ -291,7 +291,7 @@
            .expand("orders.orderDetails");
 
         try {
-            var queryUrl = q2._toUri(em.metadataStore);
+            var queryUrl = q2._toUri(em);
             ok(false, "should not get here")
         } catch (e) {
             ok(e.message.indexOf("XXquantity") >= 0, "error should be about 'XXquantity'");

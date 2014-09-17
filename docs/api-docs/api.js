@@ -26,7 +26,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "MetadataStore",
         "NamingConvention",
         "NavigationProperty",
-        "Predicate",
         "Promise",
         "QueryOptions",
         "SaveOptions",

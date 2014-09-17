@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -240,6 +238,7 @@ var __config = (function () {
         ajax: new InterfaceDef(&quot;ajax&quot;),
         modelLibrary: new InterfaceDef(&quot;modelLibrary&quot;),
         dataService: new InterfaceDef(&quot;dataService&quot;)
+        // uriBuilder: new InterfaceDef(&quot;uriBuilder&quot;)
     };
 
     __config.interfaceRegistry.modelLibrary.getDefaultInstance = function() {
@@ -341,6 +340,7 @@ var __config = (function () {
             .whereParam(&quot;dataService&quot;).isOptional()
             .whereParam(&quot;modelLibrary&quot;).isOptional()
             .whereParam(&quot;ajax&quot;).isOptional()
+            // .whereParam(&quot;uriBuilder&quot;).isOptional()
             .applyAll(this, false);
         return __objectMapToArray(config, __config.initializeAdapterInstance);
 
@@ -407,6 +407,10 @@ var __config = (function () {
         assertParam(fnName, &quot;fnName&quot;).isString().check();
         fn.prototype._$fnName = fnName;
         __config.functionRegistry[fnName] = fn;
+    };
+
+    __config.getRegisteredFunction = function(fnName) {
+      return __config.functionRegistry[fnName];
     };
 
     __config._storeObject = function(obj, type, name) {

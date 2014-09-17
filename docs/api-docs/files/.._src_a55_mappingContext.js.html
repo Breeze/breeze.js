@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -232,7 +230,19 @@ var MappingContext = (function () {
     proto._$typeName = &quot;MappingContext&quot;;
 
     proto.getUrl = function () {
-        return  this.dataService.makeUrl(this.metadataStore.toQueryString(this.query));
+        var query = this.query;
+        if (!query) {
+          throw new Error(&quot;query cannot be empty&quot;);
+        }
+        var uriString;
+        if (typeof query === &#x27;string&#x27;) {
+          uriString = query;
+        } else if (query instanceof EntityQuery) {
+          uriString = this.dataService.uriBuilder.buildUri(query, this.metadataStore);
+        } else {
+          throw new Error(&quot;unable to recognize query parameter as either a string or an EntityQuery&quot;);
+        }
+        return  this.dataService.makeUrl(uriString);
     }
 
     proto.visitAndMerge = function (nodes, nodeContext) {

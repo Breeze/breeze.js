@@ -280,7 +280,7 @@ var Validator = (function () {
             return json.map(function(js) { return ctor.fromJSON(js); });
         };
         var validatorName = "Validator." + json.name;
-        var fn = __config.functionRegistry[validatorName];
+        var fn = __config.getRegisteredFunction(validatorName);
         if (!fn) {
             throw new Error("Unable to locate a validator named:" + json.name);
         }

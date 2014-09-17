@@ -48,6 +48,7 @@ var DataService = (function () {
     **/
         
     var ctor = function (config) {
+        this.uriBuilder = uriBuilderForOData;
         updateWithConfig(this, config);
     };
     var proto = ctor.prototype;
@@ -137,6 +138,7 @@ var DataService = (function () {
                 .applyAll(obj);
             obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
             obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
+
         }
         return obj;
     }

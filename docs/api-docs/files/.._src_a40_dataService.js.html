@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -255,6 +253,7 @@ var DataService = (function () {
     **/
         
     var ctor = function (config) {
+        this.uriBuilder = uriBuilderForOData;
         updateWithConfig(this, config);
     };
     var proto = ctor.prototype;
@@ -344,6 +343,7 @@ var DataService = (function () {
                 .applyAll(obj);
             obj.serviceName = obj.serviceName &amp;&amp; DataService._normalizeServiceName(obj.serviceName);
             obj.adapterInstance = obj.adapterName &amp;&amp; __config.getAdapterInstance(&quot;dataService&quot;, obj.adapterName);
+
         }
         return obj;
     }

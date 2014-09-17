@@ -1219,7 +1219,7 @@
         em.attachEntity(emp);
         // now fetch
         var q = EntityQuery.fromEntities(emp);
-        var uri = q._toUri(em.metadataStore);
+        var uri = q._toUri(em);
         stop();
         em.executeQuery(q, function (data) {
             ok(changes.length === 1, "query merges should only fire a single property change");

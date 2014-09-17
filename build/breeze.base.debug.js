@@ -1609,6 +1609,7 @@ var __config = (function () {
         ajax: new InterfaceDef("ajax"),
         modelLibrary: new InterfaceDef("modelLibrary"),
         dataService: new InterfaceDef("dataService")
+        // uriBuilder: new InterfaceDef("uriBuilder")
     };
 
     __config.interfaceRegistry.modelLibrary.getDefaultInstance = function() {
@@ -1710,6 +1711,7 @@ var __config = (function () {
             .whereParam("dataService").isOptional()
             .whereParam("modelLibrary").isOptional()
             .whereParam("ajax").isOptional()
+            // .whereParam("uriBuilder").isOptional()
             .applyAll(this, false);
         return __objectMapToArray(config, __config.initializeAdapterInstance);
 
@@ -1776,6 +1778,10 @@ var __config = (function () {
         assertParam(fnName, "fnName").isString().check();
         fn.prototype._$fnName = fnName;
         __config.functionRegistry[fnName] = fn;
+    };
+
+    __config.getRegisteredFunction = function(fnName) {
+      return __config.functionRegistry[fnName];
     };
 
     __config._storeObject = function(obj, type, name) {
@@ -2293,7 +2299,7 @@ var Validator = (function () {
             return json.map(function(js) { return ctor.fromJSON(js); });
         };
         var validatorName = "Validator." + json.name;
-        var fn = __config.functionRegistry[validatorName];
+        var fn = __config.getRegisteredFunction(validatorName);
         if (!fn) {
             throw new Error("Unable to locate a validator named:" + json.name);
         }
@@ -5507,6 +5513,7 @@ var DataType = (function () {
         return "binary'" + val + "'";
     };
 
+    // TODO: __identity;
     var fmtUndefined = function (val) {
         return val;
     };
@@ -5661,6 +5668,25 @@ var DataType = (function () {
     **/
     DataType.Undefined = DataType.addSymbol({ defaultValue: undefined , fmtOData: fmtUndefined});
     DataType.resolveSymbols();
+
+    DataType.getComparableFn = function(dataType) {
+      if (dataType && dataType.isDate) {
+        // dates don't perform equality comparisons properly
+        return function (value) {
+          return value && value.getTime();
+        };
+      } else if (dataType === DataType.Time) {
+        // durations must be converted to compare them
+        return function (value) {
+          return value && __durationToSeconds(value);
+        };
+      } else {
+        // TODO: __identity
+        return function (value) {
+          return value;
+        };
+      }
+    };
 
     /**
     Returns the DataType for a specified EDM type name.
@@ -5862,6 +5888,7 @@ var DataService = (function () {
     **/
         
     var ctor = function (config) {
+        this.uriBuilder = uriBuilderForOData;
         updateWithConfig(this, config);
     };
     var proto = ctor.prototype;
@@ -5951,6 +5978,7 @@ var DataService = (function () {
                 .applyAll(obj);
             obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
             obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
+
         }
         return obj;
     }
@@ -6567,20 +6595,7 @@ var MetadataStore = (function () {
         }
         
     };
-    
-    proto.toQueryString = function(query) {
-        if (!query) {
-            throw new Error("query cannot be empty");
-        }
-        if (typeof query === 'string') {
-            return query;
-        } else if (query instanceof EntityQuery) {
-            return query._toUri(this);
-        } else {
-            throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
-        }
-    };
-             
+
     /**
     Returns whether this MetadataStore contains any metadata yet.
     @example
@@ -10166,7 +10181,7 @@ breeze.NamingConvention = NamingConvention;
 
     function getBinaryPredicateFn(entityType, op, dataType) {
       var lqco = entityType.metadataStore.localQueryComparisonOptions;
-      var mc = getComparableFn(dataType);
+      var mc = DataType.getComparableFn(dataType);
       var predFn;
       switch (op.key) {
         case 'eq':
@@ -10229,23 +10244,7 @@ breeze.NamingConvention = NamingConvention;
       return predFn;
     }
 
-    function getComparableFn(dataType) {
-      if (dataType && dataType.isDate) {
-        // dates don't perform equality comparisons properly
-        return function (value) {
-          return value && value.getTime();
-        };
-      } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function (value) {
-          return value && __durationToSeconds(value);
-        };
-      } else {
-        return function (value) {
-          return value;
-        };
-      }
-    }
+
 
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
@@ -10290,99 +10289,6 @@ breeze.NamingConvention = NamingConvention;
     return visitor;
   }());
 
-  // toODataFragment visitor
-  Predicate.attachVisitor(function() {
-    var visitor = {
-      fnName: "toODataFragment",
-
-      passthruPredicate: function () {
-        return this.value;
-      },
-
-      unaryPredicate: function (config) {
-        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(config) + ")";
-      },
-
-      binaryPredicate: function (config) {
-        var v1Expr = this.expr1.toODataFragment(config);
-        var prefix = config.prefix;
-        if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
-        }
-
-        var v2Expr = this.expr2.toODataFragment(config);
-
-        var odataOp = odataOpFrom(this);
-
-        if (this.op.isFunction) {
-          if (odataOp == "substringof") {
-            return odataOp + "(" + v2Expr + "," + v1Expr + ") eq true";
-          } else {
-            return odataOp + "(" + v1Expr + "," + v2Expr + ") eq true";
-          }
-        } else {
-          return v1Expr + " " + odataOp + " " + v2Expr;
-        }
-      },
-
-      andOrPredicate: function (config) {
-        if (this.preds.length === 0) return;
-        var result = this.preds.map(function (pred) {
-          return "(" + pred.toODataFragment(config) + ")";
-        }).join(" " + odataOpFrom(this) + " ");
-        return result;
-      },
-
-      anyAllPredicate: function (config) {
-        var v1Expr = this.expr.toODataFragment(config);
-
-        var prefix = config.prefix;
-        if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
-          prefix = "x" + (parseInt(prefix.substring(1)) + 1);
-        } else {
-          prefix = "x1";
-        }
-        var newConfig = __extend({}, config);
-        newConfig.entityType = this.expr.dataType;
-        newConfig.prefix = prefix;
-        return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
-      },
-
-      litExpr:  function () {
-        return this.dataType.fmtOData(this.value);
-      },
-
-      propExpr:  function (config) {
-        var entityType = config.entityType;
-        return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
-      },
-
-      fnExpr: function (config) {
-        var frags = this.exprArgs.map(function (expr) {
-          return expr.toODataFragment(config);
-        });
-        return this.fnName + "(" + frags.join(",") + ")";
-      }
-    };
-
-    var _operatorMap = {
-      'contains': 'substringof'
-      // ops where op.key === odataOperator
-      // not
-      // eq, ne, gt, ge, lt, le,
-      // any, all, and, or
-      // startswith, endswith
-    }
-
-    function odataOpFrom(node) {
-      var op = node.op.key;
-      var odataOp = _operatorMap[op];
-      return odataOp || op;
-    }
-
-    return visitor;
-  }());
 
   // toJSON visitor
   Predicate.attachVisitor(function() {
@@ -10588,8 +10494,7 @@ breeze.NamingConvention = NamingConvention;
 
 breeze.Predicate = Predicate;
 
-;     
-var EntityQuery = (function () {
+;var EntityQuery = (function () {
     /**
     An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink "EntityManager"}}{{/crossLink}}. 
 
@@ -11408,77 +11313,10 @@ var EntityQuery = (function () {
         return copy;
     }
 
-    proto._toUri = function (metadataStore) {
-        // force entityType validation;
-        var entityType = this._getFromEntityType(metadataStore, false);
-        if (!entityType) {
-            entityType = new EntityType(metadataStore);
-        }
-
-        var eq = this;
-        var queryOptions = {};
-        queryOptions["$filter"] =  toODataFragment(eq.wherePredicate);
-        queryOptions["$orderby"] = toODataFragment(eq.orderByClause);
-        queryOptions["$skip"] = toSkipString();
-        queryOptions["$top"] = toTopString();
-        queryOptions["$expand"] = toODataFragment(eq.expandClause);
-        queryOptions["$select"] =   toODataFragment(eq.selectClause);
-        queryOptions["$inlinecount"] = toInlineCountString();
-            
-        var qoText = toQueryOptionsString(queryOptions);
-        return this.resourceName + qoText;
-
-        // private methods to this func.
-
-        function toODataFragment(clause) {
-          if (!clause) return;
-          if (clause.validate && !entityType.isAnonymous) {
-            clause.validate(entityType);
-          }
-          return clause.toODataFragment( { entityType: entityType});
-        }
-
-        function toInlineCountString() {
-            if (!eq.inlineCountEnabled) return;
-            return eq.inlineCountEnabled ? "allpages" : "none";
-        }
-
-        function toSkipString() {
-            var count = eq.skipCount;
-            if (!count) return;
-            return count.toString();
-        }
-
-        function toTopString() {
-            var count = eq.takeCount;
-            if (count==null) return;
-            return count.toString();
-        }
-
-        function toQueryOptionsString(queryOptions) {
-            var qoStrings = [];
-            for (var qoName in queryOptions) {
-                var qoValue = queryOptions[qoName];
-                if (qoValue !== undefined) {
-                    if (qoValue instanceof Array) {
-                        qoValue.forEach(function (qov) {
-                            qoStrings.push(qoName + "=" + encodeURIComponent(qov));
-                        });
-                    }  else {
-                        qoStrings.push(qoName + "=" + encodeURIComponent(qoValue));
-                    }
-                }
-            }
-
-            if (qoStrings.length > 0) {
-                return "?" + qoStrings.join("&");
-            } else {
-                return "";
-            }
-        }
-
-
-    };
+    // for testing
+    proto._toUri = function (em) {
+      return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+    }
 
     // private functions
         
@@ -11554,7 +11392,6 @@ var EntityQuery = (function () {
     return ctor;
 })();
 
-   
 var FilterQueryOp = (function () {
     /**
     FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink "Predicate"}}{{/crossLink}} 
@@ -11698,8 +11535,6 @@ var BooleanQueryOp = (function () {
     };
     return aEnum;
 }) ();
-
-
 // Not exposed externally for now
 var OrderByClause = (function () {
     /*
@@ -11851,7 +11686,7 @@ var SimpleOrderByClause = (function () {
                     value2 = (value2 || "").toLowerCase();
                 } 
             } else {
-                var normalize = getComparableFn(dataType);
+                var normalize = DataType.getComparableFn(dataType);
                 value1 = normalize(value1);
                 value2 = normalize(value2);
             }
@@ -11997,18 +11832,7 @@ function getPropertyPathValue(obj, propertyPath) {
     }
 }
    
-function getComparableFn(dataType)  {
-    if (dataType && dataType.isDate) {
-        // dates don't perform equality comparisons properly 
-        return function (value) { return value && value.getTime(); };
-    } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function(value) { return value && __durationToSeconds(value); };
-    } else {
-        return function(value) { return value; };
-    }
-        
-}
+
 
 // expose
 breeze.FilterQueryOp = FilterQueryOp;
@@ -12247,6 +12071,175 @@ var QueryOptions = (function () {
 breeze.QueryOptions= QueryOptions;
 breeze.FetchStrategy= FetchStrategy;
 breeze.MergeStrategy = MergeStrategy;
+
+
+;var uriBuilderForOData = (function () {
+
+  var buildUri = function (entityQuery, metadataStore) {
+    // force entityType validation;
+    var entityType = entityQuery._getFromEntityType(metadataStore, false);
+    if (!entityType) {
+      entityType = new EntityType(metadataStore);
+    }
+
+
+    var queryOptions = {};
+    queryOptions["$filter"] = toODataFragment(entityQuery.wherePredicate);
+    queryOptions["$orderby"] = toODataFragment(entityQuery.orderByClause);
+
+    if (entityQuery.skipCount) {
+      queryOptions["$skip"] = entityQuery.skipCount;
+    }
+
+    if (entityQuery.takeCount != null) {
+      queryOptions["$top"] = entityQuery.takeCount;
+    }
+
+    queryOptions["$expand"] = toODataFragment(entityQuery.expandClause);
+    queryOptions["$select"] = toODataFragment(entityQuery.selectClause);
+
+    if (entityQuery.inlineCountEnabled) {
+      queryOptions["$inlinecount"] = "allpages";
+    }
+
+    var qoText = toQueryOptionsString(queryOptions);
+    return entityQuery.resourceName + qoText;
+
+    // private methods to this func.
+
+    function toODataFragment(clause) {
+      if (!clause) return;
+      if (clause.validate && !entityType.isAnonymous) {
+        clause.validate(entityType);
+      }
+      return clause.toODataFragment({ entityType: entityType});
+    }
+
+    function toQueryOptionsString(queryOptions) {
+      var qoStrings = [];
+      for (var qoName in queryOptions) {
+        var qoValue = queryOptions[qoName];
+        if (qoValue !== undefined) {
+          if (qoValue instanceof Array) {
+            qoValue.forEach(function (qov) {
+              qoStrings.push(qoName + "=" + encodeURIComponent(qov));
+            });
+          } else {
+            qoStrings.push(qoName + "=" + encodeURIComponent(qoValue));
+          }
+        }
+      }
+
+      if (qoStrings.length > 0) {
+        return "?" + qoStrings.join("&");
+      } else {
+        return "";
+      }
+    }
+
+  };
+
+
+  // toODataFragment visitor
+  Predicate.attachVisitor(function () {
+    var visitor = {
+      fnName: "toODataFragment",
+
+      passthruPredicate: function () {
+        return this.value;
+      },
+
+      unaryPredicate: function (config) {
+        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(config) + ")";
+      },
+
+      binaryPredicate: function (config) {
+        var v1Expr = this.expr1.toODataFragment(config);
+        var prefix = config.prefix;
+        if (prefix) {
+          v1Expr = prefix + "/" + v1Expr;
+        }
+
+        var v2Expr = this.expr2.toODataFragment(config);
+
+        var odataOp = odataOpFrom(this);
+
+        if (this.op.isFunction) {
+          if (odataOp == "substringof") {
+            return odataOp + "(" + v2Expr + "," + v1Expr + ") eq true";
+          } else {
+            return odataOp + "(" + v1Expr + "," + v2Expr + ") eq true";
+          }
+        } else {
+          return v1Expr + " " + odataOp + " " + v2Expr;
+        }
+      },
+
+      andOrPredicate: function (config) {
+        if (this.preds.length === 0) return;
+        var result = this.preds.map(function (pred) {
+          return "(" + pred.toODataFragment(config) + ")";
+        }).join(" " + odataOpFrom(this) + " ");
+        return result;
+      },
+
+      anyAllPredicate: function (config) {
+        var v1Expr = this.expr.toODataFragment(config);
+
+        var prefix = config.prefix;
+        if (prefix) {
+          v1Expr = prefix + "/" + v1Expr;
+          prefix = "x" + (parseInt(prefix.substring(1)) + 1);
+        } else {
+          prefix = "x1";
+        }
+        var newConfig = __extend({}, config);
+        newConfig.entityType = this.expr.dataType;
+        newConfig.prefix = prefix;
+        return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
+      },
+
+      litExpr: function () {
+        return this.dataType.fmtOData(this.value);
+      },
+
+      propExpr: function (config) {
+        var entityType = config.entityType;
+        return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
+      },
+
+      fnExpr: function (config) {
+        var frags = this.exprArgs.map(function (expr) {
+          return expr.toODataFragment(config);
+        });
+        return this.fnName + "(" + frags.join(",") + ")";
+      }
+    };
+
+    var _operatorMap = {
+      'contains': 'substringof'
+      // ops where op.key === odataOperator
+      // not
+      // eq, ne, gt, ge, lt, le,
+      // any, all, and, or
+      // startswith, endswith
+    }
+
+    function odataOpFrom(node) {
+      var op = node.op.key;
+      var odataOp = _operatorMap[op];
+      return odataOp || op;
+    }
+
+    return visitor;
+  }());
+
+  return {
+    buildUri: buildUri
+  };
+
+})();
+
 
 
 ;/**
@@ -14788,7 +14781,19 @@ var MappingContext = (function () {
     proto._$typeName = "MappingContext";
 
     proto.getUrl = function () {
-        return  this.dataService.makeUrl(this.metadataStore.toQueryString(this.query));
+        var query = this.query;
+        if (!query) {
+          throw new Error("query cannot be empty");
+        }
+        var uriString;
+        if (typeof query === 'string') {
+          uriString = query;
+        } else if (query instanceof EntityQuery) {
+          uriString = this.dataService.uriBuilder.buildUri(query, this.metadataStore);
+        } else {
+          throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
+        }
+        return  this.dataService.makeUrl(uriString);
     }
 
     proto.visitAndMerge = function (nodes, nodeContext) {

@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -205,8 +203,7 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
-﻿     
-var EntityQuery = (function () {
+﻿var EntityQuery = (function () {
     /**
     An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}}. 
 
@@ -1025,77 +1022,10 @@ var EntityQuery = (function () {
         return copy;
     }
 
-    proto._toUri = function (metadataStore) {
-        // force entityType validation;
-        var entityType = this._getFromEntityType(metadataStore, false);
-        if (!entityType) {
-            entityType = new EntityType(metadataStore);
-        }
-
-        var eq = this;
-        var queryOptions = {};
-        queryOptions[&quot;$filter&quot;] =  toODataFragment(eq.wherePredicate);
-        queryOptions[&quot;$orderby&quot;] = toODataFragment(eq.orderByClause);
-        queryOptions[&quot;$skip&quot;] = toSkipString();
-        queryOptions[&quot;$top&quot;] = toTopString();
-        queryOptions[&quot;$expand&quot;] = toODataFragment(eq.expandClause);
-        queryOptions[&quot;$select&quot;] =   toODataFragment(eq.selectClause);
-        queryOptions[&quot;$inlinecount&quot;] = toInlineCountString();
-            
-        var qoText = toQueryOptionsString(queryOptions);
-        return this.resourceName + qoText;
-
-        // private methods to this func.
-
-        function toODataFragment(clause) {
-          if (!clause) return;
-          if (clause.validate &amp;&amp; !entityType.isAnonymous) {
-            clause.validate(entityType);
-          }
-          return clause.toODataFragment( { entityType: entityType});
-        }
-
-        function toInlineCountString() {
-            if (!eq.inlineCountEnabled) return;
-            return eq.inlineCountEnabled ? &quot;allpages&quot; : &quot;none&quot;;
-        }
-
-        function toSkipString() {
-            var count = eq.skipCount;
-            if (!count) return;
-            return count.toString();
-        }
-
-        function toTopString() {
-            var count = eq.takeCount;
-            if (count==null) return;
-            return count.toString();
-        }
-
-        function toQueryOptionsString(queryOptions) {
-            var qoStrings = [];
-            for (var qoName in queryOptions) {
-                var qoValue = queryOptions[qoName];
-                if (qoValue !== undefined) {
-                    if (qoValue instanceof Array) {
-                        qoValue.forEach(function (qov) {
-                            qoStrings.push(qoName + &quot;=&quot; + encodeURIComponent(qov));
-                        });
-                    }  else {
-                        qoStrings.push(qoName + &quot;=&quot; + encodeURIComponent(qoValue));
-                    }
-                }
-            }
-
-            if (qoStrings.length &gt; 0) {
-                return &quot;?&quot; + qoStrings.join(&quot;&amp;&quot;);
-            } else {
-                return &quot;&quot;;
-            }
-        }
-
-
-    };
+    // for testing
+    proto._toUri = function (em) {
+      return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+    }
 
     // private functions
         
@@ -1171,7 +1101,6 @@ var EntityQuery = (function () {
     return ctor;
 })();
 
-   
 var FilterQueryOp = (function () {
     /**
     FilterQueryOp is an &#x27;Enum&#x27; containing all of the valid  {{#crossLink &quot;Predicate&quot;}}{{/crossLink}} 
@@ -1315,8 +1244,6 @@ var BooleanQueryOp = (function () {
     };
     return aEnum;
 }) ();
-
-
 // Not exposed externally for now
 var OrderByClause = (function () {
     /*
@@ -1468,7 +1395,7 @@ var SimpleOrderByClause = (function () {
                     value2 = (value2 || &quot;&quot;).toLowerCase();
                 } 
             } else {
-                var normalize = getComparableFn(dataType);
+                var normalize = DataType.getComparableFn(dataType);
                 value1 = normalize(value1);
                 value2 = normalize(value2);
             }
@@ -1614,18 +1541,7 @@ function getPropertyPathValue(obj, propertyPath) {
     }
 }
    
-function getComparableFn(dataType)  {
-    if (dataType &amp;&amp; dataType.isDate) {
-        // dates don&#x27;t perform equality comparisons properly 
-        return function (value) { return value &amp;&amp; value.getTime(); };
-    } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function(value) { return value &amp;&amp; __durationToSeconds(value); };
-    } else {
-        return function(value) { return value; };
-    }
-        
-}
+
 
 // expose
 breeze.FilterQueryOp = FilterQueryOp;

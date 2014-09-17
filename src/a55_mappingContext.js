@@ -25,7 +25,19 @@ var MappingContext = (function () {
     proto._$typeName = "MappingContext";
 
     proto.getUrl = function () {
-        return  this.dataService.makeUrl(this.metadataStore.toQueryString(this.query));
+        var query = this.query;
+        if (!query) {
+          throw new Error("query cannot be empty");
+        }
+        var uriString;
+        if (typeof query === 'string') {
+          uriString = query;
+        } else if (query instanceof EntityQuery) {
+          uriString = this.dataService.uriBuilder.buildUri(query, this.metadataStore);
+        } else {
+          throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
+        }
+        return  this.dataService.makeUrl(uriString);
     }
 
     proto.visitAndMerge = function (nodes, nodeContext) {

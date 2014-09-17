@@ -627,7 +627,7 @@
 
     function getBinaryPredicateFn(entityType, op, dataType) {
       var lqco = entityType.metadataStore.localQueryComparisonOptions;
-      var mc = getComparableFn(dataType);
+      var mc = DataType.getComparableFn(dataType);
       var predFn;
       switch (op.key) {
         case 'eq':
@@ -690,23 +690,7 @@
       return predFn;
     }
 
-    function getComparableFn(dataType) {
-      if (dataType && dataType.isDate) {
-        // dates don't perform equality comparisons properly
-        return function (value) {
-          return value && value.getTime();
-        };
-      } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function (value) {
-          return value && __durationToSeconds(value);
-        };
-      } else {
-        return function (value) {
-          return value;
-        };
-      }
-    }
+
 
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
@@ -751,99 +735,6 @@
     return visitor;
   }());
 
-  // toODataFragment visitor
-  Predicate.attachVisitor(function() {
-    var visitor = {
-      fnName: "toODataFragment",
-
-      passthruPredicate: function () {
-        return this.value;
-      },
-
-      unaryPredicate: function (config) {
-        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(config) + ")";
-      },
-
-      binaryPredicate: function (config) {
-        var v1Expr = this.expr1.toODataFragment(config);
-        var prefix = config.prefix;
-        if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
-        }
-
-        var v2Expr = this.expr2.toODataFragment(config);
-
-        var odataOp = odataOpFrom(this);
-
-        if (this.op.isFunction) {
-          if (odataOp == "substringof") {
-            return odataOp + "(" + v2Expr + "," + v1Expr + ") eq true";
-          } else {
-            return odataOp + "(" + v1Expr + "," + v2Expr + ") eq true";
-          }
-        } else {
-          return v1Expr + " " + odataOp + " " + v2Expr;
-        }
-      },
-
-      andOrPredicate: function (config) {
-        if (this.preds.length === 0) return;
-        var result = this.preds.map(function (pred) {
-          return "(" + pred.toODataFragment(config) + ")";
-        }).join(" " + odataOpFrom(this) + " ");
-        return result;
-      },
-
-      anyAllPredicate: function (config) {
-        var v1Expr = this.expr.toODataFragment(config);
-
-        var prefix = config.prefix;
-        if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
-          prefix = "x" + (parseInt(prefix.substring(1)) + 1);
-        } else {
-          prefix = "x1";
-        }
-        var newConfig = __extend({}, config);
-        newConfig.entityType = this.expr.dataType;
-        newConfig.prefix = prefix;
-        return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
-      },
-
-      litExpr:  function () {
-        return this.dataType.fmtOData(this.value);
-      },
-
-      propExpr:  function (config) {
-        var entityType = config.entityType;
-        return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
-      },
-
-      fnExpr: function (config) {
-        var frags = this.exprArgs.map(function (expr) {
-          return expr.toODataFragment(config);
-        });
-        return this.fnName + "(" + frags.join(",") + ")";
-      }
-    };
-
-    var _operatorMap = {
-      'contains': 'substringof'
-      // ops where op.key === odataOperator
-      // not
-      // eq, ne, gt, ge, lt, le,
-      // any, all, and, or
-      // startswith, endswith
-    }
-
-    function odataOpFrom(node) {
-      var op = node.op.key;
-      var odataOp = _operatorMap[op];
-      return odataOp || op;
-    }
-
-    return visitor;
-  }());
 
   // toJSON visitor
   Predicate.attachVisitor(function() {

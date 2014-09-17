@@ -35,7 +35,7 @@
         if (testFns.DEBUG_ODATA) {
             query = query.expand("customer");
         }
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             var results = data.results;
@@ -51,7 +51,7 @@
         var query = new EntityQuery()
             .from("Suppliers")
             .select(testFns.supplierKeyName + ", companyName, location");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             ok(!em.metadataStore.isEmpty(), "metadata should not be empty");
@@ -97,7 +97,7 @@
             .take(3)
             .using(jra);
         
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             var anons = data.results;
@@ -118,7 +118,7 @@
             .from("Customers")
             .where("companyName", "startsWith", "C")
             .select("companyName");
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             ok(!em.metadataStore.isEmpty(), "metadata should not be empty");
@@ -144,7 +144,7 @@
         if (testFns.DEBUG_ODATA) {
             query = query.expand("orders");
         }
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             ok(!em.metadataStore.isEmpty(), "metadata should not be empty");
@@ -178,7 +178,7 @@
         //if (testFns.DEBUG_ODATA) {
         //    query = query.expand("orders");
         //}        
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             ok(!em.metadataStore.isEmpty(), "metadata should not be empty");
@@ -217,7 +217,7 @@
             query = query.expand("customer");
         }
             
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function(data) {
             ok(!em.metadataStore.isEmpty(), "metadata should not be empty");

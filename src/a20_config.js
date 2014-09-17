@@ -33,6 +33,7 @@ var __config = (function () {
         ajax: new InterfaceDef("ajax"),
         modelLibrary: new InterfaceDef("modelLibrary"),
         dataService: new InterfaceDef("dataService")
+        // uriBuilder: new InterfaceDef("uriBuilder")
     };
 
     __config.interfaceRegistry.modelLibrary.getDefaultInstance = function() {
@@ -134,6 +135,7 @@ var __config = (function () {
             .whereParam("dataService").isOptional()
             .whereParam("modelLibrary").isOptional()
             .whereParam("ajax").isOptional()
+            // .whereParam("uriBuilder").isOptional()
             .applyAll(this, false);
         return __objectMapToArray(config, __config.initializeAdapterInstance);
 
@@ -200,6 +202,10 @@ var __config = (function () {
         assertParam(fnName, "fnName").isString().check();
         fn.prototype._$fnName = fnName;
         __config.functionRegistry[fnName] = fn;
+    };
+
+    __config.getRegisteredFunction = function(fnName) {
+      return __config.functionRegistry[fnName];
     };
 
     __config._storeObject = function(obj, type, name) {

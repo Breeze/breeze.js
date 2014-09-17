@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -382,6 +380,7 @@ var DataType = (function () {
         return &quot;binary&#x27;&quot; + val + &quot;&#x27;&quot;;
     };
 
+    // TODO: __identity;
     var fmtUndefined = function (val) {
         return val;
     };
@@ -536,6 +535,25 @@ var DataType = (function () {
     **/
     DataType.Undefined = DataType.addSymbol({ defaultValue: undefined , fmtOData: fmtUndefined});
     DataType.resolveSymbols();
+
+    DataType.getComparableFn = function(dataType) {
+      if (dataType &amp;&amp; dataType.isDate) {
+        // dates don&#x27;t perform equality comparisons properly
+        return function (value) {
+          return value &amp;&amp; value.getTime();
+        };
+      } else if (dataType === DataType.Time) {
+        // durations must be converted to compare them
+        return function (value) {
+          return value &amp;&amp; __durationToSeconds(value);
+        };
+      } else {
+        // TODO: __identity
+        return function (value) {
+          return value;
+        };
+      }
+    };
 
     /**
     Returns the DataType for a specified EDM type name.

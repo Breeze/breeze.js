@@ -91,7 +91,7 @@
          .from("Suppliers")
          .take(3)
          .noTracking();
-        var queryUrl = query._toUri(em.metadataStore);
+        var queryUrl = query._toUri(em);
         stop();
         em.executeQuery(query).then(function (data) {
             var suppliers = data.results;

@@ -1,5 +1,4 @@
-﻿     
-var EntityQuery = (function () {
+﻿var EntityQuery = (function () {
     /**
     An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink "EntityManager"}}{{/crossLink}}. 
 
@@ -818,77 +817,10 @@ var EntityQuery = (function () {
         return copy;
     }
 
-    proto._toUri = function (metadataStore) {
-        // force entityType validation;
-        var entityType = this._getFromEntityType(metadataStore, false);
-        if (!entityType) {
-            entityType = new EntityType(metadataStore);
-        }
-
-        var eq = this;
-        var queryOptions = {};
-        queryOptions["$filter"] =  toODataFragment(eq.wherePredicate);
-        queryOptions["$orderby"] = toODataFragment(eq.orderByClause);
-        queryOptions["$skip"] = toSkipString();
-        queryOptions["$top"] = toTopString();
-        queryOptions["$expand"] = toODataFragment(eq.expandClause);
-        queryOptions["$select"] =   toODataFragment(eq.selectClause);
-        queryOptions["$inlinecount"] = toInlineCountString();
-            
-        var qoText = toQueryOptionsString(queryOptions);
-        return this.resourceName + qoText;
-
-        // private methods to this func.
-
-        function toODataFragment(clause) {
-          if (!clause) return;
-          if (clause.validate && !entityType.isAnonymous) {
-            clause.validate(entityType);
-          }
-          return clause.toODataFragment( { entityType: entityType});
-        }
-
-        function toInlineCountString() {
-            if (!eq.inlineCountEnabled) return;
-            return eq.inlineCountEnabled ? "allpages" : "none";
-        }
-
-        function toSkipString() {
-            var count = eq.skipCount;
-            if (!count) return;
-            return count.toString();
-        }
-
-        function toTopString() {
-            var count = eq.takeCount;
-            if (count==null) return;
-            return count.toString();
-        }
-
-        function toQueryOptionsString(queryOptions) {
-            var qoStrings = [];
-            for (var qoName in queryOptions) {
-                var qoValue = queryOptions[qoName];
-                if (qoValue !== undefined) {
-                    if (qoValue instanceof Array) {
-                        qoValue.forEach(function (qov) {
-                            qoStrings.push(qoName + "=" + encodeURIComponent(qov));
-                        });
-                    }  else {
-                        qoStrings.push(qoName + "=" + encodeURIComponent(qoValue));
-                    }
-                }
-            }
-
-            if (qoStrings.length > 0) {
-                return "?" + qoStrings.join("&");
-            } else {
-                return "";
-            }
-        }
-
-
-    };
+    // for testing
+    proto._toUri = function (em) {
+      return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+    }
 
     // private functions
         
@@ -964,7 +896,6 @@ var EntityQuery = (function () {
     return ctor;
 })();
 
-   
 var FilterQueryOp = (function () {
     /**
     FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink "Predicate"}}{{/crossLink}} 
@@ -1108,8 +1039,6 @@ var BooleanQueryOp = (function () {
     };
     return aEnum;
 }) ();
-
-
 // Not exposed externally for now
 var OrderByClause = (function () {
     /*
@@ -1261,7 +1190,7 @@ var SimpleOrderByClause = (function () {
                     value2 = (value2 || "").toLowerCase();
                 } 
             } else {
-                var normalize = getComparableFn(dataType);
+                var normalize = DataType.getComparableFn(dataType);
                 value1 = normalize(value1);
                 value2 = normalize(value2);
             }
@@ -1407,18 +1336,7 @@ function getPropertyPathValue(obj, propertyPath) {
     }
 }
    
-function getComparableFn(dataType)  {
-    if (dataType && dataType.isDate) {
-        // dates don't perform equality comparisons properly 
-        return function (value) { return value && value.getTime(); };
-    } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function(value) { return value && __durationToSeconds(value); };
-    } else {
-        return function(value) { return value; };
-    }
-        
-}
+
 
 // expose
 breeze.FilterQueryOp = FilterQueryOp;

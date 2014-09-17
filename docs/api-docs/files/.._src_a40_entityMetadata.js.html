@@ -134,8 +134,6 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
-                <li><a href="../classes/Predicate.html">Predicate</a></li>
-            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -699,20 +697,7 @@ var MetadataStore = (function () {
         }
         
     };
-    
-    proto.toQueryString = function(query) {
-        if (!query) {
-            throw new Error(&quot;query cannot be empty&quot;);
-        }
-        if (typeof query === &#x27;string&#x27;) {
-            return query;
-        } else if (query instanceof EntityQuery) {
-            return query._toUri(this);
-        } else {
-            throw new Error(&quot;unable to recognize query parameter as either a string or an EntityQuery&quot;);
-        }
-    };
-             
+
     /**
     Returns whether this MetadataStore contains any metadata yet.
     @example
