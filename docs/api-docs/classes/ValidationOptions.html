@@ -485,9 +485,9 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var newVo = new ValidationOptions( { validateOnSave: false, validateOnAttach: false });
+                <p>var newVo = new ValidationOptions( { validateOnSave: false, validateOnAttach: false });
 // assume em1 is a preexisting EntityManager
-em1.setProperties( { validationOptions: newVo });</code></pre>
+em1.setProperties( { validationOptions: newVo });</p>
 
             </div>
         </div>
@@ -540,7 +540,7 @@ em1.setProperties( { validationOptions: newVo });</code></pre>
     </div>
 
     <div class="description">
-        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance. 
+        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance.
 The current instance is returned unchanged.</p>
 
     </div>
@@ -554,9 +554,9 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var validationOptions = new ValidationOptions()
+                <p>var validationOptions = new ValidationOptions()
 var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
-var newOptions.setAsDefault();</code></pre>
+var newOptions.setAsDefault();</p>
 
             </div>
         </div>
@@ -732,8 +732,8 @@ var newOptions.setAsDefault();</code></pre>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var validationOptions = new ValidationOptions();
-var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );</code></pre>
+                <p>var validationOptions = new ValidationOptions();
+var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );</p>
 
             </div>
         </div>

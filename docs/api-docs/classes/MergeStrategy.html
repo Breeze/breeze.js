@@ -342,7 +342,8 @@
     </div>
 
     <div class="description">
-        <p>Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.<br>Use this strategy when you want to be sure that the incoming entity is not already in cache. 
+        <p>Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.
+Use this strategy when you want to be sure that the incoming entity is not already in cache.
 This is the default strategy for EntityManager.attachEntity.</p>
 
     </div>
@@ -393,8 +394,8 @@ This is the default strategy for EntityManager.attachEntity.</p>
 
     <div class="description">
         <p>MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
-a changed state (added, modified, deleted). After the merge, the pending changes are lost. 
-The new EntityState will be  EntityState/Unchanged unless you’re importing entities 
+a changed state (added, modified, deleted). After the merge, the pending changes are lost.
+The new EntityState will be  EntityState/Unchanged unless you’re importing entities
 in which case the new EntityState will be that of the imported entities.</p>
 
     </div>
@@ -444,9 +445,9 @@ in which case the new EntityState will be that of the imported entities.</p>
     </div>
 
     <div class="description">
-        <p>MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed 
+        <p>MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed
 state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
-remain EntityState/Unchanged unless you’re importing entities in which case the new EntityState will 
+remain EntityState/Unchanged unless you’re importing entities in which case the new EntityState will
 be that of the imported entities.</p>
 
     </div>
@@ -496,7 +497,7 @@ be that of the imported entities.</p>
     </div>
 
     <div class="description">
-        <p>SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key. 
+        <p>SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key.
 This is the fastest merge strategy but your existing cached data will remain “stale”.</p>
 
     </div>

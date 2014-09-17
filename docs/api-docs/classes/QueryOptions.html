@@ -465,13 +465,13 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+                <p>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
 // assume em1 is a preexisting EntityManager
-em1.setProperties( { queryOptions: newQo });</code></pre>
-<p>Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e. </p>
+em1.setProperties( { queryOptions: newQo });</p>
+<p>Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e.</p>
 <ul>
-<li>from query.queryOptions </li>
-<li>to   entityManager.queryOptions </li>
+<li>from query.queryOptions</li>
+<li>to   entityManager.queryOptions</li>
 <li>to   QueryOptions.defaultInstance;</li>
 </ul>
 
@@ -526,7 +526,7 @@ em1.setProperties( { queryOptions: newQo });</code></pre>
     </div>
 
     <div class="description">
-        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance. 
+        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance.
 The current instance is returned unchanged.</p>
 
     </div>
@@ -540,8 +540,8 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-newQo.setAsDefault();</code></pre>
+                <p>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+newQo.setAsDefault();</p>
 
             </div>
         </div>
@@ -608,7 +608,7 @@ newQo.setAsDefault();</code></pre>
     </div>
 
     <div class="description">
-        <p>Returns a copy of this QueryOptions with the specified <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a>, 
+        <p>Returns a copy of this QueryOptions with the specified <a href="../classes/MergeStrategy.html" class="crosslink">MergeStrategy</a>,
 <a href="../classes/FetchStrategy.html" class="crosslink">FetchStrategy</a>, or &#39;includeDeleted&#39; option applied.</p>
 
     </div>
@@ -658,17 +658,17 @@ newQo.setAsDefault();</code></pre>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// Given an EntityManager instance, em
-var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code></pre>
-<p>or</p>
-<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);</code></pre>
-<p>or</p>
-<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });</code></pre>
-<p>or</p>
-<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({ 
-        includeDeleted: true,
-        fetchStrategy:  FetchStrategy.FromLocalCache 
-    });</code></pre>
+                <p>// Given an EntityManager instance, em
+var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
+or</p>
+<p>var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
+or</p>
+<p>var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+or</p>
+<p>var queryOptions = em.queryOptions.using({
+             includeDeleted: true,
+             fetchStrategy:  FetchStrategy.FromLocalCache 
+         });</p>
 
             </div>
         </div>

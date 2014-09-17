@@ -56,14 +56,14 @@
           throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
         }
         // add function to the Predicate or Expr node.
-        var fn = wrapValidation( visitor[key]);
+        var fn = wrapValidation(visitor[key]);
         proto[fnName] = fn;
       });
     };
 
     var _nodeMap = {};
 
-    ctor._registerProto = function(name, proto, validateFn) {
+    ctor._registerProto = function (name, proto, validateFn) {
       _nodeMap[name.toLowerCase()] = proto;
       // perf improvement so that we don't keep revalidating
       proto.validate = validateFn ? cacheValidation(validateFn) : __noop;
@@ -85,9 +85,9 @@
       return new UnaryPredicate("not", this);
     };
 
-    proto.toString = function() {
+    proto.toString = function () {
       // this._entityType may be null
-      return JSON.stringify(this.toJSON( {entityType: this._entityType }));
+      return JSON.stringify(this.toJSON({entityType: this._entityType }));
     };
 
     proto._initialize = function (name, validateFn, map) {
@@ -202,7 +202,7 @@
     }
 
     function cacheValidation(fn) {
-      return function(entityType) {
+      return function (entityType) {
         // don't both rerunning the validation if its already been run for this entityType
         // but always run it for a null or undefined type
         if (entityType && this._entityType === entityType) return;
@@ -379,7 +379,7 @@
       if (DataType.contains(dataType)) {
         return dataType;
       }
-      if ( __isString(dataType)) {
+      if (__isString(dataType)) {
         var dt = DataType.fromName(dataType);
         if (dt) return dt;
         throw new Error("Unable to resolve a dataType named: " + dataType);
@@ -504,7 +504,7 @@
   })();
 
   // toFunction visitor
-  Predicate.attachVisitor(function() {
+  Predicate.attachVisitor(function () {
     var visitor = {
       fnName: "toFunction",
 
@@ -593,7 +593,7 @@
         }
       },
 
-      fnExpr:  function (config) {
+      fnExpr: function (config) {
         var that = this;
         return function (entity) {
           var values = that.exprArgs.map(function (expr) {
@@ -691,7 +691,6 @@
     }
 
 
-
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
       if (typeof b !== 'string') {
@@ -737,7 +736,7 @@
 
 
   // toJSON visitor
-  Predicate.attachVisitor(function() {
+  Predicate.attachVisitor(function () {
     var visitor = {
       fnName: "toJSON",
 
@@ -829,7 +828,6 @@
   }());
 
 
-
   var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
   // comma delimited expressions ignoring commas inside of both single and double quotes.
   var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
@@ -857,7 +855,7 @@
 
     // TODO: get rid of isAnonymous below when we get the chance.
     if (is2ndExpr && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source )
+      return new LitExpr(source)
     }
 
     var regex = /\([^()]*\)/;

@@ -223,8 +223,8 @@
 
 
 <div class="box intro">
-    <p>A NamingConvention instance is used to specify the naming conventions under which a MetadataStore 
-will translate property names between the server and the javascript client. </p>
+    <p>A NamingConvention instance is used to specify the naming conventions under which a MetadataStore
+will translate property names between the server and the javascript client.</p>
 <p>The default NamingConvention does not perform any translation, it simply passes property names thru unchanged.</p>
 
 </div>
@@ -455,17 +455,16 @@ will translate property names between the server and the javascript client. </p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// A naming convention that converts the first character of every property name to uppercase on the server
+                <p>// A naming convention that converts the first character of every property name to uppercase on the server
 // and lowercase on the client.
 var namingConv = new NamingConvention({
-    serverPropertyNameToClient: function(serverPropertyName) {
-        return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-    },
-    clientPropertyNameToServer: function(clientPropertyName) {
-        return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-    }            
-});</code></pre>
-<p>var ms = new MetadataStore({ namingConvention: namingConv });
+         serverPropertyNameToClient: function(serverPropertyName) {
+             return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+         },
+         clientPropertyNameToServer: function(clientPropertyName) {
+             return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+         }<br>     });
+var ms = new MetadataStore({ namingConvention: namingConv });
 var em = new EntityManager( { metadataStore: ms });</p>
 
             </div>
@@ -777,7 +776,7 @@ var em = new EntityManager( { metadataStore: ms });</p>
     </div>
 
     <div class="description">
-        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance. 
+        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance.
 The current instance is returned unchanged.</p>
 
     </div>
@@ -791,15 +790,14 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var namingConv = new NamingConvention({
-    serverPropertyNameToClient: function(serverPropertyName) {
-        return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-    },
-    clientPropertyNameToServer: function(clientPropertyName) {
-        return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-    }            
-});
-namingConv.setAsDefault();</code></pre>
+                <p>var namingConv = new NamingConvention({
+         serverPropertyNameToClient: function(serverPropertyName) {
+             return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+         },
+         clientPropertyNameToServer: function(clientPropertyName) {
+             return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+         }<br>     });
+namingConv.setAsDefault();</p>
 
             </div>
         </div>

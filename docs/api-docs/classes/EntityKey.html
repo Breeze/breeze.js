@@ -426,17 +426,17 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+                <p>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
-var entityKey = new EntityKey(empType, 1);</code></pre>
-<p>EntityKey&#39;s may also be found by calling EntityAspect.getKey()</p>
-<pre class="code prettyprint"><code>// assume employee1 is an existing Employee entity
-var empKey = employee1.entityAspect.getKey();</code></pre>
-<p>Multipart keys are created by passing an array as the &#39;keyValues&#39; parameter</p>
-<pre class="code prettyprint"><code>var empTerrType = em1.metadataStore.getEntityType(&quot;EmployeeTerritory&quot;);            
+var entityKey = new EntityKey(empType, 1);
+EntityKey&#39;s may also be found by calling EntityAspect.getKey()</p>
+<p>// assume employee1 is an existing Employee entity
+var empKey = employee1.entityAspect.getKey();
+Multipart keys are created by passing an array as the &#39;keyValues&#39; parameter</p>
+<p>var empTerrType = em1.metadataStore.getEntityType(&quot;EmployeeTerritory&quot;);
 var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
-// The order of the properties in the &#39;keyValues&#39; array must be the same as that 
-// returned by empTerrType.keyProperties</code></pre>
+// The order of the properties in the &#39;keyValues&#39; array must be the same as that
+// returned by empTerrType.keyProperties</p>
 
             </div>
         </div>
@@ -486,7 +486,7 @@ var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
             
         
         
-        <a href="../files/.._src_a30_entityKey.js.html#l88"><code>..\src\a30_entityKey.js:88</code></a>
+        <a href="../files/.._src_a30_entityKey.js.html#l90"><code>..\src\a30_entityKey.js:90</code></a>
         
         </p>
 
@@ -534,14 +534,14 @@ There is also an static version of &#39;equals&#39; with the same functionality.
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+                <p>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
 var empKey1 = new EntityKey(empType, 1);
 // assume employee1 is an existing Employee entity
 var empKey2 = employee1.entityAspect.getKey();
 if (empKey1.equals(empKey2)) {
-    // do something  ...
-}</code></pre>
+         // do something  ...
+     }</p>
 
             </div>
         </div>
@@ -599,7 +599,7 @@ if (empKey1.equals(empKey2)) {
             
         
         
-        <a href="../files/.._src_a30_entityKey.js.html#l117"><code>..\src\a30_entityKey.js:117</code></a>
+        <a href="../files/.._src_a30_entityKey.js.html#l119"><code>..\src\a30_entityKey.js:119</code></a>
         
         </p>
 
@@ -610,7 +610,7 @@ if (empKey1.equals(empKey2)) {
     </div>
 
     <div class="description">
-        <p>Used to compare EntityKeys are determine if they refer to the same Entity. 
+        <p>Used to compare EntityKeys are determine if they refer to the same Entity.
 There is also an instance version of &#39;equals&#39; with the same functionality.</p>
 
     </div>
@@ -662,14 +662,14 @@ There is also an instance version of &#39;equals&#39; with the same functionalit
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+                <p>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
 var empKey1 = new EntityKey(empType, 1);
 // assume employee1 is an existing Employee entity
 var empKey2 = employee1.entityAspect.getKey();
 if (EntityKey.equals(empKey1, empKey2)) {
-    // do something  ...
-}</code></pre>
+         // do something  ...
+     }</p>
 
             </div>
         </div>
@@ -708,7 +708,7 @@ if (EntityKey.equals(empKey1, empKey2)) {
             
         
         
-        <a href="../files/.._src_a30_entityKey.js.html#l62"><code>..\src\a30_entityKey.js:62</code></a>
+        <a href="../files/.._src_a30_entityKey.js.html#l64"><code>..\src\a30_entityKey.js:64</code></a>
         
         </p>
 
@@ -718,7 +718,7 @@ if (EntityKey.equals(empKey1, empKey2)) {
     </div>
 
     <div class="description">
-        <p>The &#39;EntityType&#39; that this is a key for. </p>
+        <p>The &#39;EntityType&#39; that this is a key for.</p>
 <p><strong>readOnly</strong></p>
 
     </div>
@@ -754,7 +754,7 @@ if (EntityKey.equals(empKey1, empKey2)) {
             
         
         
-        <a href="../files/.._src_a30_entityKey.js.html#l69"><code>..\src\a30_entityKey.js:69</code></a>
+        <a href="../files/.._src_a30_entityKey.js.html#l71"><code>..\src\a30_entityKey.js:71</code></a>
         
         </p>
 

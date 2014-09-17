@@ -207,7 +207,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._src_a30_relationArray.js.html#l6"><code>..\src\a30_relationArray.js:6</code></a>
+            Defined in: <a href="../files/.._src_a30_relationArray.js.html#l5"><code>..\src\a30_relationArray.js:5</code></a>
         </div>
     
 
@@ -223,7 +223,7 @@
 
 
 <div class="box intro">
-    <p>Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of 
+    <p>Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of
 entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
 This collection looks like an array in that the basic methods on arrays such as &#39;push&#39;, &#39;pop&#39;, &#39;shift&#39;, &#39;unshift&#39;, &#39;splice&#39;
 are all provided as well as several special purpose methods.</p>
@@ -346,7 +346,7 @@ are all provided as well as several special purpose methods.</p>
             
         
         
-        <a href="../files/.._src_a30_relationArray.js.html#l33"><code>..\src\a30_relationArray.js:33</code></a>
+        <a href="../files/.._src_a30_relationArray.js.html#l32"><code>..\src\a30_relationArray.js:32</code></a>
         
         </p>
 
@@ -422,9 +422,9 @@ are all provided as well as several special purpose methods.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume orders is an empty, as yet unpopulated, relation array of orders
+                <p>// assume orders is an empty, as yet unpopulated, relation array of orders
 // associated with a specific customer.
-orders.load().then(...)</code></pre>
+orders.load().then(...)</p>
 
             </div>
         </div>
@@ -467,7 +467,7 @@ orders.load().then(...)</code></pre>
             
         
         
-        <a href="../files/.._src_a30_relationArray.js.html#l14"><code>..\src\a30_relationArray.js:14</code></a>
+        <a href="../files/.._src_a30_relationArray.js.html#l13"><code>..\src\a30_relationArray.js:13</code></a>
         
         </p>
 
@@ -532,12 +532,12 @@ collections are collected into a single notification event for each relation arr
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+                <p>// assume order is an order entity attached to an EntityManager.
 orders.arrayChanged.subscribe(
-    function (arrayChangedArgs) {
-        var addedEntities = arrayChangedArgs.added;
-        var removedEntities = arrayChanged.removed;
-    });</code></pre>
+function (arrayChangedArgs) {
+             var addedEntities = arrayChangedArgs.added;
+             var removedEntities = arrayChanged.removed;
+         });</p>
 
             </div>
         </div>

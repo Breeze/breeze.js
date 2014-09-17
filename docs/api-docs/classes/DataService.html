@@ -223,13 +223,13 @@
 
 
 <div class="box intro">
-    <p>A DataService instance is used to encapsulate the details of a single &#39;service&#39;; this includes a serviceName, a dataService adapterInstance, 
-and whether the service has server side metadata.  </p>
-<p>You can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService 
+    <p>A DataService instance is used to encapsulate the details of a single &#39;service&#39;; this includes a serviceName, a dataService adapterInstance,
+and whether the service has server side metadata.</p>
+<p>You can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService
 is constructed for you.  (It can also be set via the EntityManager.setProperties method).</p>
 <p>The same applies to the MetadataStore.fetchMetadata method, i.e. it takes either a serviceName or a DataService instance.</p>
-<p>Each metadataStore contains a list of DataServices, each accessible via its ‘serviceName’. 
-( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally 
+<p>Each metadataStore contains a list of DataServices, each accessible via its ‘serviceName’.
+( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally
 anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or service name).</p>
 
 </div>
@@ -507,20 +507,18 @@ anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or se
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// 
+                <p>//
 var dataService = new DataService({
-    serviceName: altServiceName,
-    hasServerMetadata: false
-});
-
-var metadataStore = new MetadataStore({
-    namingConvention: NamingConvention.camelCase
-});
-
-return new EntityManager({
-    dataService: dataService,
-    metadataStore: metadataStore
-});</code></pre>
+         serviceName: altServiceName,
+         hasServerMetadata: false
+     });</p>
+<p>var metadataStore = new MetadataStore({
+         namingConvention: NamingConvention.camelCase
+     });</p>
+<p>return new EntityManager({
+         dataService: dataService,
+         metadataStore: metadataStore
+     });</p>
 
             </div>
         </div>

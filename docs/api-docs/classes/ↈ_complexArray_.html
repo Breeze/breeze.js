@@ -207,7 +207,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._src_a30_complexArray.js.html#l14"><code>..\src\a30_complexArray.js:14</code></a>
+            Defined in: <a href="../files/.._src_a30_complexArray.js.html#l13"><code>..\src\a30_complexArray.js:13</code></a>
         </div>
     
 
@@ -223,7 +223,7 @@
 
 
 <div class="box intro">
-    <p>Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of 
+    <p>Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of
 complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
 This collection looks like an array in that the basic methods on arrays such as &#39;push&#39;, &#39;pop&#39;, &#39;shift&#39;, &#39;unshift&#39;, &#39;splice&#39;
 are all provided as well as several special purpose methods.</p>
@@ -306,7 +306,7 @@ are all provided as well as several special purpose methods.</p>
             
         
         
-        <a href="../files/.._src_a30_complexArray.js.html#l22"><code>..\src\a30_complexArray.js:22</code></a>
+        <a href="../files/.._src_a30_complexArray.js.html#l21"><code>..\src\a30_complexArray.js:21</code></a>
         
         </p>
 
@@ -371,12 +371,12 @@ collections are collected into a single notification event for each relation arr
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+                <p>// assume order is an order entity attached to an EntityManager.
 orders.arrayChanged.subscribe(
-    function (arrayChangedArgs) {
-        var addedEntities = arrayChangedArgs.added;
-        var removedEntities = arrayChanged.removed;
-    });</code></pre>
+function (arrayChangedArgs) {
+             var addedEntities = arrayChangedArgs.added;
+             var removedEntities = arrayChanged.removed;
+         });</p>
 
             </div>
         </div>

@@ -1987,8 +1987,6 @@ var EntityType = (function () {
   };
 
 
-
-
 //  proto.getProperty = function (propertyPath, throwIfNotFound) {
 //    throwIfNotFound = throwIfNotFound || false;
 //    var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split(&#x27;.&#x27;);
@@ -2181,7 +2179,7 @@ var EntityType = (function () {
       var prop = __arrayFirst(parentType.getProperties(), __propEq(&quot;name&quot;, propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
-      } else  if (throwIfNotFound) {
+      } else if (throwIfNotFound) {
         throw new Error(&quot;unable to locate property: &quot; + propName + &quot; on entityType: &quot; + parentType.name);
       } else {
         ok = false;

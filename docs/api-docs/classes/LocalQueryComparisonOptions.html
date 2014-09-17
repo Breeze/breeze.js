@@ -223,8 +223,8 @@
 
 
 <div class="box intro">
-    <p>A LocalQueryComparisonOptions instance is used to specify the &quot;comparison rules&quot; used when performing &quot;local queries&quot; in order 
-to match the semantics of these same queries when executed against a remote service.  These options should be set based on the 
+    <p>A LocalQueryComparisonOptions instance is used to specify the &quot;comparison rules&quot; used when performing &quot;local queries&quot; in order
+to match the semantics of these same queries when executed against a remote service.  These options should be set based on the
 manner in which your remote service interprets certain comparison operations.</p>
 <p>The default LocalQueryComparisonOptions stipulates &#39;caseInsensitive&quot; queries with ANSI SQL rules regarding comparisons of unequal
 length strings.</p>
@@ -428,9 +428,9 @@ length strings.</p>
                                 
 
                                 <div class="param-description">
-                                    <p>Whether of not to enforce the ANSI SQL standard 
-    of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and 
-    inequality predicates, and not with operations like &#39;startsWith&#39;, &#39;endsWith&#39; or &#39;contains&#39;.  Default is true.</p>
+                                    <p>Whether of not to enforce the ANSI SQL standard
+of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and
+inequality predicates, and not with operations like &#39;startsWith&#39;, &#39;endsWith&#39; or &#39;contains&#39;.  Default is true.</p>
 
                                 </div>
 
@@ -452,17 +452,17 @@ length strings.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// create a &#39;caseSensitive - non SQL&#39; instance.
+                <p>// create a &#39;caseSensitive - non SQL&#39; instance.
 var lqco = new LocalQueryComparisonOptions({
-    name: &quot;caseSensitive-nonSQL&quot;
-    isCaseSensitive: true;
-    usesSql92CompliantStringComparison: false;
-});
+         name: &quot;caseSensitive-nonSQL&quot;
+         isCaseSensitive: true;
+         usesSql92CompliantStringComparison: false;
+     });
 // either apply it globally
 lqco.setAsDefault();
 // or to a specific MetadataStore
 var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
-var em = new EntityManager( { metadataStore: ms });</code></pre>
+var em = new EntityManager( { metadataStore: ms });</p>
 
             </div>
         </div>
@@ -515,7 +515,7 @@ var em = new EntityManager( { metadataStore: ms });</code></pre>
     </div>
 
     <div class="description">
-        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance. 
+        <p>Sets the &#39;defaultInstance&#39; by creating a copy of the current &#39;defaultInstance&#39; and then applying all of the properties of the current instance.
 The current instance is returned unchanged.</p>
 
     </div>
@@ -529,11 +529,11 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>var lqco = new LocalQueryComparisonOptions({
-    isCaseSensitive: false;
-    usesSql92CompliantStringComparison: true;
-});
-lqco.setAsDefault();</code></pre>
+                <p>var lqco = new LocalQueryComparisonOptions({
+         isCaseSensitive: false;
+         usesSql92CompliantStringComparison: true;
+     });
+lqco.setAsDefault();</p>
 
             </div>
         </div>

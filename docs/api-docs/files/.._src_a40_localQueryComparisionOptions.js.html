@@ -204,99 +204,99 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var LocalQueryComparisonOptions = (function () {
 
-    /**
-    A LocalQueryComparisonOptions instance is used to specify the &quot;comparison rules&quot; used when performing &quot;local queries&quot; in order 
-    to match the semantics of these same queries when executed against a remote service.  These options should be set based on the 
-    manner in which your remote service interprets certain comparison operations.
-    
-    The default LocalQueryComparisonOptions stipulates &#x27;caseInsensitive&quot; queries with ANSI SQL rules regarding comparisons of unequal
-    length strings. 
-    
-    @class LocalQueryComparisonOptions
-    **/
+  /**
+   A LocalQueryComparisonOptions instance is used to specify the &quot;comparison rules&quot; used when performing &quot;local queries&quot; in order
+   to match the semantics of these same queries when executed against a remote service.  These options should be set based on the
+   manner in which your remote service interprets certain comparison operations.
 
-    /**
-    LocalQueryComparisonOptions constructor
-    @example
-        // create a &#x27;caseSensitive - non SQL&#x27; instance.
-        var lqco = new LocalQueryComparisonOptions({
+   The default LocalQueryComparisonOptions stipulates &#x27;caseInsensitive&quot; queries with ANSI SQL rules regarding comparisons of unequal
+   length strings.
+
+   @class LocalQueryComparisonOptions
+   **/
+
+  /**
+   LocalQueryComparisonOptions constructor
+   @example
+   // create a &#x27;caseSensitive - non SQL&#x27; instance.
+   var lqco = new LocalQueryComparisonOptions({
             name: &quot;caseSensitive-nonSQL&quot;
             isCaseSensitive: true;
             usesSql92CompliantStringComparison: false;
         });
-        // either apply it globally
-        lqco.setAsDefault();
-        // or to a specific MetadataStore
-        var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
-        var em = new EntityManager( { metadataStore: ms });
-    
-    @method &lt;ctor&gt; LocalQueryComparisonOptions
-    @param config {Object}
-    @param [config.name] {String}
-    @param [config.isCaseSensitive] {Boolean} Whether predicates that involve strings will be interpreted in a &quot;caseSensitive&quot; manner. Default is &#x27;false&#x27;
-    @param [config.usesSql92CompliantStringComparison] {Boolean} Whether of not to enforce the ANSI SQL standard 
-        of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and 
-        inequality predicates, and not with operations like &#x27;startsWith&#x27;, &#x27;endsWith&#x27; or &#x27;contains&#x27;.  Default is true.
-    **/
+   // either apply it globally
+   lqco.setAsDefault();
+   // or to a specific MetadataStore
+   var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
+   var em = new EntityManager( { metadataStore: ms });
 
-    var ctor = function (config) {
-        assertConfig(config || {})
-            .whereParam(&quot;name&quot;).isOptional().isString()
-            .whereParam(&quot;isCaseSensitive&quot;).isOptional().isBoolean()
-            .whereParam(&quot;usesSql92CompliantStringComparison&quot;).isBoolean()
-            .applyAll(this);
-        if (!this.name) {
-            this.name = __getUuid();
-        }
-        __config._storeObject(this, proto._$typeName, this.name);
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = &quot;LocalQueryComparisonOptions&quot;;
-        
-    // 
-    /**
-    Case insensitive SQL compliant options - this is also the default unless otherwise changed.
-    @property caseInsensitiveSQL {LocalQueryComparisonOptions}
-    @static
-    **/
-    ctor.caseInsensitiveSQL = new ctor({
-        name: &quot;caseInsensitiveSQL&quot;,
-        isCaseSensitive: false,
-        usesSql92CompliantStringComparison: true
-    });
+   @method &lt;ctor&gt; LocalQueryComparisonOptions
+   @param config {Object}
+   @param [config.name] {String}
+   @param [config.isCaseSensitive] {Boolean} Whether predicates that involve strings will be interpreted in a &quot;caseSensitive&quot; manner. Default is &#x27;false&#x27;
+   @param [config.usesSql92CompliantStringComparison] {Boolean} Whether of not to enforce the ANSI SQL standard
+   of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and
+   inequality predicates, and not with operations like &#x27;startsWith&#x27;, &#x27;endsWith&#x27; or &#x27;contains&#x27;.  Default is true.
+   **/
 
-    /**
-    The default value whenever LocalQueryComparisonOptions are not specified. By default this is &#x27;caseInsensitiveSQL&#x27;.
-    @property defaultInstance {LocalQueryComparisonOptions}
-    @static
-    **/
-    ctor.defaultInstance = new ctor(ctor.caseInsensitiveSQL);
+  var ctor = function (config) {
+    assertConfig(config || {})
+        .whereParam(&quot;name&quot;).isOptional().isString()
+        .whereParam(&quot;isCaseSensitive&quot;).isOptional().isBoolean()
+        .whereParam(&quot;usesSql92CompliantStringComparison&quot;).isBoolean()
+        .applyAll(this);
+    if (!this.name) {
+      this.name = __getUuid();
+    }
+    __config._storeObject(this, proto._$typeName, this.name);
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = &quot;LocalQueryComparisonOptions&quot;;
 
-    /**
-    Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @example
-        var lqco = new LocalQueryComparisonOptions({
+  //
+  /**
+   Case insensitive SQL compliant options - this is also the default unless otherwise changed.
+   @property caseInsensitiveSQL {LocalQueryComparisonOptions}
+   @static
+   **/
+  ctor.caseInsensitiveSQL = new ctor({
+    name: &quot;caseInsensitiveSQL&quot;,
+    isCaseSensitive: false,
+    usesSql92CompliantStringComparison: true
+  });
+
+  /**
+   The default value whenever LocalQueryComparisonOptions are not specified. By default this is &#x27;caseInsensitiveSQL&#x27;.
+   @property defaultInstance {LocalQueryComparisonOptions}
+   @static
+   **/
+  ctor.defaultInstance = new ctor(ctor.caseInsensitiveSQL);
+
+  /**
+   Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @method setAsDefault
+   @example
+   var lqco = new LocalQueryComparisonOptions({
             isCaseSensitive: false;
             usesSql92CompliantStringComparison: true;
         });
-        lqco.setAsDefault();
-    @chainable
-    **/
-    proto.setAsDefault = function () {
-        return __setAsDefault(this, ctor);
-    };
+   lqco.setAsDefault();
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
 
 
-    return ctor;
+  return ctor;
 })();
-       
+
 breeze.LocalQueryComparisonOptions = LocalQueryComparisonOptions;
 
 

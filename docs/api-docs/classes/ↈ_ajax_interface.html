@@ -349,7 +349,8 @@ implementation of this interface.</p>
     </div>
 
     <div class="description">
-        <p>Performs an ajax request. This method takes a single argument — a configuration object — that is used to generate an HTTP request. The config object has two callback methods:<br>&#39;success&#39; and &#39;error&#39; in addition to a number of properties that may be used to configure the request itself. Higher level Breeze constructs will wrap calls to the ajax adapter 
+        <p>Performs an ajax request. This method takes a single argument — a configuration object — that is used to generate an HTTP request. The config object has two callback methods:
+&#39;success&#39; and &#39;error&#39; in addition to a number of properties that may be used to configure the request itself. Higher level Breeze constructs will wrap calls to the ajax adapter
 into Promises. Individual adapters may add additional properties to the basic config object described below.</p>
 
     </div>
@@ -455,7 +456,7 @@ into Promises. Individual adapters may add additional properties to the basic co
 
                                 <div class="param-description">
                                     <p>Function called on success.
-        successFunction(httpResponse)</p>
+successFunction(httpResponse)</p>
 
                                 </div>
 
@@ -470,7 +471,7 @@ into Promises. Individual adapters may add additional properties to the basic co
 
                                 <div class="param-description">
                                     <p>Function called on failure.
-        errorFunction(httpResponse)</p>
+errorFunction(httpResponse)</p>
 
                                 </div>
 
@@ -543,7 +544,7 @@ into Promises. Individual adapters may add additional properties to the basic co
             
         
         
-        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l146"><code>..\src\a60_abstractDataServiceAdapter.js:146</code></a>
+        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l149"><code>..\src\a60_abstractDataServiceAdapter.js:149</code></a>
         
         </p>
 
@@ -558,7 +559,7 @@ into Promises. Individual adapters may add additional properties to the basic co
 that can tweak the saveBundle both as it is built and when it is completed
 by a concrete DataServiceAdapater.</p>
 <p>Initialized with a default, no-op implementation that developers can replace with a
-substantive implementation that changes the individual entity change requests 
+substantive implementation that changes the individual entity change requests
 or aspects of the entire &#39;saveBundle&#39; without having to write their own DataService adapters.</p>
 
     </div>
@@ -628,17 +629,17 @@ or aspects of the entire &#39;saveBundle&#39; without having to write their own 
             <div class="example-content">
                 <p>var adapter = breeze.config.getAdapterInstance(&#39;dataService&#39;);
 adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
-    this.getRequest = function (request, entity, index) {
-        // alter the request that the adapter prepared for this entity
-        // based on the entity, saveContext, and saveBundle
-        // e.g., add a custom header or prune the originalValuesMap
-        return request;
-    };
-    this.done = function (requests) {
-        // alter the array of requests representing the entire change-set 
-        // based on the saveContext and saveBundle
-    };
-}</p>
+     this.getRequest = function (request, entity, index) {
+         // alter the request that the adapter prepared for this entity
+         // based on the entity, saveContext, and saveBundle
+         // e.g., add a custom header or prune the originalValuesMap
+         return request;
+     };
+     this.done = function (requests) {
+         // alter the array of requests representing the entire change-set 
+         // based on the saveContext and saveBundle
+     };
+ }</p>
 
             </div>
         </div>
@@ -688,7 +689,7 @@ adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
             
         
         
-        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l200"><code>..\src\a60_abstractDataServiceAdapter.js:200</code></a>
+        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l205"><code>..\src\a60_abstractDataServiceAdapter.js:205</code></a>
         
         </p>
 
@@ -700,7 +701,7 @@ adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
 
     <div class="description">
         <p>Last chance to change anything about the &#39;requests&#39; array
-after it has been built with requests for all of the entities-to-be-saved. </p>
+after it has been built with requests for all of the entities-to-be-saved.</p>
 <p>The &#39;requests&#39; array is the same as &#39;saveBundle.entities&#39; in many implementations</p>
 <p>This method can do anything to the array including add and remove requests.
 It&#39;s up to you to ensure that server will accept the requests array data as valid.</p>
@@ -742,9 +743,9 @@ It&#39;s up to you to ensure that server will accept the requests array data as 
 
             <div class="example-content">
                 <p>this.done = function (requests) {
-    // alter the array of requests representing the entire change-set 
-    // based on the saveContext and saveBundle
-};</p>
+       // alter the array of requests representing the entire change-set 
+       // based on the saveContext and saveBundle
+   };</p>
 
             </div>
         </div>
@@ -810,7 +811,7 @@ It&#39;s up to you to ensure that server will accept the requests array data as 
             
         
         
-        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l178"><code>..\src\a60_abstractDataServiceAdapter.js:178</code></a>
+        <a href="../files/.._src_a60_abstractDataServiceAdapter.js.html#l181"><code>..\src\a60_abstractDataServiceAdapter.js:181</code></a>
         
         </p>
 
@@ -821,7 +822,7 @@ It&#39;s up to you to ensure that server will accept the requests array data as 
     </div>
 
     <div class="description">
-        <p>Prepare and return the save data for an entity change-set. </p>
+        <p>Prepare and return the save data for an entity change-set.</p>
 <p>The adapter calls this method for each entity in the change-set,
 after it has prepared a &quot;change request&quot; for that object.</p>
 <p>The method can do anything to the request but it must return a valid, non-null request.</p>
@@ -908,11 +909,11 @@ after it has prepared a &quot;change request&quot; for that object.</p>
 
             <div class="example-content">
                 <p>this.getRequest = function (request, entity, index) {
-    // alter the request that the adapter prepared for this entity
-    // based on the entity, saveContext, and saveBundle
-    // e.g., add a custom header or prune the originalValuesMap
-    return request;
-};</p>
+       // alter the request that the adapter prepared for this entity
+       // based on the entity, saveContext, and saveBundle
+       // e.g., add a custom header or prune the originalValuesMap
+       return request;
+   };</p>
 
             </div>
         </div>

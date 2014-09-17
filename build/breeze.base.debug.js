@@ -33,281 +33,285 @@
 var __hasOwnProperty = uncurry(Object.prototype.hasOwnProperty);
 var __arraySlice = uncurry(Array.prototype.slice);
 var __isES5Supported = function () {
-    try {
-        return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
-    } catch (e) {
-        return false;
-    }
+  try {
+    return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+  } catch (e) {
+    return false;
+  }
 }();
 
 // iterate over object
 function __objectForEach(obj, kvFn) {
-    for (var key in obj) {
-        if (__hasOwnProperty(obj, key)) {
-            kvFn(key, obj[key]);
-        }
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      kvFn(key, obj[key]);
     }
+  }
 }
-    
+
 function __objectFirst(obj, kvPredicate) {
-    for (var key in obj) {
-        if (__hasOwnProperty(obj, key)) {
-            var value = obj[key];
-            if (kvPredicate(key, value)) {
-                return { key: key, value: value };
-            }
-        }
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      var value = obj[key];
+      if (kvPredicate(key, value)) {
+        return { key: key, value: value };
+      }
     }
-    return null;
+  }
+  return null;
 }
 
 function __objectMapToArray(obj, kvFn) {
-    var results = [];
-    for (var key in obj) {
-        if (__hasOwnProperty(obj, key)) {
-            var result = kvFn ? kvFn(key, obj[key]) : obj[key];
-            if (result !== undefined) {
-                results.push(result);
-            }
-        }
+  var results = [];
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      var result = kvFn ? kvFn(key, obj[key]) : obj[key];
+      if (result !== undefined) {
+        results.push(result);
+      }
     }
-    return results;
+  }
+  return results;
 }
 
 function __isSettable(entity, propertyName) {
-    var pd = __getPropDescriptor(entity, propertyName);
-    if (pd == null) return true;
-    return !! (pd.writable || pd.set);
+  var pd = __getPropDescriptor(entity, propertyName);
+  if (pd == null) return true;
+  return !!(pd.writable || pd.set);
 }
 
 function __getPropDescriptor(obj, propertyName) {
-    if (!__isES5Supported) return null;
+  if (!__isES5Supported) return null;
 
-    if (obj.hasOwnProperty(propertyName)) {
-        return Object.getOwnPropertyDescriptor(obj, propertyName);
-    } else {
-        var nextObj = Object.getPrototypeOf(obj);
-        if (nextObj == null) return null;
-        return __getPropDescriptor(nextObj, propertyName);
-    }
-} 
+  if (obj.hasOwnProperty(propertyName)) {
+    return Object.getOwnPropertyDescriptor(obj, propertyName);
+  } else {
+    var nextObj = Object.getPrototypeOf(obj);
+    if (nextObj == null) return null;
+    return __getPropDescriptor(nextObj, propertyName);
+  }
+}
 
 // Functional extensions 
 
 // can be used like: persons.filter(propEq("firstName", "John"))
 function __propEq(propertyName, value) {
-    return function (obj) {
-        return obj[propertyName] === value;
-    };
+  return function (obj) {
+    return obj[propertyName] === value;
+  };
 }
 
 // can be used like persons.map(pluck("firstName"))
 function __pluck(propertyName) {
-    return function (obj) { return obj[propertyName]; };
+  return function (obj) {
+    return obj[propertyName];
+  };
 }
 
 // end functional extensions
 
 
 function __getOwnPropertyValues(source) {
-    var result = [];
-    for (var name in source) {
-        if (__hasOwnProperty(source, name)) {
-            result.push(source[name]);
-        }
+  var result = [];
+  for (var name in source) {
+    if (__hasOwnProperty(source, name)) {
+      result.push(source[name]);
     }
-    return result;
+  }
+  return result;
 }
 
 function __extend(target, source, propNames) {
-    if (!source) return target;
-    if (propNames) {
-        propNames.forEach(function(propName) {
-            target[propName] = source[propName];
-        });
-    } else {
-        for (var propName in source) {
-            if (__hasOwnProperty(source, propName)) {
-                target[propName] = source[propName];
-            }
-        }
+  if (!source) return target;
+  if (propNames) {
+    propNames.forEach(function (propName) {
+      target[propName] = source[propName];
+    });
+  } else {
+    for (var propName in source) {
+      if (__hasOwnProperty(source, propName)) {
+        target[propName] = source[propName];
+      }
     }
-    return target;
+  }
+  return target;
 }
 
 
 function __updateWithDefaults(target, defaults) {
-    for (var name in defaults) {
-        if (target[name] === undefined) {
-            target[name] = defaults[name];
-        }
+  for (var name in defaults) {
+    if (target[name] === undefined) {
+      target[name] = defaults[name];
     }
-    return target;
+  }
+  return target;
 }
 
 
 function __setAsDefault(target, ctor) {
-    // we want to insure that the object returned by ctor.defaultInstance is always immutable
-    // Use 'target' as the primary template for the ctor.defaultInstance; 
-    // Use current 'ctor.defaultInstance' as the template for any missing properties
-    // creates a new instance for ctor.defaultInstance
-    // returns target unchanged 
-    ctor.defaultInstance = __updateWithDefaults(new ctor(target), ctor.defaultInstance);
-    return target;
+  // we want to insure that the object returned by ctor.defaultInstance is always immutable
+  // Use 'target' as the primary template for the ctor.defaultInstance;
+  // Use current 'ctor.defaultInstance' as the template for any missing properties
+  // creates a new instance for ctor.defaultInstance
+  // returns target unchanged
+  ctor.defaultInstance = __updateWithDefaults(new ctor(target), ctor.defaultInstance);
+  return target;
 }
 
 
 // template keys are the keys to return
 // template values are the 'default' value of these keys - value is not serialized if it == the default value
 function __toJson(source, template) {
-    var target = {};
+  var target = {};
 
-    for (var propName in template) {
-        if (!(propName in source)) continue;
-        var value = source[propName];
-        var defaultValue = template[propName];
-        // == is deliberate here - idea is that null or undefined values will never get serialized if default value is set to null.
-        if (value == defaultValue) continue;
-        if (Array.isArray(value) && value.length === 0) continue;
-        if (typeof(defaultValue) === "function") {
-            value = defaultValue(value);
-        } else if (typeof (value) === "object") {
-            if (value && value.parentEnum) {
-                value = value.name;
-            }
-        }
-        if (value === undefined) continue;
-        target[propName] = value;
+  for (var propName in template) {
+    if (!(propName in source)) continue;
+    var value = source[propName];
+    var defaultValue = template[propName];
+    // == is deliberate here - idea is that null or undefined values will never get serialized if default value is set to null.
+    if (value == defaultValue) continue;
+    if (Array.isArray(value) && value.length === 0) continue;
+    if (typeof(defaultValue) === "function") {
+      value = defaultValue(value);
+    } else if (typeof (value) === "object") {
+      if (value && value.parentEnum) {
+        value = value.name;
+      }
     }
-    return target;
+    if (value === undefined) continue;
+    target[propName] = value;
+  }
+  return target;
 }
 
 function __toJSONSafe(obj, replacer) {
-    if (obj !== Object(obj)) return obj; // primitive value
-    if (obj._$visited) return undefined;
-    if (obj.toJSON) {
-        var newObj = obj.toJSON();
-        if (newObj !== Object(newObj)) return newObj; // primitive value
-        if (newObj !== obj) return __toJSONSafe(newObj);
-        // toJSON returned the object unchanged.
-        obj = newObj;
+  if (obj !== Object(obj)) return obj; // primitive value
+  if (obj._$visited) return undefined;
+  if (obj.toJSON) {
+    var newObj = obj.toJSON();
+    if (newObj !== Object(newObj)) return newObj; // primitive value
+    if (newObj !== obj) return __toJSONSafe(newObj);
+    // toJSON returned the object unchanged.
+    obj = newObj;
+  }
+  obj._$visited = true;
+  var result;
+  if (obj instanceof Array) {
+    result = obj.map(function (o) {
+      return __toJSONSafe(o, replacer);
+    });
+  } else if (typeof (obj) === "function") {
+    result = undefined;
+  } else {
+    result = {};
+    for (var prop in obj) {
+      if (prop === "_$visited") continue;
+      var val = obj[prop];
+      if (replacer) {
+        val = replacer(prop, val);
+        if (val === undefined) continue;
+      }
+      val = __toJSONSafe(val);
+      if (val === undefined) continue;
+      result[prop] = val;
     }
-    obj._$visited = true;
-    var result;
-    if (obj instanceof Array) {
-        result = obj.map(function (o) { return __toJSONSafe(o, replacer); } );
-    } else if (typeof (obj) === "function") {
-        result = undefined;
-    } else {
-        result = {};
-        for (var prop in obj) {
-            if (prop === "_$visited") continue;
-            var val = obj[prop];
-            if (replacer) {
-                val = replacer(prop, val);
-                if (val === undefined) continue;
-            }
-            val = __toJSONSafe(val);
-            if (val === undefined) continue;
-            result[prop] = val;
-        }
-    }
-    delete obj._$visited;
-    return result;
+  }
+  delete obj._$visited;
+  return result;
 }
 
 // resolves the values of a list of properties by checking each property in multiple sources until a value is found.
 function __resolveProperties(sources, propertyNames) {
-    var r = {};
-    var length = sources.length;
-    propertyNames.forEach(function (pn) {
-        for (var i = 0; i < length; i++) {
-            var src = sources[i];
-            if (src) {
-                var val = src[pn];
-                if (val !== undefined) {
-                    r[pn] = val;
-                    break;
-                }
-            }
+  var r = {};
+  var length = sources.length;
+  propertyNames.forEach(function (pn) {
+    for (var i = 0; i < length; i++) {
+      var src = sources[i];
+      if (src) {
+        var val = src[pn];
+        if (val !== undefined) {
+          r[pn] = val;
+          break;
         }
-    });
-    return r;
+      }
+    }
+  });
+  return r;
 }
 
 
 // array functions
 
 function __toArray(item) {
-    if (item==null) {
-        return [];
-    } else if (Array.isArray(item)) {
-        return item;
-    } else {
-        return [item];
-    }
+  if (item == null) {
+    return [];
+  } else if (Array.isArray(item)) {
+    return item;
+  } else {
+    return [item];
+  }
 }
 
 // a version of Array.map that doesn't require an array, i.e. works on arrays and scalars.
 function __map(items, fn) {
-    if (items == null) return items;
-    var result;
-    if (Array.isArray(items)) {
-        result = [];
-        items.map(function (v, ix) {
-            result[ix] = fn(v, ix);
-        });
-    } else {
-        result = fn(items);
-    }
-    return result;
+  if (items == null) return items;
+  var result;
+  if (Array.isArray(items)) {
+    result = [];
+    items.map(function (v, ix) {
+      result[ix] = fn(v, ix);
+    });
+  } else {
+    result = fn(items);
+  }
+  return result;
 }
 
 
 function __arrayFirst(array, predicate) {
-    for (var i = 0, j = array.length; i < j; i++) {
-        if (predicate(array[i])) {
-            return array[i];
-        }
+  for (var i = 0, j = array.length; i < j; i++) {
+    if (predicate(array[i])) {
+      return array[i];
     }
-    return null;
+  }
+  return null;
 }
 
 function __arrayIndexOf(array, predicate) {
-    for (var i = 0, j = array.length; i < j; i++) {
-        if (predicate(array[i])) return i;
-    }
-    return -1;
+  for (var i = 0, j = array.length; i < j; i++) {
+    if (predicate(array[i])) return i;
+  }
+  return -1;
 }
 
 function __arrayAddItemUnique(array, item) {
-    var ix = array.indexOf(item);
-    if (ix === -1) array.push(item);
+  var ix = array.indexOf(item);
+  if (ix === -1) array.push(item);
 }
 
 function __arrayRemoveItem(array, predicateOrItem, shouldRemoveMultiple) {
-    var predicate = __isFunction(predicateOrItem) ? predicateOrItem : undefined;
-    var lastIx = array.length-1;
-    var removed = false;
-    for (var i = lastIx; i >= 0; i--) {
-        if (predicate ? predicate(array[i]) : (array[i] === predicateOrItem)) {
-            array.splice(i, 1);
-            removed = true;
-            if (!shouldRemoveMultiple) {
-                return true;
-            }
-        }
+  var predicate = __isFunction(predicateOrItem) ? predicateOrItem : undefined;
+  var lastIx = array.length - 1;
+  var removed = false;
+  for (var i = lastIx; i >= 0; i--) {
+    if (predicate ? predicate(array[i]) : (array[i] === predicateOrItem)) {
+      array.splice(i, 1);
+      removed = true;
+      if (!shouldRemoveMultiple) {
+        return true;
+      }
     }
-    return removed;
+  }
+  return removed;
 }
 
 function __arrayZip(a1, a2, callback) {
-    var result = [];
-    var n = Math.min(a1.length, a2.length);
-    for (var i = 0; i < n; ++i) {
-        result.push(callback(a1[i], a2[i]));
-    }
-    return result;
+  var result = [];
+  var n = Math.min(a1.length, a2.length);
+  for (var i = 0; i < n; ++i) {
+    result.push(callback(a1[i], a2[i]));
+  }
+  return result;
 }
 
 //function __arrayDistinct(array) {
@@ -335,170 +339,170 @@ function __arrayZip(a1, a2, callback) {
 //}
 
 function __arrayEquals(a1, a2, equalsFn) {
-    //Check if the arrays are undefined/null
-    if (!a1 || !a2) return false;
+  //Check if the arrays are undefined/null
+  if (!a1 || !a2) return false;
 
-    if (a1.length !== a2.length) return false;
+  if (a1.length !== a2.length) return false;
 
-    //go thru all the vars
-    for (var i = 0; i < a1.length; i++) {
-        //if the var is an array, we need to make a recursive check
-        //otherwise we'll just compare the values
-        if (Array.isArray( a1[i])) {
-            if (!__arrayEquals(a1[i], a2[i])) return false;
-        } else {
-            if (equalsFn) {
-                if (!equalsFn(a1[i], a2[i])) return false;
-            } else {
-                if (a1[i] !== a2[i]) return false;
-            }
-        }
+  //go thru all the vars
+  for (var i = 0; i < a1.length; i++) {
+    //if the var is an array, we need to make a recursive check
+    //otherwise we'll just compare the values
+    if (Array.isArray(a1[i])) {
+      if (!__arrayEquals(a1[i], a2[i])) return false;
+    } else {
+      if (equalsFn) {
+        if (!equalsFn(a1[i], a2[i])) return false;
+      } else {
+        if (a1[i] !== a2[i]) return false;
+      }
     }
-    return true;
+  }
+  return true;
 }
 
 // end of array functions
 
 function __getArray(source, propName) {
-    var arr = source[propName];
-    if (!arr) {
-        arr = [];
-        source[propName] = arr;
-    }
-    return arr;
+  var arr = source[propName];
+  if (!arr) {
+    arr = [];
+    source[propName] = arr;
+  }
+  return arr;
 }
-    
+
 function __requireLib(libNames, errMessage) {
-    var arrNames = libNames.split(";");
-    for (var i = 0, j = arrNames.length; i < j; i++) {
-        var lib = __requireLibCore(arrNames[i]);
-        if (lib) return lib;
-    }
-    if (errMessage) {
-        throw new Error("Unable to initialize " + libNames + ".  " + errMessage );
-    }
+  var arrNames = libNames.split(";");
+  for (var i = 0, j = arrNames.length; i < j; i++) {
+    var lib = __requireLibCore(arrNames[i]);
+    if (lib) return lib;
+  }
+  if (errMessage) {
+    throw new Error("Unable to initialize " + libNames + ".  " + errMessage);
+  }
 }
 
 // Returns the 'libName' module if loaded or else returns undefined
 function __requireLibCore(libName) {
-    var window = global.window;
-    if (!window) return; // Must run in a browser. Todo: add commonjs support
+  var window = global.window;
+  if (!window) return; // Must run in a browser. Todo: add commonjs support
 
-    // get library from browser globals if we can
-    var lib = window[libName];
-    if (lib) return lib;
+  // get library from browser globals if we can
+  var lib = window[libName];
+  if (lib) return lib;
 
-    // if require exists, maybe require can get it.
-    // This method is synchronous so it can't load modules with AMD.
-    // It can only obtain modules from require that have already been loaded.
-    // Developer should bootstrap such that the breeze module
-    // loads after all other libraries that breeze should find with this method
-    // See documentation 
-    var r = window.require;
-    if (r) { // if require exists
-        if (r.defined) { // require.defined is not standard and may not exist
-            // require.defined returns true if module has been loaded
-            return r.defined(libName) ? r(libName) : undefined; 
-        } else {
-            // require.defined does not exist so we have to call require('libName') directly.
-            // The require('libName') overload is synchronous and does not load modules.
-            // It throws an exception if the module isn't already loaded.
-            try {
-                return r(libName);  
-            } catch (e) {
-                // require('libName') threw because module not loaded
-                return; 
-            }             
-        }     
+  // if require exists, maybe require can get it.
+  // This method is synchronous so it can't load modules with AMD.
+  // It can only obtain modules from require that have already been loaded.
+  // Developer should bootstrap such that the breeze module
+  // loads after all other libraries that breeze should find with this method
+  // See documentation
+  var r = window.require;
+  if (r) { // if require exists
+    if (r.defined) { // require.defined is not standard and may not exist
+      // require.defined returns true if module has been loaded
+      return r.defined(libName) ? r(libName) : undefined;
+    } else {
+      // require.defined does not exist so we have to call require('libName') directly.
+      // The require('libName') overload is synchronous and does not load modules.
+      // It throws an exception if the module isn't already loaded.
+      try {
+        return r(libName);
+      } catch (e) {
+        // require('libName') threw because module not loaded
+        return;
+      }
     }
+  }
 }
 
 function __using(obj, property, tempValue, fn) {
-    var originalValue = obj[property];
-    if (tempValue === originalValue) {
-        return fn();
+  var originalValue = obj[property];
+  if (tempValue === originalValue) {
+    return fn();
+  }
+  obj[property] = tempValue;
+  try {
+    return fn();
+  } finally {
+    if (originalValue === undefined) {
+      delete obj[property];
+    } else {
+      obj[property] = originalValue;
     }
-    obj[property] = tempValue;
-    try {
-        return fn();
-    } finally {
-        if (originalValue === undefined) {
-            delete obj[property];
-        } else {
-            obj[property] = originalValue;
-        }
-    }
+  }
 }
-    
+
 function __wrapExecution(startFn, endFn, fn) {
-    var state;
-    try {
-        state = startFn();
-        return fn();
-    } catch (e) {
-        if (typeof(state) === 'object') {
-            state.error = e;
-        }
-        throw e;
-    } finally {
-        endFn(state);
+  var state;
+  try {
+    state = startFn();
+    return fn();
+  } catch (e) {
+    if (typeof(state) === 'object') {
+      state.error = e;
     }
+    throw e;
+  } finally {
+    endFn(state);
+  }
 }
 
 function __memoize(fn) {
-    return function () {
-        var args = __arraySlice(arguments),
-            hash = "",
-            i = args.length,
-            currentArg = null;
-        while (i--) {
-            currentArg = args[i];
-            hash += (currentArg === Object(currentArg)) ? JSON.stringify(currentArg) : currentArg;
-            fn.memoize || (fn.memoize = {});
-        }
-        return (hash in fn.memoize) ?
-            fn.memoize[hash] :
-            fn.memoize[hash] = fn.apply(this, args);
-    };
+  return function () {
+    var args = __arraySlice(arguments),
+        hash = "",
+        i = args.length,
+        currentArg = null;
+    while (i--) {
+      currentArg = args[i];
+      hash += (currentArg === Object(currentArg)) ? JSON.stringify(currentArg) : currentArg;
+      fn.memoize || (fn.memoize = {});
+    }
+    return (hash in fn.memoize) ?
+           fn.memoize[hash] :
+           fn.memoize[hash] = fn.apply(this, args);
+  };
 }
 
 function __getUuid() {
 
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        //noinspection NonShortCircuitBooleanExpressionJS
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //noinspection NonShortCircuitBooleanExpressionJS
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
-    
+
 function __durationToSeconds(duration) {
-    // basic algorithm from https://github.com/nezasa/iso8601-js-period
-    if (typeof duration !== "string") throw new Error("Invalid ISO8601 duration '" + duration + "'");
+  // basic algorithm from https://github.com/nezasa/iso8601-js-period
+  if (typeof duration !== "string") throw new Error("Invalid ISO8601 duration '" + duration + "'");
 
-    // regex splits as follows - grp0, grp1, y, m, d, grp2, h, m, s
-    //                           0     1     2  3  4  5     6  7  8   
-    var struct = /^P((\d+Y)?(\d+M)?(\d+D)?)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.exec(duration);
-    if (!struct) throw new Error("Invalid ISO8601 duration '" + duration + "'");
-        
-    var ymdhmsIndexes = [2, 3, 4, 6, 7, 8]; // -> grp1,y,m,d,grp2,h,m,s 
-    var factors = [31104000, // year (360*24*60*60) 
-        2592000,             // month (30*24*60*60) 
-        86400,               // day (24*60*60) 
-        3600,                // hour (60*60) 
-        60,                  // minute (60) 
-        1];                  // second (1)
+  // regex splits as follows - grp0, grp1, y, m, d, grp2, h, m, s
+  //                           0     1     2  3  4  5     6  7  8
+  var struct = /^P((\d+Y)?(\d+M)?(\d+D)?)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.exec(duration);
+  if (!struct) throw new Error("Invalid ISO8601 duration '" + duration + "'");
 
-    var seconds = 0;
-    for (var i = 0; i < 6; i++) {
-        var digit = struct[ymdhmsIndexes[i]];
-        // remove letters, replace by 0 if not defined
-        digit = digit ? +digit.replace(/[A-Za-z]+/g, '') : 0;
-        seconds += digit * factors[i];
-    }
-    return seconds;
+  var ymdhmsIndexes = [2, 3, 4, 6, 7, 8]; // -> grp1,y,m,d,grp2,h,m,s
+  var factors = [31104000, // year (360*24*60*60)
+                 2592000,             // month (30*24*60*60)
+                 86400,               // day (24*60*60)
+                 3600,                // hour (60*60)
+                 60,                  // minute (60)
+                 1];                  // second (1)
+
+  var seconds = 0;
+  for (var i = 0; i < 6; i++) {
+    var digit = struct[ymdhmsIndexes[i]];
+    // remove letters, replace by 0 if not defined
+    digit = digit ? +digit.replace(/[A-Za-z]+/g, '') : 0;
+    seconds += digit * factors[i];
+  }
+  return seconds;
 
 }
-    
+
 // is functions
 
 function __noop() {
@@ -506,21 +510,21 @@ function __noop() {
 }
 
 function __classof(o) {
-    if (o === null) {
-        return "null";
-    }
-    if (o === undefined) {
-        return "undefined";
-    }
-    return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
+  if (o === null) {
+    return "null";
+  }
+  if (o === undefined) {
+    return "undefined";
+  }
+  return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
 }
 
 function __isDate(o) {
-    return __classof(o) === "date" && !isNaN(o.getTime());
+  return __classof(o) === "date" && !isNaN(o.getTime());
 }
 
 function __isFunction(o) {
-    return __classof(o) === "function";
+  return __classof(o) === "function";
 }
 
 function __isString(o) {
@@ -532,27 +536,27 @@ function __isObject(o) {
 }
 
 function __isGuid(value) {
-    return (typeof value === "string") && /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
+  return (typeof value === "string") && /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
 }
-    
+
 function __isDuration(value) {
-    return (typeof value === "string") && /^(-|)?P[T]?[\d\.,\-]+[YMDTHS]/.test(value);
+  return (typeof value === "string") && /^(-|)?P[T]?[\d\.,\-]+[YMDTHS]/.test(value);
 }
 
 function __isEmpty(obj) {
-    if (obj === null || obj === undefined) {
-        return true;
-    }
-    for (var key in obj) {
-        if (__hasOwnProperty(obj, key)) {
-            return false;
-        }
-    }
+  if (obj === null || obj === undefined) {
     return true;
+  }
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function __isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 // end of is Functions
@@ -560,27 +564,27 @@ function __isNumeric(n) {
 // string functions
 
 function __stringStartsWith(str, prefix) {
-    // returns true for empty string or null prefix
-    if ((!str)) return false;
-    if (prefix == "" || prefix == null) return true;
-    return str.indexOf(prefix, 0) === 0;
+  // returns true for empty string or null prefix
+  if ((!str)) return false;
+  if (prefix == "" || prefix == null) return true;
+  return str.indexOf(prefix, 0) === 0;
 }
 
 function __stringEndsWith(str, suffix) {
-    // returns true for empty string or null suffix
-    if ((!str)) return false;
-    if (suffix == "" || suffix == null) return true;
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  // returns true for empty string or null suffix
+  if ((!str)) return false;
+  if (suffix == "" || suffix == null) return true;
+  return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
 // Based on fragment from Dean Edwards' Base 2 library
 // format("a %1 and a %2", "cat", "dog") -> "a cat and a dog"
 function __formatString(string) {
-    var args = arguments;
-    var pattern = RegExp("%([1-" + (arguments.length - 1) + "])", "g");
-    return string.replace(pattern, function (match, index) {
-        return args[index];
-    });
+  var args = arguments;
+  var pattern = RegExp("%([1-" + (arguments.length - 1) + "])", "g");
+  return string.replace(pattern, function (match, index) {
+    return args[index];
+  });
 }
 
 // end of string functions
@@ -588,30 +592,30 @@ function __formatString(string) {
 // See Mark Miller’s explanation of what this does.
 // http://wiki.ecmascript.org/doku.php?id=conventions:safe_meta_programming
 function uncurry(f) {
-    var call = Function.call;
-    return function () {
-        return call.apply(f, arguments);
-    };
+  var call = Function.call;
+  return function () {
+    return call.apply(f, arguments);
+  };
 }
 
 // shims
 
 if (!Object.create) {
-    Object.create = function (parent) {
-        var F = function () { };
-        F.prototype = parent;
-        return new F();
+  Object.create = function (parent) {
+    var F = function () {
     };
+    F.prototype = parent;
+    return new F();
+  };
 }
 
 var core = {};
 
 
-
 core.__isES5Supported = __isES5Supported;
 
 // core.getOwnPropertyValues = __getOwnPropertyValues;
-core.objectForEach= __objectForEach;
+core.objectForEach = __objectForEach;
 // core.objectMapToArray= __objectMapToArray;
 // core.objectFirst= __objectFirst;
 
@@ -638,12 +642,12 @@ core.durationToSeconds = __durationToSeconds;
 core.isDate = __isDate;
 core.isGuid = __isGuid;
 core.isDuration = __isDuration;
-core.isFunction= __isFunction;
-core.isEmpty= __isEmpty;
-core.isNumeric= __isNumeric;
+core.isFunction = __isFunction;
+core.isEmpty = __isEmpty;
+core.isNumeric = __isNumeric;
 
-core.stringStartsWith= __stringStartsWith;
-core.stringEndsWith= __stringEndsWith;
+core.stringStartsWith = __stringStartsWith;
+core.stringEndsWith = __stringEndsWith;
 core.formatString = __formatString;
 
 core.toJSONSafe = __toJSONSafe;
@@ -657,354 +661,354 @@ breeze.core = core;
  **/
 
 var Param = (function () {
-    // The %1 parameter 
-    // is required
-    // must be a %2
-    // must be an instance of %2
-    // must be an instance of the %2 enumeration
-    // must have a %2 property
-    // must be an array where each element  
-    // is optional or 
+  // The %1 parameter
+  // is required
+  // must be a %2
+  // must be an instance of %2
+  // must be an instance of the %2 enumeration
+  // must have a %2 property
+  // must be an array where each element
+  // is optional or
 
-    var ctor = function(v, name) {
-        this.v = v;
-        this.name = name;
-        this._contexts = [null];
+  var ctor = function (v, name) {
+    this.v = v;
+    this.name = name;
+    this._contexts = [null];
 
+  };
+  var proto = ctor.prototype;
+
+  proto.isObject = function () {
+    return this.isTypeOf("object");
+  };
+
+  proto.isBoolean = function () {
+    return this.isTypeOf('boolean');
+  };
+
+  proto.isString = function () {
+    return this.isTypeOf('string');
+  };
+
+  proto.isNonEmptyString = function () {
+    return addContext(this, {
+      fn: isNonEmptyString,
+      msg: "must be a nonEmpty string"
+    });
+  };
+
+  function isNonEmptyString(context, v) {
+    if (v == null) return false;
+    return (typeof(v) === 'string') && v.length > 0;
+  }
+
+  proto.isNumber = function () {
+    return this.isTypeOf('number');
+  };
+
+  proto.isFunction = function () {
+    return this.isTypeOf('function');
+  };
+
+
+  proto.isTypeOf = function (typeName) {
+    return addContext(this, {
+      fn: isTypeOf,
+      typeName: typeName,
+      msg: __formatString("must be a '%1'", typeName)
+    });
+  };
+
+  function isTypeOf(context, v) {
+    if (v == null) return false;
+    if (typeof(v) === context.typeName) return true;
+    return false;
+  }
+
+  proto.isInstanceOf = function (type, typeName) {
+    typeName = typeName || type.prototype._$typeName;
+    return addContext(this, {
+      fn: isInstanceOf,
+      type: type,
+      typeName: typeName,
+      msg: __formatString("must be an instance of '%1'", typeName)
+    });
+  };
+
+  function isInstanceOf(context, v) {
+    if (v == null) return false;
+    return (v instanceof context.type);
+  }
+
+  proto.hasProperty = function (propertyName) {
+    return addContext(this, {
+      fn: hasProperty,
+      propertyName: propertyName,
+      msg: __formatString("must have a '%1' property ", propertyName)
+    });
+  };
+
+  function hasProperty(context, v) {
+    if (v == null) return false;
+    return (v[context.propertyName] !== undefined);
+  }
+
+  proto.isEnumOf = function (enumType) {
+    return addContext(this, {
+      fn: isEnumOf,
+      enumType: enumType,
+      msg: __formatString("must be an instance of the '%1' enumeration", enumType.name)
+    });
+  };
+
+  function isEnumOf(context, v) {
+    if (v == null) return false;
+    return context.enumType.contains(v);
+  }
+
+  proto.isRequired = function (allowNull) {
+    return addContext(this, {
+      fn: isRequired,
+      allowNull: allowNull,
+      msg: "is required"
+    });
+  };
+
+  function isRequired(context, v) {
+    if (context.allowNull) {
+      return v !== undefined;
+    } else {
+      return v != null;
+    }
+  }
+
+  // combinable methods.
+
+  proto.isOptional = function () {
+    var context = {
+      fn: isOptional,
+      prevContext: null,
+      msg: isOptionalMessage
     };
-    var proto = ctor.prototype;
+    return addContext(this, context);
+  };
 
-    proto.isObject = function() {
-        return this.isTypeOf("object");
+  function isOptional(context, v) {
+    if (v == null) return true;
+    var prevContext = context.prevContext;
+    if (prevContext) {
+      return prevContext.fn(prevContext, v);
+    } else {
+      return true;
+    }
+  }
+
+  function isOptionalMessage(context, v) {
+    var prevContext = context.prevContext;
+    var element = prevContext ? " or it " + getMessage(prevContext, v) : "";
+    return "is optional" + element;
+  }
+
+  proto.isNonEmptyArray = function () {
+    return this.isArray(true);
+  };
+
+  proto.isArray = function (mustNotBeEmpty) {
+    var context = {
+      fn: isArray,
+      mustNotBeEmpty: mustNotBeEmpty,
+      prevContext: null,
+      msg: isArrayMessage
     };
+    return addContext(this, context);
+  };
 
-    proto.isBoolean = function() {
-        return this.isTypeOf('boolean');
-    };
 
-    proto.isString = function() {
-        return this.isTypeOf('string');
-    };
+  function isArray(context, v) {
+    if (!Array.isArray(v)) {
+      return false;
+    }
+    if (context.mustNotBeEmpty) {
+      if (v.length === 0) return false;
+    }
+    // allow standalone is array call.
+    var prevContext = context.prevContext;
+    if (!prevContext) return true;
 
-    proto.isNonEmptyString = function() {
-        return addContext(this, {
-            fn: isNonEmptyString,
-            msg: "must be a nonEmpty string"
-        });
-    };
+    return v.every(function (v1) {
+      return prevContext.fn(prevContext, v1);
+    });
+  }
 
-    function isNonEmptyString(context, v) {
-        if (v == null) return false;
-        return (typeof(v) === 'string') && v.length > 0;
+  function isArrayMessage(context, v) {
+    var arrayDescr = context.mustNotBeEmpty ? "a nonEmpty array" : "an array";
+    var prevContext = context.prevContext;
+    var element = prevContext ? " where each element " + getMessage(prevContext, v) : "";
+    return " must be " + arrayDescr + element;
+  }
+
+  function getMessage(context, v) {
+    var msg = context.msg;
+    if (typeof(msg) === "function") {
+      msg = msg(context, v);
+    }
+    return msg;
+  }
+
+  proto.or = function () {
+    this._contexts.push(null);
+    this._context = null;
+    return this;
+  };
+
+  proto.check = function (defaultValue) {
+    var ok = exec(this);
+    if (ok === undefined) return;
+    if (!ok) {
+      throw new Error(this.getMessage());
     }
 
-    proto.isNumber = function() {
-        return this.isTypeOf('number');
-    };
-
-    proto.isFunction = function() {
-        return this.isTypeOf('function');
-    };
-
-
-    proto.isTypeOf = function(typeName) {
-        return addContext(this, {
-            fn: isTypeOf,
-            typeName: typeName,
-            msg: __formatString("must be a '%1'", typeName)
-        });
-    };
-
-    function isTypeOf(context, v) {
-        if (v == null) return false;
-        if (typeof(v) === context.typeName) return true;
-        return false;
+    if (this.v !== undefined) {
+      return this.v;
+    } else {
+      return defaultValue;
     }
+  };
 
-    proto.isInstanceOf = function (type, typeName) {
-        typeName = typeName || type.prototype._$typeName;
-        return addContext(this, {
-            fn: isInstanceOf,
-            type: type,
-            typeName: typeName,
-            msg: __formatString("must be an instance of '%1'", typeName)
-        });
-    };
+  // called from outside this file.
+  proto._addContext = function (context) {
+    return addContext(this, context);
+  };
 
-    function isInstanceOf(context, v) {
-        if (v == null) return false;
-        return (v instanceof context.type);
-    }
+  function addContext(that, context) {
+    if (that._context) {
+      var curContext = that._context;
 
-    proto.hasProperty = function(propertyName) {
-        return addContext(this, {
-            fn: hasProperty,
-            propertyName: propertyName,
-            msg: __formatString("must have a '%1' property ", propertyName)
-        });
-    };
+      while (curContext.prevContext != null) {
+        curContext = curContext.prevContext;
+      }
 
-    function hasProperty(context, v) {
-        if (v == null) return false;
-        return (v[context.propertyName] !== undefined);
-    }
-
-    proto.isEnumOf = function(enumType) {
-        return addContext(this, {
-            fn: isEnumOf,
-            enumType: enumType,
-            msg: __formatString("must be an instance of the '%1' enumeration", enumType.name)
-        });
-    };
-
-    function isEnumOf(context, v) {
-        if (v == null) return false;
-        return context.enumType.contains(v);
-    }
-
-    proto.isRequired = function(allowNull) {
-        return addContext(this, {
-            fn: isRequired,
-            allowNull: allowNull,
-            msg: "is required"
-        });
-    };
-
-    function isRequired(context, v) {
-        if (context.allowNull) {
-            return v !== undefined;
-        } else {
-            return v != null;
-        }
-    }
-
-    // combinable methods.
-
-    proto.isOptional = function() {
-        var context = {
-            fn: isOptional,
-            prevContext: null,
-            msg: isOptionalMessage
-        };
-        return addContext(this, context);
-    };
-
-    function isOptional(context, v) {
-        if (v == null) return true;
-        var prevContext = context.prevContext;
-        if (prevContext) {
-            return prevContext.fn(prevContext, v);
-        } else {
-            return true;
-        }
-    }
-
-    function isOptionalMessage(context, v) {
-        var prevContext = context.prevContext;
-        var element = prevContext ? " or it " + getMessage(prevContext, v) : "";
-        return "is optional" + element;
-    }
-
-    proto.isNonEmptyArray = function() {
-        return this.isArray(true);
-    };
-
-    proto.isArray = function(mustNotBeEmpty) {
-        var context = {
-            fn: isArray,
-            mustNotBeEmpty: mustNotBeEmpty,
-            prevContext: null,
-            msg: isArrayMessage
-        };
-        return addContext(this, context);
-    };
-
-
-    function isArray(context, v) {
-        if (!Array.isArray(v)) {
-            return false;
-        }
-        if (context.mustNotBeEmpty) {
-            if (v.length === 0) return false;
-        }
-        // allow standalone is array call.
-        var prevContext = context.prevContext;
-        if (!prevContext) return true;
-
-        return v.every(function(v1) {
-            return prevContext.fn(prevContext, v1);
-        });
-    }
-
-    function isArrayMessage(context, v) {
-        var arrayDescr = context.mustNotBeEmpty ? "a nonEmpty array" : "an array";
-        var prevContext = context.prevContext;
-        var element = prevContext ? " where each element " + getMessage(prevContext, v) : "";
-        return " must be " + arrayDescr + element;
-    }
-
-    function getMessage(context, v) {
-        var msg = context.msg;
-        if (typeof(msg) === "function") {
-            msg = msg(context, v);
-        }
-        return msg;
-    }
-
-    proto.or = function() {
-        this._contexts.push(null);
-        this._context = null;
-        return this;
-    };
-
-    proto.check = function(defaultValue) {
-        var ok = exec(this);
-        if (ok === undefined) return;
-        if (!ok) {
-            throw new Error(this.getMessage());
-        }
-
-        if (this.v !== undefined) {
-            return this.v;
-        } else {
-            return defaultValue;
-        }
-    };
-
-    // called from outside this file.
-    proto._addContext = function(context) {
-        return addContext(this, context);
-    };
-
-    function addContext(that, context) {
-        if (that._context) {
-            var curContext = that._context;
-
-            while (curContext.prevContext != null) {
-                curContext = curContext.prevContext;
-            }
-
-            if (curContext.prevContext === null) {
-                curContext.prevContext = context;
-                // just update the prevContext but don't change the curContext.
-                return that;
-            } else if (context.prevContext == null) {
-                context.prevContext = that._context;
-            } else {
-                throw new Error("Illegal construction - use 'or' to combine checks");
-            }
-        }
-        return setContext(that, context);
-    }
-
-    function setContext(that, context) {
-        that._contexts[that._contexts.length - 1] = context;
-        that._context = context;
+      if (curContext.prevContext === null) {
+        curContext.prevContext = context;
+        // just update the prevContext but don't change the curContext.
         return that;
+      } else if (context.prevContext == null) {
+        context.prevContext = that._context;
+      } else {
+        throw new Error("Illegal construction - use 'or' to combine checks");
+      }
     }
+    return setContext(that, context);
+  }
+
+  function setContext(that, context) {
+    that._contexts[that._contexts.length - 1] = context;
+    that._context = context;
+    return that;
+  }
 
 
-    function exec(self) {
-        // clear off last one if null 
-        var contexts = self._contexts;
-        if (contexts[contexts.length - 1] == null) {
-            contexts.pop();
-        }
-        if (contexts.length === 0) {
-            return undefined;
-        }
-        return contexts.some(function(context) {
-            return context.fn(context, self.v);
-        });
+  function exec(self) {
+    // clear off last one if null
+    var contexts = self._contexts;
+    if (contexts[contexts.length - 1] == null) {
+      contexts.pop();
     }
-
-
-    proto.getMessage = function() {
-        var that = this;
-        var message = this._contexts.map(function(context) {
-            return getMessage(context, that.v);
-        }).join(", or it ");
-        return __formatString(this.MESSAGE_PREFIX, this.name) + " " + message;
-    };
-
-    proto.withDefault = function(defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
-    };
-
-    proto.whereParam = function(propName) {
-        return this.parent.whereParam(propName);
-    };
-
-
-    proto.applyAll = function (instance, checkOnly) {
-        var parentTypeName = instance._$typeName;
-        var allowUnknownProperty = (parentTypeName && this.parent.config._$typeName === parentTypeName);
-        
-        var clone = __extend({}, this.parent.config);
-        this.parent.params.forEach(function(p) {
-            if (!allowUnknownProperty) delete clone[p.name];
-            try {
-                p.check();
-            } catch(e) {
-                throwConfigError(instance, e.message);
-            }
-            (!checkOnly) && p._applyOne(instance);
-        });
-        // should be no properties left in the clone
-        if (!allowUnknownProperty) {
-            for (var key in clone) {
-                // allow props with an undefined value
-                if (clone[key] !== undefined) {
-                    throwConfigError(instance, __formatString("Unknown property: '%1'.", key));
-                }
-            }
-        }
-    };
-    
-    function throwConfigError(instance, message) {
-        throw new Error(__formatString("Error configuring an instance of '%1'. %2", (instance && instance._$typeName) || "object", message));
+    if (contexts.length === 0) {
+      return undefined;
     }
+    return contexts.some(function (context) {
+      return context.fn(context, self.v);
+    });
+  }
 
-    proto._applyOne = function(instance) {
-        if (this.v !== undefined) {
-            instance[this.name] = this.v;
-        } else {
-            if (this.defaultValue !== undefined) {
-                instance[this.name] = this.defaultValue;
-            }
+
+  proto.getMessage = function () {
+    var that = this;
+    var message = this._contexts.map(function (context) {
+      return getMessage(context, that.v);
+    }).join(", or it ");
+    return __formatString(this.MESSAGE_PREFIX, this.name) + " " + message;
+  };
+
+  proto.withDefault = function (defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  };
+
+  proto.whereParam = function (propName) {
+    return this.parent.whereParam(propName);
+  };
+
+
+  proto.applyAll = function (instance, checkOnly) {
+    var parentTypeName = instance._$typeName;
+    var allowUnknownProperty = (parentTypeName && this.parent.config._$typeName === parentTypeName);
+
+    var clone = __extend({}, this.parent.config);
+    this.parent.params.forEach(function (p) {
+      if (!allowUnknownProperty) delete clone[p.name];
+      try {
+        p.check();
+      } catch (e) {
+        throwConfigError(instance, e.message);
+      }
+      (!checkOnly) && p._applyOne(instance);
+    });
+    // should be no properties left in the clone
+    if (!allowUnknownProperty) {
+      for (var key in clone) {
+        // allow props with an undefined value
+        if (clone[key] !== undefined) {
+          throwConfigError(instance, __formatString("Unknown property: '%1'.", key));
         }
-    };
+      }
+    }
+  };
 
-    proto.MESSAGE_PREFIX = "The '%1' parameter ";
-    return ctor;
+  function throwConfigError(instance, message) {
+    throw new Error(__formatString("Error configuring an instance of '%1'. %2", (instance && instance._$typeName) || "object", message));
+  }
+
+  proto._applyOne = function (instance) {
+    if (this.v !== undefined) {
+      instance[this.name] = this.v;
+    } else {
+      if (this.defaultValue !== undefined) {
+        instance[this.name] = this.defaultValue;
+      }
+    }
+  };
+
+  proto.MESSAGE_PREFIX = "The '%1' parameter ";
+  return ctor;
 })();
 
 var assertParam = function (v, name) {
-    return new Param(v, name);
+  return new Param(v, name);
 };
 
-var ConfigParam = (function() {
-    var ctor = function(config) {
-        if (typeof(config) !== "object") {
-            throw new Error("Configuration parameter should be an object, instead it is a: " + typeof(config));
-        }
-        this.config = config;
-        this.params = [];
-    };
-    var proto = ctor.prototype;
+var ConfigParam = (function () {
+  var ctor = function (config) {
+    if (typeof(config) !== "object") {
+      throw new Error("Configuration parameter should be an object, instead it is a: " + typeof(config));
+    }
+    this.config = config;
+    this.params = [];
+  };
+  var proto = ctor.prototype;
 
-    proto.whereParam = function(propName) {
-        var param = new Param(this.config[propName], propName);
-        param.parent = this;
-        this.params.push(param);
-        return param;
-    };
-    return ctor;
+  proto.whereParam = function (propName) {
+    var param = new Param(this.config[propName], propName);
+    param.parent = this;
+    this.params.push(param);
+    return param;
+  };
+  return ctor;
 })();
 
-var assertConfig = function(config) {
-    return new ConfigParam(config);
+var assertConfig = function (config) {
+  return new ConfigParam(config);
 };
 
 // Param is exposed so that additional 'is' methods can be added to the prototype.
@@ -1018,840 +1022,846 @@ core.assertConfig = assertConfig;
  @module core
  **/
 
-var Enum = (function() {
+var Enum = (function () {
 
-    // TODO: think about CompositeEnum (flags impl).
+  // TODO: think about CompositeEnum (flags impl).
 
-    /**
-    Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
-    A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.
-    Unlike enums in some other environments, each 'symbol' can have both methods and properties.
+  /**
+   Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
+   A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.
+   Unlike enums in some other environments, each 'symbol' can have both methods and properties.
 
-    See the example below:
+   See the example below:
 
-        // Example of creating a new Enum
-        var prototype = {
+   // Example of creating a new Enum
+   var prototype = {
             nextDay: function () {
                 var nextIndex = (this.dayIndex+1) % 7;
                 return DayOfWeek.getSymbols()[nextIndex];
             }
         };
 
-        var DayOfWeek = new Enum("DayOfWeek", prototype);
-        DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
-        DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });
-        DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });
-        DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });
-        DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });
-        DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });
-        DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });
-        DayOfWeek.resolveSymbols();
+   var DayOfWeek = new Enum("DayOfWeek", prototype);
+   DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
+   DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });
+   DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });
+   DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });
+   DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });
+   DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });
+   DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });
+   DayOfWeek.resolveSymbols();
 
-        // custom methods
-        ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
-        ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
-        // custom properties
-        ok(DayOfWeek.Tuesday.isWeekend === undefined);
-        ok(DayOfWeek.Saturday.isWeekend == true);
-        // Standard enum capabilities
-        ok(DayOfWeek instanceof Enum);
-        ok(Enum.isSymbol(DayOfWeek.Wednesday));
-        ok(DayOfWeek.contains(DayOfWeek.Thursday));
-        ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
-        ok(DayOfWeek.getSymbols().length === 7);
-        ok(DayOfWeek.Friday.toString() === "Friday");
+   // custom methods
+   ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
+   ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
+   // custom properties
+   ok(DayOfWeek.Tuesday.isWeekend === undefined);
+   ok(DayOfWeek.Saturday.isWeekend == true);
+   // Standard enum capabilities
+   ok(DayOfWeek instanceof Enum);
+   ok(Enum.isSymbol(DayOfWeek.Wednesday));
+   ok(DayOfWeek.contains(DayOfWeek.Thursday));
+   ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
+   ok(DayOfWeek.getSymbols().length === 7);
+   ok(DayOfWeek.Friday.toString() === "Friday");
 
 
-    @class Enum
-    **/
+   @class Enum
+   **/
 
-    /**
-    Enum constructor - may be used to create new Enums.
-    @example
-        var prototype = {
+  /**
+   Enum constructor - may be used to create new Enums.
+   @example
+   var prototype = {
             nextDay: function () {
                 var nextIndex = (this.dayIndex+1) % 7;
                 return DayOfWeek.getSymbols()[nextIndex];
             }
         };
 
-        var DayOfWeek = new Enum("DayOfWeek", prototype);
-    @method <ctor> Enum
-    @param name {String}
-    @param [methodObj] {Object}
-    **/
+   var DayOfWeek = new Enum("DayOfWeek", prototype);
+   @method <ctor> Enum
+   @param name {String}
+   @param [methodObj] {Object}
+   **/
 
-    var ctor = function(name, methodObj) {
-        this.name = name;
-        var prototype = new EnumSymbol(methodObj);
-        prototype.parentEnum = this;
-        this._symbolPrototype = prototype;
-        if (methodObj) {
-            Object.keys(methodObj).forEach(function(key) {
-                prototype[key] = methodObj[key];
-            });
-        }
-    };
-    var proto = ctor.prototype;
+  var ctor = function (name, methodObj) {
+    this.name = name;
+    var prototype = new EnumSymbol(methodObj);
+    prototype.parentEnum = this;
+    this._symbolPrototype = prototype;
+    if (methodObj) {
+      Object.keys(methodObj).forEach(function (key) {
+        prototype[key] = methodObj[key];
+      });
+    }
+  };
+  var proto = ctor.prototype;
 
-    /**
-    Checks if an object is an Enum 'symbol'.
-    @example
-         if (Enum.isSymbol(DayOfWeek.Wednesday)) {
+  /**
+   Checks if an object is an Enum 'symbol'.
+   @example
+   if (Enum.isSymbol(DayOfWeek.Wednesday)) {
             // do something ...
          };
-    @method isSymbol
-    @return {Boolean}
-    @static
-    **/
-    ctor.isSymbol = function(obj) {
-        return obj instanceof EnumSymbol;
-    };
+   @method isSymbol
+   @return {Boolean}
+   @static
+   **/
+  ctor.isSymbol = function (obj) {
+    return obj instanceof EnumSymbol;
+  };
 
-    /**
-    Returns an Enum symbol given its name.
-    @example
-         var dayOfWeek = DayOfWeek.from("Thursday");
-         // nowdayOfWeek === DayOfWeek.Thursday            
-    @method fromName
-    @param name {String} Name for which an enum symbol should be returned.
-    @return {EnumSymbol} The symbol that matches the name or 'undefined' if not found.
-    **/
-    proto.fromName = function(name) {
-        return this[name];
-    };
+  /**
+   Returns an Enum symbol given its name.
+   @example
+   var dayOfWeek = DayOfWeek.from("Thursday");
+   // nowdayOfWeek === DayOfWeek.Thursday
+   @method fromName
+   @param name {String} Name for which an enum symbol should be returned.
+   @return {EnumSymbol} The symbol that matches the name or 'undefined' if not found.
+   **/
+  proto.fromName = function (name) {
+    return this[name];
+  };
 
-    /**
-    Adds a new symbol to an Enum.
-    @example
-        var DayOfWeek = new Enum("DayOfWeek", prototype);
-        DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
-    @method addSymbol
-    @param [propertiesObj] {Object} A collection of properties that should be added to the new symbol.
-    In other words, the 'propertiesObj' is any state that should be held by the symbol.
-    @return {EnumSymbol} The new symbol
-    **/
-    proto.addSymbol = function(propertiesObj) {
-        // TODO: check if sealed.
-        var newSymbol = Object.create(this._symbolPrototype);
-        if (propertiesObj) {
-            Object.keys(propertiesObj).forEach(function(key) {
-                newSymbol[key] = propertiesObj[key];
-            });
+  /**
+   Adds a new symbol to an Enum.
+   @example
+   var DayOfWeek = new Enum("DayOfWeek", prototype);
+   DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
+   @method addSymbol
+   @param [propertiesObj] {Object} A collection of properties that should be added to the new symbol.
+   In other words, the 'propertiesObj' is any state that should be held by the symbol.
+   @return {EnumSymbol} The new symbol
+   **/
+  proto.addSymbol = function (propertiesObj) {
+    // TODO: check if sealed.
+    var newSymbol = Object.create(this._symbolPrototype);
+    if (propertiesObj) {
+      Object.keys(propertiesObj).forEach(function (key) {
+        newSymbol[key] = propertiesObj[key];
+      });
+    }
+    setTimeout(function () {
+      newSymbol.getName();
+    }, 0);
+    return newSymbol;
+  };
+
+  /**
+   Seals this enum so that no more symbols may be added to it. This should only be called after all symbols
+   have already been added to the Enum.
+   @example
+   DayOfWeek.resolveSymbols();
+   @method resolveSymbols
+   **/
+  proto.resolveSymbols = function () {
+    this.getSymbols().forEach(function (sym) {
+      return sym.getName();
+    });
+  };
+
+  //// TODO: remove or rethink this.
+  //Enum.prototype.combineSymbols = function () {
+  //    var proto = this._symbolPrototype;
+  //    var newSymbol = Object.create(proto);
+  //    newSymbol._symbols = __arraySlice(arguments);
+
+  //    Object.keys(proto).forEach(function (key) {
+  //        var result;
+  //        var oldMethod = proto[key];
+  //        if (__isFunction(oldMethod)) {
+  //            var newMethod = function () {
+
+  //                if (this._symbols) {
+  //                    result = this._symbols.map(function (sym) {
+  //                        return oldMethod.apply(sym);
+  //                    });
+  //                } else {
+  //                    result = oldMethod.apply(this);
+  //                }
+  //                return result;
+  //            };
+  //            proto[key] = newMethod;
+  //        }
+  //    });
+  //    return newSymbol;
+  //};
+
+  /**
+   Returns all of the symbols contained within this Enum.
+   @example
+   var symbols = DayOfWeek.getSymbols();
+   @method getSymbols
+   @return {Array of EnumSymbol} All of the symbols contained within this Enum.
+   **/
+  proto.getSymbols = function () {
+    return this.getNames().map(function (key) {
+      return this[key];
+    }, this);
+  };
+
+  /**
+   Returns the names of all of the symbols contained within this Enum.
+   @example
+   var symbols = DayOfWeek.getNames();
+   @method getNames
+   @return {Array of String} All of the names of the symbols contained within this Enum.
+   **/
+  proto.getNames = function () {
+    var result = [];
+    for (var key in this) {
+      if (this.hasOwnProperty(key)) {
+        if (key !== "name" && key.substr(0, 1) !== "_" && !__isFunction(this[key])) {
+          result.push(key);
         }
-        setTimeout(function() { newSymbol.getName(); }, 0);
-        return newSymbol;
-    };
+      }
+    }
+    return result;
+  };
 
-    /**
-    Seals this enum so that no more symbols may be added to it. This should only be called after all symbols
-    have already been added to the Enum.
-    @example
-        DayOfWeek.resolveSymbols();
-    @method resolveSymbols
-    **/
-    proto.resolveSymbols = function() {
-        this.getSymbols().forEach(function(sym) { return sym.getName(); });
-    };
-
-    //// TODO: remove or rethink this.
-    //Enum.prototype.combineSymbols = function () {
-    //    var proto = this._symbolPrototype;
-    //    var newSymbol = Object.create(proto);
-    //    newSymbol._symbols = __arraySlice(arguments);
-
-    //    Object.keys(proto).forEach(function (key) {
-    //        var result;
-    //        var oldMethod = proto[key];
-    //        if (__isFunction(oldMethod)) {
-    //            var newMethod = function () {
-
-    //                if (this._symbols) {
-    //                    result = this._symbols.map(function (sym) {
-    //                        return oldMethod.apply(sym);
-    //                    });
-    //                } else {
-    //                    result = oldMethod.apply(this);
-    //                }
-    //                return result;
-    //            };
-    //            proto[key] = newMethod;
-    //        }
-    //    });
-    //    return newSymbol;
-    //};
-
-    /**
-    Returns all of the symbols contained within this Enum.
-    @example
-        var symbols = DayOfWeek.getSymbols();
-    @method getSymbols
-    @return {Array of EnumSymbol} All of the symbols contained within this Enum.
-    **/
-    proto.getSymbols = function() {
-        return this.getNames().map(function(key) {
-            return this[key];
-        }, this);
-    };
-
-    /**
-    Returns the names of all of the symbols contained within this Enum.
-    @example
-        var symbols = DayOfWeek.getNames();
-    @method getNames
-    @return {Array of String} All of the names of the symbols contained within this Enum.
-    **/
-    proto.getNames = function() {
-        var result = [];
-        for (var key in this) {
-            if (this.hasOwnProperty(key)) {
-                if (key !== "name" && key.substr(0, 1) !== "_" && !__isFunction(this[key])) {
-                    result.push(key);
-                }
-            }
-        }
-        return result;
-    };
-
-    /**
-    Returns whether an Enum contains a specified symbol. 
-    @example
-        var symbol = DayOfWeek.Friday;
-        if (DayOfWeek.contains(symbol)) {
+  /**
+   Returns whether an Enum contains a specified symbol.
+   @example
+   var symbol = DayOfWeek.Friday;
+   if (DayOfWeek.contains(symbol)) {
             // do something
         }
-    @method contains
-    @param {Object} Object or symbol to test.
-    @return {Boolean} Whether this Enum contains the specified symbol.
-    **/
-    proto.contains = function(sym) {
-        if (!(sym instanceof EnumSymbol)) {
-            return false;
-        }
-        return this[sym.getName()] === sym;
-    };
-
-    /**
-    One of the constant values that is generated by the {{#crossLink "Enum"}}{{/crossLink}} "addSymbol" method.  EnumSymbols should ONLY be created via
-    the Enum.addSymbol method.
-
-         var DayOfWeek = new Enum("DayOfWeek");
-         DayOfWeek.Monday    = DayOfWeek.addSymbol();
-    @class EnumSymbol
-    **/
-
-    function EnumSymbol() {
+   @method contains
+   @param {Object} Object or symbol to test.
+   @return {Boolean} Whether this Enum contains the specified symbol.
+   **/
+  proto.contains = function (sym) {
+    if (!(sym instanceof EnumSymbol)) {
+      return false;
     }
+    return this[sym.getName()] === sym;
+  };
 
-    /**
-    The {{#crossLink "Enum"}}{{/crossLink}} to which this symbol belongs.
-    __readOnly__
-    @property parentEnum {Enum}
-    **/
+  /**
+   One of the constant values that is generated by the {{#crossLink "Enum"}}{{/crossLink}} "addSymbol" method.  EnumSymbols should ONLY be created via
+   the Enum.addSymbol method.
 
-    /**
-    Returns the name of this symbol.
-    @example
-        var name = DayOfWeek.Monday.getName();
-        // name === "Monday"
-    @method getName
-    **/
-    EnumSymbol.prototype.getName = function() {
-        if (!this.name) {
-            var that = this;
-            this.name = __arrayFirst(this.parentEnum.getNames(), function(name) {
-                return that.parentEnum[name] === that;
-            });
-        }
-        return this.name;
+   var DayOfWeek = new Enum("DayOfWeek");
+   DayOfWeek.Monday    = DayOfWeek.addSymbol();
+   @class EnumSymbol
+   **/
+
+  function EnumSymbol() {
+  }
+
+  /**
+   The {{#crossLink "Enum"}}{{/crossLink}} to which this symbol belongs.
+   __readOnly__
+   @property parentEnum {Enum}
+   **/
+
+  /**
+   Returns the name of this symbol.
+   @example
+   var name = DayOfWeek.Monday.getName();
+   // name === "Monday"
+   @method getName
+   **/
+  EnumSymbol.prototype.getName = function () {
+    if (!this.name) {
+      var that = this;
+      this.name = __arrayFirst(this.parentEnum.getNames(), function (name) {
+        return that.parentEnum[name] === that;
+      });
+    }
+    return this.name;
+  };
+
+  /**
+   Same as the getName method. Returns the name of this symbol.
+   @example
+   var name = DayOfWeek.Monday.toString();
+   // name === "Monday"
+   @method toString
+   **/
+  EnumSymbol.prototype.toString = function () {
+    return this.getName();
+  };
+
+  EnumSymbol.prototype.toJSON = function () {
+    return {
+      _$typeName: this.parentEnum.name,
+      name: this.name
     };
+  };
 
-    /**
-    Same as the getName method. Returns the name of this symbol.
-    @example
-        var name = DayOfWeek.Monday.toString();
-        // name === "Monday"
-    @method toString
-    **/
-    EnumSymbol.prototype.toString = function() {
-        return this.getName();
-    };
-
-    EnumSymbol.prototype.toJSON = function() {
-        return {
-            _$typeName: this.parentEnum.name,
-            name: this.name
-        };
-    };
-
-    return ctor;
+  return ctor;
 })();
 core.Enum = Enum;
 
 
 ;/**
-@module core
-**/
+ @module core
+ **/
 
-var Event = (function() {
-  
-    var __eventNameMap = {};
-    var __nextUnsubKey = 1;
+var Event = (function () {
 
-    /**
-    Class to support basic event publication and subscription semantics.
-    @class Event
-    **/
+  var __eventNameMap = {};
+  var __nextUnsubKey = 1;
 
-    /**
-    Constructor for an Event
-    @example
-        salaryEvent = new Event("salaryEvent", person);
-    @method <ctor> Event
-    @param name {String}
-    @param publisher {Object} The object that will be doing the publication. i.e. the object to which this event is attached. 
-    @param [defaultErrorCallback] {Function} If omitted then subscriber notification failures will be ignored.
+  /**
+   Class to support basic event publication and subscription semantics.
+   @class Event
+   **/
 
-    errorCallback([e])
-    @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
-    **/
-
-    var ctor = function(name, publisher, defaultErrorCallback) {
-        assertParam(name, "eventName").isNonEmptyString().check();
-        assertParam(publisher, "publisher").isObject().check();
-
-        this.name = name;
-        // register the name
-        __eventNameMap[name] = true;
-        this.publisher = publisher;
-        if (defaultErrorCallback) {
-            this._defaultErrorCallback = defaultErrorCallback;
-        }
-    };
-    var proto = ctor.prototype;
-
-    /**
-    Publish data for this event.
-    @example
-        // Assume 'salaryEvent' is previously constructed Event
-        salaryEvent.publish( { eventType: "payRaise", amount: 100 });
-    This event can also be published asychronously
-    @example
-        salaryEvent.publish( { eventType: "payRaise", amount: 100 }, true);
-    And we can add a handler in case the subscriber 'mishandles' the event.
-    @example
-        salaryEvent.publish( { eventType: "payRaise", amount: 100 }, true, function(error) {
-            // do something with the 'error' object
-        });
-    @method publish
-    @param data {Object} Data to publish
-    @param [publishAsync=false] {Boolean} Whether to publish asynchonously or not.
-    @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted, 
-    errors will be eaten.
-
-    errorCallback([e])
-    @param [errorCallback.e] {Error} Any error encountered during publication execution.
-    @return {Boolean} false if event is disabled; true otherwise.
-    **/
-    proto.publish = function(data, publishAsync, errorCallback) {
-
-        if (!ctor._isEnabled(this.name, this.publisher)) return false;
-
-        if (publishAsync === true) {
-            setTimeout(publishCore, 0, this, data, errorCallback);
-        } else {
-            publishCore(this, data, errorCallback);
-        }
-        return true;
-    };
-
-    function publishCore(that, data, errorCallback) {
-        var subscribers = that._subscribers;
-        if (!subscribers) return true;
-        // subscribers from outer scope.
-        subscribers.forEach(function(s) {
-            try {
-                s.callback(data);
-            } catch(e) {
-                e.context = "unable to publish on topic: " + that.name;
-                if (errorCallback) {
-                    errorCallback(e);
-                } else if (that._defaultErrorCallback) {
-                    that._defaultErrorCallback(e);
-                } else {
-                    fallbackErrorHandler(e);
-                }
-            }
-        });
-    }
-
-    /**
-   Publish data for this event asynchronously.
+  /**
+   Constructor for an Event
    @example
-       // Assume 'salaryEvent' is previously constructed Event
-       salaryEvent.publishAsync( { eventType: "payRaise", amount: 100 });
+   salaryEvent = new Event("salaryEvent", person);
+   @method <ctor> Event
+   @param name {String}
+   @param publisher {Object} The object that will be doing the publication. i.e. the object to which this event is attached.
+   @param [defaultErrorCallback] {Function} If omitted then subscriber notification failures will be ignored.
+
+   errorCallback([e])
+   @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
+   **/
+
+  var ctor = function (name, publisher, defaultErrorCallback) {
+    assertParam(name, "eventName").isNonEmptyString().check();
+    assertParam(publisher, "publisher").isObject().check();
+
+    this.name = name;
+    // register the name
+    __eventNameMap[name] = true;
+    this.publisher = publisher;
+    if (defaultErrorCallback) {
+      this._defaultErrorCallback = defaultErrorCallback;
+    }
+  };
+  var proto = ctor.prototype;
+
+  /**
+   Publish data for this event.
+   @example
+   // Assume 'salaryEvent' is previously constructed Event
+   salaryEvent.publish( { eventType: "payRaise", amount: 100 });
+   This event can also be published asychronously
+   @example
+   salaryEvent.publish( { eventType: "payRaise", amount: 100 }, true);
    And we can add a handler in case the subscriber 'mishandles' the event.
    @example
-       salaryEvent.publishAsync( { eventType: "payRaise", amount: 100 }, function(error) {
+   salaryEvent.publish( { eventType: "payRaise", amount: 100 }, true, function(error) {
+            // do something with the 'error' object
+        });
+   @method publish
+   @param data {Object} Data to publish
+   @param [publishAsync=false] {Boolean} Whether to publish asynchonously or not.
+   @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
+   errors will be eaten.
+
+   errorCallback([e])
+   @param [errorCallback.e] {Error} Any error encountered during publication execution.
+   @return {Boolean} false if event is disabled; true otherwise.
+   **/
+  proto.publish = function (data, publishAsync, errorCallback) {
+
+    if (!ctor._isEnabled(this.name, this.publisher)) return false;
+
+    if (publishAsync === true) {
+      setTimeout(publishCore, 0, this, data, errorCallback);
+    } else {
+      publishCore(this, data, errorCallback);
+    }
+    return true;
+  };
+
+  function publishCore(that, data, errorCallback) {
+    var subscribers = that._subscribers;
+    if (!subscribers) return true;
+    // subscribers from outer scope.
+    subscribers.forEach(function (s) {
+      try {
+        s.callback(data);
+      } catch (e) {
+        e.context = "unable to publish on topic: " + that.name;
+        if (errorCallback) {
+          errorCallback(e);
+        } else if (that._defaultErrorCallback) {
+          that._defaultErrorCallback(e);
+        } else {
+          fallbackErrorHandler(e);
+        }
+      }
+    });
+  }
+
+  /**
+   Publish data for this event asynchronously.
+   @example
+   // Assume 'salaryEvent' is previously constructed Event
+   salaryEvent.publishAsync( { eventType: "payRaise", amount: 100 });
+   And we can add a handler in case the subscriber 'mishandles' the event.
+   @example
+   salaryEvent.publishAsync( { eventType: "payRaise", amount: 100 }, function(error) {
            // do something with the 'error' object
        });
    @method publishAsync
    @param data {Object} Data to publish
-   @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted, 
+   @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
    errors will be eaten.
 
    errorCallback([e])
    @param [errorCallback.e] {Error} Any error encountered during publication execution.
    **/
-    proto.publishAsync = function(data, errorCallback) {
-        this.publish(data, true, errorCallback);
-    };
+  proto.publishAsync = function (data, errorCallback) {
+    this.publish(data, true, errorCallback);
+  };
 
-    /**
-    Subscribe to this event.
-    @example
-        // Assume 'salaryEvent' is previously constructed Event
-        salaryEvent.subscribe(function (eventArgs) {
+  /**
+   Subscribe to this event.
+   @example
+   // Assume 'salaryEvent' is previously constructed Event
+   salaryEvent.subscribe(function (eventArgs) {
             if (eventArgs.eventType === "payRaise") {
                // do something
             }
         });
-    There are several built in Breeze events, such as EntityAspect.propertyChanged, EntityAspect.validationErrorsChanged as well.
-    @example
-         // Assume order is a preexisting 'order' entity
-         order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
+   There are several built in Breeze events, such as EntityAspect.propertyChanged, EntityAspect.validationErrorsChanged as well.
+   @example
+   // Assume order is a preexisting 'order' entity
+   order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
              if ( pcEvent.propertyName === "OrderDate") {
                  // do something
              }
          });
-    @method subscribe
-    @param [callback] {Function} Will be called whenever 'data' is published for this event. 
+   @method subscribe
+   @param [callback] {Function} Will be called whenever 'data' is published for this event.
 
-        callback([data])
-        @param [callback.data] {Object} Whatever 'data' was published.  This should be documented on the specific event.
-    @return {Number} This is a key for 'unsubscription'.  It can be passed to the 'unsubscribe' method.
-    **/
-    proto.subscribe = function(callback) {
-        if (!this._subscribers) {
-            this._subscribers = [];
-        }
-
-        var unsubKey = __nextUnsubKey;
-        this._subscribers.push({ unsubKey: unsubKey, callback: callback });
-        ++__nextUnsubKey;
-        return unsubKey;
-    };
-
-    /**
-    Unsubscribe from this event. 
-    @example
-        // Assume order is a preexisting 'order' entity
-        var token = order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
-                // do something
-        });
-        // sometime later
-        order.entityAspect.propertyChanged.unsubscribe(token);
-    @method unsubscribe
-    @param unsubKey {Number} The value returned from the 'subscribe' method may be used to unsubscribe here.
-    @return {Boolean} Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
-    cannot be found.
-    **/
-    proto.unsubscribe = function(unsubKey) {
-        if (!this._subscribers) return false;
-        var subs = this._subscribers;
-        var ix = __arrayIndexOf(subs, function(s) {
-            return s.unsubKey === unsubKey;
-        });
-        if (ix !== -1) {
-            subs.splice(ix, 1);
-            if (subs.length === 0) {
-                this._subscribers = null;
-            }
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    proto.clear = function() {
-        this._subscribers = null;
-    };
-
-    // event bubbling - document later.
-    ctor.bubbleEvent = function(target, getParentFn) {
-        target._getEventParent = getParentFn;
-    };
-
-    /**
-    Enables or disables the named event for an object and all of its children. 
-    @example
-        Event.enable(“propertyChanged”, myEntityManager, false) 
-    will disable all EntityAspect.propertyChanged events within a EntityManager.
-    @example
-        Event.enable(“propertyChanged”, myEntityManager, true) 
-    will enable all EntityAspect.propertyChanged events within a EntityManager.
-    @example
-        Event.enable(“propertyChanged”, myEntity.entityAspect, false) 
-    will disable EntityAspect.propertyChanged events for a specific entity.
-    @example
-        Event.enable(“propertyChanged”, myEntity.entityAspect, null) 
-    will removes any enabling / disabling at the entity aspect level so now any 'Event.enable' calls at the EntityManager level, 
-    made either previously or in the future, will control notification.
-    @example
-        Event.enable(“validationErrorsChanged”, myEntityManager, function(em) {     
-           return em.customTag === “blue”;
-        })                 
-    will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager. 
-    Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.
-    @method enable
-    @static
-    @param eventName {String} The name of the event. 
-    @param target {Object} The object at which enabling or disabling will occur.  All event notifications that occur to this object or 
-    children of this object will be enabled or disabled. 
-    @param isEnabled {Boolean|null|Function} A boolean, a null or a function that returns either a boolean or a null. 
-    **/
-    ctor.enable = function(eventName, obj, isEnabled) {
-        assertParam(eventName, "eventName").isNonEmptyString().check();
-        assertParam(obj, "obj").isObject().check();
-        assertParam(isEnabled, "isEnabled").isBoolean().isOptional().or().isFunction().check();
-        if (!obj._$eventMap) {
-            obj._$eventMap = {};
-        }
-        obj._$eventMap[eventName] = isEnabled;
-    };
-
-
-    /**
-    Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set. 
-    @example
-        Event.isEnabled(“propertyChanged”, myEntityManager) 
-    
-    @method isEnabled
-    @static
-    @param eventName {String} The name of the event. 
-    @param target {Object} The object for which we want to know if notifications are enabled. 
-    @return {Boolean|null} A null is returned if this value has not been set.
-    **/
-    ctor.isEnabled = function(eventName, obj) {
-        assertParam(eventName, "eventName").isNonEmptyString().check();
-        assertParam(obj, "obj").isObject().check();
-        if (!obj._getEventParent) {
-            throw new Error("This object does not support event enabling/disabling");
-        }
-        // return ctor._isEnabled(obj, getFullEventName(eventName));
-        return ctor._isEnabled(obj, eventName);
-    };
-
-    ctor._isEnabled = function(eventName, obj) {
-        var isEnabled = null;
-        var eventMap = obj._$eventMap;
-        if (eventMap) {
-            isEnabled = eventMap[eventName];
-        }
-        if (isEnabled != null) {
-            if (typeof isEnabled === 'function') {
-                return isEnabled(obj);
-            } else {
-                return !!isEnabled;
-            }
-        } else {
-            var parent = obj._getEventParent && obj._getEventParent();
-            if (parent) {
-                return ctor._isEnabled(eventName, parent);
-            } else {
-                // default if not explicitly disabled.
-                return true;
-            }
-        }
-    };
-
-    function fallbackErrorHandler(e) {
-        // TODO: maybe log this 
-        // for now do nothing;
+   callback([data])
+   @param [callback.data] {Object} Whatever 'data' was published.  This should be documented on the specific event.
+   @return {Number} This is a key for 'unsubscription'.  It can be passed to the 'unsubscribe' method.
+   **/
+  proto.subscribe = function (callback) {
+    if (!this._subscribers) {
+      this._subscribers = [];
     }
 
-    return ctor;
+    var unsubKey = __nextUnsubKey;
+    this._subscribers.push({ unsubKey: unsubKey, callback: callback });
+    ++__nextUnsubKey;
+    return unsubKey;
+  };
+
+  /**
+   Unsubscribe from this event.
+   @example
+   // Assume order is a preexisting 'order' entity
+   var token = order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
+                // do something
+        });
+   // sometime later
+   order.entityAspect.propertyChanged.unsubscribe(token);
+   @method unsubscribe
+   @param unsubKey {Number} The value returned from the 'subscribe' method may be used to unsubscribe here.
+   @return {Boolean} Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
+   cannot be found.
+   **/
+  proto.unsubscribe = function (unsubKey) {
+    if (!this._subscribers) return false;
+    var subs = this._subscribers;
+    var ix = __arrayIndexOf(subs, function (s) {
+      return s.unsubKey === unsubKey;
+    });
+    if (ix !== -1) {
+      subs.splice(ix, 1);
+      if (subs.length === 0) {
+        this._subscribers = null;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  proto.clear = function () {
+    this._subscribers = null;
+  };
+
+  // event bubbling - document later.
+  ctor.bubbleEvent = function (target, getParentFn) {
+    target._getEventParent = getParentFn;
+  };
+
+  /**
+   Enables or disables the named event for an object and all of its children.
+   @example
+   Event.enable(“propertyChanged”, myEntityManager, false)
+   will disable all EntityAspect.propertyChanged events within a EntityManager.
+   @example
+   Event.enable(“propertyChanged”, myEntityManager, true)
+   will enable all EntityAspect.propertyChanged events within a EntityManager.
+   @example
+   Event.enable(“propertyChanged”, myEntity.entityAspect, false)
+   will disable EntityAspect.propertyChanged events for a specific entity.
+   @example
+   Event.enable(“propertyChanged”, myEntity.entityAspect, null)
+   will removes any enabling / disabling at the entity aspect level so now any 'Event.enable' calls at the EntityManager level,
+   made either previously or in the future, will control notification.
+   @example
+   Event.enable(“validationErrorsChanged”, myEntityManager, function(em) {
+           return em.customTag === “blue”;
+        })
+   will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager.
+   Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.
+   @method enable
+   @static
+   @param eventName {String} The name of the event.
+   @param target {Object} The object at which enabling or disabling will occur.  All event notifications that occur to this object or
+   children of this object will be enabled or disabled.
+   @param isEnabled {Boolean|null|Function} A boolean, a null or a function that returns either a boolean or a null.
+   **/
+  ctor.enable = function (eventName, obj, isEnabled) {
+    assertParam(eventName, "eventName").isNonEmptyString().check();
+    assertParam(obj, "obj").isObject().check();
+    assertParam(isEnabled, "isEnabled").isBoolean().isOptional().or().isFunction().check();
+    if (!obj._$eventMap) {
+      obj._$eventMap = {};
+    }
+    obj._$eventMap[eventName] = isEnabled;
+  };
+
+
+  /**
+   Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set.
+   @example
+   Event.isEnabled(“propertyChanged”, myEntityManager)
+
+   @method isEnabled
+   @static
+   @param eventName {String} The name of the event.
+   @param target {Object} The object for which we want to know if notifications are enabled.
+   @return {Boolean|null} A null is returned if this value has not been set.
+   **/
+  ctor.isEnabled = function (eventName, obj) {
+    assertParam(eventName, "eventName").isNonEmptyString().check();
+    assertParam(obj, "obj").isObject().check();
+    if (!obj._getEventParent) {
+      throw new Error("This object does not support event enabling/disabling");
+    }
+    // return ctor._isEnabled(obj, getFullEventName(eventName));
+    return ctor._isEnabled(obj, eventName);
+  };
+
+  ctor._isEnabled = function (eventName, obj) {
+    var isEnabled = null;
+    var eventMap = obj._$eventMap;
+    if (eventMap) {
+      isEnabled = eventMap[eventName];
+    }
+    if (isEnabled != null) {
+      if (typeof isEnabled === 'function') {
+        return isEnabled(obj);
+      } else {
+        return !!isEnabled;
+      }
+    } else {
+      var parent = obj._getEventParent && obj._getEventParent();
+      if (parent) {
+        return ctor._isEnabled(eventName, parent);
+      } else {
+        // default if not explicitly disabled.
+        return true;
+      }
+    }
+  };
+
+  function fallbackErrorHandler(e) {
+    // TODO: maybe log this
+    // for now do nothing;
+  }
+
+  return ctor;
 
 })();
 
 core.Event = Event;;/**
-@module breeze   
-**/
+ @module breeze
+ **/
 
 var __config = (function () {
 
-    // alias for within fns with a config param
-    var __config = {};
+  // alias for within fns with a config param
+  var __config = {};
 
-    __config.functionRegistry = {};
-    __config.typeRegistry = {};
-    __config.objectRegistry = {};
-    __config.interfaceInitialized = new Event("interfaceInitialized", __config);
+  __config.functionRegistry = {};
+  __config.typeRegistry = {};
+  __config.objectRegistry = {};
+  __config.interfaceInitialized = new Event("interfaceInitialized", __config);
 
-    var InterfaceDef = function(name) {
-        this.name = name;
-        this.defaultInstance = null;
-        this._implMap = {};
-    };
+  var InterfaceDef = function (name) {
+    this.name = name;
+    this.defaultInstance = null;
+    this._implMap = {};
+  };
 
-    InterfaceDef.prototype.registerCtor = function(adapterName, ctor) {
-        this._implMap[adapterName.toLowerCase()] = { ctor: ctor, defaultInstance: null };
-    };
-    InterfaceDef.prototype.getImpl = function(adapterName) {
-        return this._implMap[adapterName.toLowerCase()];
-    };
-    InterfaceDef.prototype.getFirstImpl = function() {
-        var kv = __objectFirst(this._implMap, function() { return true; });
-        return kv ? kv.value : null;
-    };
+  InterfaceDef.prototype.registerCtor = function (adapterName, ctor) {
+    this._implMap[adapterName.toLowerCase()] = { ctor: ctor, defaultInstance: null };
+  };
+  InterfaceDef.prototype.getImpl = function (adapterName) {
+    return this._implMap[adapterName.toLowerCase()];
+  };
+  InterfaceDef.prototype.getFirstImpl = function () {
+    var kv = __objectFirst(this._implMap, function () {
+      return true;
+    });
+    return kv ? kv.value : null;
+  };
 
-    __config.interfaceRegistry = {
-        ajax: new InterfaceDef("ajax"),
-        modelLibrary: new InterfaceDef("modelLibrary"),
-        dataService: new InterfaceDef("dataService")
-        // uriBuilder: new InterfaceDef("uriBuilder")
-    };
+  __config.interfaceRegistry = {
+    ajax: new InterfaceDef("ajax"),
+    modelLibrary: new InterfaceDef("modelLibrary"),
+    dataService: new InterfaceDef("dataService")
+    // uriBuilder: new InterfaceDef("uriBuilder")
+  };
 
-    __config.interfaceRegistry.modelLibrary.getDefaultInstance = function() {
-        if (!this.defaultInstance) {
-            throw new Error("Unable to locate the default implementation of the '" + this.name +
-                "' interface.  Possible options are 'ko', 'backingStore' or 'backbone'. See the breeze.config.initializeAdapterInstances method.");
-        }
-        return this.defaultInstance;
-    };
+  __config.interfaceRegistry.modelLibrary.getDefaultInstance = function () {
+    if (!this.defaultInstance) {
+      throw new Error("Unable to locate the default implementation of the '" + this.name +
+          "' interface.  Possible options are 'ko', 'backingStore' or 'backbone'. See the breeze.config.initializeAdapterInstances method.");
+    }
+    return this.defaultInstance;
+  };
 
-    /**
-    A singleton object that is the repository of all configuration options.
+  /**
+   A singleton object that is the repository of all configuration options.
 
-        config.initializeAdapterInstance( {
+   config.initializeAdapterInstance( {
             modelLibrary: "ko",
             dataService: "webApi"
         });
-        
-    @class config
-    **/
 
-    /**
-    This method is now OBSOLETE.  Use the "initializeAdapterInstances" to accomplish the same result.
-    @method setProperties
-    @deprecated
-    @param config {Object}
-        @param [config.remoteAccessImplementation] { implementation of remoteAccess-interface }
-        @param [config.trackingImplementation] { implementation of entityTracking-interface }
-        @param [config.ajaxImplementation] {implementation of ajax-interface }
-    **/
-    __config.setProperties = function(config) {
-        assertConfig(config)
-            .whereParam("remoteAccessImplementation").isOptional()
-            .whereParam("trackingImplementation").isOptional()
-            .whereParam("ajaxImplementation").isOptional()
-            .applyAll(config);
-        if (config.remoteAccessImplementation) {
-            __config.initializeAdapterInstance("dataService", config.remoteAccessImplementation);
-        }
-        if (config.trackingImplementation) {
-            // note the name change
-            __config.initializeAdapterInstance("modelLibrary", config.trackingImplementation);
-        }
-        if (config.ajaxImplementation) {
-            __config.initializeAdapterInstance("ajax", config.ajaxImplementation);
-        }
-    };
+   @class config
+   **/
 
-    /**
-    Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
-    made as the last step within an adapter implementation. 
-    @method registerAdapter
-    @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
-    @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.  
-    **/
-    __config.registerAdapter = function(interfaceName, adapterCtor) {
-        assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
-        assertParam(adapterCtor, "adapterCtor").isFunction().check();
-        // this impl will be thrown away after the name is retrieved.
-        var impl = new adapterCtor();
-        var implName = impl.name;
-        if (!implName) {
-            throw new Error("Unable to locate a 'name' property on the constructor passed into the 'registerAdapter' call.");
-        }
-        var idef = getInterfaceDef(interfaceName);
-        idef.registerCtor(implName, adapterCtor);
+  /**
+   This method is now OBSOLETE.  Use the "initializeAdapterInstances" to accomplish the same result.
+   @method setProperties
+   @deprecated
+   @param config {Object}
+   @param [config.remoteAccessImplementation] { implementation of remoteAccess-interface }
+   @param [config.trackingImplementation] { implementation of entityTracking-interface }
+   @param [config.ajaxImplementation] {implementation of ajax-interface }
+   **/
+  __config.setProperties = function (config) {
+    assertConfig(config)
+        .whereParam("remoteAccessImplementation").isOptional()
+        .whereParam("trackingImplementation").isOptional()
+        .whereParam("ajaxImplementation").isOptional()
+        .applyAll(config);
+    if (config.remoteAccessImplementation) {
+      __config.initializeAdapterInstance("dataService", config.remoteAccessImplementation);
+    }
+    if (config.trackingImplementation) {
+      // note the name change
+      __config.initializeAdapterInstance("modelLibrary", config.trackingImplementation);
+    }
+    if (config.ajaxImplementation) {
+      __config.initializeAdapterInstance("ajax", config.ajaxImplementation);
+    }
+  };
 
-    };
+  /**
+   Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
+   made as the last step within an adapter implementation.
+   @method registerAdapter
+   @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
+   @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
+   **/
+  __config.registerAdapter = function (interfaceName, adapterCtor) {
+    assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
+    assertParam(adapterCtor, "adapterCtor").isFunction().check();
+    // this impl will be thrown away after the name is retrieved.
+    var impl = new adapterCtor();
+    var implName = impl.name;
+    if (!implName) {
+      throw new Error("Unable to locate a 'name' property on the constructor passed into the 'registerAdapter' call.");
+    }
+    var idef = getInterfaceDef(interfaceName);
+    idef.registerCtor(implName, adapterCtor);
 
-    /**
-    Returns the ctor function used to implement a specific interface with a specific adapter name.
-    @method getAdapter
-    @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
-    @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
-    this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
-    @return {Function|null} Returns either a ctor function or null.
-    **/
-    __config.getAdapter = function(interfaceName, adapterName) {
-        var idef = getInterfaceDef(interfaceName);
-        if (adapterName) {
-            var impl = idef.getImpl(adapterName);
-            return impl ? impl.ctor : null;
-        } else {
-            return idef.defaultInstance ? idef.defaultInstance._$impl.ctor : null;
-        }
-    };
+  };
 
-    /**
-    Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
-    @method initializeAdapterInstances
-    @param config {Object}
-    @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
-    @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
-    @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
-    @return [array of instances]
-    **/
-    __config.initializeAdapterInstances = function(config) {
-        assertConfig(config)
-            .whereParam("dataService").isOptional()
-            .whereParam("modelLibrary").isOptional()
-            .whereParam("ajax").isOptional()
-            // .whereParam("uriBuilder").isOptional()
-            .applyAll(this, false);
-        return __objectMapToArray(config, __config.initializeAdapterInstance);
+  /**
+   Returns the ctor function used to implement a specific interface with a specific adapter name.
+   @method getAdapter
+   @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
+   @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
+   this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
+   @return {Function|null} Returns either a ctor function or null.
+   **/
+  __config.getAdapter = function (interfaceName, adapterName) {
+    var idef = getInterfaceDef(interfaceName);
+    if (adapterName) {
+      var impl = idef.getImpl(adapterName);
+      return impl ? impl.ctor : null;
+    } else {
+      return idef.defaultInstance ? idef.defaultInstance._$impl.ctor : null;
+    }
+  };
 
-    };
+  /**
+   Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
+   @method initializeAdapterInstances
+   @param config {Object}
+   @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
+   @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
+   @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+   @return [array of instances]
+   **/
+  __config.initializeAdapterInstances = function (config) {
+    assertConfig(config)
+        .whereParam("dataService").isOptional()
+        .whereParam("modelLibrary").isOptional()
+        .whereParam("ajax").isOptional()
+      // .whereParam("uriBuilder").isOptional()
+        .applyAll(this, false);
+    return __objectMapToArray(config, __config.initializeAdapterInstance);
 
-    /**
-    Initializes a single adapter implementation. Initialization means either newing a instance of the 
-    specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
-    if it already exists.
-    @method initializeAdapterInstance
-    @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
-    @param adapterName {String} - The name of a previously registered adapter to initialize.
-    @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface. 
-    @return {an instance of the specified adapter}
-    **/
-    __config.initializeAdapterInstance = function(interfaceName, adapterName, isDefault) {
-        isDefault = isDefault === undefined ? true : isDefault;
-        assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
-        assertParam(adapterName, "adapterName").isNonEmptyString().check();
-        assertParam(isDefault, "isDefault").isBoolean().check();
+  };
 
-        var idef = getInterfaceDef(interfaceName);
-        var impl = idef.getImpl(adapterName);
-        if (!impl) {
-            throw new Error("Unregistered adapter.  Interface: " + interfaceName + " AdapterName: " + adapterName);
-        }
+  /**
+   Initializes a single adapter implementation. Initialization means either newing a instance of the
+   specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
+   if it already exists.
+   @method initializeAdapterInstance
+   @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
+   @param adapterName {String} - The name of a previously registered adapter to initialize.
+   @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface.
+   @return {an instance of the specified adapter}
+   **/
+  __config.initializeAdapterInstance = function (interfaceName, adapterName, isDefault) {
+    isDefault = isDefault === undefined ? true : isDefault;
+    assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
+    assertParam(adapterName, "adapterName").isNonEmptyString().check();
+    assertParam(isDefault, "isDefault").isBoolean().check();
 
-        return initializeAdapterInstanceCore(idef, impl, isDefault);
-    };
-
-    /**
-    Returns the adapter instance corresponding to the specified interface and adapter names.
-    @method getAdapterInstance
-    @param interfaceName {String} The name of the interface.
-    @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
-    omitted then the default implementation of the specified interface is returned. If there is
-    no defaultInstance of this interface, then the first registered instance of this interface is returned.
-    @return {an instance of the specified adapter}
-    **/
-    __config.getAdapterInstance = function(interfaceName, adapterName) {
-        var idef = getInterfaceDef(interfaceName);
-        var impl;
-        if (adapterName && adapterName !== "") {
-            impl = idef.getImpl(adapterName);
-            return impl ? impl.defaultInstance : null;
-        } else {
-            if (idef.defaultInstance) {
-                return idef.defaultInstance;
-            } else {
-                impl = idef.getFirstImpl();
-                if (impl.defaultInstance) {
-                    return impl.defaultInstance;
-                } else {
-                    return initializeAdapterInstanceCore(idef, impl, true);
-                }
-            }
-        }
-    };
-
-    // this is needed for reflection purposes when deserializing an object that needs a fn or ctor
-    // used to register validators.
-    __config.registerFunction = function(fn, fnName) {
-        assertParam(fn, "fn").isFunction().check();
-        assertParam(fnName, "fnName").isString().check();
-        fn.prototype._$fnName = fnName;
-        __config.functionRegistry[fnName] = fn;
-    };
-
-    __config.getRegisteredFunction = function(fnName) {
-      return __config.functionRegistry[fnName];
-    };
-
-    __config._storeObject = function(obj, type, name) {
-        // uncomment this if we make this public.
-        //assertParam(obj, "obj").isObject().check();
-        //assertParam(name, "objName").isString().check();
-        var key = (typeof(type) === "string" ? type : type.prototype._$typeName) + "." + name;
-        __config.objectRegistry[key] = obj;
-    };
-
-    __config._fetchObject = function(type, name) {
-        if (!name) return undefined;
-        var key = (typeof(type) === "string" ? type : type.prototype._$typeName) + "." + name;
-        var result = __config.objectRegistry[key];
-        if (!result) {
-            throw new Error("Unable to locate a registered object by the name: " + key);
-        }
-        return result;
-    };
-
-    __config.registerType = function(ctor, typeName) {
-        assertParam(ctor, "ctor").isFunction().check();
-        assertParam(typeName, "typeName").isString().check();
-        ctor.prototype._$typeName = typeName;
-        __config.typeRegistry[typeName] = ctor;
-    };
-
-    __config.stringifyPad = '';
-
-    function initializeAdapterInstanceCore(interfaceDef, impl, isDefault) {
-        var instance = impl.defaultInstance;
-        if (!instance) {
-            instance = new (impl.ctor)();
-            impl.defaultInstance = instance;
-            instance._$impl = impl;
-        }
-
-        instance.initialize();
-
-        if (isDefault) {
-            // next line needs to occur before any recomposition 
-            interfaceDef.defaultInstance = instance;
-        }
-
-        // recomposition of other impls will occur here.
-        __config.interfaceInitialized.publish({ interfaceName: interfaceDef.name, instance: instance, isDefault: true });
-
-        if (instance.checkForRecomposition) {
-            // now register for own dependencies.
-            __config.interfaceInitialized.subscribe(function(interfaceInitializedArgs) {
-                instance.checkForRecomposition(interfaceInitializedArgs);
-            });
-        }
-
-        return instance;
+    var idef = getInterfaceDef(interfaceName);
+    var impl = idef.getImpl(adapterName);
+    if (!impl) {
+      throw new Error("Unregistered adapter.  Interface: " + interfaceName + " AdapterName: " + adapterName);
     }
 
-    function getInterfaceDef(interfaceName) {
-        var lcName = interfaceName.toLowerCase();
-        // source may be null
-        var kv = __objectFirst(__config.interfaceRegistry || {}, function(k, v) {
-            return k.toLowerCase() === lcName;
-        });
-        if (!kv) {
-            throw new Error("Unknown interface name: " + interfaceName);
+    return initializeAdapterInstanceCore(idef, impl, isDefault);
+  };
+
+  /**
+   Returns the adapter instance corresponding to the specified interface and adapter names.
+   @method getAdapterInstance
+   @param interfaceName {String} The name of the interface.
+   @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
+   omitted then the default implementation of the specified interface is returned. If there is
+   no defaultInstance of this interface, then the first registered instance of this interface is returned.
+   @return {an instance of the specified adapter}
+   **/
+  __config.getAdapterInstance = function (interfaceName, adapterName) {
+    var idef = getInterfaceDef(interfaceName);
+    var impl;
+    if (adapterName && adapterName !== "") {
+      impl = idef.getImpl(adapterName);
+      return impl ? impl.defaultInstance : null;
+    } else {
+      if (idef.defaultInstance) {
+        return idef.defaultInstance;
+      } else {
+        impl = idef.getFirstImpl();
+        if (impl.defaultInstance) {
+          return impl.defaultInstance;
+        } else {
+          return initializeAdapterInstanceCore(idef, impl, true);
         }
-        return kv.value;
+      }
+    }
+  };
+
+  // this is needed for reflection purposes when deserializing an object that needs a fn or ctor
+  // used to register validators.
+  __config.registerFunction = function (fn, fnName) {
+    assertParam(fn, "fn").isFunction().check();
+    assertParam(fnName, "fnName").isString().check();
+    fn.prototype._$fnName = fnName;
+    __config.functionRegistry[fnName] = fn;
+  };
+
+  __config.getRegisteredFunction = function (fnName) {
+    return __config.functionRegistry[fnName];
+  };
+
+  __config._storeObject = function (obj, type, name) {
+    // uncomment this if we make this public.
+    //assertParam(obj, "obj").isObject().check();
+    //assertParam(name, "objName").isString().check();
+    var key = (typeof(type) === "string" ? type : type.prototype._$typeName) + "." + name;
+    __config.objectRegistry[key] = obj;
+  };
+
+  __config._fetchObject = function (type, name) {
+    if (!name) return undefined;
+    var key = (typeof(type) === "string" ? type : type.prototype._$typeName) + "." + name;
+    var result = __config.objectRegistry[key];
+    if (!result) {
+      throw new Error("Unable to locate a registered object by the name: " + key);
+    }
+    return result;
+  };
+
+  __config.registerType = function (ctor, typeName) {
+    assertParam(ctor, "ctor").isFunction().check();
+    assertParam(typeName, "typeName").isString().check();
+    ctor.prototype._$typeName = typeName;
+    __config.typeRegistry[typeName] = ctor;
+  };
+
+  __config.stringifyPad = '';
+
+  function initializeAdapterInstanceCore(interfaceDef, impl, isDefault) {
+    var instance = impl.defaultInstance;
+    if (!instance) {
+      instance = new (impl.ctor)();
+      impl.defaultInstance = instance;
+      instance._$impl = impl;
     }
 
-    return __config;
+    instance.initialize();
+
+    if (isDefault) {
+      // next line needs to occur before any recomposition
+      interfaceDef.defaultInstance = instance;
+    }
+
+    // recomposition of other impls will occur here.
+    __config.interfaceInitialized.publish({ interfaceName: interfaceDef.name, instance: instance, isDefault: true });
+
+    if (instance.checkForRecomposition) {
+      // now register for own dependencies.
+      __config.interfaceInitialized.subscribe(function (interfaceInitializedArgs) {
+        instance.checkForRecomposition(interfaceInitializedArgs);
+      });
+    }
+
+    return instance;
+  }
+
+  function getInterfaceDef(interfaceName) {
+    var lcName = interfaceName.toLowerCase();
+    // source may be null
+    var kv = __objectFirst(__config.interfaceRegistry || {}, function (k, v) {
+      return k.toLowerCase() === lcName;
+    });
+    if (!kv) {
+      throw new Error("Unknown interface name: " + interfaceName);
+    }
+    return kv.value;
+  }
+
+  return __config;
 })();
 
 var __modelLibraryDef = __config.interfaceRegistry.modelLibrary;
@@ -1859,242 +1869,240 @@ var __modelLibraryDef = __config.interfaceRegistry.modelLibrary;
 // legacy
 core.config = __config;
 
-breeze.config = __config;;
-var observableArray = (function() {
+breeze.config = __config;;var observableArray = (function () {
 
-    var mixin = {};
-    mixin.push = function() {
-        if (this._inProgress) {
-            return -1;
-        }
-
-        var goodAdds = this._getGoodAdds(__arraySlice(arguments));
-        if (!goodAdds.length) {
-            return this.length;
-        }
-        this._beforeChange();
-        var result = Array.prototype.push.apply(this, goodAdds);
-        processAdds(this, goodAdds);
-        return result;
-    };
-
-    mixin._push = function () {
-        if (this._inProgress) {
-            return -1;
-        }
-        var goodAdds = __arraySlice(arguments);
-        this._beforeChange();
-        var result = Array.prototype.push.apply(this, goodAdds);
-        processAdds(this, goodAdds);
-        return result;
-    };
-
-    mixin.unshift = function () {
-        var goodAdds = this._getGoodAdds( __arraySlice(arguments));
-        if (!goodAdds.length) {
-            return this.length;
-        }
-        this._beforeChange();
-        var result = Array.prototype.unshift.apply(this, goodAdds);
-        processAdds(this, __arraySlice(goodAdds));
-        return result;
-    };
-
-    mixin.pop = function () {
-        this._beforeChange();
-        var result = Array.prototype.pop.apply(this);
-        processRemoves(this, [result]);
-        return result;
-    };
-
-    mixin.shift = function () {
-        this._beforeChange();
-        var result = Array.prototype.shift.apply(this);
-        processRemoves(this, [result]);
-        return result;
-    };
-
-    mixin.splice = function () {
-        var goodAdds = this._getGoodAdds( __arraySlice(arguments, 2));
-        var newArgs = __arraySlice(arguments, 0, 2).concat(goodAdds);
-        this._beforeChange();
-        var result = Array.prototype.splice.apply(this, newArgs);
-        processRemoves(this, result);
-
-        if (goodAdds.length) {
-            processAdds(this, goodAdds);
-        }
-        return result;
-    };
-
-    mixin.getEntityAspect = function() {
-        return this.parent.entityAspect || this.parent.complexAspect.getEntityAspect();
+  var mixin = {};
+  mixin.push = function () {
+    if (this._inProgress) {
+      return -1;
     }
 
-    mixin._getEventParent = function () {
-        return this.getEntityAspect();
-    };
-
-    mixin._getPendingPubs = function () {
-        var em = this.getEntityAspect().entityManager;
-        return em && em._pendingPubs;
-    };
-
-    mixin._beforeChange = function() {
-        // default is to do nothing
-    };
-
-    function updateEntityState(obsArray) {
-        var entityAspect = obsArray.getEntityAspect();
-        if (entityAspect.entityState.isUnchanged()) {
-            entityAspect.setModified();
-        }
-        if (entityAspect.entityState.isModified() && !obsArray._origValues) {
-            obsArray._origValues = obsArray.slice(0);
-        }
+    var goodAdds = this._getGoodAdds(__arraySlice(arguments));
+    if (!goodAdds.length) {
+      return this.length;
     }
+    this._beforeChange();
+    var result = Array.prototype.push.apply(this, goodAdds);
+    processAdds(this, goodAdds);
+    return result;
+  };
 
-    function processAdds(obsArray, adds) {
-        obsArray._processAdds(adds);
-        // this is referencing the name of the method on the complexArray not the name of the event
-        //var args = { added: adds };
-        //args[obsArray._typeName] = obsArray;
-        publish(obsArray, "arrayChanged", { array: obsArray, added: adds });
+  mixin._push = function () {
+    if (this._inProgress) {
+      return -1;
     }
+    var goodAdds = __arraySlice(arguments);
+    this._beforeChange();
+    var result = Array.prototype.push.apply(this, goodAdds);
+    processAdds(this, goodAdds);
+    return result;
+  };
 
-    function processRemoves(obsArray, removes) {
-        obsArray._processRemoves(removes);
-        // this is referencing the name of the method on the array not the name of the event
-        publish(obsArray, "arrayChanged", { array: obsArray, removed: removes });
+  mixin.unshift = function () {
+    var goodAdds = this._getGoodAdds(__arraySlice(arguments));
+    if (!goodAdds.length) {
+      return this.length;
     }
+    this._beforeChange();
+    var result = Array.prototype.unshift.apply(this, goodAdds);
+    processAdds(this, __arraySlice(goodAdds));
+    return result;
+  };
 
-    function publish(publisher, eventName, eventArgs) {
-        var pendingPubs = publisher._getPendingPubs();
-        if (pendingPubs) {
-            if (!publisher._pendingArgs) {
-                publisher._pendingArgs = eventArgs;
-                pendingPubs.push(function() {
-                    publisher[eventName].publish(publisher._pendingArgs);
-                    publisher._pendingArgs = null;
-                });
-            } else {
-                combineArgs(publisher._pendingArgs, eventArgs);
-            }
+  mixin.pop = function () {
+    this._beforeChange();
+    var result = Array.prototype.pop.apply(this);
+    processRemoves(this, [result]);
+    return result;
+  };
+
+  mixin.shift = function () {
+    this._beforeChange();
+    var result = Array.prototype.shift.apply(this);
+    processRemoves(this, [result]);
+    return result;
+  };
+
+  mixin.splice = function () {
+    var goodAdds = this._getGoodAdds(__arraySlice(arguments, 2));
+    var newArgs = __arraySlice(arguments, 0, 2).concat(goodAdds);
+    this._beforeChange();
+    var result = Array.prototype.splice.apply(this, newArgs);
+    processRemoves(this, result);
+
+    if (goodAdds.length) {
+      processAdds(this, goodAdds);
+    }
+    return result;
+  };
+
+  mixin.getEntityAspect = function () {
+    return this.parent.entityAspect || this.parent.complexAspect.getEntityAspect();
+  }
+
+  mixin._getEventParent = function () {
+    return this.getEntityAspect();
+  };
+
+  mixin._getPendingPubs = function () {
+    var em = this.getEntityAspect().entityManager;
+    return em && em._pendingPubs;
+  };
+
+  mixin._beforeChange = function () {
+    // default is to do nothing
+  };
+
+  function updateEntityState(obsArray) {
+    var entityAspect = obsArray.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
+    }
+    if (entityAspect.entityState.isModified() && !obsArray._origValues) {
+      obsArray._origValues = obsArray.slice(0);
+    }
+  }
+
+  function processAdds(obsArray, adds) {
+    obsArray._processAdds(adds);
+    // this is referencing the name of the method on the complexArray not the name of the event
+    //var args = { added: adds };
+    //args[obsArray._typeName] = obsArray;
+    publish(obsArray, "arrayChanged", { array: obsArray, added: adds });
+  }
+
+  function processRemoves(obsArray, removes) {
+    obsArray._processRemoves(removes);
+    // this is referencing the name of the method on the array not the name of the event
+    publish(obsArray, "arrayChanged", { array: obsArray, removed: removes });
+  }
+
+  function publish(publisher, eventName, eventArgs) {
+    var pendingPubs = publisher._getPendingPubs();
+    if (pendingPubs) {
+      if (!publisher._pendingArgs) {
+        publisher._pendingArgs = eventArgs;
+        pendingPubs.push(function () {
+          publisher[eventName].publish(publisher._pendingArgs);
+          publisher._pendingArgs = null;
+        });
+      } else {
+        combineArgs(publisher._pendingArgs, eventArgs);
+      }
+    } else {
+      publisher[eventName].publish(eventArgs);
+    }
+  }
+
+  function combineArgs(target, source) {
+    for (var key in source) {
+      if (key !== "array" && target.hasOwnProperty(key)) {
+        var sourceValue = source[key];
+        var targetValue = target[key];
+        if (targetValue) {
+          if (!Array.isArray(targetValue)) {
+            throw new Error("Cannot combine non array args");
+          }
+          Array.prototype.push.apply(targetValue, sourceValue);
         } else {
-            publisher[eventName].publish(eventArgs);
+          target[key] = sourceValue;
         }
+      }
     }
+  }
 
-    function combineArgs(target, source) {
-        for (var key in source) {
-            if (key !== "array" && target.hasOwnProperty(key)) {
-                var sourceValue = source[key];
-                var targetValue = target[key];
-                if (targetValue) {
-                    if (!Array.isArray(targetValue)) {
-                        throw new Error("Cannot combine non array args");
-                    }
-                    Array.prototype.push.apply(targetValue, sourceValue);
-                } else {
-                    target[key] = sourceValue;
-                }
-            }
-        }
-    }
-
-    function initializeParent(obsArray, parent, parentProperty) {
-        obsArray.parent = parent;
-        obsArray.parentProperty = parentProperty;
-    }
+  function initializeParent(obsArray, parent, parentProperty) {
+    obsArray.parent = parent;
+    obsArray.parentProperty = parentProperty;
+  }
 
 
-    return {
-        mixin: mixin,
-        publish: publish,
-        updateEntityState: updateEntityState,
-        initializeParent: initializeParent
-    };
-
+  return {
+    mixin: mixin,
+    publish: publish,
+    updateEntityState: updateEntityState,
+    initializeParent: initializeParent
+  };
 
 
 })();;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var Validator = (function () {
 
-    var INT16_MIN = -32768;
-    var INT16_MAX = 32767;
+  var INT16_MIN = -32768;
+  var INT16_MAX = 32767;
 
-    var INT32_MIN = -2147483648;
-    var INT32_MAX = 2147483647;
+  var INT32_MIN = -2147483648;
+  var INT32_MAX = 2147483647;
 
-    var BYTE_MIN = 0;
-    var BYTE_MAX = 255;
+  var BYTE_MIN = 0;
+  var BYTE_MAX = 255;
 
-    // add common props and methods for every validator 'context' here.
-    var rootContext = {
-        displayName: function (context) {
-            if (context.property) {
-                return context.property.resolveProperty("displayName") || context.propertyName || context.property.name;
-            } else {
-                return "Value";
-            }
-        }
-    };
+  // add common props and methods for every validator 'context' here.
+  var rootContext = {
+    displayName: function (context) {
+      if (context.property) {
+        return context.property.resolveProperty("displayName") || context.propertyName || context.property.name;
+      } else {
+        return "Value";
+      }
+    }
+  };
 
-    /**
-    Instances of the Validator class provide the logic to validate another object and provide a description of any errors
-    encountered during the validation process.  They are typically associated with a 'validators' property on the following types: {{#crossLink "EntityType"}}{{/crossLink}}, 
-    {{#crossLink "DataProperty"}}{{/crossLink}} or {{#crossLink "NavigationProperty"}}{{/crossLink}}.
-        
-    A number of property level validators are registered automatically, i.e added to each DataProperty.validators property 
-    based on {{#crossLink "DataProperty"}}{{/crossLink}} metadata.  For example, 
-        
-    - DataProperty.dataType -> one of the 'dataType' validator methods such as Validator.int64, Validator.date, Validator.bool etc.
-    - DataProperty.maxLength -> Validator.maxLength 
-    - DataProperty.isNullable -> Validator.required (if not nullable)
+  /**
+   Instances of the Validator class provide the logic to validate another object and provide a description of any errors
+   encountered during the validation process.  They are typically associated with a 'validators' property on the following types: {{#crossLink "EntityType"}}{{/crossLink}},
+   {{#crossLink "DataProperty"}}{{/crossLink}} or {{#crossLink "NavigationProperty"}}{{/crossLink}}.
 
-    @class Validator
-    **/
-        
-    /**
-    Validator constructor - This method is used to create create custom validations.  Several
-    basic "Validator" construction methods are also provided as static methods to this class. These methods
-    provide a simpler syntax for creating basic validations.
-   
-    Many of these stock validators are inspired by and implemented to conform to the validators defined at
-    http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx
+   A number of property level validators are registered automatically, i.e added to each DataProperty.validators property
+   based on {{#crossLink "DataProperty"}}{{/crossLink}} metadata.  For example,
 
-    Sometimes a custom validator will be required.
-    @example
-    Most validators will be 'property' level validators, like this.
-    @example
-        // v is this function is the value to be validated, in this case a "country" string.
-        var valFn = function (v) {
+   - DataProperty.dataType -> one of the 'dataType' validator methods such as Validator.int64, Validator.date, Validator.bool etc.
+   - DataProperty.maxLength -> Validator.maxLength
+   - DataProperty.isNullable -> Validator.required (if not nullable)
+
+   @class Validator
+   **/
+
+  /**
+   Validator constructor - This method is used to create create custom validations.  Several
+   basic "Validator" construction methods are also provided as static methods to this class. These methods
+   provide a simpler syntax for creating basic validations.
+
+   Many of these stock validators are inspired by and implemented to conform to the validators defined at
+   http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx
+
+   Sometimes a custom validator will be required.
+   @example
+   Most validators will be 'property' level validators, like this.
+   @example
+   // v is this function is the value to be validated, in this case a "country" string.
+   var valFn = function (v) {
             if (v == null) return true;
             return (core.stringStartsWith(v, "US"));
         };
-        var countryValidator = new Validator("countryIsUS", valFn, { 
+   var countryValidator = new Validator("countryIsUS", valFn, {
             displayName: "Country", 
             messageTemplate: "'%displayName%' must start with 'US'" 
         });
 
-        // Now plug it into Breeze.
-        // Assume em1 is a preexisting EntityManager.
-        var custType = metadataStore.getEntityType("Customer");
-        var countryProp = custType.getProperty("Country");
-        // Note that validator is added to a 'DataProperty' validators collection.
-        prop.validators.push(countryValidator);
-    Entity level validators are also possible
-    @example
-        function isValidZipCode(value) {
+   // Now plug it into Breeze.
+   // Assume em1 is a preexisting EntityManager.
+   var custType = metadataStore.getEntityType("Customer");
+   var countryProp = custType.getProperty("Country");
+   // Note that validator is added to a 'DataProperty' validators collection.
+   prop.validators.push(countryValidator);
+   Entity level validators are also possible
+   @example
+   function isValidZipCode(value) {
             var re = /^\d{5}([\-]\d{4})?$/;
             return (re.test(value));
-        }               
-           
-        // v in this case will be a Customer entity
-        var valFn = function (v) {
+        }
+
+   // v in this case will be a Customer entity
+   var valFn = function (v) {
             // This validator only validates US Zip Codes.
             if ( v.getProperty("Country") === "USA") {
                 var postalCode = v.getProperty("PostalCode");
@@ -2102,20 +2110,20 @@ var Validator = (function () {
             }
             return true;
         };
-        var zipCodeValidator = new Validator("zipCodeValidator", valFn, 
-            { messageTemplate: "For the US, this is not a valid PostalCode" });
-        
-        // Now plug it into Breeze.
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        // Note that validator is added to an 'EntityType' validators collection.
-        custType.validators.push(zipCodeValidator);
-    What is commonly needed is a way of creating a parameterized function that will itself
-    return a new Validator.  This requires the use of a 'context' object.
-    @example
-        // create a function that will take in a config object
-        // and will return a validator
-        var numericRangeValidator = function(context) {
+   var zipCodeValidator = new Validator("zipCodeValidator", valFn,
+   { messageTemplate: "For the US, this is not a valid PostalCode" });
+
+   // Now plug it into Breeze.
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   // Note that validator is added to an 'EntityType' validators collection.
+   custType.validators.push(zipCodeValidator);
+   What is commonly needed is a way of creating a parameterized function that will itself
+   return a new Validator.  This requires the use of a 'context' object.
+   @example
+   // create a function that will take in a config object
+   // and will return a validator
+   var numericRangeValidator = function(context) {
             var valFn = function(v, ctx) {
                 if (v == null) return true;
                 if (typeof(v) !== "number") return false;
@@ -2131,3915 +2139,3942 @@ var Validator = (function () {
                 max: context.max
             });
         };
-        // Assume that freightProperty is a DataEntityProperty that describes numeric values.
-        // register the validator
-        freightProperty.validators.push(numericRangeValidator({ min: 100, max: 500 }));
+   // Assume that freightProperty is a DataEntityProperty that describes numeric values.
+   // register the validator
+   freightProperty.validators.push(numericRangeValidator({ min: 100, max: 500 }));
 
-    Breeze substitutes context values and functions for the tokens in the messageTemplate when preparing the runtime error message;
-    'displayName' is a pre-defined context function that is always available.
+   Breeze substitutes context values and functions for the tokens in the messageTemplate when preparing the runtime error message;
+   'displayName' is a pre-defined context function that is always available.
 
-    Please note that Breeze substitutes the empty string for falsey parameters. That usually works in your favor. 
-    Sometimes it doesn't as when the 'min' value is zero in which case the message text would have a hole 
-    where the 'min' value goes, saying: "... an integer between the values of and ...". That is not what you want.
+   Please note that Breeze substitutes the empty string for falsey parameters. That usually works in your favor.
+   Sometimes it doesn't as when the 'min' value is zero in which case the message text would have a hole
+   where the 'min' value goes, saying: "... an integer between the values of and ...". That is not what you want.
 
-    To avoid this effect, you may can bake certain of the context values into the 'messageTemplate' itself
-    as shown in this revision to the pertinent part of the previous example:
-    @example
-        // ... as before 
-        // ... but bake the min/max values into the message template.
-        var template = breeze.core.formatString(
-            "'%displayName%' must be a number between the values of %1 and %2",
-            context.min, context.max);
-        return new Validator("numericRange", valFn, {
+   To avoid this effect, you may can bake certain of the context values into the 'messageTemplate' itself
+   as shown in this revision to the pertinent part of the previous example:
+   @example
+   // ... as before
+   // ... but bake the min/max values into the message template.
+   var template = breeze.core.formatString(
+   "'%displayName%' must be a number between the values of %1 and %2",
+   context.min, context.max);
+   return new Validator("numericRange", valFn, {
             messageTemplate: template,
             min: context.min,
             max: context.max
         });
 
-    @method <ctor> Validator
-    @param name {String} The name of this validator.
-    @param validatorFn {Function} A function to perform validation.
-            
-    validatorFn(value, context)
-    @param validatorFn.value {Object} Value to be validated
-    @param validatorFn.context {Object} The same context object passed into the constructor with the following additional properties if not
-    otherwise specified.
-    @param validatorFn.context.value {Object} The value being validated.
-    @param validatorFn.context.name {String} The name of the validator being executed.
-    @param validatorFn.context.displayName {String} This will be either the value of the property's 'displayName' property or
-    the value of its 'name' property or the string 'Value'
-    @param validatorFn.context.messageTemplate {String} This will either be the value of Validator.messageTemplates[ {this validators name}] or null. Validator.messageTemplates
-    is an object that is keyed by validator name and that can be added to in order to 'register' your own message for a given validator. 
-    The following property can also be specified for any validator to force a specific errorMessage string
-    @param [validatorFn.context.message] {String} If this property is set it will be used instead of the 'messageTemplate' property when an
-    error message is generated. 
-                    
-    @param [context] {Object} A free form object whose properties will made available during the validation and error message creation process.
-    This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
-    of additional properties that will be automatically added to this object if not otherwise specified. 
-    **/
-    var ctor = function (name, valFn, context) {
-        // _baseContext is what will get serialized 
-        this._baseContext = context || {};
-        this._baseContext.name = name;
-        context = __extend(Object.create(rootContext), this._baseContext);
-        context.messageTemplate = context.messageTemplate || ctor.messageTemplates[name];
-        this.name = name;
-        this.valFn = valFn;
-        this.context = context;
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = "Validator";
-    
-    /**
-    The name of this validator.
+   @method <ctor> Validator
+   @param name {String} The name of this validator.
+   @param validatorFn {Function} A function to perform validation.
 
-    __readOnly__
-    @property name {String}
-    **/
+   validatorFn(value, context)
+   @param validatorFn.value {Object} Value to be validated
+   @param validatorFn.context {Object} The same context object passed into the constructor with the following additional properties if not
+   otherwise specified.
+   @param validatorFn.context.value {Object} The value being validated.
+   @param validatorFn.context.name {String} The name of the validator being executed.
+   @param validatorFn.context.displayName {String} This will be either the value of the property's 'displayName' property or
+   the value of its 'name' property or the string 'Value'
+   @param validatorFn.context.messageTemplate {String} This will either be the value of Validator.messageTemplates[ {this validators name}] or null. Validator.messageTemplates
+   is an object that is keyed by validator name and that can be added to in order to 'register' your own message for a given validator.
+   The following property can also be specified for any validator to force a specific errorMessage string
+   @param [validatorFn.context.message] {String} If this property is set it will be used instead of the 'messageTemplate' property when an
+   error message is generated.
 
-    /**
-    The context for this validator.
-        
-    This object will typically contain at a minimum the following properties. "name", "displayName", and "message" or "messageTemplate".
-    __readOnly__
-    @property context {Object}
-    **/
+   @param [context] {Object} A free form object whose properties will made available during the validation and error message creation process.
+   This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
+   of additional properties that will be automatically added to this object if not otherwise specified.
+   **/
+  var ctor = function (name, valFn, context) {
+    // _baseContext is what will get serialized
+    this._baseContext = context || {};
+    this._baseContext.name = name;
+    context = __extend(Object.create(rootContext), this._baseContext);
+    context.messageTemplate = context.messageTemplate || ctor.messageTemplates[name];
+    this.name = name;
+    this.valFn = valFn;
+    this.context = context;
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = "Validator";
+
+  /**
+   The name of this validator.
+
+   __readOnly__
+   @property name {String}
+   **/
+
+  /**
+   The context for this validator.
+
+   This object will typically contain at a minimum the following properties. "name", "displayName", and "message" or "messageTemplate".
+   __readOnly__
+   @property context {Object}
+   **/
 
 
-    /**
-    Run this validator against the specified value.  This method will usually be called internally either
-    automatically by an property change, entity attach, query or save operation, or manually as a result of
-    a validateEntity call on the EntityAspect. The resulting ValidationResults are available via the 
-    EntityAspect.getValidationErrors method.
+  /**
+   Run this validator against the specified value.  This method will usually be called internally either
+   automatically by an property change, entity attach, query or save operation, or manually as a result of
+   a validateEntity call on the EntityAspect. The resulting ValidationResults are available via the
+   EntityAspect.getValidationErrors method.
 
-    However, you can also call a validator directly either for testing purposes or some other reason if needed.
-    @example
-        // using one of the predefined validators
-        var validator = Validator.maxLength({ maxLength: 5, displayName: "City" });
-        // should be ok because "asdf".length < 5
-        var result = validator.validate("asdf");
-        ok(result === null);
-        result = validator.validate("adasdfasdf");
-        // extract all of the properties of the 'result'
-        var errMsg = result.errorMessage;
-        var context = result.context;
-        var sameValidator = result.validator;
-    @method validate
-    @param value {Object} Value to validate
-    @param additionalContext {Object} Any additional contextual information that the Validator
-    can make use of.
-    @return {ValidationError|null} A ValidationError if validation fails, null otherwise
-    **/
-    proto.validate = function (value, additionalContext) {
-        var currentContext;
-        if (additionalContext) {
-            currentContext = __extend(Object.create(this.context), additionalContext);
+   However, you can also call a validator directly either for testing purposes or some other reason if needed.
+   @example
+   // using one of the predefined validators
+   var validator = Validator.maxLength({ maxLength: 5, displayName: "City" });
+   // should be ok because "asdf".length < 5
+   var result = validator.validate("asdf");
+   ok(result === null);
+   result = validator.validate("adasdfasdf");
+   // extract all of the properties of the 'result'
+   var errMsg = result.errorMessage;
+   var context = result.context;
+   var sameValidator = result.validator;
+   @method validate
+   @param value {Object} Value to validate
+   @param additionalContext {Object} Any additional contextual information that the Validator
+   can make use of.
+   @return {ValidationError|null} A ValidationError if validation fails, null otherwise
+   **/
+  proto.validate = function (value, additionalContext) {
+    var currentContext;
+    if (additionalContext) {
+      currentContext = __extend(Object.create(this.context), additionalContext);
+    } else {
+      currentContext = this.context;
+    }
+    this.currentContext = currentContext;
+
+    try {
+      if (this.valFn(value, currentContext)) {
+        return null;
+      } else {
+        currentContext.value = value;
+        return new ValidationError(this, currentContext, this.getMessage());
+      }
+    } catch (e) {
+      return new ValidationError(this, currentContext, "Exception occured while executing this validator: " + this.name);
+    }
+  };
+
+
+  // context.value is not avail unless validate was called first.
+
+  /**
+   Returns the message generated by the most recent execution of this Validator.
+   @example
+   var v0 = Validator.maxLength({ maxLength: 5, displayName: "City" });
+   v0.validate("adasdfasdf");
+   var errMessage = v0.getMessage());
+   @method getMessage
+   @return {String}
+   **/
+  proto.getMessage = function () {
+    try {
+      var context = this.currentContext;
+      var message = context.message;
+      if (message) {
+        if (typeof (message) === "function") {
+          return message(context);
         } else {
-            currentContext = this.context;
+          return message;
         }
-        this.currentContext = currentContext;
-        
-        try {
-            if (this.valFn(value, currentContext)) {
-                return null;
-            } else {
-                currentContext.value = value;
-                return new ValidationError(this, currentContext, this.getMessage());
-            }
-        } catch (e) {
-            return new ValidationError(this, currentContext, "Exception occured while executing this validator: " + this.name);
-        }
-    };
+      } else if (context.messageTemplate) {
+        return formatTemplate(context.messageTemplate, context);
+      } else {
+        return "invalid value: " + (this.name || "{unnamed validator}");
+      }
+    } catch (e) {
+      return "Unable to format error message" + e.toString();
+    }
+  };
 
-        
-    // context.value is not avail unless validate was called first.
+  proto.toJSON = function () {
+    return this._baseContext;
+  };
 
-    /**
-    Returns the message generated by the most recent execution of this Validator.
-    @example
-        var v0 = Validator.maxLength({ maxLength: 5, displayName: "City" });
-        v0.validate("adasdfasdf");
-        var errMessage = v0.getMessage());
-    @method getMessage
-    @return {String}
-    **/
-    proto.getMessage = function () {
-        try {
-            var context = this.currentContext;
-            var message = context.message;
-            if (message) {
-                if (typeof (message) === "function") {
-                    return message(context);
-                } else {
-                    return message;
-                }
-            } else if (context.messageTemplate) {
-                return formatTemplate(context.messageTemplate, context);
-            } else {
-                return "invalid value: " + (this.name || "{unnamed validator}");
-            }
-        } catch (e) {
-            return "Unable to format error message" + e.toString();
-        }
-    };
+  /**
+   Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
+   @method fromJSON
+   @static
+   @param json {Object} JSON object that represents the serialized version of a validator.
+   **/
+  ctor.fromJSON = function (json) {
+    if (Array.isArray(json)) {
+      return json.map(function (js) {
+        return ctor.fromJSON(js);
+      });
+    }
+    ;
+    var validatorName = "Validator." + json.name;
+    var fn = __config.getRegisteredFunction(validatorName);
+    if (!fn) {
+      throw new Error("Unable to locate a validator named:" + json.name);
+    }
+    return fn(json);
+  };
 
-    proto.toJSON = function () {
-        return this._baseContext;
-    };
+  /**
+   Register a validator instance so that any deserialized metadata can reference it.
+   @method register
+   @static
+   @param validator {Validator} Validator to register.
+   **/
+  ctor.register = function (validator) {
+    __config.registerFunction(function () {
+      return validator;
+    }, "Validator." + validator.name);
+  };
 
-    /**
-    Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
-    @method fromJSON
-    @static
-    @param json {Object} JSON object that represents the serialized version of a validator.
-    **/
-    ctor.fromJSON = function (json) {
-        if (Array.isArray(json)) {
-            return json.map(function(js) { return ctor.fromJSON(js); });
-        };
-        var validatorName = "Validator." + json.name;
-        var fn = __config.getRegisteredFunction(validatorName);
-        if (!fn) {
-            throw new Error("Unable to locate a validator named:" + json.name);
-        }
-        return fn(json);
-    };
+  /**
+   Register a validator factory so that any deserialized metadata can reference it.
+   @method registerFactory
+   @static
+   @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
+   @param name {String} The name of the validator.
+   **/
+  ctor.registerFactory = function (validatorFn, name) {
+    __config.registerFunction(validatorFn, "Validator." + name);
+  };
 
-    /**
-    Register a validator instance so that any deserialized metadata can reference it. 
-    @method register
-    @static
-    @param validator {Validator} Validator to register.
-    **/
-    ctor.register = function(validator) {
-        __config.registerFunction(function () { return validator; }, "Validator." + validator.name);
-    };
-
-    /**
-    Register a validator factory so that any deserialized metadata can reference it. 
-    @method registerFactory
-    @static
-    @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
-    @param name {String} The name of the validator.
-    **/
-    ctor.registerFactory = function(validatorFn, name) {
-        __config.registerFunction(validatorFn, "Validator." + name);
-    };
-
-    /**
-    Map of standard error message templates keyed by validator name.
-    You can add to or modify this object to customize the template used for any validation error message.
-    @example
-        // v is this function is the value to be validated, in this case a "country" string.
-        var valFn = function (v) {
+  /**
+   Map of standard error message templates keyed by validator name.
+   You can add to or modify this object to customize the template used for any validation error message.
+   @example
+   // v is this function is the value to be validated, in this case a "country" string.
+   var valFn = function (v) {
             if (v == null) return true;
             return (core.stringStartsWith(v, "US"));
         };
-        var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" }); 
-        Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
-    This will have a similar effect to this
-            var countryValidator = new Validator("countryIsUS", valFn, { 
+   var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" });
+   Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
+   This will have a similar effect to this
+   var countryValidator = new Validator("countryIsUS", valFn, {
             displayName: "Country", 
             messageTemplate: "'%displayName%' must start with 'US'" 
         });
-    @property messageTemplates {Object}
-    @static
-    **/
-    ctor.messageTemplates = {
-        bool: "'%displayName%' must be a 'true' or 'false' value",
-        creditCard: "The %displayName% is not a valid credit card number",
-        date: "'%displayName%' must be a date",
-        duration: "'%displayName%' must be a ISO8601 duration string, such as 'P3H24M60S'",
-        emailAddress: "The %displayName% '%value%' is not a valid email address",
-        guid: "'%displayName%' must be a GUID",
-        integer: "'%displayName%' must be an integer",
-        integerRange: "'%displayName%' must be an integer between the values of %minValue% and %maxValue%",
-        maxLength: "'%displayName%' must be a string with %maxLength% characters or less",
-        number: "'%displayName%' must be a number",
-        phone: "The %displayName% '%value%' is not a valid phone number",
-        regularExpression: "The %displayName% '%value%' does not match '%expression%'",
-        required: "'%displayName%' is required",
-        string: "'%displayName%' must be a string",
-        stringLength: "'%displayName%' must be a string with between %minLength% and %maxLength% characters",
-        url: "The %displayName% '%value%' is not a valid url"
-    };
+   @property messageTemplates {Object}
+   @static
+   **/
+  ctor.messageTemplates = {
+    bool: "'%displayName%' must be a 'true' or 'false' value",
+    creditCard: "The %displayName% is not a valid credit card number",
+    date: "'%displayName%' must be a date",
+    duration: "'%displayName%' must be a ISO8601 duration string, such as 'P3H24M60S'",
+    emailAddress: "The %displayName% '%value%' is not a valid email address",
+    guid: "'%displayName%' must be a GUID",
+    integer: "'%displayName%' must be an integer",
+    integerRange: "'%displayName%' must be an integer between the values of %minValue% and %maxValue%",
+    maxLength: "'%displayName%' must be a string with %maxLength% characters or less",
+    number: "'%displayName%' must be a number",
+    phone: "The %displayName% '%value%' is not a valid phone number",
+    regularExpression: "The %displayName% '%value%' does not match '%expression%'",
+    required: "'%displayName%' is required",
+    string: "'%displayName%' must be a string",
+    stringLength: "'%displayName%' must be a string with between %minLength% and %maxLength% characters",
+    url: "The %displayName% '%value%' is not a valid url"
+  };
 
-    /**
-    Returns a standard 'required value' Validator
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var regionProperty - custType.getProperty("Region");
-        // Makes "Region" on Customer a required property.
-        regionProperty.validators.push(Validator.required());
-        // or to allow empty strings
-        regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
-    @method required
-    @static
-    @param context {Object} 
-    @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
-    @return {Validator} A new Validator
-    **/
-    ctor.required = function (context) {
-        var valFn = function (v, ctx) {
-            if (typeof v === "string") {
-                if (ctx && ctx.allowEmptyStrings) return true;
-                return v.length > 0;
-            } else {
-                return v != null;
-            }
-        };
-        return new ctor("required", valFn, context);
+  /**
+   Returns a standard 'required value' Validator
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var regionProperty - custType.getProperty("Region");
+   // Makes "Region" on Customer a required property.
+   regionProperty.validators.push(Validator.required());
+   // or to allow empty strings
+   regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
+   @method required
+   @static
+   @param context {Object}
+   @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
+   @return {Validator} A new Validator
+   **/
+  ctor.required = function (context) {
+    var valFn = function (v, ctx) {
+      if (typeof v === "string") {
+        if (ctx && ctx.allowEmptyStrings) return true;
+        return v.length > 0;
+      } else {
+        return v != null;
+      }
     };
+    return new ctor("required", valFn, context);
+  };
 
-    /**
-    Returns a standard maximum string length Validator; the maximum length must be specified
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var regionProperty - custType.getProperty("Region");
-        // Validates that the value of the Region property on Customer will be less than or equal to 5 characters.
-        regionProperty.validators.push(Validator.maxLength( {maxLength: 5}));
-    @method maxLength
-    @static
-    @param context {Object} 
-    @param context.maxLength {Integer}
-    @return {Validator} A new Validator
-    **/
-    ctor.maxLength = function (context) {
-        var valFn = function (v, ctx) {
-            if (v == null) return true;
-            if (typeof (v) !== "string") return false;
-            return v.length <= ctx.maxLength;
-        };
-        return new ctor("maxLength", valFn, context);
+  /**
+   Returns a standard maximum string length Validator; the maximum length must be specified
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var regionProperty - custType.getProperty("Region");
+   // Validates that the value of the Region property on Customer will be less than or equal to 5 characters.
+   regionProperty.validators.push(Validator.maxLength( {maxLength: 5}));
+   @method maxLength
+   @static
+   @param context {Object}
+   @param context.maxLength {Integer}
+   @return {Validator} A new Validator
+   **/
+  ctor.maxLength = function (context) {
+    var valFn = function (v, ctx) {
+      if (v == null) return true;
+      if (typeof (v) !== "string") return false;
+      return v.length <= ctx.maxLength;
     };
+    return new ctor("maxLength", valFn, context);
+  };
 
-    /**
-    Returns a standard string length Validator; both minimum and maximum lengths must be specified.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var regionProperty - custType.getProperty("Region");
-        // Validates that the value of the Region property on Customer will be 
-        // between 2 and 5 characters
-        regionProperty.validators.push(Validator.stringLength( {minLength: 2, maxLength: 5});
-    @method stringLength
-    @static
-    @param context {Object} 
-    @param context.maxLength {Integer}
-    @param context.minLength {Integer}
-    @return {Validator} A new Validator
-    **/
-    ctor.stringLength = function (context) {
-        var valFn = function (v, ctx) {
-            if (v == null) return true;
-            if (typeof (v) !== "string") return false;
-            if (ctx.minLength != null && v.length < ctx.minLength) return false;
-            if (ctx.maxLength != null && v.length > ctx.maxLength) return false;
-            return true;
-        };
-        return new ctor("stringLength", valFn, context);
+  /**
+   Returns a standard string length Validator; both minimum and maximum lengths must be specified.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var regionProperty - custType.getProperty("Region");
+   // Validates that the value of the Region property on Customer will be
+   // between 2 and 5 characters
+   regionProperty.validators.push(Validator.stringLength( {minLength: 2, maxLength: 5});
+   @method stringLength
+   @static
+   @param context {Object}
+   @param context.maxLength {Integer}
+   @param context.minLength {Integer}
+   @return {Validator} A new Validator
+   **/
+  ctor.stringLength = function (context) {
+    var valFn = function (v, ctx) {
+      if (v == null) return true;
+      if (typeof (v) !== "string") return false;
+      if (ctx.minLength != null && v.length < ctx.minLength) return false;
+      if (ctx.maxLength != null && v.length > ctx.maxLength) return false;
+      return true;
     };
+    return new ctor("stringLength", valFn, context);
+  };
 
-    /**
-    Returns a standard string dataType Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var regionProperty - custType.getProperty("Region");
-        // Validates that the value of the Region property on Customer is a string.
-        regionProperty.validators.push(Validator.string());
-    @method string
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.string = function () {
-        var valFn = function (v) {
-            if (v == null) return true;
-            return (typeof v === "string");
-        };
-        return new ctor("string", valFn );
+  /**
+   Returns a standard string dataType Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var regionProperty - custType.getProperty("Region");
+   // Validates that the value of the Region property on Customer is a string.
+   regionProperty.validators.push(Validator.string());
+   @method string
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.string = function () {
+    var valFn = function (v) {
+      if (v == null) return true;
+      return (typeof v === "string");
     };
+    return new ctor("string", valFn);
+  };
 
-    /**
-    Returns a Guid data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var customerIdProperty - custType.getProperty("CustomerID");
-        // Validates that the value of the CustomerID property on Customer is a Guid.
-        customerIdProperty.validators.push(Validator.guid());
-    @method guid
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.guid = function () {
-        var valFn = function (v) {
-            if (v == null) return true;
-            return __isGuid(v);
-        };
-        return new ctor("guid", valFn);
+  /**
+   Returns a Guid data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var customerIdProperty - custType.getProperty("CustomerID");
+   // Validates that the value of the CustomerID property on Customer is a Guid.
+   customerIdProperty.validators.push(Validator.guid());
+   @method guid
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.guid = function () {
+    var valFn = function (v) {
+      if (v == null) return true;
+      return __isGuid(v);
     };
+    return new ctor("guid", valFn);
+  };
 
-    /**
-    Returns a ISO 8601 duration string  Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var eventType = em1.metadataStore.getEntityType("Event");
-        var elapsedTimeProperty - eventType.getProperty("ElapsedTime");
-        // Validates that the value of the ElapsedTime property on Customer is a duration.
-        elapsedTimeProperty.validators.push(Validator.duration());
-    @method duration
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.duration = function() {
-        var valFn = function(v) {
-            if (v == null) return true;
-            return __isDuration(v);
-        };
-        return new ctor("duration", valFn);
+  /**
+   Returns a ISO 8601 duration string  Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var eventType = em1.metadataStore.getEntityType("Event");
+   var elapsedTimeProperty - eventType.getProperty("ElapsedTime");
+   // Validates that the value of the ElapsedTime property on Customer is a duration.
+   elapsedTimeProperty.validators.push(Validator.duration());
+   @method duration
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.duration = function () {
+    var valFn = function (v) {
+      if (v == null) return true;
+      return __isDuration(v);
     };
+    return new ctor("duration", valFn);
+  };
 
-    /**
-    Returns a standard numeric data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var freightProperty - orderType.getProperty("Freight");
-        // Validates that the value of the Freight property on Order is a number.
-        freightProperty.validators.push(Validator.number());
-    @method number 
-    @static
-    @return {Validator} A new Validator
-    **/
+  /**
+   Returns a standard numeric data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var freightProperty - orderType.getProperty("Freight");
+   // Validates that the value of the Freight property on Order is a number.
+   freightProperty.validators.push(Validator.number());
+   @method number
+   @static
+   @return {Validator} A new Validator
+   **/
 
     // TODO: may need to have seperate logic for single.
-    ctor.number = ctor.double = ctor.single = function (context) {
-        var valFn = function (v, ctx) {
-            if (v == null) return true;
-            if (typeof v === "string" && ctx && ctx.allowString) {
-                v = parseFloat(v, 10);
-            }
-            return (typeof v === "number" && !isNaN(v));
-        };
-        return new ctor("number", valFn, context);
+  ctor.number = ctor.double = ctor.single = function (context) {
+    var valFn = function (v, ctx) {
+      if (v == null) return true;
+      if (typeof v === "string" && ctx && ctx.allowString) {
+        v = parseFloat(v, 10);
+      }
+      return (typeof v === "number" && !isNaN(v));
     };
+    return new ctor("number", valFn, context);
+  };
 
-    /**
-    Returns a standard large integer data type - 64 bit - Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var freightProperty - orderType.getProperty("Freight");
-        // Validates that the value of the Freight property on Order is within the range of a 64 bit integer.
-        freightProperty.validators.push(Validator.int64());
-    @method int64
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.integer = ctor.int64 = function (context) {
-        var valFn = function (v, ctx) {
-            if (v == null) return true;
-            if (typeof v === "string" && ctx && ctx.allowString) {
-                v = parseInt(v, 10);
-            }
-            return (typeof v === "number") && (!isNaN(v)) && Math.floor(v) === v;
-        };
-        return new ctor("integer", valFn, context );
+  /**
+   Returns a standard large integer data type - 64 bit - Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var freightProperty - orderType.getProperty("Freight");
+   // Validates that the value of the Freight property on Order is within the range of a 64 bit integer.
+   freightProperty.validators.push(Validator.int64());
+   @method int64
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.integer = ctor.int64 = function (context) {
+    var valFn = function (v, ctx) {
+      if (v == null) return true;
+      if (typeof v === "string" && ctx && ctx.allowString) {
+        v = parseInt(v, 10);
+      }
+      return (typeof v === "number") && (!isNaN(v)) && Math.floor(v) === v;
     };
+    return new ctor("integer", valFn, context);
+  };
 
-    /**
-    Returns a standard 32 bit integer data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var freightProperty - orderType.getProperty("Freight");
-        freightProperty.validators.push(Validator.int32());
-    @method int32
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.int32 = function(context) {
-        return intRangeValidatorCtor("int32", INT32_MIN, INT32_MAX, context)();
+  /**
+   Returns a standard 32 bit integer data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var freightProperty - orderType.getProperty("Freight");
+   freightProperty.validators.push(Validator.int32());
+   @method int32
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.int32 = function (context) {
+    return intRangeValidatorCtor("int32", INT32_MIN, INT32_MAX, context)();
+  };
+
+  /**
+   Returns a standard 16 bit integer data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var freightProperty - orderType.getProperty("Freight");
+   // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
+   freightProperty.validators.push(Validator.int16());
+   @method int16
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.int16 = function (context) {
+    return intRangeValidatorCtor("int16", INT16_MIN, INT16_MAX, context)();
+  };
+
+  /**
+   Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var freightProperty - orderType.getProperty("Freight");
+   // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
+   // Probably not a very good validation to place on the Freight property.
+   regionProperty.validators.push(Validator.byte());
+   @method byte
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.byte = function (context) {
+    return intRangeValidatorCtor("byte", BYTE_MIN, BYTE_MAX, context)();
+  };
+
+  /**
+   Returns a standard boolean data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var productType = em1.metadataStore.getEntityType("Product");
+   var discontinuedProperty - productType.getProperty("Discontinued");
+   // Validates that the value of the Discontinued property on Product is a boolean
+   discontinuedProperty.validators.push(Validator.bool());
+   @method bool
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.bool = function () {
+    var valFn = function (v) {
+      if (v == null) return true;
+      return (v === true) || (v === false);
     };
+    return new ctor("bool", valFn);
+  };
 
-    /**
-    Returns a standard 16 bit integer data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var freightProperty - orderType.getProperty("Freight");
-        // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
-        freightProperty.validators.push(Validator.int16());
-    @method int16
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.int16 = function (context) {
-        return intRangeValidatorCtor("int16", INT16_MIN, INT16_MAX, context)();
+  ctor.none = function () {
+    var valFn = function (v) {
+      return true;
     };
+    return new ctor("none", valFn);
+  };
 
-    /**
-    Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var freightProperty - orderType.getProperty("Freight");
-        // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
-        // Probably not a very good validation to place on the Freight property.
-        regionProperty.validators.push(Validator.byte());
-    @method byte
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.byte = function (context) {
-        return intRangeValidatorCtor("byte", BYTE_MIN, BYTE_MAX, context)();
-    };
-
-    /**
-    Returns a standard boolean data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var productType = em1.metadataStore.getEntityType("Product");
-        var discontinuedProperty - productType.getProperty("Discontinued");
-        // Validates that the value of the Discontinued property on Product is a boolean
-        discontinuedProperty.validators.push(Validator.bool());
-    @method bool
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.bool = function () {
-        var valFn = function (v) {
-            if (v == null) return true;
-            return (v === true) || (v === false);
-        };
-        return new ctor("bool", valFn );
-    };
-
-    ctor.none = function () {
-        var valFn = function (v) {
-            return true;
-        };
-        return new ctor("none", valFn);
-    };
-
-    /**
-    Returns a standard date data type Validator.
-    @example
-        // Assume em1 is a preexisting EntityManager.
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var orderDateProperty - orderType.getProperty("OrderDate");
-        // Validates that the value of the OrderDate property on Order is a date
-        // Probably not a very good validation to place on the Freight property.
-        orderDateProperty.validators.push(Validator.date());
-    @method date
-    @static
-    @return {Validator} A new Validator
-    **/
-    ctor.date = function () {
-        var valFn = function (v) {
-            if (v == null) return true;
-            if (typeof v === "string") {
-                try {
-                    return !isNaN(Date.parse(v));
-                    // old code
-                    // return __isDate(new Date(v));
-                } catch (e) {
-                    return false;
-                }
-            } else {
-                return __isDate(v);
-            }
-        };
-        return new ctor("date", valFn );
-    };
-
-    /**
-    Returns a credit card number validator
-    Performs a luhn algorithm checksum test for plausability
-    catches simple mistakes; only service knows for sure
-    @example
-        // Assume em is a preexisting EntityManager.
-        var personType = em.metadataStore.getEntityType("Person");
-        var creditCardProperty = personType.getProperty("creditCard");
-        // Validates that the value of the Person.creditCard property is credit card.
-        creditCardProperty.validators.push(Validator.creditCard());
-    @method creditCard
-    @static
-    @param [context] {Object} optional parameters to pass through to validation constructor
-    @return {Validator} A new Validator
-    **/
-    ctor.creditCard = function(context) {
-        function valFn(v) {
-            if (v == null || v === '') return true;
-            if (typeof (v) !== 'string') return false;
-            v = v.replace(/(\-|\s)/g, ""); // remove dashes and spaces
-            if (!v || /\D/.test(v)) return false; // all digits, not empty
-            return luhn(v);
-        };
-        return new ctor('creditCard', valFn, context);
-    };
-
-    // http://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers#JavaScript
-    function luhn(a, b, c, d, e) {
-        for (d = +a[b = a.length - 1], e = 0; b--;)
-            c = +a[b], d += ++e % 2 ? 2 * c % 10 + (c > 4) : c;
-        return !(d % 10);
-    };
-
-    /**
-    Returns a regular expression validator; the expression must be specified
-    @example
-        // Add validator to a property. Assume em is a preexisting EntityManager.
-        var customerType = em.metadataStore.getEntityType("Customer");
-        var regionProperty = customerType.getProperty("Region");
-        // Validates that the value of Customer.Region is 2 char uppercase alpha.
-        regionProperty.validators.push(Validator.regularExpression( {expression: '^[A-Z]{2}$'} );
-    @method regularExpression
-    @static
-    @param context {Object} 
-    @param context.expression {String} String form of the regular expression to apply
-    @return {Validator} A new Validator
-    **/
-    ctor.regularExpression = function(context) {
-        function valFn(v, ctx) {
-            // do not invalidate if empty; use a separate required test
-            if (v == null || v === '') return true;
-            if (typeof (v) !== 'string') return false;
-            try {
-                var re = new RegExp(ctx.expression);
-            } catch (e) {
-                throw new Error('Missing or invalid expression parameter to regExp validator');
-            }
-            return re.test(v);
-        };
-        return new ctor('regularExpression', valFn, context);
-    };
-
-    /**
-    Returns the email address validator
-    @example
-        // Assume em is a preexisting EntityManager.
-        var personType = em.metadataStore.getEntityType("Person");
-        var emailProperty = personType.getProperty("email");
-        // Validates that the value of the Person.email property is an email address.
-        emailProperty.validators.push(Validator.emailAddress());
-    @method emailAddress
-    @static
-    @param [context] {Object} optional parameters to pass through to validation constructor
-    @return {Validator} A new Validator
-    **/
-    ctor.emailAddress = function(context) {
-        // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/EmailAttribute.cs
-        var reEmailAddress = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
-        return makeRegExpValidator('emailAddress', reEmailAddress, null, context);
-    };
-
-    /**
-    Returns the phone validator
-    Provides basic assertions on the format and will help to eliminate most nonsense input
-    Matches:
-      International dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])
-        > ((\+)|(0(\d+)?[-/.\s]))
-      Country code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])
-        > [1-9]\d{,2}[-/.\s]?
-      Area code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])
-        > ((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?
-      Local: {0, ...}+ (with or without a trailing break character: [-/. ])
-        > (\d+[-/.\s]?)+\d+
-    @example
-        // Assume em is a preexisting EntityManager.
-        var customerType = em.metadataStore.getEntityType("Customer");
-        var phoneProperty = customerType.getProperty("phone");
-        // Validates that the value of the Customer.phone property is phone.
-        phoneProperty.validators.push(Validator.phone());
-    @method phone
-    @static
-    @param [context] {Object} optional parameters to pass through to validation constructor
-    @return {Validator} A new Validator
-    **/
-    ctor.phone = function(context) {
-        // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/Expressions.cs
-        var rePhone = /^((\+|(0(\d+)?[-/.\s]?))[1-9]\d{0,2}[-/.\s]?)?((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?(\d+[-/.\s]?)+\d+$/;
-        return makeRegExpValidator('phone', rePhone, null, context);
-    };
-
-    /**
-    Returns the URL (protocol required) validator
-    @example
-        // Assume em is a preexisting EntityManager.
-        var personType = em.metadataStore.getEntityType("Person");
-        var websiteProperty = personType.getProperty("website");
-        // Validates that the value of the Person.website property is a URL.
-        websiteProperty.validators.push(Validator.url());
-    @method url
-    @static
-    @param [context] {Object} optional parameters to pass through to validation constructor
-    @return {Validator} A new Validator
-    **/
-    ctor.url = function(context) {
-        //See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/UrlAttribute.cs
-        var reUrlProtocolRequired = /^(https?|ftp):\/\/(((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|([a-zA-Z][\-a-zA-Z0-9]*)|((([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/;
-        return makeRegExpValidator('url', reUrlProtocolRequired, null, context);
-    };
-
-    /**
-    Creates a regular expression validator with a fixed expression.
-    Many of the stock validators are built with this factory method.
-    Their expressions are often derived from 
-    https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions
-    You can try many of them at http://dataannotationsextensions.org/
-    @example
-        // Make a zipcode validator
-        function zipValidator = Validator.makeRegExpValidator(
-            "zipVal,  
-            /^\d{5}([\-]\d{4})?$/,  
-            "The %displayName% '%value%' is not a valid U.S. zipcode");
-        // Register it.
-        Validator.register(zipValidator);
-        // Add it to a data property. Assume em is a preexisting EntityManager.
-        var custType = em.metadataStore.getEntityType("Customer");
-        var zipProperty = custType.getProperty("PostalCode");
-        zipProperty.validators.push(zipValidator);
-    @method makeRegExpValidator
-    @static
-    @param validatorName {String} name of this validator
-    @param expression {String | RegExp} regular expression to apply
-    @param [defaultMessage] {String} default message for failed validations
-    @param [context] {Object} optional parameters to pass through to validation constructor
-    @return {Validator} A new Validator
-    **/
-    ctor.makeRegExpValidator = makeRegExpValidator;
-
-    function makeRegExpValidator(validatorName, expression, defaultMessage, context) {
-        if (defaultMessage) {
-            ctor.messageTemplates[validatorName] = defaultMessage;
+  /**
+   Returns a standard date data type Validator.
+   @example
+   // Assume em1 is a preexisting EntityManager.
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var orderDateProperty - orderType.getProperty("OrderDate");
+   // Validates that the value of the OrderDate property on Order is a date
+   // Probably not a very good validation to place on the Freight property.
+   orderDateProperty.validators.push(Validator.date());
+   @method date
+   @static
+   @return {Validator} A new Validator
+   **/
+  ctor.date = function () {
+    var valFn = function (v) {
+      if (v == null) return true;
+      if (typeof v === "string") {
+        try {
+          return !isNaN(Date.parse(v));
+          // old code
+          // return __isDate(new Date(v));
+        } catch (e) {
+          return false;
         }
-        var re = (typeof (expression) === 'string') ? new RegExp(expression) : expression;
-        var valFn = function(v) {
-            // do not invalidate if empty; use a separate required test
-            if (v == null || v === '') return true;
-            if (typeof (v) !== 'string') return false;
-            return re.test(v);
-        };
-        return new ctor(validatorName, valFn, context);
+      } else {
+        return __isDate(v);
+      }
     };
-    
-    // register all validators
-    __objectForEach(ctor, function (key, value) {
-        if (typeof (value) !== "function") {
-            return;
-        }
-        if (key === "fromJSON" || key === "register" ||
-            key === "registerFactory" || key === "makeRegExpValidator") {
-            return;
-        }
+    return new ctor("date", valFn);
+  };
 
-        __config.registerFunction(value, "Validator." + key);
+  /**
+   Returns a credit card number validator
+   Performs a luhn algorithm checksum test for plausability
+   catches simple mistakes; only service knows for sure
+   @example
+   // Assume em is a preexisting EntityManager.
+   var personType = em.metadataStore.getEntityType("Person");
+   var creditCardProperty = personType.getProperty("creditCard");
+   // Validates that the value of the Person.creditCard property is credit card.
+   creditCardProperty.validators.push(Validator.creditCard());
+   @method creditCard
+   @static
+   @param [context] {Object} optional parameters to pass through to validation constructor
+   @return {Validator} A new Validator
+   **/
+  ctor.creditCard = function (context) {
+    function valFn(v) {
+      if (v == null || v === '') return true;
+      if (typeof (v) !== 'string') return false;
+      v = v.replace(/(\-|\s)/g, ""); // remove dashes and spaces
+      if (!v || /\D/.test(v)) return false; // all digits, not empty
+      return luhn(v);
+    };
+    return new ctor('creditCard', valFn, context);
+  };
+
+  // http://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers#JavaScript
+  function luhn(a, b, c, d, e) {
+    for (d = +a[b = a.length - 1], e = 0; b--;)
+      c = +a[b], d += ++e % 2 ? 2 * c % 10 + (c > 4) : c;
+    return !(d % 10);
+  };
+
+  /**
+   Returns a regular expression validator; the expression must be specified
+   @example
+   // Add validator to a property. Assume em is a preexisting EntityManager.
+   var customerType = em.metadataStore.getEntityType("Customer");
+   var regionProperty = customerType.getProperty("Region");
+   // Validates that the value of Customer.Region is 2 char uppercase alpha.
+   regionProperty.validators.push(Validator.regularExpression( {expression: '^[A-Z]{2}$'} );
+   @method regularExpression
+   @static
+   @param context {Object}
+   @param context.expression {String} String form of the regular expression to apply
+   @return {Validator} A new Validator
+   **/
+  ctor.regularExpression = function (context) {
+    function valFn(v, ctx) {
+      // do not invalidate if empty; use a separate required test
+      if (v == null || v === '') return true;
+      if (typeof (v) !== 'string') return false;
+      try {
+        var re = new RegExp(ctx.expression);
+      } catch (e) {
+        throw new Error('Missing or invalid expression parameter to regExp validator');
+      }
+      return re.test(v);
+    };
+    return new ctor('regularExpression', valFn, context);
+  };
+
+  /**
+   Returns the email address validator
+   @example
+   // Assume em is a preexisting EntityManager.
+   var personType = em.metadataStore.getEntityType("Person");
+   var emailProperty = personType.getProperty("email");
+   // Validates that the value of the Person.email property is an email address.
+   emailProperty.validators.push(Validator.emailAddress());
+   @method emailAddress
+   @static
+   @param [context] {Object} optional parameters to pass through to validation constructor
+   @return {Validator} A new Validator
+   **/
+  ctor.emailAddress = function (context) {
+    // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/EmailAttribute.cs
+    var reEmailAddress = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
+    return makeRegExpValidator('emailAddress', reEmailAddress, null, context);
+  };
+
+  /**
+   Returns the phone validator
+   Provides basic assertions on the format and will help to eliminate most nonsense input
+   Matches:
+   International dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])
+   > ((\+)|(0(\d+)?[-/.\s]))
+   Country code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])
+   > [1-9]\d{,2}[-/.\s]?
+   Area code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])
+   > ((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?
+   Local: {0, ...}+ (with or without a trailing break character: [-/. ])
+   > (\d+[-/.\s]?)+\d+
+   @example
+   // Assume em is a preexisting EntityManager.
+   var customerType = em.metadataStore.getEntityType("Customer");
+   var phoneProperty = customerType.getProperty("phone");
+   // Validates that the value of the Customer.phone property is phone.
+   phoneProperty.validators.push(Validator.phone());
+   @method phone
+   @static
+   @param [context] {Object} optional parameters to pass through to validation constructor
+   @return {Validator} A new Validator
+   **/
+  ctor.phone = function (context) {
+    // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/Expressions.cs
+    var rePhone = /^((\+|(0(\d+)?[-/.\s]?))[1-9]\d{0,2}[-/.\s]?)?((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?(\d+[-/.\s]?)+\d+$/;
+    return makeRegExpValidator('phone', rePhone, null, context);
+  };
+
+  /**
+   Returns the URL (protocol required) validator
+   @example
+   // Assume em is a preexisting EntityManager.
+   var personType = em.metadataStore.getEntityType("Person");
+   var websiteProperty = personType.getProperty("website");
+   // Validates that the value of the Person.website property is a URL.
+   websiteProperty.validators.push(Validator.url());
+   @method url
+   @static
+   @param [context] {Object} optional parameters to pass through to validation constructor
+   @return {Validator} A new Validator
+   **/
+  ctor.url = function (context) {
+    //See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/UrlAttribute.cs
+    var reUrlProtocolRequired = /^(https?|ftp):\/\/(((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|([a-zA-Z][\-a-zA-Z0-9]*)|((([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/;
+    return makeRegExpValidator('url', reUrlProtocolRequired, null, context);
+  };
+
+  /**
+   Creates a regular expression validator with a fixed expression.
+   Many of the stock validators are built with this factory method.
+   Their expressions are often derived from
+   https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions
+   You can try many of them at http://dataannotationsextensions.org/
+   @example
+   // Make a zipcode validator
+   function zipValidator = Validator.makeRegExpValidator(
+   "zipVal,
+   /^\d{5}([\-]\d{4})?$/,
+   "The %displayName% '%value%' is not a valid U.S. zipcode");
+   // Register it.
+   Validator.register(zipValidator);
+   // Add it to a data property. Assume em is a preexisting EntityManager.
+   var custType = em.metadataStore.getEntityType("Customer");
+   var zipProperty = custType.getProperty("PostalCode");
+   zipProperty.validators.push(zipValidator);
+   @method makeRegExpValidator
+   @static
+   @param validatorName {String} name of this validator
+   @param expression {String | RegExp} regular expression to apply
+   @param [defaultMessage] {String} default message for failed validations
+   @param [context] {Object} optional parameters to pass through to validation constructor
+   @return {Validator} A new Validator
+   **/
+  ctor.makeRegExpValidator = makeRegExpValidator;
+
+  function makeRegExpValidator(validatorName, expression, defaultMessage, context) {
+    if (defaultMessage) {
+      ctor.messageTemplates[validatorName] = defaultMessage;
+    }
+    var re = (typeof (expression) === 'string') ? new RegExp(expression) : expression;
+    var valFn = function (v) {
+      // do not invalidate if empty; use a separate required test
+      if (v == null || v === '') return true;
+      if (typeof (v) !== 'string') return false;
+      return re.test(v);
+    };
+    return new ctor(validatorName, valFn, context);
+  };
+
+  // register all validators
+  __objectForEach(ctor, function (key, value) {
+    if (typeof (value) !== "function") {
+      return;
+    }
+    if (key === "fromJSON" || key === "register" ||
+        key === "registerFactory" || key === "makeRegExpValidator") {
+      return;
+    }
+
+    __config.registerFunction(value, "Validator." + key);
+  });
+
+
+  // private funcs
+
+  function formatTemplate(template, vars, ownPropertiesOnly) {
+    if (!vars) return template;
+    return template.replace(/%([^%]+)%/g, function (_, key) {
+      var valOrFn;
+      if (ownPropertiesOnly) {
+        valOrFn = vars.hasOwnProperty(key) ? vars[key] : '';
+      } else {
+        valOrFn = vars[key];
+      }
+      if (valOrFn != null) {
+        if (__isFunction(valOrFn)) {
+          return valOrFn(vars);
+        } else {
+          return valOrFn;
+        }
+      } else {
+        return "";
+      }
     });
+  }
 
-
-    // private funcs
-
-    function formatTemplate(template, vars, ownPropertiesOnly) {
-        if (!vars) return template;
-        return template.replace(/%([^%]+)%/g, function (_, key) {
-            var valOrFn;
-            if (ownPropertiesOnly) {
-                valOrFn = vars.hasOwnProperty(key) ? vars[key] : '';
-            } else {
-                valOrFn = vars[key];
-            }
-            if (valOrFn != null) {
-                if (__isFunction(valOrFn)) {
-                    return valOrFn(vars);
-                } else {
-                    return valOrFn;
-                }
-            } else {
-                return "";
-            }
-        });
+  function intRangeValidatorCtor(validatorName, minValue, maxValue, context) {
+    var templateExists = (context && context.messageTemplate) || ctor.messageTemplates[validatorName];
+    if (!templateExists) {
+      ctor.messageTemplates[validatorName] = __formatString("'%displayName%' must be an integer between the values of %1 and %2",
+          minValue, maxValue);
     }
-
-    function intRangeValidatorCtor(validatorName, minValue, maxValue, context) {
-        var templateExists = (context && context.messageTemplate) || ctor.messageTemplates[validatorName];
-        if (!templateExists) {
-            ctor.messageTemplates[validatorName] = __formatString("'%displayName%' must be an integer between the values of %1 and %2",
-            minValue, maxValue);
+    return function () {
+      var valFn = function (v, ctx) {
+        if (v == null) return true;
+        if (typeof v === "string" && ctx && ctx.allowString) {
+          v = parseInt(v, 0);
         }
-        return function () {
-            var valFn = function (v, ctx) {
-                if (v == null) return true;
-                if (typeof v === "string" && ctx && ctx.allowString)  {
-                    v = parseInt(v, 0);
-                }
-                if ((typeof v === "number") && (!isNaN(v)) && Math.floor(v) === v) {
-                    if (minValue != null && v < minValue) {
-                        return false;
-                    }
-                    if (maxValue != null && v > maxValue) {
-                        return false;
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-            return new ctor(validatorName, valFn, context);
-        };
-    }
+        if ((typeof v === "number") && (!isNaN(v)) && Math.floor(v) === v) {
+          if (minValue != null && v < minValue) {
+            return false;
+          }
+          if (maxValue != null && v > maxValue) {
+            return false;
+          }
+          return true;
+        } else {
+          return false;
+        }
+      };
+      return new ctor(validatorName, valFn, context);
+    };
+  }
 
-    
-    return ctor;
-}) ();
+
+  return ctor;
+})();
 
 var ValidationError = (function () {
-    /**
-    A ValidationError is used to describe a failed validation.
+  /**
+   A ValidationError is used to describe a failed validation.
 
-    @class ValidationError
-    **/
-        
-    /**
-    Constructs a new ValidationError
-    @method <ctor> ValidationError
+   @class ValidationError
+   **/
 
-    @param validator {Validator || null} The Validator used to create this error, if any.
-    @param context { ContextObject || null} The Context object used in conjunction with the Validator to create this error.
-    @param errorMessage { String} The actual error message
-    @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here. 
-    **/
-    var ctor = function (validator, context, errorMessage, key) {
-        assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
-        assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
-        assertParam(key, "key").isOptional().isNonEmptyString().check();
-        this.validator = validator;
-        context = context || {};
-        this.context = context;
-        this.errorMessage = errorMessage;
+  /**
+   Constructs a new ValidationError
+   @method <ctor> ValidationError
 
-        this.property = context.property;
-        this.propertyName = context.propertyName || (context.property && context.property.name);
-        
-        if (key) {
-            this.key = key;
-        } else {
-            this.key = ValidationError.getKey(validator || errorMessage, this.propertyName);
-        }
-        this.isServerError = false;
-    };
+   @param validator {Validator || null} The Validator used to create this error, if any.
+   @param context { ContextObject || null} The Context object used in conjunction with the Validator to create this error.
+   @param errorMessage { String} The actual error message
+   @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here.
+   **/
+  var ctor = function (validator, context, errorMessage, key) {
+    assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
+    assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
+    assertParam(key, "key").isOptional().isNonEmptyString().check();
+    this.validator = validator;
+    context = context || {};
+    this.context = context;
+    this.errorMessage = errorMessage;
 
-        
-    /**
-    The Validator associated with this ValidationError.
+    this.property = context.property;
+    this.propertyName = context.propertyName || (context.property && context.property.name);
 
-    __readOnly__
-    @property validator {Validator}
-    **/
-        
-    /**
-    A 'context' object associated with this ValidationError.
+    if (key) {
+      this.key = key;
+    } else {
+      this.key = ValidationError.getKey(validator || errorMessage, this.propertyName);
+    }
+    this.isServerError = false;
+  };
 
-    __readOnly__
-    @property context {Object}
-    **/
-        
-    /**
-    The DataProperty or NavigationProperty associated with this ValidationError.
 
-    __readOnly__
-    @property property {DataProperty|NavigationProperty}
-    **/
-        
-    /**
-    The property name associated with this ValidationError. This will be a "property path" for any properties of a complex object.
+  /**
+   The Validator associated with this ValidationError.
 
-    __readOnly__
-    @property propertyName {String}
-    **/
-        
-    /**
-    The error message associated with the ValidationError.
+   __readOnly__
+   @property validator {Validator}
+   **/
 
-    __readOnly__
-    @property errorMessage {string}
-    **/
+  /**
+   A 'context' object associated with this ValidationError.
 
-    /**
-    The key by which this validation error may be removed from a collection of ValidationErrors.
+   __readOnly__
+   @property context {Object}
+   **/
 
-    __readOnly__
-    @property key {string}
-    **/
+  /**
+   The DataProperty or NavigationProperty associated with this ValidationError.
 
-    /**
-   Whether this is a server error.  
+   __readOnly__
+   @property property {DataProperty|NavigationProperty}
+   **/
+
+  /**
+   The property name associated with this ValidationError. This will be a "property path" for any properties of a complex object.
+
+   __readOnly__
+   @property propertyName {String}
+   **/
+
+  /**
+   The error message associated with the ValidationError.
+
+   __readOnly__
+   @property errorMessage {string}
+   **/
+
+  /**
+   The key by which this validation error may be removed from a collection of ValidationErrors.
+
+   __readOnly__
+   @property key {string}
+   **/
+
+  /**
+   Whether this is a server error.
 
    __readOnly__
    @property isServerError {bool}
    **/
 
 
-    /**
-    Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName
-    @method getKey
-    @static
-    @param validator {ValidatorOrErrorKey} A Validator or an "error name" if no validator is available.
-    @param [propertyName] A property name
-    @return {String} A ValidationError 'key'
-    **/
-    ctor.getKey = function (validatorOrErrorName, propertyName) {
-        return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? ":" + propertyName : "");
-    };
+  /**
+   Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName
+   @method getKey
+   @static
+   @param validator {ValidatorOrErrorKey} A Validator or an "error name" if no validator is available.
+   @param [propertyName] A property name
+   @return {String} A ValidationError 'key'
+   **/
+  ctor.getKey = function (validatorOrErrorName, propertyName) {
+    return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? ":" + propertyName : "");
+  };
 
 
-    return ctor;
+  return ctor;
 })();
-    
+
 breeze.Validator = Validator;
 breeze.ValidationError = ValidationError;
  
 ;/**
-@module breeze
-**/
-   
+ @module breeze
+ **/
+
 var ValidationOptions = (function () {
 
-    /**
-    A ValidationOptions instance is used to specify the conditions under which validation will be executed.
+  /**
+   A ValidationOptions instance is used to specify the conditions under which validation will be executed.
 
-    @class ValidationOptions
-    **/
-        
-    /**
-    ValidationOptions constructor
-    @example
-        var newVo = new ValidationOptions( { validateOnSave: false, validateOnAttach: false });
-        // assume em1 is a preexisting EntityManager
-        em1.setProperties( { validationOptions: newVo });
-    @method <ctor> ValidationOptions
-    @param [config] {Object}
-    @param [config.validateOnAttach=true] {Boolean}
-    @param [config.validateOnSave=true] {Boolean}
-    @param [config.validateOnQuery=false] {Boolean}
-    @param [config.validateOnPropertyChange=true] {Boolean}
-    **/
-    var ctor = function (config) {
-        updateWithConfig(this, config);
-    };
-    var proto = ctor.prototype;
+   @class ValidationOptions
+   **/
 
-    /**
-    Whether entity and property level validation should occur when entities are attached to the EntityManager other than via a query.
+  /**
+   ValidationOptions constructor
+   @example
+   var newVo = new ValidationOptions( { validateOnSave: false, validateOnAttach: false });
+   // assume em1 is a preexisting EntityManager
+   em1.setProperties( { validationOptions: newVo });
+   @method <ctor> ValidationOptions
+   @param [config] {Object}
+   @param [config.validateOnAttach=true] {Boolean}
+   @param [config.validateOnSave=true] {Boolean}
+   @param [config.validateOnQuery=false] {Boolean}
+   @param [config.validateOnPropertyChange=true] {Boolean}
+   **/
+  var ctor = function (config) {
+    updateWithConfig(this, config);
+  };
+  var proto = ctor.prototype;
 
-    __readOnly__
-    @property validateOnAttach {Boolean}
-    **/
+  /**
+   Whether entity and property level validation should occur when entities are attached to the EntityManager other than via a query.
 
-    /**
-    Whether entity and property level validation should occur before entities are saved. A failed validation will force the save to fail early.
+   __readOnly__
+   @property validateOnAttach {Boolean}
+   **/
 
-    __readOnly__
-    @property validateOnSave {Boolean}
-    **/
+  /**
+   Whether entity and property level validation should occur before entities are saved. A failed validation will force the save to fail early.
 
-    /**
-    Whether entity and property level validation should occur after entities are queried from a remote server.
+   __readOnly__
+   @property validateOnSave {Boolean}
+   **/
 
-    __readOnly__
-    @property validateOnQuery {Boolean}
-    **/
+  /**
+   Whether entity and property level validation should occur after entities are queried from a remote server.
 
-    /**
-    Whether property level validation should occur after entities are modified.
+   __readOnly__
+   @property validateOnQuery {Boolean}
+   **/
 
-    __readOnly__
-    @property validateOnPropertyChange {Boolean}
-    **/
+  /**
+   Whether property level validation should occur after entities are modified.
 
-    proto._$typeName = "ValidationOptions";
-        
-    /**
-    Returns a copy of this ValidationOptions with changes to the specified config properties.
-    @example
-        var validationOptions = new ValidationOptions();
-        var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
-    @method using
-    @param config {Object} The object to apply to create a new QueryOptions.
-    @param [config.validateOnAttach] {Boolean}
-    @param [config.validateOnSave] {Boolean}
-    @param [config.validateOnQuery] {Boolean}
-    @param [config.validateOnPropertyChange] {Boolean}
-    @return {ValidationOptions}
-    @chainable
-    **/
-    proto.using = function (config) {
-        if (!config) return this;
-        var result = new ValidationOptions(this);
-        updateWithConfig(result, config);
-        return result;
-    };
+   __readOnly__
+   @property validateOnPropertyChange {Boolean}
+   **/
 
-    /**
-    Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @example
-        var validationOptions = new ValidationOptions()
-        var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
-        var newOptions.setAsDefault();
-    @method setAsDefault
-    @chainable
-    **/
-    proto.setAsDefault = function() {
-        return __setAsDefault(this, ctor);
-    };
+  proto._$typeName = "ValidationOptions";
 
-    /**
-    The default value whenever ValidationOptions are not specified.
-    @property defaultInstance {ValidationOptions}
-    @static
-    **/
-    ctor.defaultInstance = new ctor({
-            validateOnAttach: true,
-            validateOnSave: true,
-            validateOnQuery: false,
-            validateOnPropertyChange: true
-    });
-        
-    function updateWithConfig( obj, config ) {
-        if (config) {
-            assertConfig(config)
-            .whereParam("validateOnAttach").isBoolean().isOptional()
-            .whereParam("validateOnSave").isBoolean().isOptional()
-            .whereParam("validateOnQuery").isBoolean().isOptional()
-            .whereParam("validateOnPropertyChange").isBoolean().isOptional()
-            .applyAll(obj);
-        }
-        return obj;
+  /**
+   Returns a copy of this ValidationOptions with changes to the specified config properties.
+   @example
+   var validationOptions = new ValidationOptions();
+   var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
+   @method using
+   @param config {Object} The object to apply to create a new QueryOptions.
+   @param [config.validateOnAttach] {Boolean}
+   @param [config.validateOnSave] {Boolean}
+   @param [config.validateOnQuery] {Boolean}
+   @param [config.validateOnPropertyChange] {Boolean}
+   @return {ValidationOptions}
+   @chainable
+   **/
+  proto.using = function (config) {
+    if (!config) return this;
+    var result = new ValidationOptions(this);
+    updateWithConfig(result, config);
+    return result;
+  };
+
+  /**
+   Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @example
+   var validationOptions = new ValidationOptions()
+   var newOptions = validationOptions.using( { validateOnQuery: true, validateOnSave: false} );
+   var newOptions.setAsDefault();
+   @method setAsDefault
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
+
+  /**
+   The default value whenever ValidationOptions are not specified.
+   @property defaultInstance {ValidationOptions}
+   @static
+   **/
+  ctor.defaultInstance = new ctor({
+    validateOnAttach: true,
+    validateOnSave: true,
+    validateOnQuery: false,
+    validateOnPropertyChange: true
+  });
+
+  function updateWithConfig(obj, config) {
+    if (config) {
+      assertConfig(config)
+          .whereParam("validateOnAttach").isBoolean().isOptional()
+          .whereParam("validateOnSave").isBoolean().isOptional()
+          .whereParam("validateOnQuery").isBoolean().isOptional()
+          .whereParam("validateOnPropertyChange").isBoolean().isOptional()
+          .applyAll(obj);
     }
-    return ctor;
+    return obj;
+  }
+
+  return ctor;
 })();
-    
+
 // expose
 
 breeze.ValidationOptions = ValidationOptions;
 
 
 
-;
-breeze.makeComplexArray = (function() {
-    var complexArrayMixin = {};
+;breeze.makeComplexArray = (function () {
+  var complexArrayMixin = {};
 
-    // complexArray will have the following props
-    //    parent
-    //    propertyPath
-    //    parentProperty
-    //    addedItems  - only if modified
-    //    removedItems  - only if modified
-    //  each complexAspect of any entity within a complexArray
-    //  will have its own _complexState = "A/M";
+  // complexArray will have the following props
+  //    parent
+  //    propertyPath
+  //    parentProperty
+  //    addedItems  - only if modified
+  //    removedItems  - only if modified
+  //  each complexAspect of any entity within a complexArray
+  //  will have its own _complexState = "A/M";
 
-    /**
-    Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of 
-    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
-    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
-    are all provided as well as several special purpose methods. 
-    @class ↈ_complexArray_
-    **/
+  /**
+   Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of
+   complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
+   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
+   are all provided as well as several special purpose methods.
+   @class ↈ_complexArray_
+   **/
 
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
-    is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-    Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-    collections are collected into a single notification event for each relation array.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        orders.arrayChanged.subscribe(
-            function (arrayChangedArgs) {
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
+   is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+   Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+   collections are collected into a single notification event for each relation array.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   orders.arrayChanged.subscribe(
+   function (arrayChangedArgs) {
                 var addedEntities = arrayChangedArgs.added;
                 var removedEntities = arrayChanged.removed;
             });
-    @event arrayChanged 
-    @param added {Array of Entity} An array of all of the entities added to this collection.
-    @param removed {Array of Entity} An array of all of the removed from this collection.
-    @readOnly
-    **/
+   @event arrayChanged
+   @param added {Array of Entity} An array of all of the entities added to this collection.
+   @param removed {Array of Entity} An array of all of the removed from this collection.
+   @readOnly
+   **/
 
     // virtual impls 
-    complexArrayMixin._getGoodAdds = function (adds) {
-        return getGoodAdds(this, adds);
-    };
+  complexArrayMixin._getGoodAdds = function (adds) {
+    return getGoodAdds(this, adds);
+  };
 
-    complexArrayMixin._beforeChange = function() {
-        observableArray.updateEntityState(this);
-    };
+  complexArrayMixin._beforeChange = function () {
+    observableArray.updateEntityState(this);
+  };
 
-    complexArrayMixin._processAdds = function (adds) {
-        processAdds(this, adds);
-    };
+  complexArrayMixin._processAdds = function (adds) {
+    processAdds(this, adds);
+  };
 
-    complexArrayMixin._processRemoves = function (removes) {
-        processRemoves(this, removes);
-    };
-    //
+  complexArrayMixin._processRemoves = function (removes) {
+    processRemoves(this, removes);
+  };
+  //
 
-    complexArrayMixin._rejectChanges = function() {
-        if (!this._origValues) return;
-        var that = this;
-        this.forEach(function(co) {
-            clearAspect(co, that);
-        });
-        this.length = 0;
-        this._origValues.forEach(function(co) {
-            that.push(co);
-        });
-        Array.prototype.push.apply(this, this._origValues);
-    };
+  complexArrayMixin._rejectChanges = function () {
+    if (!this._origValues) return;
+    var that = this;
+    this.forEach(function (co) {
+      clearAspect(co, that);
+    });
+    this.length = 0;
+    this._origValues.forEach(function (co) {
+      that.push(co);
+    });
+    Array.prototype.push.apply(this, this._origValues);
+  };
 
-    complexArrayMixin._acceptChanges = function() {
-        this._origValues = null;
-    } ;
+  complexArrayMixin._acceptChanges = function () {
+    this._origValues = null;
+  };
 
-    // local functions
+  // local functions
 
 
-    function getGoodAdds(complexArray, adds) {
-        // remove any that are already added here
-        return adds.filter(function (a) {
-            return a.parent !== complexArray.parent;
-        });
-    }
+  function getGoodAdds(complexArray, adds) {
+    // remove any that are already added here
+    return adds.filter(function (a) {
+      return a.parent !== complexArray.parent;
+    });
+  }
 
-    function processAdds(complexArray, adds) {
-        adds.forEach(function (a) {
-            if (a.parent != null) {
-                throw new Error("The complexObject is already attached. Either clone it or remove it from its current owner");
-            }
-            setAspect(a, complexArray);
-        });
-    }
+  function processAdds(complexArray, adds) {
+    adds.forEach(function (a) {
+      if (a.parent != null) {
+        throw new Error("The complexObject is already attached. Either clone it or remove it from its current owner");
+      }
+      setAspect(a, complexArray);
+    });
+  }
 
-    function processRemoves(complexArray, removes) {
-        removes.forEach(function (a) {
-            clearAspect(a, complexArray);
-        });
-    }
+  function processRemoves(complexArray, removes) {
+    removes.forEach(function (a) {
+      clearAspect(a, complexArray);
+    });
+  }
 
-    function clearAspect(co, arr) {
-        var coAspect = co.complexAspect;
-        // if not already attached - exit
-        if (coAspect.parent !== arr.parent) return null;
+  function clearAspect(co, arr) {
+    var coAspect = co.complexAspect;
+    // if not already attached - exit
+    if (coAspect.parent !== arr.parent) return null;
 
-        coAspect.parent = null;
-        coAspect.parentProperty = null;
-        return coAspect;
-    }
+    coAspect.parent = null;
+    coAspect.parentProperty = null;
+    return coAspect;
+  }
 
-    function setAspect(co, arr) {
-        var coAspect = co.complexAspect;
-        // if already attached - exit
-        if (coAspect.parent === arr.parent) return null;
-        coAspect.parent = arr.parent;
-        coAspect.parentProperty = arr.parentProperty;
+  function setAspect(co, arr) {
+    var coAspect = co.complexAspect;
+    // if already attached - exit
+    if (coAspect.parent === arr.parent) return null;
+    coAspect.parent = arr.parent;
+    coAspect.parentProperty = arr.parentProperty;
 
-        return coAspect;
-    }
+    return coAspect;
+  }
 
-    function makeComplexArray(arr, parent, parentProperty) {
+  function makeComplexArray(arr, parent, parentProperty) {
 
-        observableArray.initializeParent(arr, parent, parentProperty);
-        arr.arrayChanged = new Event("arrayChanged", arr);
-        __extend(arr, observableArray.mixin);
-        return __extend(arr, complexArrayMixin);
-    }
+    observableArray.initializeParent(arr, parent, parentProperty);
+    arr.arrayChanged = new Event("arrayChanged", arr);
+    __extend(arr, observableArray.mixin);
+    return __extend(arr, complexArrayMixin);
+  }
 
-    return makeComplexArray;
+  return makeComplexArray;
 })();;/**
-@module breeze   
-**/
+ @module breeze
+ **/
 
-    
+
 var EntityAction = (function () {
-    /**
-    EntityAction is an 'Enum' containing all of the valid actions that can occur to an 'Entity'.
+  /**
+   EntityAction is an 'Enum' containing all of the valid actions that can occur to an 'Entity'.
 
-    @class EntityAction
-    @static
-    **/
-    var entityActionMethods = {
-        isAttach: function () { return !!this.isAttach; },
-        isDetach: function () { return !!this.isDetach; },
-        isModification: function () { return !!this.isModification; }
-    };
+   @class EntityAction
+   @static
+   **/
+  var entityActionMethods = {
+    isAttach: function () {
+      return !!this.isAttach;
+    },
+    isDetach: function () {
+      return !!this.isDetach;
+    },
+    isModification: function () {
+      return !!this.isModification;
+    }
+  };
 
-    var EntityAction = new Enum("EntityAction", entityActionMethods);
-        
-    /**
-    Attach - Entity was attached via an AttachEntity call.
+  var EntityAction = new Enum("EntityAction", entityActionMethods);
 
-    @property Attach {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Attach = EntityAction.addSymbol({ isAttach: true});
-        
-    /**
-    AttachOnQuery - Entity was attached as a result of a query.
+  /**
+   Attach - Entity was attached via an AttachEntity call.
 
-    @property AttachOnQuery {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AttachOnQuery = EntityAction.addSymbol({ isAttach: true});
-        
-    /**
-    AttachOnImport - Entity was attached as a result of an import.
+   @property Attach {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.Attach = EntityAction.addSymbol({ isAttach: true});
 
-    @property AttachOnImport {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AttachOnImport = EntityAction.addSymbol({ isAttach: true});
-        
-        
-    /**
-    Detach - Entity was detached.
+  /**
+   AttachOnQuery - Entity was attached as a result of a query.
 
-    @property Detach {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Detach = EntityAction.addSymbol( { isDetach: true });
-        
-    /**
-    MergeOnQuery - Properties on the entity were merged as a result of a query.
+   @property AttachOnQuery {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.AttachOnQuery = EntityAction.addSymbol({ isAttach: true});
 
-    @property MergeOnQuery {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnQuery = EntityAction.addSymbol( { isModification: true });
-        
-    /**
-    MergeOnImport - Properties on the entity were merged as a result of an import.
+  /**
+   AttachOnImport - Entity was attached as a result of an import.
 
-    @property MergeOnImport {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnImport = EntityAction.addSymbol( { isModification: true });
-        
-    /**
-    MergeOnSave - Properties on the entity were merged as a result of a save
+   @property AttachOnImport {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.AttachOnImport = EntityAction.addSymbol({ isAttach: true});
 
-    @property MergeOnSave {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.MergeOnSave = EntityAction.addSymbol( { isModification: true });
-        
-    /**
-    PropertyChange - A property on the entity was changed.
 
-    @property PropertyChange {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.PropertyChange = EntityAction.addSymbol({ isModification: true});
-        
-    /**
-    EntityStateChange - The EntityState of the entity was changed.
+  /**
+   Detach - Entity was detached.
 
-    @property EntityStateChange {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.EntityStateChange = EntityAction.addSymbol();
-        
-        
-    /**
-    AcceptChanges - AcceptChanges was called on the entity, or its entityState was set to Unmodified.
+   @property Detach {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.Detach = EntityAction.addSymbol({ isDetach: true });
 
-    @property AcceptChanges {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.AcceptChanges = EntityAction.addSymbol();
+  /**
+   MergeOnQuery - Properties on the entity were merged as a result of a query.
 
-    /**
-    RejectChanges - RejectChanges was called on the entity.
+   @property MergeOnQuery {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.MergeOnQuery = EntityAction.addSymbol({ isModification: true });
 
-    @property RejectChanges {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.RejectChanges = EntityAction.addSymbol({ isModification: true});
-        
-    /**
-    Clear - The EntityManager was cleared.  All entities detached.
+  /**
+   MergeOnImport - Properties on the entity were merged as a result of an import.
 
-    @property Clear {EntityAction}
-    @final
-    @static
-    **/
-    EntityAction.Clear = EntityAction.addSymbol({ isDetach: true});
-        
-    EntityAction.resolveSymbols();
-    return EntityAction;
+   @property MergeOnImport {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.MergeOnImport = EntityAction.addSymbol({ isModification: true });
+
+  /**
+   MergeOnSave - Properties on the entity were merged as a result of a save
+
+   @property MergeOnSave {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.MergeOnSave = EntityAction.addSymbol({ isModification: true });
+
+  /**
+   PropertyChange - A property on the entity was changed.
+
+   @property PropertyChange {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.PropertyChange = EntityAction.addSymbol({ isModification: true});
+
+  /**
+   EntityStateChange - The EntityState of the entity was changed.
+
+   @property EntityStateChange {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.EntityStateChange = EntityAction.addSymbol();
+
+
+  /**
+   AcceptChanges - AcceptChanges was called on the entity, or its entityState was set to Unmodified.
+
+   @property AcceptChanges {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.AcceptChanges = EntityAction.addSymbol();
+
+  /**
+   RejectChanges - RejectChanges was called on the entity.
+
+   @property RejectChanges {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.RejectChanges = EntityAction.addSymbol({ isModification: true});
+
+  /**
+   Clear - The EntityManager was cleared.  All entities detached.
+
+   @property Clear {EntityAction}
+   @final
+   @static
+   **/
+  EntityAction.Clear = EntityAction.addSymbol({ isDetach: true});
+
+  EntityAction.resolveSymbols();
+  return EntityAction;
 })();
 
-breeze.EntityAction= EntityAction;
+breeze.EntityAction = EntityAction;
 
 ;/**
-@module breeze   
-**/
+ @module breeze
+ **/
 
-var EntityAspect = (function() {
-    /**
-    An EntityAspect instance is associated with every attached entity and is accessed via the entity's 'entityAspect' property. 
-        
-    The EntityAspect itself provides properties to determine and modify the EntityState of the entity and has methods 
-    that provide a variety of services including validation and change tracking.
+var EntityAspect = (function () {
+  /**
+   An EntityAspect instance is associated with every attached entity and is accessed via the entity's 'entityAspect' property.
 
-    An EntityAspect will almost never need to be constructed directly. You will usually get an EntityAspect by accessing
-    an entities 'entityAspect' property.  This property will be automatically attached when an entity is created via either 
-    a query, import or EntityManager.createEntity call.
-        
-        // assume order is an order entity attached to an EntityManager.
-        var aspect = order.entityAspect;
-        var currentState = aspect.entityState;
-    @class EntityAspect
-    **/
-    var ctor = function(entity) {
-        if (entity === null) {
-            var nullInstance = EntityAspect._nullInstance;
-            if (nullInstance) return nullInstance;
-            EntityAspect._nullInstance = this;
-        } else if (entity === undefined) {
-            throw new Error("The EntityAspect ctor requires an entity as its only argument.");
-        } else if (entity.entityAspect) {
-            return entity.entityAspect;
+   The EntityAspect itself provides properties to determine and modify the EntityState of the entity and has methods
+   that provide a variety of services including validation and change tracking.
+
+   An EntityAspect will almost never need to be constructed directly. You will usually get an EntityAspect by accessing
+   an entities 'entityAspect' property.  This property will be automatically attached when an entity is created via either
+   a query, import or EntityManager.createEntity call.
+
+   // assume order is an order entity attached to an EntityManager.
+   var aspect = order.entityAspect;
+   var currentState = aspect.entityState;
+   @class EntityAspect
+   **/
+  var ctor = function (entity) {
+    if (entity === null) {
+      var nullInstance = EntityAspect._nullInstance;
+      if (nullInstance) return nullInstance;
+      EntityAspect._nullInstance = this;
+    } else if (entity === undefined) {
+      throw new Error("The EntityAspect ctor requires an entity as its only argument.");
+    } else if (entity.entityAspect) {
+      return entity.entityAspect;
+    }
+
+    // if called without new
+    if (!(this instanceof EntityAspect)) {
+      return new EntityAspect(entity);
+    }
+
+    this.entity = entity;
+    // TODO: keep public or not?
+    this.entityGroup = null;
+    this.entityManager = null;
+    this.entityState = EntityState.Detached;
+    this.isBeingSaved = false;
+    this.originalValues = {};
+    this.hasValidationErrors = false;
+    this._validationErrors = {};
+
+    // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
+    // this._loadedNavPropMap = {};
+
+    this.validationErrorsChanged = new Event("validationErrorsChanged", this);
+    this.propertyChanged = new Event("propertyChanged", this);
+    // in case this is the NULL entityAspect. - used with ComplexAspects that have no parent.
+
+    if (entity != null) {
+      entity.entityAspect = this;
+      // entityType should already be on the entity from 'watch'
+      var entityType = entity.entityType || entity._$entityType;
+      if (!entityType) {
+        var typeName = entity.prototype._$typeName;
+        if (!typeName) {
+          throw new Error("This entity is not registered as a valid EntityType");
+        } else {
+          throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
         }
+      }
+      var entityCtor = entityType.getEntityCtor();
+      __modelLibraryDef.getDefaultInstance().startTracking(entity, entityCtor.prototype);
+    }
+  };
+  var proto = ctor.prototype;
 
-        // if called without new
-        if (!(this instanceof EntityAspect)) {
-            return new EntityAspect(entity);
-        }
 
-        this.entity = entity;
-        // TODO: keep public or not?
-        this.entityGroup = null;
-        this.entityManager = null;
-        this.entityState = EntityState.Detached;
-        this.isBeingSaved = false;
-        this.originalValues = {};
-        this.hasValidationErrors = false;
-        this._validationErrors = {};
+  Event.bubbleEvent(proto, function () {
+    return this.entityManager;
+  });
 
-        // Uncomment when we implement entityAspect.isNavigationPropertyLoaded method
-        // this._loadedNavPropMap = {};
-        
-        this.validationErrorsChanged = new Event("validationErrorsChanged", this);
-        this.propertyChanged = new Event("propertyChanged", this);
-        // in case this is the NULL entityAspect. - used with ComplexAspects that have no parent.
+  /**
+   The Entity that this aspect is associated with.
 
-        if (entity != null) {
-            entity.entityAspect = this;
-            // entityType should already be on the entity from 'watch'    
-            var entityType = entity.entityType || entity._$entityType; 
-            if (!entityType) {
-                var typeName = entity.prototype._$typeName;
-                if (!typeName) {
-                    throw new Error("This entity is not registered as a valid EntityType");
-                } else {
-                    throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
-                }
-            }
-            var entityCtor = entityType.getEntityCtor();
-            __modelLibraryDef.getDefaultInstance().startTracking(entity, entityCtor.prototype);
-        }
-    };
-    var proto = ctor.prototype;
+   __readOnly__
+   @property entity {Entity}
+   **/
 
-  
+  /**
+   The {{#crossLink "EntityManager"}}{{/crossLink}} that contains this entity.
 
-    Event.bubbleEvent(proto, function() {
-        return this.entityManager;
-    });
+   __readOnly__
+   @property entityManager {EntityManager}
+   **/
 
-    /**
-    The Entity that this aspect is associated with.
+  /**
+   The {{#crossLink "EntityState"}}{{/crossLink}} of this entity.
 
-    __readOnly__
-    @property entity {Entity} 
-    **/
+   __readOnly__
+   @property entityState {EntityState}
+   **/
 
-    /**
-    The {{#crossLink "EntityManager"}}{{/crossLink}} that contains this entity.
+  /**
+   Whether this entity is in the process of being saved.
 
-    __readOnly__
-    @property entityManager {EntityManager}
-    **/
+   __readOnly__
+   @property isBeingSaved {Boolean}
+   **/
 
-    /**
-    The {{#crossLink "EntityState"}}{{/crossLink}} of this entity.
+  /**
+   Whether this entity has any validation errors.
 
-    __readOnly__
-    @property entityState {EntityState}
-    **/
+   __readOnly__
+   @property hasValidationErrors {Boolean}
+   **/
 
-    /**
-    Whether this entity is in the process of being saved.
+  /**
+   The 'original values' of this entity where they are different from the 'current values'.
+   This is a map where the key is a property name and the value is the 'original value' of the property.
 
-    __readOnly__
-    @property isBeingSaved {Boolean}
-    **/
+   __readOnly__
+   @property originalValues {Object}
+   **/
 
-    /**
-    Whether this entity has any validation errors.
-
-    __readOnly__
-    @property hasValidationErrors {Boolean}
-    **/
-
-    /**
-    The 'original values' of this entity where they are different from the 'current values'. 
-    This is a map where the key is a property name and the value is the 'original value' of the property.
-
-    __readOnly__
-    @property originalValues {Object} 
-    **/
-
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a value of one of this entity's properties change.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.propertyChanged.subscribe(
-            function (propertyChangedArgs) {
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a value of one of this entity's properties change.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.propertyChanged.subscribe(
+   function (propertyChangedArgs) {
                 // this code will be executed anytime a property value changes on the 'order' entity.
                 var entity = propertyChangedArgs.entity; // Note: entity === order
                 var propertyNameChanged = propertyChangedArgs.propertyName;
                 var oldValue = propertyChangedArgs.oldValue;
                 var newValue = propertyChangedArgs.newValue;
             });
-    @event propertyChanged 
-    @param entity {Entity} The entity whose property has changed.
-    @param property {DataProperty} The DataProperty that changed.
-    @param propertyName {String} The name of the property that changed. This value will be 'null' for operations that replace the entire entity.  This includes
-    queries, imports and saves that require a merge. The remaining parameters will not exist in this case either. This will actually be a "property path"
-    for any properties of a complex type.
-    @param oldValue {Object} The old value of this property before the change.
-    @param newValue {Object} The new value of this property after the change.
-    @param parent {Object} The immediate parent object for the changed property.  This will be different from the 'entity' for any complex type or nested complex type properties.
-    @readOnly
-    **/
+   @event propertyChanged
+   @param entity {Entity} The entity whose property has changed.
+   @param property {DataProperty} The DataProperty that changed.
+   @param propertyName {String} The name of the property that changed. This value will be 'null' for operations that replace the entire entity.  This includes
+   queries, imports and saves that require a merge. The remaining parameters will not exist in this case either. This will actually be a "property path"
+   for any properties of a complex type.
+   @param oldValue {Object} The old value of this property before the change.
+   @param newValue {Object} The new value of this property after the change.
+   @param parent {Object} The immediate parent object for the changed property.  This will be different from the 'entity' for any complex type or nested complex type properties.
+   @readOnly
+   **/
 
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever any of the validation errors on this entity change. 
-    Note that this might be the removal of an error when some data on the entity is fixed. 
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.validationErrorsChanged.subscribe(
-            function (validationChangeArgs) {
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever any of the validation errors on this entity change.
+   Note that this might be the removal of an error when some data on the entity is fixed.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.validationErrorsChanged.subscribe(
+   function (validationChangeArgs) {
                 // this code will be executed anytime a property value changes on the 'order' entity.
                 var entity == validationChangeArgs.entity; // Note: entity === order
                 var errorsAdded = validationChangeArgs.added;
                 var errorsCleared = validationChangeArgs.removed;
             });
-    @event validationErrorsChanged 
-    @param entity {Entity} The entity on which the validation errors are being added or removed.
-    @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
-    @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
-    errors that have been 'fixed'
-    @readOnly
-    **/
+   @event validationErrorsChanged
+   @param entity {Entity} The entity on which the validation errors are being added or removed.
+   @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
+   @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
+   errors that have been 'fixed'
+   @readOnly
+   **/
 
-    /**
-    Returns the {{#crossLink "EntityKey"}}{{/crossLink}} for this Entity. 
-    @example
-            // assume order is an order entity attached to an EntityManager.
-        var entityKey = order.entityAspect.getKey();
-    @method getKey
-    @param [forceRefresh=false] {Boolean} Forces the recalculation of the key.  This should normally be unnecessary.
-    @return {EntityKey} The {{#crossLink "EntityKey"}}{{/crossLink}} associated with this Entity.
-    **/
-    proto.getKey = function(forceRefresh) {
-        forceRefresh = assertParam(forceRefresh, "forceRefresh").isBoolean().isOptional().check(false);
-        if (forceRefresh || !this._entityKey) {
-            var entityType = this.entity.entityType;
-            var keyProps = entityType.keyProperties;
-            var values = keyProps.map(function(p) {
-                return this.entity.getProperty(p.name);
-            }, this);
-            this._entityKey = new EntityKey(entityType, values);
-        }
-        return this._entityKey;
-    };
-
-    /**
-    Returns the entity to an {{#crossLink "EntityState"}}{{/crossLink}} of 'Unchanged' by committing all changes made since the entity was last queried 
-    had 'acceptChanges' called on it. 
-    @example
-            // assume order is an order entity attached to an EntityManager.
-            order.entityAspect.acceptChanges();
-            // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
-    @method acceptChanges
-    **/
-    proto.acceptChanges = function() {
-        var em = this.entityManager;
-        if (this.entityState.isDeleted()) {
-            em.detachEntity(this.entity);
-        } else {
-            this.setUnchanged();
-        }
-        em.entityChanged.publish({ entityAction: EntityAction.AcceptChanges, entity: this.entity });
-    };
-
-    /**
-    Returns the entity to an EntityState of 'Unchanged' by rejecting all changes made to it since the entity was last queried 
-    had 'rejectChanges' called on it. 
-    @example
-            // assume order is an order entity attached to an EntityManager.
-            order.entityAspect.rejectChanges();
-            // The 'order' entity will now be in an 'Unchanged' state with any changes rejected. 
-    @method rejectChanges
-    **/
-    proto.rejectChanges = function() {
-        var entity = this.entity;
-        var entityManager = this.entityManager;
-        // we do not want PropertyChange or EntityChange events to occur here
-        __using(entityManager, "isRejectingChanges", true, function() {
-            rejectChangesCore(entity);
-        });
-        if (this.entityState.isAdded()) {
-            // next line is needed because the following line will cause this.entityManager -> null;
-            entityManager.detachEntity(entity);
-            // need to tell em that an entity that needed to be saved no longer does.
-            entityManager._notifyStateChange(entity, false);
-        } else {
-            if (this.entityState.isDeleted()) {
-                this.entityManager._linkRelatedEntities(entity);
-            }
-            this.setUnchanged();
-            // propertyChanged propertyName is null because more than one property may have changed.
-            this.propertyChanged.publish({ entity: entity, propertyName: null });
-            this.entityManager.entityChanged.publish({ entityAction: EntityAction.RejectChanges, entity: entity });
-        }
-    };
-
-    function rejectChangesCore(target) {
-        var aspect = target.entityAspect || target.complexAspect;
-        var stype = target.entityType || target.complexType;
-        var originalValues = aspect.originalValues;
-        for (var propName in originalValues) {
-            target.setProperty(propName, originalValues[propName]);
-        }
-        stype.complexProperties.forEach(function(cp) {
-            var cos = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                rejectChangesCore(cos);
-            } else {
-                cos._rejectChanges();
-                cos.forEach(function (co) { rejectChangesCore(co); });
-            }
-        });
+  /**
+   Returns the {{#crossLink "EntityKey"}}{{/crossLink}} for this Entity.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var entityKey = order.entityAspect.getKey();
+   @method getKey
+   @param [forceRefresh=false] {Boolean} Forces the recalculation of the key.  This should normally be unnecessary.
+   @return {EntityKey} The {{#crossLink "EntityKey"}}{{/crossLink}} associated with this Entity.
+   **/
+  proto.getKey = function (forceRefresh) {
+    forceRefresh = assertParam(forceRefresh, "forceRefresh").isBoolean().isOptional().check(false);
+    if (forceRefresh || !this._entityKey) {
+      var entityType = this.entity.entityType;
+      var keyProps = entityType.keyProperties;
+      var values = keyProps.map(function (p) {
+        return this.entity.getProperty(p.name);
+      }, this);
+      this._entityKey = new EntityKey(entityType, values);
     }
+    return this._entityKey;
+  };
 
-    proto.getPropertyPath = function(propName) {
-        return propName;
+  /**
+   Returns the entity to an {{#crossLink "EntityState"}}{{/crossLink}} of 'Unchanged' by committing all changes made since the entity was last queried
+   had 'acceptChanges' called on it.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.acceptChanges();
+   // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
+   @method acceptChanges
+   **/
+  proto.acceptChanges = function () {
+    var em = this.entityManager;
+    if (this.entityState.isDeleted()) {
+      em.detachEntity(this.entity);
+    } else {
+      this.setUnchanged();
     }
+    em.entityChanged.publish({ entityAction: EntityAction.AcceptChanges, entity: this.entity });
+  };
+
+  /**
+   Returns the entity to an EntityState of 'Unchanged' by rejecting all changes made to it since the entity was last queried
+   had 'rejectChanges' called on it.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.rejectChanges();
+   // The 'order' entity will now be in an 'Unchanged' state with any changes rejected.
+   @method rejectChanges
+   **/
+  proto.rejectChanges = function () {
+    var entity = this.entity;
+    var entityManager = this.entityManager;
+    // we do not want PropertyChange or EntityChange events to occur here
+    __using(entityManager, "isRejectingChanges", true, function () {
+      rejectChangesCore(entity);
+    });
+    if (this.entityState.isAdded()) {
+      // next line is needed because the following line will cause this.entityManager -> null;
+      entityManager.detachEntity(entity);
+      // need to tell em that an entity that needed to be saved no longer does.
+      entityManager._notifyStateChange(entity, false);
+    } else {
+      if (this.entityState.isDeleted()) {
+        this.entityManager._linkRelatedEntities(entity);
+      }
+      this.setUnchanged();
+      // propertyChanged propertyName is null because more than one property may have changed.
+      this.propertyChanged.publish({ entity: entity, propertyName: null });
+      this.entityManager.entityChanged.publish({ entityAction: EntityAction.RejectChanges, entity: entity });
+    }
+  };
+
+  function rejectChangesCore(target) {
+    var aspect = target.entityAspect || target.complexAspect;
+    var stype = target.entityType || target.complexType;
+    var originalValues = aspect.originalValues;
+    for (var propName in originalValues) {
+      target.setProperty(propName, originalValues[propName]);
+    }
+    stype.complexProperties.forEach(function (cp) {
+      var cos = target.getProperty(cp.name);
+      if (cp.isScalar) {
+        rejectChangesCore(cos);
+      } else {
+        cos._rejectChanges();
+        cos.forEach(function (co) {
+          rejectChangesCore(co);
+        });
+      }
+    });
+  }
+
+  proto.getPropertyPath = function (propName) {
+    return propName;
+  }
 
 
-    /**
+  /**
    Sets the entity to an EntityState of 'Added'.  This is NOT the equivalent of calling {{#crossLink "EntityManager/addEntity"}}{{/crossLink}}
    because no key generation will occur for autogenerated keys as a result of this operation. As a result this operation can be problematic
    unless you are certain that the entity being marked 'Added' does not already exist in the database and does not have an autogenerated key.
    The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
-       @example
-           // assume order is an order entity attached to an EntityManager.
-           order.entityAspect.setAdded();
-           // The 'order' entity will now be in an 'Added' state.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setAdded();
+   // The 'order' entity will now be in an 'Added' state.
    @method setAdded
    **/
-    proto.setAdded = function () {
-        return this.setEntityState(EntityState.Added);
-    }
+  proto.setAdded = function () {
+    return this.setEntityState(EntityState.Added);
+  }
 
-    /**
-    Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink "EntityAspect/acceptChanges"}}{{/crossLink}}.
-    The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
-        @example
-            // assume order is an order entity attached to an EntityManager.
-            order.entityAspect.setUnchanged();
-            // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
-    @method setUnchanged
-    **/
-    proto.setUnchanged = function () {
-        return this.setEntityState(EntityState.Unchanged);
-    };
-
-
-    /**
-    Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.
-    The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.setModified();
-        // The 'order' entity will now be in a 'Modified' state. 
-    @method setModified
-    **/
-    proto.setModified = function () {
-        return this.setEntityState(EntityState.Modified);
-    };
-
-    /**
-    Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call
-    but also removes the entity from all of its related entities. 
-    The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        order.entityAspect.setDeleted();
-        // The 'order' entity will now be in a 'Deleted' state and it will no longer have any 'related' entities. 
-    @method setDeleted
-    **/
-    proto.setDeleted = function () {
-        return this.setEntityState(EntityState.Deleted);
-    };
-
-    /**
-   Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities. 
+  /**
+   Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink "EntityAspect/acceptChanges"}}{{/crossLink}}.
    The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
    @example
-       // assume order is an order entity attached to an EntityManager.
-       order.entityAspect.setDetached();
-       // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities. 
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setUnchanged();
+   // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
+   @method setUnchanged
+   **/
+  proto.setUnchanged = function () {
+    return this.setEntityState(EntityState.Unchanged);
+  };
+
+
+  /**
+   Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.
+   The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setModified();
+   // The 'order' entity will now be in a 'Modified' state.
+   @method setModified
+   **/
+  proto.setModified = function () {
+    return this.setEntityState(EntityState.Modified);
+  };
+
+  /**
+   Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call
+   but also removes the entity from all of its related entities.
+   The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setDeleted();
+   // The 'order' entity will now be in a 'Deleted' state and it will no longer have any 'related' entities.
+   @method setDeleted
+   **/
+  proto.setDeleted = function () {
+    return this.setEntityState(EntityState.Deleted);
+  };
+
+  /**
+   Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities.
+   The same operation can be performed by calling  {{#crossLink "EntityAspect/setEntityState"}}{{/crossLink}}.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setDetached();
+   // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities.
    @method setDetached
    **/
-    proto.setDetached = function () {
-        return this.setEntityState(EntityState.Detached);
-    }
+  proto.setDetached = function () {
+    return this.setEntityState(EntityState.Detached);
+  }
 
-    /**
-    Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc. 
-    @example
-       // assume order is an order entity attached to an EntityManager.
-       order.entityAspect.setEntityState(EntityState.Unchanged);
-       // The 'order' entity will now be in a 'Unchanged' state. 
-    @method setEntityState
-    **/
-    proto.setEntityState = function (entityState) {
-        if (this.entityState === entityState) return false;
-        if (this.entityState.isDetached()) {
-            throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
-        }
-        var entity = this.entity;
-        var em = this.entityManager;
-        var needsSave = true;
-        if (entityState === EntityState.Unchanged) {
-            clearOriginalValues(entity);
-            delete this.hasTempKey;
-            needsSave = false;
-        } else if (entityState === EntityState.Added) {
-            clearOriginalValues(entity);
-            // TODO: more to do here... like regenerating key ???
-        } else if (entityState === EntityState.Deleted) {
-            if (this.entityState.isAdded()) {
-                // turn it into a detach and exit early
-                this.setEntityState(EntityState.Detached);
-                return true;
-            } else {
-                // TODO: think about cascade deletes
-                // entityState needs to be set it early in this one case to insure that fk's are not cleared.
-                this.entityState = EntityState.Deleted;
-                removeFromRelations(entity, EntityState.Deleted);
-            }
-        } else if (entityState === EntityState.Modified) {
-            // nothing extra needed
-        } else if (entityState === EntityState.Detached) {
-            var group = this.entityGroup;
-            // no group === already detached.
-            if (!group) return false;
-            group.detachEntity(entity);
-            // needs to occur early here - so this IS deliberately redundent with the same code later in this method.
-            this.entityState = entityState;
-            removeFromRelations(entity, EntityState.Detached);
-            this._detach();
-            em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
-            needsSave = false;
-        }
-        this.entityState = entityState;
-        em._notifyStateChange(entity, needsSave);
+  /**
+   Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   order.entityAspect.setEntityState(EntityState.Unchanged);
+   // The 'order' entity will now be in a 'Unchanged' state.
+   @method setEntityState
+   **/
+  proto.setEntityState = function (entityState) {
+    if (this.entityState === entityState) return false;
+    if (this.entityState.isDetached()) {
+      throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
+    }
+    var entity = this.entity;
+    var em = this.entityManager;
+    var needsSave = true;
+    if (entityState === EntityState.Unchanged) {
+      clearOriginalValues(entity);
+      delete this.hasTempKey;
+      needsSave = false;
+    } else if (entityState === EntityState.Added) {
+      clearOriginalValues(entity);
+      // TODO: more to do here... like regenerating key ???
+    } else if (entityState === EntityState.Deleted) {
+      if (this.entityState.isAdded()) {
+        // turn it into a detach and exit early
+        this.setEntityState(EntityState.Detached);
         return true;
+      } else {
+        // TODO: think about cascade deletes
+        // entityState needs to be set it early in this one case to insure that fk's are not cleared.
+        this.entityState = EntityState.Deleted;
+        removeFromRelations(entity, EntityState.Deleted);
+      }
+    } else if (entityState === EntityState.Modified) {
+      // nothing extra needed
+    } else if (entityState === EntityState.Detached) {
+      var group = this.entityGroup;
+      // no group === already detached.
+      if (!group) return false;
+      group.detachEntity(entity);
+      // needs to occur early here - so this IS deliberately redundent with the same code later in this method.
+      this.entityState = entityState;
+      removeFromRelations(entity, EntityState.Detached);
+      this._detach();
+      em.entityChanged.publish({ entityAction: EntityAction.Detach, entity: entity });
+      needsSave = false;
     }
+    this.entityState = entityState;
+    em._notifyStateChange(entity, needsSave);
+    return true;
+  }
 
-    function clearOriginalValues(target) {
-        var aspect = target.entityAspect || target.complexAspect;
-        aspect.originalValues = {};
-        var stype = target.entityType || target.complexType;
-        stype.complexProperties.forEach(function (cp) {
-            var cos = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                clearOriginalValues(cos);
-            } else {
-                cos._acceptChanges();
-                cos.forEach(function (co) { clearOriginalValues(co); });
-            }
+  function clearOriginalValues(target) {
+    var aspect = target.entityAspect || target.complexAspect;
+    aspect.originalValues = {};
+    var stype = target.entityType || target.complexType;
+    stype.complexProperties.forEach(function (cp) {
+      var cos = target.getProperty(cp.name);
+      if (cp.isScalar) {
+        clearOriginalValues(cos);
+      } else {
+        cos._acceptChanges();
+        cos.forEach(function (co) {
+          clearOriginalValues(co);
         });
-    }
+      }
+    });
+  }
 
-    /**
-    Performs a query for the value of a specified {{#crossLink "NavigationProperty"}}{{/crossLink}}.
-    @example
-            emp.entityAspect.loadNavigationProperty("Orders")
-            .then(function (data) {
+  /**
+   Performs a query for the value of a specified {{#crossLink "NavigationProperty"}}{{/crossLink}}.
+   @example
+   emp.entityAspect.loadNavigationProperty("Orders")
+   .then(function (data) {
                 var orders = data.results;
             }).fail(function (exception) {
                 // handle exception here;
             });
-    @method loadNavigationProperty
-    @async
-    @param navigationProperty {NavigationProperty|String} The NavigationProperty or the name of the NavigationProperty to 'load'.
-    @param [callback] {Function} Function to call on success.
-    @param [errorCallback] {Function} Function to call on failure.
-    @return {Promise} 
+   @method loadNavigationProperty
+   @async
+   @param navigationProperty {NavigationProperty|String} The NavigationProperty or the name of the NavigationProperty to 'load'.
+   @param [callback] {Function} Function to call on success.
+   @param [errorCallback] {Function} Function to call on failure.
+   @return {Promise}
 
-        promiseData.results {Array of Entity}
-        promiseData.query {EntityQuery} The original query
-        promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.
-    **/
-    proto.loadNavigationProperty = function (navigationProperty, callback, errorCallback) {
-        var entity = this.entity;
-        var navProperty = entity.entityType._checkNavProperty(navigationProperty);
-        var query = EntityQuery.fromEntityNavigation(entity, navProperty);
-        // return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
-        var promise = entity.entityAspect.entityManager.executeQuery(query);
-        var that = this;
-        return promise.then(function(data) {
-            that._markAsLoaded(navProperty.name);
-            if (callback) callback(data);
-            return Q.resolve(data);
-        }, function(error) {
-            if (errorCallback) errorCallback(error);
-            return Q.reject(error);
-        });
+   promiseData.results {Array of Entity}
+   promiseData.query {EntityQuery} The original query
+   promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.
+   **/
+  proto.loadNavigationProperty = function (navigationProperty, callback, errorCallback) {
+    var entity = this.entity;
+    var navProperty = entity.entityType._checkNavProperty(navigationProperty);
+    var query = EntityQuery.fromEntityNavigation(entity, navProperty);
+    // return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
+    var promise = entity.entityAspect.entityManager.executeQuery(query);
+    var that = this;
+    return promise.then(function (data) {
+      that._markAsLoaded(navProperty.name);
+      if (callback) callback(data);
+      return Q.resolve(data);
+    }, function (error) {
+      if (errorCallback) errorCallback(error);
+      return Q.reject(error);
+    });
 
-    };
+  };
 
-    /**
-    Marks this navigationProperty on this entity as already having been loaded.
-    @example
-            emp.entityAspect.markNavigationPropertyAsLoaded("Orders");
-            
-    @method markAsLoaded
-    @async
-    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
-    **/
-    proto.markNavigationPropertyAsLoaded = function(navigationProperty) {
-        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-        this._markAsLoaded(navProperty.name);
+  /**
+   Marks this navigationProperty on this entity as already having been loaded.
+   @example
+   emp.entityAspect.markNavigationPropertyAsLoaded("Orders");
+
+   @method markAsLoaded
+   @async
+   @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.
+   **/
+  proto.markNavigationPropertyAsLoaded = function (navigationProperty) {
+    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+    this._markAsLoaded(navProperty.name);
+  }
+
+  /**
+   Determines whether a navigationProperty on this entity has already been loaded.
+
+   @example
+   A navigation property is considered loaded when any of the following three conditions applies:
+
+   1) It was fetched from the backend server.
+   a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method.
+   b) Note that even if the fetch returns nothing the property is still marked as loaded in this case.
+   2) The property is scalar and has been set to a nonnull value.
+   3) The EntityAspect.markNavigationPropertyAsLoaded was called.
+
+   @example
+   var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
+
+   @method isNavigationPropertyLoaded
+   @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.
+   **/
+  proto.isNavigationPropertyLoaded = function (navigationProperty) {
+    var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
+    if (navProperty.isScalar && this.entity.getProperty(navProperty.name) != null) {
+      return true;
     }
+    return this._loadedNps && this._loadedNps.indexOf(navProperty.name) >= 0;
+  }
 
-    /**
-    Determines whether a navigationProperty on this entity has already been loaded. 
-    
-    @example
-    A navigation property is considered loaded when any of the following three conditions applies:  
-
-        1) It was fetched from the backend server.  
-            a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method. 
-            b) Note that even if the fetch returns nothing the property is still marked as loaded in this case. 
-        2) The property is scalar and has been set to a nonnull value. 
-        3) The EntityAspect.markNavigationPropertyAsLoaded was called.
-    
-    @example
-        var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded("Orders");
-            
-    @method isNavigationPropertyLoaded
-    @param navigationProperty {NavigationProperty|String} The NavigationProperty or name of NavigationProperty to 'load'.   
-    **/
-    proto.isNavigationPropertyLoaded = function (navigationProperty) {
-        var navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
-        if (navProperty.isScalar && this.entity.getProperty(navProperty.name) != null) {
-            return true;
-        }
-        return this._loadedNps && this._loadedNps.indexOf(navProperty.name) >= 0;
-    }
-
-    proto._markAsLoaded = function(navPropName) {
-        this._loadedNps = this._loadedNps || [];
-        __arrayAddItemUnique(this._loadedNps, navPropName);
-    }
+  proto._markAsLoaded = function (navPropName) {
+    this._loadedNps = this._loadedNps || [];
+    __arrayAddItemUnique(this._loadedNps, navPropName);
+  }
 
 
-    /**
-    Performs validation on the entity, any errors encountered during the validation are available via the 
-    {{#crossLink "EntityAspect.getValidationErrors"}}{{/crossLink}} method. Validating an entity means executing
-    all of the validators on both the entity itself as well as those on each of its properties.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        var isOk = order.entityAspect.validateEntity();
-        // isOk will be 'true' if there are no errors on the entity.
-        if (!isOk) {
+  /**
+   Performs validation on the entity, any errors encountered during the validation are available via the
+   {{#crossLink "EntityAspect.getValidationErrors"}}{{/crossLink}} method. Validating an entity means executing
+   all of the validators on both the entity itself as well as those on each of its properties.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var isOk = order.entityAspect.validateEntity();
+   // isOk will be 'true' if there are no errors on the entity.
+   if (!isOk) {
             var errors = order.entityAspect.getValidationErrors();
         }
-    @method validateEntity
-    @return {Boolean} Whether the entity passed validation.
-    **/
-    proto.validateEntity = function () {
-        var ok =true;
-        this._processValidationOpAndPublish(function(that) {
-            ok = validateTarget(that.entity);
-        });
-        return ok;
-    };
+   @method validateEntity
+   @return {Boolean} Whether the entity passed validation.
+   **/
+  proto.validateEntity = function () {
+    var ok = true;
+    this._processValidationOpAndPublish(function (that) {
+      ok = validateTarget(that.entity);
+    });
+    return ok;
+  };
 
-    // coIndex is only used where target is a complex object that is part of an array of complex objects 
-    // in which case ctIndex is the index of the target within the array.
-    function validateTarget(target, coIndex) {
-        var ok = true;
-        var stype = target.entityType || target.complexType;
-        var aspect = target.entityAspect || target.complexAspect;
-        var entityAspect = target.entityAspect || target.complexAspect.getEntityAspect();
-        var context = { entity: entityAspect.entity  };
-        if (coIndex !== undefined) {
-            context.index = coIndex;
-        }    
-        
-        stype.getProperties().forEach(function (p) {
-            var value = target.getProperty(p.name);
-            var validators = p.getAllValidators();
-            if (validators.length > 0) {
-                context.property = p;
-                context.propertyName = aspect.getPropertyPath(p.name);
-                ok = entityAspect._validateProperty(value, context) && ok;
-            }
-            if (p.isComplexProperty) {
-                if (p.isScalar) {
-                    ok = validateTarget(value) && ok;
-                } else {
-                    ok = value.reduce(function(pv, cv, ix) {
-                        return validateTarget(cv, ix) && pv;
-                    }, ok);
-                }
-            }
-        });
-            
-
-        // then target level
-        stype.getAllValidators().forEach(function (validator) {
-            ok = validate(entityAspect, validator, target) && ok;
-        });
-        return ok;
+  // coIndex is only used where target is a complex object that is part of an array of complex objects
+  // in which case ctIndex is the index of the target within the array.
+  function validateTarget(target, coIndex) {
+    var ok = true;
+    var stype = target.entityType || target.complexType;
+    var aspect = target.entityAspect || target.complexAspect;
+    var entityAspect = target.entityAspect || target.complexAspect.getEntityAspect();
+    var context = { entity: entityAspect.entity  };
+    if (coIndex !== undefined) {
+      context.index = coIndex;
     }
-    
 
-    /**
-    Performs validation on a specific property of this entity, any errors encountered during the validation are available via the 
-    {{#crossLink "EntityAspect.getValidationErrors"}}{{/crossLink}} method. Validating a property means executing
-    all of the validators on the specified property.  This call is also made automatically anytime a property
-    of an entity is changed.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        var isOk = order.entityAspect.validateProperty("Order"); 
-    or
-    @example
-        var orderDateProperty = order.entityType.getProperty("OrderDate");
-        var isOk = order.entityAspect.validateProperty(OrderDateProperty); 
-    @method validateProperty
-    @param property {DataProperty|NavigationProperty|String} The {{#crossLink "DataProperty"}}{{/crossLink}} or 
-    {{#crossLink "NavigationProperty"}}{{/crossLink}} to validate or a string with the name of the property or a property path with
-    the path to a property of a complex object.
-    @param [context] {Object} A context object used to pass additional information to each  {{#crossLink "Validator"}}{{/crossLink}}
-    @return {Boolean} Whether the entity passed validation.
-    **/
-    proto.validateProperty = function (property, context) {
-        var value = this.getPropertyValue(property); // performs validations
-        if (value && value.complexAspect) {
-            return validateTarget(value);
-        }
-        context = context || {};
-        context.entity = this.entity;
-        if (typeof(property) === 'string') {
-            context.property = this.entity.entityType.getProperty(property, true);
-            context.propertyName = property;
+    stype.getProperties().forEach(function (p) {
+      var value = target.getProperty(p.name);
+      var validators = p.getAllValidators();
+      if (validators.length > 0) {
+        context.property = p;
+        context.propertyName = aspect.getPropertyPath(p.name);
+        ok = entityAspect._validateProperty(value, context) && ok;
+      }
+      if (p.isComplexProperty) {
+        if (p.isScalar) {
+          ok = validateTarget(value) && ok;
         } else {
-            context.property = property;
-            context.propertyName = property.name;
+          ok = value.reduce(function (pv, cv, ix) {
+            return validateTarget(cv, ix) && pv;
+          }, ok);
         }
-            
-        return this._validateProperty(value, context);
-    };
+      }
+    });
 
-    /**
-    Returns the validation errors associated with either the entire entity or any specified property.
-    @example
-    This method can return all of the errors for an Entity
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        var valErrors = order.entityAspect.getValidationErrors();
-    as well as those for just a specific property.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        var orderDateErrors = order.entityAspect.getValidationErrors("OrderDate");
-    which can also be expressed as
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        var orderDateProperty = order.entityType.getProperty("OrderDate");
-        var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
-    @method getValidationErrors
-    @param [property] {DataProperty|NavigationProperty} The property for which validation errors should be retrieved.
-    If omitted, all of the validation errors for this entity will be returned.
-    @return {Array of ValidationError}
-    **/
-    proto.getValidationErrors = function (property) {
-        assertParam(property, "property").isOptional().isEntityProperty().or().isString().check();
-        var result = __getOwnPropertyValues(this._validationErrors);
-        if (property) {
-            var propertyName = typeof (property) === 'string' ? property : property.name;
-            result = result.filter(function (ve) {
-                return ve.property && (ve.property.name === propertyName || (propertyName.indexOf(".") != -1 && ve.propertyName == propertyName));
-            });
-        }
-        return result;
-    };
 
-    /**
-    Adds a validation error.
-    @method addValidationError
-    @param validationError {ValidationError} 
-    **/
-    proto.addValidationError = function (validationError) {
-        assertParam(validationError, "validationError").isInstanceOf(ValidationError).check();
-        this._processValidationOpAndPublish(function (that) {
-            that._addValidationError(validationError);
-        });
-    };
+    // then target level
+    stype.getAllValidators().forEach(function (validator) {
+      ok = validate(entityAspect, validator, target) && ok;
+    });
+    return ok;
+  }
 
-    /**
-    Removes a validation error.
-    @method removeValidationError
-    @param validationErrorOrKey {ValidationError|String} Either a ValidationError or a ValidationError 'key' value
-    **/
-    proto.removeValidationError = function (validationErrorOrKey) {
-        assertParam(validationErrorOrKey, "validationErrorOrKey").isString().or().isInstanceOf(ValidationError).or().isInstanceOf(Validator).check();
-        
-        var key = (typeof (validationErrorOrKey) === "string") ? validationErrorOrKey : validationErrorOrKey.key;
-        this._processValidationOpAndPublish(function (that) {
-            that._removeValidationError(key);
-        });
-    };
 
-    /**
-    Removes all of the validation errors for a specified entity
-    @method clearValidationErrors
-    **/
-    proto.clearValidationErrors = function () {
-        this._processValidationOpAndPublish(function (that) {
-            __objectForEach(that._validationErrors, function(key, valError) {
-                if (valError) {
-                    delete that._validationErrors[key];
-                    that._pendingValidationResult.removed.push(valError);
-                }
-            });
-            that.hasValidationErrors = !__isEmpty(that._validationErrors);
-        });
-    };
+  /**
+   Performs validation on a specific property of this entity, any errors encountered during the validation are available via the
+   {{#crossLink "EntityAspect.getValidationErrors"}}{{/crossLink}} method. Validating a property means executing
+   all of the validators on the specified property.  This call is also made automatically anytime a property
+   of an entity is changed.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var isOk = order.entityAspect.validateProperty("Order");
+   or
+   @example
+   var orderDateProperty = order.entityType.getProperty("OrderDate");
+   var isOk = order.entityAspect.validateProperty(OrderDateProperty);
+   @method validateProperty
+   @param property {DataProperty|NavigationProperty|String} The {{#crossLink "DataProperty"}}{{/crossLink}} or
+   {{#crossLink "NavigationProperty"}}{{/crossLink}} to validate or a string with the name of the property or a property path with
+   the path to a property of a complex object.
+   @param [context] {Object} A context object used to pass additional information to each  {{#crossLink "Validator"}}{{/crossLink}}
+   @return {Boolean} Whether the entity passed validation.
+   **/
+  proto.validateProperty = function (property, context) {
+    var value = this.getPropertyValue(property); // performs validations
+    if (value && value.complexAspect) {
+      return validateTarget(value);
+    }
+    context = context || {};
+    context.entity = this.entity;
+    if (typeof(property) === 'string') {
+      context.property = this.entity.entityType.getProperty(property, true);
+      context.propertyName = property;
+    } else {
+      context.property = property;
+      context.propertyName = property.name;
+    }
 
-   
+    return this._validateProperty(value, context);
+  };
 
-    // returns null for np's that do not have a parentKey
-    proto.getParentKey = function (navigationProperty) {
-        // NavigationProperty doesn't yet exist
-        // assertParam(navigationProperty, "navigationProperty").isInstanceOf(NavigationProperty).check();
-        var fkNames = navigationProperty.foreignKeyNames;
-        if (fkNames.length === 0) return null;
-        var that = this;
-        var fkValues = fkNames.map(function (fkn) {
-            return that.entity.getProperty(fkn);
-        });
-        return new EntityKey(navigationProperty.entityType, fkValues);
-    };
+  /**
+   Returns the validation errors associated with either the entire entity or any specified property.
+   @example
+   This method can return all of the errors for an Entity
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var valErrors = order.entityAspect.getValidationErrors();
+   as well as those for just a specific property.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var orderDateErrors = order.entityAspect.getValidationErrors("OrderDate");
+   which can also be expressed as
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   var orderDateProperty = order.entityType.getProperty("OrderDate");
+   var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
+   @method getValidationErrors
+   @param [property] {DataProperty|NavigationProperty} The property for which validation errors should be retrieved.
+   If omitted, all of the validation errors for this entity will be returned.
+   @return {Array of ValidationError}
+   **/
+  proto.getValidationErrors = function (property) {
+    assertParam(property, "property").isOptional().isEntityProperty().or().isString().check();
+    var result = __getOwnPropertyValues(this._validationErrors);
+    if (property) {
+      var propertyName = typeof (property) === 'string' ? property : property.name;
+      result = result.filter(function (ve) {
+        return ve.property && (ve.property.name === propertyName || (propertyName.indexOf(".") != -1 && ve.propertyName == propertyName));
+      });
+    }
+    return result;
+  };
 
-    proto.getPropertyValue = function (property) {
-        assertParam(property, "property").isString().or().isEntityProperty().check();
-        var value;
-        if (typeof (property) === 'string') {
-            var propNames = property.trim().split(".");
-            var propName = propNames.shift();
-            value = this.entity;
-            value = value.getProperty(propName);
-            while (propNames.length > 0) {
-                propName = propNames.shift();
-                value = value.getProperty(propName);
-            }
-        } else {
-            if (!(property.parentType instanceof EntityType)) {
-                throw new Error("The validateProperty method does not accept a 'property' parameter whose parentType is a ComplexType; " +
-                    "Pass a 'property path' string as the 'property' parameter instead ");
-            }
-            value = this.entity.getProperty(property.name);
-        }
-        return value;
-    };
+  /**
+   Adds a validation error.
+   @method addValidationError
+   @param validationError {ValidationError}
+   **/
+  proto.addValidationError = function (validationError) {
+    assertParam(validationError, "validationError").isInstanceOf(ValidationError).check();
+    this._processValidationOpAndPublish(function (that) {
+      that._addValidationError(validationError);
+    });
+  };
 
-    // internal methods
+  /**
+   Removes a validation error.
+   @method removeValidationError
+   @param validationErrorOrKey {ValidationError|String} Either a ValidationError or a ValidationError 'key' value
+   **/
+  proto.removeValidationError = function (validationErrorOrKey) {
+    assertParam(validationErrorOrKey, "validationErrorOrKey").isString().or().isInstanceOf(ValidationError).or().isInstanceOf(Validator).check();
 
-    proto._detach = function() {
-        this.entityGroup = null;
-        this.entityManager = null;
-        this.entityState = EntityState.Detached;
-        this.originalValues = {};
-        this._validationErrors = {};
-        this.hasValidationErrors = false;
-        this.validationErrorsChanged.clear();
-        this.propertyChanged.clear();
-    };
-    
+    var key = (typeof (validationErrorOrKey) === "string") ? validationErrorOrKey : validationErrorOrKey.key;
+    this._processValidationOpAndPublish(function (that) {
+      that._removeValidationError(key);
+    });
+  };
 
-    // called from defaultInterceptor.
-    proto._validateProperty = function (value, context) {
-        var ok = true;
-        this._processValidationOpAndPublish(function (that) {
-            context.property.getAllValidators().forEach(function (validator) {
-                ok = validate(that, validator, value, context) && ok;
-            });
-        });
-        return ok;
-    };
-
-    proto._processValidationOpAndPublish = function (validationFn) {
-        if (this._pendingValidationResult) {
-            // only top level processValidations call publishes
-            validationFn(this);
-        } else {
-            try {
-                this._pendingValidationResult = { entity: this.entity, added: [], removed: [] };
-                validationFn(this);
-                if (this._pendingValidationResult.added.length > 0 || this._pendingValidationResult.removed.length > 0) {
-                    this.validationErrorsChanged.publish(this._pendingValidationResult);
-                    // this might be a detached entity hence the guard below.
-                    this.entityManager && this.entityManager.validationErrorsChanged.publish(this._pendingValidationResult);
-                    
-                }
-            } finally {
-                this._pendingValidationResult = undefined;
-            }
-        }
-    };
-
-    proto._addValidationError = function (validationError) {
-        this._validationErrors[validationError.key] = validationError;
-        this.hasValidationErrors = true;
-        this._pendingValidationResult.added.push(validationError);
-    };
-
-    proto._removeValidationError = function (key) {
-        var valError = this._validationErrors[key];
+  /**
+   Removes all of the validation errors for a specified entity
+   @method clearValidationErrors
+   **/
+  proto.clearValidationErrors = function () {
+    this._processValidationOpAndPublish(function (that) {
+      __objectForEach(that._validationErrors, function (key, valError) {
         if (valError) {
-            delete this._validationErrors[key];
-            this.hasValidationErrors = !__isEmpty(this._validationErrors);
-            this._pendingValidationResult.removed.push(valError);
+          delete that._validationErrors[key];
+          that._pendingValidationResult.removed.push(valError);
         }
-    };
+      });
+      that.hasValidationErrors = !__isEmpty(that._validationErrors);
+    });
+  };
 
-    function removeFromRelations(entity, entityState) {
-        // remove this entity from any collections.
-        // mark the entity deleted or detached
 
-        var isDeleted = entityState.isDeleted();
-        if (isDeleted) {
-            removeFromRelationsCore(entity);
-        } else {
-            __using(entity.entityAspect.entityManager, "isLoading", true, function () {
-                removeFromRelationsCore(entity);
-            });
-        }
+  // returns null for np's that do not have a parentKey
+  proto.getParentKey = function (navigationProperty) {
+    // NavigationProperty doesn't yet exist
+    // assertParam(navigationProperty, "navigationProperty").isInstanceOf(NavigationProperty).check();
+    var fkNames = navigationProperty.foreignKeyNames;
+    if (fkNames.length === 0) return null;
+    var that = this;
+    var fkValues = fkNames.map(function (fkn) {
+      return that.entity.getProperty(fkn);
+    });
+    return new EntityKey(navigationProperty.entityType, fkValues);
+  };
+
+  proto.getPropertyValue = function (property) {
+    assertParam(property, "property").isString().or().isEntityProperty().check();
+    var value;
+    if (typeof (property) === 'string') {
+      var propNames = property.trim().split(".");
+      var propName = propNames.shift();
+      value = this.entity;
+      value = value.getProperty(propName);
+      while (propNames.length > 0) {
+        propName = propNames.shift();
+        value = value.getProperty(propName);
+      }
+    } else {
+      if (!(property.parentType instanceof EntityType)) {
+        throw new Error("The validateProperty method does not accept a 'property' parameter whose parentType is a ComplexType; " +
+            "Pass a 'property path' string as the 'property' parameter instead ");
+      }
+      value = this.entity.getProperty(property.name);
     }
+    return value;
+  };
 
-    function removeFromRelationsCore(entity) {
-        entity.entityType.navigationProperties.forEach(function (np) {
-            var inverseNp = np.inverse;
-            var npValue = entity.getProperty(np.name);
-            if (np.isScalar) {
-                if (npValue) {
-                    if (inverseNp) {
-                        if (inverseNp.isScalar) {
-                            npValue.setProperty(inverseNp.name, null);
-                        } else {
-                            var collection = npValue.getProperty(inverseNp.name);
-                            if (collection.length) {
-                                __arrayRemoveItem(collection, entity);
-                            }
-                        }
-                    }
-                    entity.setProperty(np.name, null);
-                }
+  // internal methods
+
+  proto._detach = function () {
+    this.entityGroup = null;
+    this.entityManager = null;
+    this.entityState = EntityState.Detached;
+    this.originalValues = {};
+    this._validationErrors = {};
+    this.hasValidationErrors = false;
+    this.validationErrorsChanged.clear();
+    this.propertyChanged.clear();
+  };
+
+
+  // called from defaultInterceptor.
+  proto._validateProperty = function (value, context) {
+    var ok = true;
+    this._processValidationOpAndPublish(function (that) {
+      context.property.getAllValidators().forEach(function (validator) {
+        ok = validate(that, validator, value, context) && ok;
+      });
+    });
+    return ok;
+  };
+
+  proto._processValidationOpAndPublish = function (validationFn) {
+    if (this._pendingValidationResult) {
+      // only top level processValidations call publishes
+      validationFn(this);
+    } else {
+      try {
+        this._pendingValidationResult = { entity: this.entity, added: [], removed: [] };
+        validationFn(this);
+        if (this._pendingValidationResult.added.length > 0 || this._pendingValidationResult.removed.length > 0) {
+          this.validationErrorsChanged.publish(this._pendingValidationResult);
+          // this might be a detached entity hence the guard below.
+          this.entityManager && this.entityManager.validationErrorsChanged.publish(this._pendingValidationResult);
+
+        }
+      } finally {
+        this._pendingValidationResult = undefined;
+      }
+    }
+  };
+
+  proto._addValidationError = function (validationError) {
+    this._validationErrors[validationError.key] = validationError;
+    this.hasValidationErrors = true;
+    this._pendingValidationResult.added.push(validationError);
+  };
+
+  proto._removeValidationError = function (key) {
+    var valError = this._validationErrors[key];
+    if (valError) {
+      delete this._validationErrors[key];
+      this.hasValidationErrors = !__isEmpty(this._validationErrors);
+      this._pendingValidationResult.removed.push(valError);
+    }
+  };
+
+  function removeFromRelations(entity, entityState) {
+    // remove this entity from any collections.
+    // mark the entity deleted or detached
+
+    var isDeleted = entityState.isDeleted();
+    if (isDeleted) {
+      removeFromRelationsCore(entity);
+    } else {
+      __using(entity.entityAspect.entityManager, "isLoading", true, function () {
+        removeFromRelationsCore(entity);
+      });
+    }
+  }
+
+  function removeFromRelationsCore(entity) {
+    entity.entityType.navigationProperties.forEach(function (np) {
+      var inverseNp = np.inverse;
+      var npValue = entity.getProperty(np.name);
+      if (np.isScalar) {
+        if (npValue) {
+          if (inverseNp) {
+            if (inverseNp.isScalar) {
+              npValue.setProperty(inverseNp.name, null);
             } else {
-                if (inverseNp) {
-                    // npValue is a live list so we need to copy it first.
-                    npValue.slice(0).forEach(function (v) {
-                        if (inverseNp.isScalar) {
-                            v.setProperty(inverseNp.name, null);
-                        } else {
-                            // TODO: many to many - not yet handled.
-                        }
-                    });
-                }
-                // now clear it.
-                npValue.length = 0;
+              var collection = npValue.getProperty(inverseNp.name);
+              if (collection.length) {
+                __arrayRemoveItem(collection, entity);
+              }
             }
-        });
-
-    };
-
-    // note entityAspect only - ( no complex aspect allowed on the call).
-    function validate(entityAspect, validator, value, context) {
-        var ve = validator.validate(value, context);
-        if (ve) {
-            entityAspect._addValidationError(ve);
-            return false;
-        } else {
-            var key = ValidationError.getKey(validator, context ? context.propertyName: null);
-            entityAspect._removeValidationError(key);
-            return true;
+          }
+          entity.setProperty(np.name, null);
         }
-    }
+      } else {
+        if (inverseNp) {
+          // npValue is a live list so we need to copy it first.
+          npValue.slice(0).forEach(function (v) {
+            if (inverseNp.isScalar) {
+              v.setProperty(inverseNp.name, null);
+            } else {
+              // TODO: many to many - not yet handled.
+            }
+          });
+        }
+        // now clear it.
+        npValue.length = 0;
+      }
+    });
 
-    return ctor;
+  };
+
+  // note entityAspect only - ( no complex aspect allowed on the call).
+  function validate(entityAspect, validator, value, context) {
+    var ve = validator.validate(value, context);
+    if (ve) {
+      entityAspect._addValidationError(ve);
+      return false;
+    } else {
+      var key = ValidationError.getKey(validator, context ? context.propertyName : null);
+      entityAspect._removeValidationError(key);
+      return true;
+    }
+  }
+
+  return ctor;
 
 })();
 
-var ComplexAspect = (function() {
-        
-    /**
-    An ComplexAspect instance is associated with every complex object instance and is accessed via the complex object's 'complexAspect' property. 
-     
-    The ComplexAspect itself provides properties to determine the parent object, parent property and original values for the complex object.
+var ComplexAspect = (function () {
 
-    A ComplexAspect will almost never need to be constructed directly. You will usually get an ComplexAspect by accessing
-    an entities 'complexAspect' property.  This property will be automatically attached when an complex object is created as part of an
-    entity via either a query, import or EntityManager.createEntity call.
-     
-        // assume address is a complex property on the 'Customer' type
-        var aspect = aCustomer.address.complexAspect;
-        // aCustomer === aspect.parent;
-    @class ComplexAspect
-    **/
-    var ctor = function(complexObject, parent, parentProperty) {
-        if (!complexObject) {
-            throw new Error("The  ComplexAspect ctor requires an entity as its only argument.");
-        }
-        if (complexObject.complexAspect) {
-            return complexObject.complexAspect;
-        }
-        // if called without new
-        if (!(this instanceof ComplexAspect)) {
-            return new ComplexAspect(complexObject, parent, parentProperty);
-        }
+  /**
+   An ComplexAspect instance is associated with every complex object instance and is accessed via the complex object's 'complexAspect' property.
 
-        // entityType should already be on the entity from 'watch'
-        this.complexObject = complexObject;
-        complexObject.complexAspect = this;
+   The ComplexAspect itself provides properties to determine the parent object, parent property and original values for the complex object.
 
-        // TODO: keep public or not?
-        this.originalValues = {};
+   A ComplexAspect will almost never need to be constructed directly. You will usually get an ComplexAspect by accessing
+   an entities 'complexAspect' property.  This property will be automatically attached when an complex object is created as part of an
+   entity via either a query, import or EntityManager.createEntity call.
 
-        // if a standalone complexObject
-        if (parent != null) {
-            this.parent = parent;
-            this.parentProperty = parentProperty;
-        }
-
-        var complexType = complexObject.complexType;
-        if (!complexType) {
-            var typeName = complexObject.prototype._$typeName;
-            if (!typeName) {
-                throw new Error("This entity is not registered as a valid ComplexType");
-            } else {
-                throw new Error("Metadata for this complexType has not yet been resolved: " + typeName);
-            }
-        }
-        var complexCtor = complexType.getCtor();
-        __modelLibraryDef.getDefaultInstance().startTracking(complexObject, complexCtor.prototype);
-
-    };
-    var proto = ctor.prototype;
-
-
-    /**
-    The complex object that this aspect is associated with.
-
-    __readOnly__
-    @property complexObject {Entity} 
-    **/
-        
-    /**
-    The parent object that to which this aspect belongs; this will either be an entity or another complex object.
-
-    __readOnly__
-    @property parent {Entity|ComplexObject} 
-    **/
-
-    /**
-    The {{#crossLink "DataProperty"}}{{/crossLink}} on the 'parent' that contains this complex object.
-
-    __readOnly__
-    @property parentProperty {DataProperty}
-    **/
-        
-    /**
-    The 'original values' of this complex object where they are different from the 'current values'. 
-    This is a map where the key is a property name and the value is the 'original value' of the property.
-
-    __readOnly__
-    @property originalValues {Object}
-    **/
-
-    /**
-    Returns the EntityAspect for the top level entity tht contains this complex object.
-
-    @method getEntityAspect
-    @return  {String}  
-    **/
-    proto.getEntityAspect = function() {
-        var parent = this.parent;
-        if (!parent) return new EntityAspect(null);
-        var entityAspect = parent.entityAspect;
-        while (parent && !entityAspect) {
-            parent = parent.complexAspect && parent.complexAspect.parent;
-            entityAspect = parent && parent.entityAspect;
-        }
-        return entityAspect || new EntityAspect(null);
+   // assume address is a complex property on the 'Customer' type
+   var aspect = aCustomer.address.complexAspect;
+   // aCustomer === aspect.parent;
+   @class ComplexAspect
+   **/
+  var ctor = function (complexObject, parent, parentProperty) {
+    if (!complexObject) {
+      throw new Error("The  ComplexAspect ctor requires an entity as its only argument.");
+    }
+    if (complexObject.complexAspect) {
+      return complexObject.complexAspect;
+    }
+    // if called without new
+    if (!(this instanceof ComplexAspect)) {
+      return new ComplexAspect(complexObject, parent, parentProperty);
     }
 
-    /**
-    Executes the specified query against this EntityManager's local cache.
+    // entityType should already be on the entity from 'watch'
+    this.complexObject = complexObject;
+    complexObject.complexAspect = this;
 
-    @method getPropertyPath
-    @param propName {String}  The property name of a property on this complex aspect for which we want the full path.
-    @return  {String}    The 'property path' from the top level entity that contains this complex object to this object.
-    **/
-    proto.getPropertyPath = function(propName) {
-        var parent = this.parent;
-        if (!parent) return null;
-        var aspect = parent.complexAspect || parent.entityAspect;
-        return aspect.getPropertyPath(this.parentProperty.name + "." + propName);
+    // TODO: keep public or not?
+    this.originalValues = {};
+
+    // if a standalone complexObject
+    if (parent != null) {
+      this.parent = parent;
+      this.parentProperty = parentProperty;
     }
 
-    return ctor;
+    var complexType = complexObject.complexType;
+    if (!complexType) {
+      var typeName = complexObject.prototype._$typeName;
+      if (!typeName) {
+        throw new Error("This entity is not registered as a valid ComplexType");
+      } else {
+        throw new Error("Metadata for this complexType has not yet been resolved: " + typeName);
+      }
+    }
+    var complexCtor = complexType.getCtor();
+    __modelLibraryDef.getDefaultInstance().startTracking(complexObject, complexCtor.prototype);
+
+  };
+  var proto = ctor.prototype;
+
+
+  /**
+   The complex object that this aspect is associated with.
+
+   __readOnly__
+   @property complexObject {Entity}
+   **/
+
+  /**
+   The parent object that to which this aspect belongs; this will either be an entity or another complex object.
+
+   __readOnly__
+   @property parent {Entity|ComplexObject}
+   **/
+
+  /**
+   The {{#crossLink "DataProperty"}}{{/crossLink}} on the 'parent' that contains this complex object.
+
+   __readOnly__
+   @property parentProperty {DataProperty}
+   **/
+
+  /**
+   The 'original values' of this complex object where they are different from the 'current values'.
+   This is a map where the key is a property name and the value is the 'original value' of the property.
+
+   __readOnly__
+   @property originalValues {Object}
+   **/
+
+  /**
+   Returns the EntityAspect for the top level entity tht contains this complex object.
+
+   @method getEntityAspect
+   @return  {String}
+   **/
+  proto.getEntityAspect = function () {
+    var parent = this.parent;
+    if (!parent) return new EntityAspect(null);
+    var entityAspect = parent.entityAspect;
+    while (parent && !entityAspect) {
+      parent = parent.complexAspect && parent.complexAspect.parent;
+      entityAspect = parent && parent.entityAspect;
+    }
+    return entityAspect || new EntityAspect(null);
+  }
+
+  /**
+   Executes the specified query against this EntityManager's local cache.
+
+   @method getPropertyPath
+   @param propName {String}  The property name of a property on this complex aspect for which we want the full path.
+   @return  {String}    The 'property path' from the top level entity that contains this complex object to this object.
+   **/
+  proto.getPropertyPath = function (propName) {
+    var parent = this.parent;
+    if (!parent) return null;
+    var aspect = parent.complexAspect || parent.entityAspect;
+    return aspect.getPropertyPath(this.parentProperty.name + "." + propName);
+  }
+
+  return ctor;
 
 })();
 
 
-breeze.EntityAspect= EntityAspect;
-breeze.ComplexAspect= ComplexAspect;
+breeze.EntityAspect = EntityAspect;
+breeze.ComplexAspect = ComplexAspect;
 ;/**
-@module breeze   
-**/
-    
+ @module breeze
+ **/
+
 var EntityKey = (function () {
 
-    var ENTITY_KEY_DELIMITER = ":::";
+  var ENTITY_KEY_DELIMITER = ":::";
 
-    /**
-    An EntityKey is an object that represents the unique identity of an entity.  EntityKey's are immutable. 
+  /**
+   An EntityKey is an object that represents the unique identity of an entity.  EntityKey's are immutable.
 
-    @class EntityKey
-    **/
-        
-    /** 
-    Constructs a new EntityKey.  Each entity within an EntityManager will have a unique EntityKey. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType("Employee");
-        var entityKey = new EntityKey(empType, 1);
-    EntityKey's may also be found by calling EntityAspect.getKey()
-    @example
-        // assume employee1 is an existing Employee entity
-        var empKey = employee1.entityAspect.getKey();
-    Multipart keys are created by passing an array as the 'keyValues' parameter
-    @example
-        var empTerrType = em1.metadataStore.getEntityType("EmployeeTerritory");            
-        var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
-        // The order of the properties in the 'keyValues' array must be the same as that 
-        // returned by empTerrType.keyProperties
-    @method <ctor> EntityKey
-    @param entityType {EntityType} The {{#crossLink "EntityType"}}{{/crossLink}} of the entity.
-    @param keyValues {value|Array of values} A single value or an array of values.
-    **/
-    var ctor = function (entityType, keyValues) {
-        assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
-        var subtypes = entityType.getSelfAndSubtypes();
-        if (subtypes.length > 1) {
-            this._subtypes = subtypes.filter(function (st) { return st.isAbstract === false; });
-        }
-       
-        if (!Array.isArray(keyValues)) {
-            keyValues = __arraySlice(arguments, 1);
-        }
-        
-        this.entityType = entityType;
-        entityType.keyProperties.forEach(function (kp, i) {
-            // insure that guid keys are comparable.
-            if (kp.dataType === DataType.Guid) {
-                keyValues[i] = keyValues[i] && keyValues[i].toLowerCase();
-            }
-        });
-        
-        this.values = keyValues;
-        this._keyInGroup = createKeyString(keyValues);        
+   @class EntityKey
+   **/
 
-    };
-    
-    ctor._$typeName = "EntityKey";
-    var proto = ctor.prototype;
-    
-    /**
-    The 'EntityType' that this is a key for. 
-
-    __readOnly__
-    @property entityType {EntityType} 
-    **/
-    
-    /**
-    An array of the values for this key. This will usually only have a single element, unless the entity type has a multipart key.
-
-    __readOnly__
-    @property values {Array} 
-    **/
-
-    proto.toJSON = function () {
-        return {
-            entityType: this.entityType.name,
-            values: this.values
-        };
-    };
-
-    ctor.fromJSON = function (json, metadataStore) {
-        var et = metadataStore._getEntityType(json.entityType, true);
-        return new EntityKey(et, json.values);
-    };
-
-    /**
-    Used to compare EntityKeys are determine if they refer to the same Entity.
-    There is also an static version of 'equals' with the same functionality. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType("Employee");
-        var empKey1 = new EntityKey(empType, 1);
-        // assume employee1 is an existing Employee entity
-        var empKey2 = employee1.entityAspect.getKey();
-        if (empKey1.equals(empKey2)) {
-            // do something  ...
-        }
-    @method equals
-    @param entityKey {EntityKey}
-    **/
-    proto.equals = function (entityKey) {
-        if (!(entityKey instanceof EntityKey)) return false;
-        return (this.entityType === entityKey.entityType) &&
-            __arrayEquals(this.values, entityKey.values);
-    };
-
-    /*
-    Returns a human readable representation of this EntityKey.
-    @method toString
-    */
-    proto.toString = function (altEntityType) {
-        return (altEntityType || this.entityType).name + '-' + this._keyInGroup;
-    };
-
-    /**
-    Used to compare EntityKeys are determine if they refer to the same Entity. 
-    There is also an instance version of 'equals' with the same functionality. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var empType = em1.metadataStore.getEntityType("Employee");
-        var empKey1 = new EntityKey(empType, 1);
-        // assume employee1 is an existing Employee entity
-        var empKey2 = employee1.entityAspect.getKey();
-        if (EntityKey.equals(empKey1, empKey2)) {
-            // do something  ...
-        }
-    @method equals
-    @static
-    @param k1 {EntityKey}
-    @param k2 {EntityKey}
-    **/
-    ctor.equals = function (k1, k2) {
-        if (!(k1 instanceof EntityKey)) return false;
-        return k1.equals(k2);
-    };
-
-    // TODO: we may want to compare to default values later.
-    proto._isEmpty = function () {
-        return this.values.join("").length === 0;
-    };
-
-    ctor.createKeyString = createKeyString;
-
-    function createKeyString(keyValues) {
-        return keyValues.join(ENTITY_KEY_DELIMITER);
+  /**
+   Constructs a new EntityKey.  Each entity within an EntityManager will have a unique EntityKey.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var empType = em1.metadataStore.getEntityType("Employee");
+   var entityKey = new EntityKey(empType, 1);
+   EntityKey's may also be found by calling EntityAspect.getKey()
+   @example
+   // assume employee1 is an existing Employee entity
+   var empKey = employee1.entityAspect.getKey();
+   Multipart keys are created by passing an array as the 'keyValues' parameter
+   @example
+   var empTerrType = em1.metadataStore.getEntityType("EmployeeTerritory");
+   var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
+   // The order of the properties in the 'keyValues' array must be the same as that
+   // returned by empTerrType.keyProperties
+   @method <ctor> EntityKey
+   @param entityType {EntityType} The {{#crossLink "EntityType"}}{{/crossLink}} of the entity.
+   @param keyValues {value|Array of values} A single value or an array of values.
+   **/
+  var ctor = function (entityType, keyValues) {
+    assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
+    var subtypes = entityType.getSelfAndSubtypes();
+    if (subtypes.length > 1) {
+      this._subtypes = subtypes.filter(function (st) {
+        return st.isAbstract === false;
+      });
     }
 
-    return ctor;
+    if (!Array.isArray(keyValues)) {
+      keyValues = __arraySlice(arguments, 1);
+    }
+
+    this.entityType = entityType;
+    entityType.keyProperties.forEach(function (kp, i) {
+      // insure that guid keys are comparable.
+      if (kp.dataType === DataType.Guid) {
+        keyValues[i] = keyValues[i] && keyValues[i].toLowerCase();
+      }
+    });
+
+    this.values = keyValues;
+    this._keyInGroup = createKeyString(keyValues);
+
+  };
+
+  ctor._$typeName = "EntityKey";
+  var proto = ctor.prototype;
+
+  /**
+   The 'EntityType' that this is a key for.
+
+   __readOnly__
+   @property entityType {EntityType}
+   **/
+
+  /**
+   An array of the values for this key. This will usually only have a single element, unless the entity type has a multipart key.
+
+   __readOnly__
+   @property values {Array}
+   **/
+
+  proto.toJSON = function () {
+    return {
+      entityType: this.entityType.name,
+      values: this.values
+    };
+  };
+
+  ctor.fromJSON = function (json, metadataStore) {
+    var et = metadataStore._getEntityType(json.entityType, true);
+    return new EntityKey(et, json.values);
+  };
+
+  /**
+   Used to compare EntityKeys are determine if they refer to the same Entity.
+   There is also an static version of 'equals' with the same functionality.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var empType = em1.metadataStore.getEntityType("Employee");
+   var empKey1 = new EntityKey(empType, 1);
+   // assume employee1 is an existing Employee entity
+   var empKey2 = employee1.entityAspect.getKey();
+   if (empKey1.equals(empKey2)) {
+            // do something  ...
+        }
+   @method equals
+   @param entityKey {EntityKey}
+   **/
+  proto.equals = function (entityKey) {
+    if (!(entityKey instanceof EntityKey)) return false;
+    return (this.entityType === entityKey.entityType) &&
+        __arrayEquals(this.values, entityKey.values);
+  };
+
+  /*
+   Returns a human readable representation of this EntityKey.
+   @method toString
+   */
+  proto.toString = function (altEntityType) {
+    return (altEntityType || this.entityType).name + '-' + this._keyInGroup;
+  };
+
+  /**
+   Used to compare EntityKeys are determine if they refer to the same Entity.
+   There is also an instance version of 'equals' with the same functionality.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var empType = em1.metadataStore.getEntityType("Employee");
+   var empKey1 = new EntityKey(empType, 1);
+   // assume employee1 is an existing Employee entity
+   var empKey2 = employee1.entityAspect.getKey();
+   if (EntityKey.equals(empKey1, empKey2)) {
+            // do something  ...
+        }
+   @method equals
+   @static
+   @param k1 {EntityKey}
+   @param k2 {EntityKey}
+   **/
+  ctor.equals = function (k1, k2) {
+    if (!(k1 instanceof EntityKey)) return false;
+    return k1.equals(k2);
+  };
+
+  // TODO: we may want to compare to default values later.
+  proto._isEmpty = function () {
+    return this.values.join("").length === 0;
+  };
+
+  ctor.createKeyString = createKeyString;
+
+  function createKeyString(keyValues) {
+    return keyValues.join(ENTITY_KEY_DELIMITER);
+  }
+
+  return ctor;
 })();
 
 breeze.EntityKey = EntityKey;
 ;/**
-@module breeze   
-**/
+ @module breeze
+ **/
 
 var EntityState = (function () {
+  /**
+   EntityState is an 'Enum' containing all of the valid states for an 'Entity'.
+
+   @class EntityState
+   @static
+   **/
+  var entityStateMethods = {
     /**
-    EntityState is an 'Enum' containing all of the valid states for an 'Entity'.
-
-    @class EntityState
-    @static
-    **/
-    var entityStateMethods = {
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isUnchanged();
-        is the same as
-        @example
-            return es === EntityState.Unchanged;
-        @method isUnchanged
-        @return {Boolean} Whether an entityState instance is EntityState.Unchanged.
-        **/
-        isUnchanged: function () { return this === EntityState.Unchanged; },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isAdded();
-        is the same as
-        @example
-            return es === EntityState.Added;
-        @method isAdded
-        @return {Boolean} Whether an entityState instance is EntityState.Added.
-        **/
-        isAdded: function () { return this === EntityState.Added; },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isModified();
-        is the same as
-        @example
-            return es === EntityState.Modified;
-        @method isModified
-        @return {Boolean} Whether an entityState instance is EntityState.Modified.
-        **/
-        isModified: function () { return this === EntityState.Modified; },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isDeleted();
-        is the same as
-        @example
-            return es === EntityState.Deleted;
-        @method isDeleted
-        @return  {Boolean} Whether an entityState instance is EntityState.Deleted.
-        **/
-        isDeleted: function () { return this === EntityState.Deleted; },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isDetached();
-        is the same as
-        @example
-            return es === EntityState.Detached;
-        @method isDetached
-        @return  {Boolean} Whether an entityState instance is EntityState.Detached.
-        **/
-        isDetached: function () { return this === EntityState.Detached; },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isUnchangedOrModified();
-        is the same as
-        @example
-            return es === EntityState.Unchanged || es === EntityState.Modified
-        @method isUnchangedOrModified
-        @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified.
-        **/
-        isUnchangedOrModified: function () {
-            return this === EntityState.Unchanged || this === EntityState.Modified;
-        },
-        /**
-        @example
-            var es = anEntity.entityAspect.entityState;
-            return es.isAddedModifiedOrDeleted();
-        is the same as
-        @example
-            return es === EntityState.Added || es === EntityState.Modified || es === EntityState.Deleted
-        @method isAddedModifiedOrDeleted
-        @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.
-        **/
-        isAddedModifiedOrDeleted: function () {
-            return this === EntityState.Added ||
-                this === EntityState.Modified ||
-                this === EntityState.Deleted;
-        }
-    };
-
-    var EntityState = new Enum("EntityState", entityStateMethods);
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isUnchanged();
+     is the same as
+     @example
+     return es === EntityState.Unchanged;
+     @method isUnchanged
+     @return {Boolean} Whether an entityState instance is EntityState.Unchanged.
+     **/
+    isUnchanged: function () {
+      return this === EntityState.Unchanged;
+    },
     /**
-    The 'Unchanged' state.
-
-    @property Unchanged {EntityState}
-    @final
-    @static
-    **/
-    EntityState.Unchanged = EntityState.addSymbol();
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isAdded();
+     is the same as
+     @example
+     return es === EntityState.Added;
+     @method isAdded
+     @return {Boolean} Whether an entityState instance is EntityState.Added.
+     **/
+    isAdded: function () {
+      return this === EntityState.Added;
+    },
     /**
-    The 'Added' state.
-
-    @property Added {EntityState}
-    @final
-    @static
-    **/
-    EntityState.Added = EntityState.addSymbol();
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isModified();
+     is the same as
+     @example
+     return es === EntityState.Modified;
+     @method isModified
+     @return {Boolean} Whether an entityState instance is EntityState.Modified.
+     **/
+    isModified: function () {
+      return this === EntityState.Modified;
+    },
     /**
-    The 'Modified' state.
-
-    @property Modified {EntityState}
-    @final
-    @static
-    **/
-    EntityState.Modified = EntityState.addSymbol();
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isDeleted();
+     is the same as
+     @example
+     return es === EntityState.Deleted;
+     @method isDeleted
+     @return  {Boolean} Whether an entityState instance is EntityState.Deleted.
+     **/
+    isDeleted: function () {
+      return this === EntityState.Deleted;
+    },
     /**
-    The 'Deleted' state.
-
-    @property Deleted {EntityState}
-    @final
-    @static
-    **/
-    EntityState.Deleted = EntityState.addSymbol();
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isDetached();
+     is the same as
+     @example
+     return es === EntityState.Detached;
+     @method isDetached
+     @return  {Boolean} Whether an entityState instance is EntityState.Detached.
+     **/
+    isDetached: function () {
+      return this === EntityState.Detached;
+    },
     /**
-    The 'Detached' state.
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isUnchangedOrModified();
+     is the same as
+     @example
+     return es === EntityState.Unchanged || es === EntityState.Modified
+     @method isUnchangedOrModified
+     @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified.
+     **/
+    isUnchangedOrModified: function () {
+      return this === EntityState.Unchanged || this === EntityState.Modified;
+    },
+    /**
+     @example
+     var es = anEntity.entityAspect.entityState;
+     return es.isAddedModifiedOrDeleted();
+     is the same as
+     @example
+     return es === EntityState.Added || es === EntityState.Modified || es === EntityState.Deleted
+     @method isAddedModifiedOrDeleted
+     @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.
+     **/
+    isAddedModifiedOrDeleted: function () {
+      return this === EntityState.Added ||
+          this === EntityState.Modified ||
+          this === EntityState.Deleted;
+    }
+  };
 
-    @property Detached {EntityState}
-    @final
-    @static
-    **/
-    EntityState.Detached = EntityState.addSymbol();
-    EntityState.resolveSymbols();
-    return EntityState;
+  var EntityState = new Enum("EntityState", entityStateMethods);
+  /**
+   The 'Unchanged' state.
+
+   @property Unchanged {EntityState}
+   @final
+   @static
+   **/
+  EntityState.Unchanged = EntityState.addSymbol();
+  /**
+   The 'Added' state.
+
+   @property Added {EntityState}
+   @final
+   @static
+   **/
+  EntityState.Added = EntityState.addSymbol();
+  /**
+   The 'Modified' state.
+
+   @property Modified {EntityState}
+   @final
+   @static
+   **/
+  EntityState.Modified = EntityState.addSymbol();
+  /**
+   The 'Deleted' state.
+
+   @property Deleted {EntityState}
+   @final
+   @static
+   **/
+  EntityState.Deleted = EntityState.addSymbol();
+  /**
+   The 'Detached' state.
+
+   @property Detached {EntityState}
+   @final
+   @static
+   **/
+  EntityState.Detached = EntityState.addSymbol();
+  EntityState.resolveSymbols();
+  return EntityState;
 })();
-   
-breeze.EntityState= EntityState;
-;
-breeze.makePrimitiveArray = (function() {
-    var primitiveArrayMixin = {};
 
-    // complexArray will have the following props
-    //    parent
-    //    propertyPath
-    //    parentProperty
-    //    addedItems  - only if modified
-    //    removedItems  - only if modified
-    //  each complexAspect of any entity within a complexArray
-    //  will have its own _complexState = "A/M";
+breeze.EntityState = EntityState;
+;breeze.makePrimitiveArray = (function () {
+  var primitiveArrayMixin = {};
 
-    /**
-    Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of
-    primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
-    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
-    are all provided as well as several special purpose methods. 
-    @class ↈ_primitiveArray_
-    **/
+  // complexArray will have the following props
+  //    parent
+  //    propertyPath
+  //    parentProperty
+  //    addedItems  - only if modified
+  //    removedItems  - only if modified
+  //  each complexAspect of any entity within a complexArray
+  //  will have its own _complexState = "A/M";
 
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
-    is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-    Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-    collections are collected into a single notification event for each relation array.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        orders.arrayChanged.subscribe(
-            function (arrayChangedArgs) {
+  /**
+   Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of
+   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
+   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
+   are all provided as well as several special purpose methods.
+   @class ↈ_primitiveArray_
+   **/
+
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
+   is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+   Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+   collections are collected into a single notification event for each relation array.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   orders.arrayChanged.subscribe(
+   function (arrayChangedArgs) {
                 var addedEntities = arrayChangedArgs.added;
                 var removedEntities = arrayChanged.removed;
             });
-    @event arrayChanged 
-    @param added {Array of Primitives} An array of all of the items added to this collection.
-    @param removed {Array of Primitives} An array of all of the items removed from this collection.
-    @readOnly
-    **/
+   @event arrayChanged
+   @param added {Array of Primitives} An array of all of the items added to this collection.
+   @param removed {Array of Primitives} An array of all of the items removed from this collection.
+   @readOnly
+   **/
 
     // virtual impls 
-    primitiveArrayMixin._getGoodAdds = function (adds) {
-        return adds;
-    };
+  primitiveArrayMixin._getGoodAdds = function (adds) {
+    return adds;
+  };
 
-    primitiveArrayMixin._beforeChange = function() {
-        var entityAspect = this.getEntityAspect();
-        if (entityAspect.entityState.isUnchanged()) {
-            entityAspect.setModified();
-        }
-        if (entityAspect.entityState.isModified() && !this._origValues) {
-            this._origValues = this.slice(0);
-        }
-    };
-
-    primitiveArrayMixin._processAdds = function (adds) {
-        // nothing needed
-    };
-
-    primitiveArrayMixin._processRemoves = function (removes) {
-        // nothing needed;
-    };
-    //
-
-    primitiveArrayMixin._rejectChanges = function() {
-        if (!this._origValues) return;
-        this.length = 0;
-        Array.prototype.push.apply(this, this._origValues);
-    };
-
-    primitiveArrayMixin._acceptChanges = function() {
-        this._origValues = null;
-    };
-
-    // local functions
-
-    function makePrimitiveArray(arr, parent, parentProperty) {
-
-        observableArray.initializeParent(arr, parent, parentProperty);
-        arr.arrayChanged = new Event("arrayChanged", arr);
-        __extend(arr, observableArray.mixin);
-        return __extend(arr, primitiveArrayMixin);
+  primitiveArrayMixin._beforeChange = function () {
+    var entityAspect = this.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
     }
+    if (entityAspect.entityState.isModified() && !this._origValues) {
+      this._origValues = this.slice(0);
+    }
+  };
 
-    return makePrimitiveArray;
-})();;
-breeze.makeRelationArray = (function() {
+  primitiveArrayMixin._processAdds = function (adds) {
+    // nothing needed
+  };
 
-    var relationArrayMixin = {};
+  primitiveArrayMixin._processRemoves = function (removes) {
+    // nothing needed;
+  };
+  //
 
-    /**
-    Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of 
-    entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
-    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
-    are all provided as well as several special purpose methods. 
-    @class ↈ_relationArray_
-    **/
+  primitiveArrayMixin._rejectChanges = function () {
+    if (!this._origValues) return;
+    this.length = 0;
+    Array.prototype.push.apply(this, this._origValues);
+  };
 
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
-    is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-    Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-    collections are collected into a single notification event for each relation array.
-    @example
-        // assume order is an order entity attached to an EntityManager.
-        orders.arrayChanged.subscribe(
-            function (arrayChangedArgs) {
+  primitiveArrayMixin._acceptChanges = function () {
+    this._origValues = null;
+  };
+
+  // local functions
+
+  function makePrimitiveArray(arr, parent, parentProperty) {
+
+    observableArray.initializeParent(arr, parent, parentProperty);
+    arr.arrayChanged = new Event("arrayChanged", arr);
+    __extend(arr, observableArray.mixin);
+    return __extend(arr, primitiveArrayMixin);
+  }
+
+  return makePrimitiveArray;
+})();;breeze.makeRelationArray = (function () {
+
+  var relationArrayMixin = {};
+
+  /**
+   Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of
+   entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
+   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
+   are all provided as well as several special purpose methods.
+   @class ↈ_relationArray_
+   **/
+
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
+   is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+   Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+   collections are collected into a single notification event for each relation array.
+   @example
+   // assume order is an order entity attached to an EntityManager.
+   orders.arrayChanged.subscribe(
+   function (arrayChangedArgs) {
                 var addedEntities = arrayChangedArgs.added;
                 var removedEntities = arrayChanged.removed;
             });
-    @event arrayChanged 
-    @param added {Array of Entity} An array of all of the entities added to this collection.
-    @param removed {Array of Entity} An array of all of the removed from this collection.
-    @readOnly
-    **/
+   @event arrayChanged
+   @param added {Array of Entity} An array of all of the entities added to this collection.
+   @param removed {Array of Entity} An array of all of the removed from this collection.
+   @readOnly
+   **/
 
 
-    /**
-    Performs an asynchronous load of all other the entities associated with this relationArray.
-    @example
-        // assume orders is an empty, as yet unpopulated, relation array of orders
-        // associated with a specific customer.
-        orders.load().then(...)
-    @method load
-    @param [callback] {Function} 
-    @param [errorCallback] {Function}
-    @return {Promise} 
-    **/
-    relationArrayMixin.load = function(callback, errorCallback) {
-        var parent = this.parentEntity;
-        var query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
-        var em = parent.entityAspect.entityManager;
-        return em.executeQuery(query, callback, errorCallback);
-    };
+  /**
+   Performs an asynchronous load of all other the entities associated with this relationArray.
+   @example
+   // assume orders is an empty, as yet unpopulated, relation array of orders
+   // associated with a specific customer.
+   orders.load().then(...)
+   @method load
+   @param [callback] {Function}
+   @param [errorCallback] {Function}
+   @return {Promise}
+   **/
+  relationArrayMixin.load = function (callback, errorCallback) {
+    var parent = this.parentEntity;
+    var query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
+    var em = parent.entityAspect.entityManager;
+    return em.executeQuery(query, callback, errorCallback);
+  };
 
-    relationArrayMixin._getEventParent = function() {
-        return this.parentEntity.entityAspect;
-    };
+  relationArrayMixin._getEventParent = function () {
+    return this.parentEntity.entityAspect;
+  };
 
-    relationArrayMixin._getPendingPubs = function() {
-        var em = this.parentEntity.entityAspect.entityManager;
-        return em && em._pendingPubs;
-    };
+  relationArrayMixin._getPendingPubs = function () {
+    var em = this.parentEntity.entityAspect.entityManager;
+    return em && em._pendingPubs;
+  };
 
-    // virtual impls 
-    relationArrayMixin._getGoodAdds = function(adds) {
-        return getGoodAdds(this, adds);
-    };
+  // virtual impls
+  relationArrayMixin._getGoodAdds = function (adds) {
+    return getGoodAdds(this, adds);
+  };
 
-    relationArrayMixin._processAdds = function(adds) {
-        processAdds(this, adds);
-    };
+  relationArrayMixin._processAdds = function (adds) {
+    processAdds(this, adds);
+  };
 
-    relationArrayMixin._processRemoves = function(removes)  {
-        processRemoves(this, removes);
-    };
-    //
+  relationArrayMixin._processRemoves = function (removes) {
+    processRemoves(this, removes);
+  };
+  //
 
-    function getGoodAdds(relationArray, adds) {
-        var goodAdds = checkForDups(relationArray, adds);
-        if (!goodAdds.length) {
-            return goodAdds;
+  function getGoodAdds(relationArray, adds) {
+    var goodAdds = checkForDups(relationArray, adds);
+    if (!goodAdds.length) {
+      return goodAdds;
+    }
+    var parentEntity = relationArray.parentEntity;
+    var entityManager = parentEntity.entityAspect.entityManager;
+    // we do not want to attach an entity during loading
+    // because these will all be 'attached' at a later step.
+    if (entityManager && !entityManager.isLoading) {
+      goodAdds.forEach(function (add) {
+        if (add.entityAspect.entityState.isDetached()) {
+          relationArray._inProgress = true;
+          try {
+            entityManager.attachEntity(add, EntityState.Added);
+          } finally {
+            relationArray._inProgress = false;
+          }
         }
-        var parentEntity = relationArray.parentEntity;
-        var entityManager = parentEntity.entityAspect.entityManager;
-        // we do not want to attach an entity during loading
-        // because these will all be 'attached' at a later step.
-        if (entityManager && !entityManager.isLoading) {
-            goodAdds.forEach(function (add) {
-                if (add.entityAspect.entityState.isDetached()) {
-                    relationArray._inProgress = true;
-                    try {
-                        entityManager.attachEntity(add, EntityState.Added);
-                    } finally {
-                        relationArray._inProgress = false;
-                    }
-                }
-            });
-        }
-        return goodAdds;
+      });
     }
+    return goodAdds;
+  }
 
-    function processAdds(relationArray, adds) {
-        var parentEntity = relationArray.parentEntity;
-        var np = relationArray.navigationProperty;
-        var addsInProcess = relationArray._addsInProcess;
+  function processAdds(relationArray, adds) {
+    var parentEntity = relationArray.parentEntity;
+    var np = relationArray.navigationProperty;
+    var addsInProcess = relationArray._addsInProcess;
 
-        var invNp = np.inverse;
-        var startIx = addsInProcess.length;
-        try {
-            adds.forEach(function (childEntity) {
-                addsInProcess.push(childEntity);
-                if (invNp) {
-                    childEntity.setProperty(invNp.name, parentEntity);
-                } else {
-                    // This occurs with a unidirectional 1-n navigation - in this case
-                    // we need to update the fks instead of the navProp
-                    var pks = parentEntity.entityType.keyProperties;
-                    np.invForeignKeyNames.forEach(function (fk, i) {
-                        childEntity.setProperty(fk, parentEntity.getProperty(pks[i].name));
-                    });
-                }
-            });
-        } finally {
-            addsInProcess.splice(startIx, adds.length);
-        }
-
-    }
-
-    function processRemoves(relationArray, removes) {
-        var inp = relationArray.navigationProperty.inverse;
-        if (inp) {
-            removes.forEach(function (childEntity) {
-                childEntity.setProperty(inp.name, null);
-            });
-        }
-    }
-
-    function checkForDups(relationArray, adds) {
-        // don't allow dups in this array. - also prevents recursion 
-        var parentEntity = relationArray.parentEntity;
-        var navProp = relationArray.navigationProperty;
-        var inverseProp = navProp.inverse;
-        var goodAdds;
-        if (inverseProp) {
-            goodAdds = adds.filter(function (a) {
-                if (relationArray._addsInProcess.indexOf(a) >= 0) {
-                    return false;
-                }
-                var inverseValue = a.getProperty(inverseProp.name);
-                return inverseValue !== parentEntity;
-            });
-        } else {
-            // This occurs with a unidirectional 1->N relation ( where there is no n -> 1)
-            // in this case we compare fks.
-            var fkPropNames = navProp.invForeignKeyNames;
-            var keyProps = parentEntity.entityType.keyProperties;
-            goodAdds = adds.filter(function (a) {
-                if (relationArray._addsInProcess.indexOf(a) >= 0) {
-                    return false;
-                }
-                return fkPropNames.some(function (fk, i) {
-                    var keyProp = keyProps[i].name;
-                    var keyVal = parentEntity.getProperty(keyProp);
-                    var fkVal = a.getProperty(fk);
-                    return keyVal !== fkVal;
-                });
-            });
-        }
-        return goodAdds;
-    }
-
-    function makeRelationArray(arr, parentEntity, navigationProperty) {
-        arr.parentEntity = parentEntity;
-        arr.navigationProperty = navigationProperty;
-        arr.arrayChanged = new Event("arrayChanged", arr);
-        // array of pushes currently in process on this relation array - used to prevent recursion.
-        arr._addsInProcess = [];
-        // need to use mixins here instead of inheritance because we are starting from an existing array object.
-        __extend(arr, observableArray.mixin);
-        return __extend(arr, relationArrayMixin);
-    }
-
-    return makeRelationArray;
-})();;
-function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
-    // 'this' is the entity itself in this context.
-
-    if (newValue === undefined) newValue = null;
-    var oldValue = rawAccessorFn();
-
-    var dataType = property.dataType;
-    if (dataType && dataType.parse) {
-        // attempts to coerce a value to the correct type - if this fails return the value unchanged
-        if (Array.isArray(newValue) && !property.isScalar) {
-            newValue = newValue.map(function(nv) { return dataType.parse(nv, typeof nv); });
-        } else {
-            newValue = dataType.parse(newValue, typeof newValue);
-        }
-    }
-
-    // exit if no change - extra cruft is because dateTimes don't compare cleanly.
-    if (newValue === oldValue || (dataType && dataType.isDate && newValue && oldValue && newValue.valueOf() === oldValue.valueOf())) {
-        return;
-    }
-
-    // CANNOT DO NEXT LINE because it has the possibility of creating a new property
-    // 'entityAspect' on 'this'.  - Not permitted by IE inside of a defined property on a prototype.
-    // var entityAspect = new EntityAspect(this);
-
-    var propertyName;
-    var entityAspect = this.entityAspect;
-    if (entityAspect) {
-        propertyName = property.name;
-    } else {
-        var localAspect = this.complexAspect;
-        if (localAspect) {
-            entityAspect = localAspect.getEntityAspect();
-            propertyName = localAspect.getPropertyPath(property.name);
-        } else {
-            // does not yet have an EntityAspect so just set the prop
-            rawAccessorFn(newValue);
-            return;
-        }
-    }
-    
-    // Note that we need to handle multiple properties in process, not just one in order to avoid recursion. 
-    // ( except in the case of null propagation with fks where null -> 0 in some cases.)
-    // (this may not be needed because of the newValue === oldValue test above)
-    var inProcess = entityAspect._inProcess = entityAspect._inProcess || [];
-    // check for recursion
-    if (inProcess.indexOf(property) >= 0) return;
-    inProcess.push(property);
-    
+    var invNp = np.inverse;
+    var startIx = addsInProcess.length;
     try {
-
-        var context = {
-            parent: this,
-            property: property,
-            newValue: newValue,
-            oldValue: oldValue,
-            propertyName: propertyName,
-            entityAspect: entityAspect
-        }
-        
-        if (property.isComplexProperty) {
-            setDpValueComplex(context, rawAccessorFn);
-        } else if (property.isDataProperty) {
-            setDpValueSimple(context, rawAccessorFn);
+      adds.forEach(function (childEntity) {
+        addsInProcess.push(childEntity);
+        if (invNp) {
+          childEntity.setProperty(invNp.name, parentEntity);
         } else {
-            setNpValue(context, rawAccessorFn);
+          // This occurs with a unidirectional 1-n navigation - in this case
+          // we need to update the fks instead of the navProp
+          var pks = parentEntity.entityType.keyProperties;
+          np.invForeignKeyNames.forEach(function (fk, i) {
+            childEntity.setProperty(fk, parentEntity.getProperty(pks[i].name));
+          });
         }
-
-        postChangeEvents(context);
-
+      });
     } finally {
-        inProcess.pop();
+      addsInProcess.splice(startIx, adds.length);
     }
+
+  }
+
+  function processRemoves(relationArray, removes) {
+    var inp = relationArray.navigationProperty.inverse;
+    if (inp) {
+      removes.forEach(function (childEntity) {
+        childEntity.setProperty(inp.name, null);
+      });
+    }
+  }
+
+  function checkForDups(relationArray, adds) {
+    // don't allow dups in this array. - also prevents recursion
+    var parentEntity = relationArray.parentEntity;
+    var navProp = relationArray.navigationProperty;
+    var inverseProp = navProp.inverse;
+    var goodAdds;
+    if (inverseProp) {
+      goodAdds = adds.filter(function (a) {
+        if (relationArray._addsInProcess.indexOf(a) >= 0) {
+          return false;
+        }
+        var inverseValue = a.getProperty(inverseProp.name);
+        return inverseValue !== parentEntity;
+      });
+    } else {
+      // This occurs with a unidirectional 1->N relation ( where there is no n -> 1)
+      // in this case we compare fks.
+      var fkPropNames = navProp.invForeignKeyNames;
+      var keyProps = parentEntity.entityType.keyProperties;
+      goodAdds = adds.filter(function (a) {
+        if (relationArray._addsInProcess.indexOf(a) >= 0) {
+          return false;
+        }
+        return fkPropNames.some(function (fk, i) {
+          var keyProp = keyProps[i].name;
+          var keyVal = parentEntity.getProperty(keyProp);
+          var fkVal = a.getProperty(fk);
+          return keyVal !== fkVal;
+        });
+      });
+    }
+    return goodAdds;
+  }
+
+  function makeRelationArray(arr, parentEntity, navigationProperty) {
+    arr.parentEntity = parentEntity;
+    arr.navigationProperty = navigationProperty;
+    arr.arrayChanged = new Event("arrayChanged", arr);
+    // array of pushes currently in process on this relation array - used to prevent recursion.
+    arr._addsInProcess = [];
+    // need to use mixins here instead of inheritance because we are starting from an existing array object.
+    __extend(arr, observableArray.mixin);
+    return __extend(arr, relationArrayMixin);
+  }
+
+  return makeRelationArray;
+})();;function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
+  // 'this' is the entity itself in this context.
+
+  if (newValue === undefined) newValue = null;
+  var oldValue = rawAccessorFn();
+
+  var dataType = property.dataType;
+  if (dataType && dataType.parse) {
+    // attempts to coerce a value to the correct type - if this fails return the value unchanged
+    if (Array.isArray(newValue) && !property.isScalar) {
+      newValue = newValue.map(function (nv) {
+        return dataType.parse(nv, typeof nv);
+      });
+    } else {
+      newValue = dataType.parse(newValue, typeof newValue);
+    }
+  }
+
+  // exit if no change - extra cruft is because dateTimes don't compare cleanly.
+  if (newValue === oldValue || (dataType && dataType.isDate && newValue && oldValue && newValue.valueOf() === oldValue.valueOf())) {
+    return;
+  }
+
+  // CANNOT DO NEXT LINE because it has the possibility of creating a new property
+  // 'entityAspect' on 'this'.  - Not permitted by IE inside of a defined property on a prototype.
+  // var entityAspect = new EntityAspect(this);
+
+  var propertyName;
+  var entityAspect = this.entityAspect;
+  if (entityAspect) {
+    propertyName = property.name;
+  } else {
+    var localAspect = this.complexAspect;
+    if (localAspect) {
+      entityAspect = localAspect.getEntityAspect();
+      propertyName = localAspect.getPropertyPath(property.name);
+    } else {
+      // does not yet have an EntityAspect so just set the prop
+      rawAccessorFn(newValue);
+      return;
+    }
+  }
+
+  // Note that we need to handle multiple properties in process, not just one in order to avoid recursion.
+  // ( except in the case of null propagation with fks where null -> 0 in some cases.)
+  // (this may not be needed because of the newValue === oldValue test above)
+  var inProcess = entityAspect._inProcess = entityAspect._inProcess || [];
+  // check for recursion
+  if (inProcess.indexOf(property) >= 0) return;
+  inProcess.push(property);
+
+  try {
+
+    var context = {
+      parent: this,
+      property: property,
+      newValue: newValue,
+      oldValue: oldValue,
+      propertyName: propertyName,
+      entityAspect: entityAspect
+    }
+
+    if (property.isComplexProperty) {
+      setDpValueComplex(context, rawAccessorFn);
+    } else if (property.isDataProperty) {
+      setDpValueSimple(context, rawAccessorFn);
+    } else {
+      setNpValue(context, rawAccessorFn);
+    }
+
+    postChangeEvents(context);
+
+  } finally {
+    inProcess.pop();
+  }
 }
 
 function setDpValueSimple(context, rawAccessorFn) {
-    var parent = context.parent;
-    var property = context.property;
-    var entityAspect = context.entityAspect;
-    var oldValue = context.oldValue;
-    var newValue = context.newValue;
+  var parent = context.parent;
+  var property = context.property;
+  var entityAspect = context.entityAspect;
+  var oldValue = context.oldValue;
+  var newValue = context.newValue;
 
-    var entityManager = entityAspect.entityManager;
-    // 'entityType' on the next line be null for complex properties but it will only be ref'd within this
-    // fn when the property is part of the key
-    var entityType = parent.entityType;
+  var entityManager = entityAspect.entityManager;
+  // 'entityType' on the next line be null for complex properties but it will only be ref'd within this
+  // fn when the property is part of the key
+  var entityType = parent.entityType;
 
-    if (!property.isScalar) {
-        throw new Error("Nonscalar data properties are readonly - items may be added or removed but the collection may not be changed.");
+  if (!property.isScalar) {
+    throw new Error("Nonscalar data properties are readonly - items may be added or removed but the collection may not be changed.");
+  }
+
+  // store an original value for this property if not already set
+  if (entityAspect.entityState.isUnchangedOrModified()) {
+    var propName = property.name;
+    // localAspect is not the same as entityAspect for complex props
+    var localAspect = parent.entityAspect || parent.complexAspect;
+    if (localAspect.originalValues[propName] === undefined) {
+      // otherwise this entry will be skipped during serialization
+      localAspect.originalValues[propName] = oldValue !== undefined ? oldValue : property.defaultValue;
     }
+  }
 
-    // store an original value for this property if not already set
-    if (entityAspect.entityState.isUnchangedOrModified()) {
-        var propName = property.name;
-        // localAspect is not the same as entityAspect for complex props
-        var localAspect = parent.entityAspect || parent.complexAspect;
-        if (localAspect.originalValues[propName] === undefined) {
-            // otherwise this entry will be skipped during serialization
-            localAspect.originalValues[propName] = oldValue !== undefined ? oldValue : property.defaultValue;
-        }
+  // if we are changing the key update our internal entityGroup indexes.
+  if (property.isPartOfKey && entityManager && !entityManager.isLoading) {
+    var keyProps = entityType.keyProperties;
+    var values = keyProps.map(function (p) {
+      if (p === property) {
+        return newValue;
+      } else {
+        return parent.getProperty(p.name);
+      }
+    });
+    var newKey = new EntityKey(entityType, values);
+    if (entityManager.findEntityByKey(newKey)) {
+      throw new Error("An entity with this key is already in the cache: " + newKey.toString());
     }
+    var oldKey = parent.entityAspect.getKey();
+    var eg = entityManager._findEntityGroup(entityType);
+    eg._replaceKey(oldKey, newKey);
+  }
 
-    // if we are changing the key update our internal entityGroup indexes.
-    if (property.isPartOfKey && entityManager && !entityManager.isLoading) {
-        var keyProps = entityType.keyProperties;
-        var values = keyProps.map(function (p) {
-            if (p === property) {
-                return newValue;
-            } else {
-                return parent.getProperty(p.name);
-            }
-        });
-        var newKey = new EntityKey(entityType, values);
-        if (entityManager.findEntityByKey(newKey)) {
-            throw new Error("An entity with this key is already in the cache: " + newKey.toString());
-        }
-        var oldKey = parent.entityAspect.getKey();
-        var eg = entityManager._findEntityGroup(entityType);
-        eg._replaceKey(oldKey, newKey);
+  // process related updates ( the inverse relationship) first so that collection dups check works properly.
+  // update inverse relationship
+
+  var relatedNavProp = property.relatedNavigationProperty;
+  if (relatedNavProp && entityManager) {
+    // Example: bidirectional fkDataProperty: 1->n: order -> orderDetails
+    // orderDetail.orderId <- newOrderId || null
+    //    ==> orderDetail.order = lookupOrder(newOrderId)
+    //    ==> (see set navProp above)
+    //       and
+    // Example: bidirectional fkDataProperty: 1->1: order -> internationalOrder
+    // internationalOrder.orderId <- newOrderId || null
+    //    ==> internationalOrder.order = lookupOrder(newOrderId)
+    //    ==> (see set navProp above)
+
+    if (newValue != null) {
+      var key = new EntityKey(relatedNavProp.entityType, [newValue]);
+      var relatedEntity = entityManager.findEntityByKey(key);
+
+      if (relatedEntity) {
+        parent.setProperty(relatedNavProp.name, relatedEntity);
+      } else {
+        // it may not have been fetched yet in which case we want to add it as an unattachedChild.
+        entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent);
+      }
+    } else {
+      parent.setProperty(relatedNavProp.name, null);
     }
+  } else if (property.inverseNavigationProperty && entityManager && !entityManager._inKeyFixup) {
+    // Example: unidirectional fkDataProperty: 1->n: region -> territories
+    // territory.regionId <- newRegionId
+    //    ==> lookupRegion(newRegionId).territories.push(territory)
+    //                and
+    // Example: unidirectional fkDataProperty: 1->1: order -> internationalOrder
+    // internationalOrder.orderId <- newOrderId
+    //    ==> lookupOrder(newOrderId).internationalOrder = internationalOrder
+    //                and
+    // Example: unidirectional fkDataProperty: 1->n: region -> territories
+    // territory.regionId <- null
+    //    ==> lookupRegion(territory.oldRegionId).territories.remove(oldTerritory);
+    //                and
+    // Example: unidirectional fkDataProperty: 1->1: order -> internationalOrder
+    // internationalOrder.orderId <- null
+    //    ==> lookupOrder(internationalOrder.oldOrderId).internationalOrder = null;
 
-    // process related updates ( the inverse relationship) first so that collection dups check works properly.
-    // update inverse relationship
+    var invNavProp = property.inverseNavigationProperty;
 
-    var relatedNavProp = property.relatedNavigationProperty;
-    if (relatedNavProp && entityManager) {
-        // Example: bidirectional fkDataProperty: 1->n: order -> orderDetails
-        // orderDetail.orderId <- newOrderId || null
-        //    ==> orderDetail.order = lookupOrder(newOrderId)
-        //    ==> (see set navProp above)
-        //       and
-        // Example: bidirectional fkDataProperty: 1->1: order -> internationalOrder
-        // internationalOrder.orderId <- newOrderId || null
-        //    ==> internationalOrder.order = lookupOrder(newOrderId)
-        //    ==> (see set navProp above)
-
-        if (newValue != null) {
-            var key = new EntityKey(relatedNavProp.entityType, [newValue]);
-            var relatedEntity = entityManager.findEntityByKey(key);
-
-            if (relatedEntity) {
-                parent.setProperty(relatedNavProp.name, relatedEntity);
-            } else {
-                // it may not have been fetched yet in which case we want to add it as an unattachedChild.    
-                entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent);
-            }
+    if (oldValue != null) {
+      key = new EntityKey(invNavProp.parentType, [oldValue]);
+      relatedEntity = entityManager.findEntityByKey(key);
+      if (relatedEntity) {
+        if (invNavProp.isScalar) {
+          relatedEntity.setProperty(invNavProp.name, null);
         } else {
-            parent.setProperty(relatedNavProp.name, null);
+          // remove 'this' from old related nav prop
+          var relatedArray = relatedEntity.getProperty(invNavProp.name);
+          // arr.splice(arr.indexOf(value_to_remove), 1);
+          relatedArray.splice(relatedArray.indexOf(parent), 1);
         }
-    } else if (property.inverseNavigationProperty && entityManager && !entityManager._inKeyFixup) {
-        // Example: unidirectional fkDataProperty: 1->n: region -> territories
-        // territory.regionId <- newRegionId
-        //    ==> lookupRegion(newRegionId).territories.push(territory)
-        //                and
-        // Example: unidirectional fkDataProperty: 1->1: order -> internationalOrder
-        // internationalOrder.orderId <- newOrderId
-        //    ==> lookupOrder(newOrderId).internationalOrder = internationalOrder
-        //                and
-        // Example: unidirectional fkDataProperty: 1->n: region -> territories
-        // territory.regionId <- null
-        //    ==> lookupRegion(territory.oldRegionId).territories.remove(oldTerritory);
-        //                and
-        // Example: unidirectional fkDataProperty: 1->1: order -> internationalOrder
-        // internationalOrder.orderId <- null
-        //    ==> lookupOrder(internationalOrder.oldOrderId).internationalOrder = null;
-
-        var invNavProp = property.inverseNavigationProperty;
-
-        if (oldValue != null) {
-            key = new EntityKey(invNavProp.parentType, [oldValue]);
-            relatedEntity = entityManager.findEntityByKey(key);
-            if (relatedEntity) {
-                if (invNavProp.isScalar) {
-                    relatedEntity.setProperty(invNavProp.name, null);
-                } else {
-                    // remove 'this' from old related nav prop
-                    var relatedArray = relatedEntity.getProperty(invNavProp.name);
-                    // arr.splice(arr.indexOf(value_to_remove), 1);
-                    relatedArray.splice(relatedArray.indexOf(parent), 1);
-                }
-            }
-        }
-
-        if (newValue != null) {
-            key = new EntityKey(invNavProp.parentType, [newValue]);
-            relatedEntity = entityManager.findEntityByKey(key);
-
-            if (relatedEntity) {
-                if (invNavProp.isScalar) {
-                    relatedEntity.setProperty(invNavProp.name, parent);
-                } else {
-                    relatedEntity.getProperty(invNavProp.name).push(parent);
-                }
-            } else {
-                // it may not have been fetched yet in which case we want to add it as an unattachedChild.    
-                entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent);
-            }
-        }
-
+      }
     }
 
-    rawAccessorFn(newValue);
+    if (newValue != null) {
+      key = new EntityKey(invNavProp.parentType, [newValue]);
+      relatedEntity = entityManager.findEntityByKey(key);
 
-    updateStateAndValidate(context);
-    
-    // if (property.isPartOfKey && (!this.complexAspect)) {
-    if (property.isPartOfKey ) {
-        // propogate pk change to all related entities;
+      if (relatedEntity) {
+        if (invNavProp.isScalar) {
+          relatedEntity.setProperty(invNavProp.name, parent);
+        } else {
+          relatedEntity.getProperty(invNavProp.name).push(parent);
+        }
+      } else {
+        // it may not have been fetched yet in which case we want to add it as an unattachedChild.
+        entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent);
+      }
+    }
 
-        var propertyIx = entityType.keyProperties.indexOf(property);
-        // this part handles order.orderId => orderDetail.orderId
-        // but won't handle product.productId => orderDetail.productId because product
-        // doesn't have an orderDetails property.
-        entityType.navigationProperties.forEach(function (np) {
-            var inverseNp = np.inverse;
-            var fkNames = inverseNp ? inverseNp.foreignKeyNames : np.invForeignKeyNames;
+  }
 
-            if (fkNames.length === 0) return;
-            var npValue = parent.getProperty(np.name);
-            var fkName = fkNames[propertyIx];
-            if (np.isScalar) {
-                if (!npValue) return;
-                npValue.setProperty(fkName, newValue);
-            } else {
-                npValue.forEach(function (iv) {
-                    iv.setProperty(fkName, newValue);
-                });
-            }
+  rawAccessorFn(newValue);
+
+  updateStateAndValidate(context);
+
+  // if (property.isPartOfKey && (!this.complexAspect)) {
+  if (property.isPartOfKey) {
+    // propogate pk change to all related entities;
+
+    var propertyIx = entityType.keyProperties.indexOf(property);
+    // this part handles order.orderId => orderDetail.orderId
+    // but won't handle product.productId => orderDetail.productId because product
+    // doesn't have an orderDetails property.
+    entityType.navigationProperties.forEach(function (np) {
+      var inverseNp = np.inverse;
+      var fkNames = inverseNp ? inverseNp.foreignKeyNames : np.invForeignKeyNames;
+
+      if (fkNames.length === 0) return;
+      var npValue = parent.getProperty(np.name);
+      var fkName = fkNames[propertyIx];
+      if (np.isScalar) {
+        if (!npValue) return;
+        npValue.setProperty(fkName, newValue);
+      } else {
+        npValue.forEach(function (iv) {
+          iv.setProperty(fkName, newValue);
         });
-        // this handles unidirectional problems not covered above.
-        if (entityManager) {
-            entityType.inverseForeignKeyProperties.forEach(function (invFkProp) {
-                if (invFkProp.relatedNavigationProperty.inverse == null) {
-                    // this next step may be slow - it iterates over all of the entities in a group;
-                    // hopefully it doesn't happen often.
-                    entityManager._updateFkVal(invFkProp, oldValue, newValue);
-                };
-            });
+      }
+    });
+    // this handles unidirectional problems not covered above.
+    if (entityManager) {
+      entityType.inverseForeignKeyProperties.forEach(function (invFkProp) {
+        if (invFkProp.relatedNavigationProperty.inverse == null) {
+          // this next step may be slow - it iterates over all of the entities in a group;
+          // hopefully it doesn't happen often.
+          entityManager._updateFkVal(invFkProp, oldValue, newValue);
         }
-
-        // insure that cached key is updated.
-        entityAspect.getKey(true);
+        ;
+      });
     }
+
+    // insure that cached key is updated.
+    entityAspect.getKey(true);
+  }
 }
 
 function setDpValueComplex(context, rawAccessorFn) {
-    var property = context.property;
-    var oldValue = context.oldValue;
-    var newValue = context.newValue;
+  var property = context.property;
+  var oldValue = context.oldValue;
+  var newValue = context.newValue;
 
-    var dataType = property.dataType;
-    if (property.isScalar) {
-        if (!newValue) {
-            throw new Error(__formatString("You cannot set the '%1' property to null because it's datatype is the ComplexType: '%2'", property.name, property.dataType.name));
-        }
-        // To get here it must be a ComplexProperty  
-        // 'dataType' will be a complexType
-        if (!oldValue) {
-            var ctor = dataType.getCtor();
-            oldValue = new ctor();
-            rawAccessorFn(oldValue);
-        }
-        dataType.dataProperties.forEach(function(dp) {
-            var pn = dp.name;
-            var nv = newValue.getProperty(pn);
-            oldValue.setProperty(pn, nv);
-        });
-    } else {
-        throw new Error(__formatString("You cannot set the non-scalar complex property: '%1' on the type: '%2'." +
-            "Instead get the property and use array functions like 'push' or 'splice' to change its contents.",
-            property.name, property.parentType.name));
+  var dataType = property.dataType;
+  if (property.isScalar) {
+    if (!newValue) {
+      throw new Error(__formatString("You cannot set the '%1' property to null because it's datatype is the ComplexType: '%2'", property.name, property.dataType.name));
     }
+    // To get here it must be a ComplexProperty
+    // 'dataType' will be a complexType
+    if (!oldValue) {
+      var ctor = dataType.getCtor();
+      oldValue = new ctor();
+      rawAccessorFn(oldValue);
+    }
+    dataType.dataProperties.forEach(function (dp) {
+      var pn = dp.name;
+      var nv = newValue.getProperty(pn);
+      oldValue.setProperty(pn, nv);
+    });
+  } else {
+    throw new Error(__formatString("You cannot set the non-scalar complex property: '%1' on the type: '%2'." +
+            "Instead get the property and use array functions like 'push' or 'splice' to change its contents.",
+        property.name, property.parentType.name));
+  }
 }
 
 function setNpValue(context, rawAccessorFn) {
 
-    var parent = context.parent;
-    var property = context.property;
-    var entityAspect = context.entityAspect;
-    var oldValue = context.oldValue;
-    var newValue = context.newValue;
+  var parent = context.parent;
+  var property = context.property;
+  var entityAspect = context.entityAspect;
+  var oldValue = context.oldValue;
+  var newValue = context.newValue;
 
-    if (!property.isScalar) {
-        throw new Error("Nonscalar navigation properties are readonly - entities can be added or removed but the collection may not be changed.");
+  if (!property.isScalar) {
+    throw new Error("Nonscalar navigation properties are readonly - entities can be added or removed but the collection may not be changed.");
+  }
+
+  var entityManager = entityAspect.entityManager;
+  var inverseProp = property.inverse;
+
+  // manage attachment -
+  if (newValue != null) {
+    var newAspect = newValue.entityAspect;
+    if (entityManager) {
+      if (newAspect.entityState.isDetached()) {
+        if (!entityManager.isLoading) {
+          entityManager.attachEntity(newValue, EntityState.Added);
+        }
+      } else {
+        if (newAspect.entityManager !== entityManager) {
+          throw new Error("An Entity cannot be attached to an entity in another EntityManager. One of the two entities must be detached first.");
+        }
+      }
+    } else {
+      if (newAspect && newAspect.entityManager) {
+        entityManager = newAspect.entityManager;
+        if (!entityManager.isLoading) {
+          entityManager.attachEntity(entityAspect.entity, EntityState.Added);
+        }
+      }
     }
+  }
 
-    var entityManager = entityAspect.entityManager;
-    var inverseProp = property.inverse;
-
-    // manage attachment -
+  // process related updates ( the inverse relationship) first so that collection dups check works properly.
+  // update inverse relationship
+  if (inverseProp) {
+    ///
+    if (inverseProp.isScalar) {
+      // Example: bidirectional navProperty: 1->1: order -> internationalOrder
+      // order.internationalOrder <- internationalOrder || null
+      //    ==> (oldInternationalOrder.order = null)
+      //    ==> internationalOrder.order = order
+      if (oldValue != null) {
+        // TODO: null -> NullEntity later
+        oldValue.setProperty(inverseProp.name, null);
+      }
+      if (newValue != null) {
+        newValue.setProperty(inverseProp.name, parent);
+      }
+    } else {
+      // Example: bidirectional navProperty: 1->n: order -> orderDetails
+      // orderDetail.order <- newOrder || null
+      //    ==> (oldOrder).orderDetails.remove(orderDetail)
+      //    ==> order.orderDetails.push(newOrder)
+      if (oldValue != null) {
+        var oldSiblings = oldValue.getProperty(inverseProp.name);
+        var ix = oldSiblings.indexOf(parent);
+        if (ix !== -1) {
+          oldSiblings.splice(ix, 1);
+        }
+      }
+      if (newValue != null) {
+        var siblings = newValue.getProperty(inverseProp.name);
+        // recursion check if already in the collection is performed by the relationArray
+        siblings.push(parent);
+      }
+    }
+  } else if (property.invForeignKeyNames && entityManager && !entityManager._inKeyFixup) {
+    var invForeignKeyNames = property.invForeignKeyNames;
     if (newValue != null) {
-        var newAspect = newValue.entityAspect;
-        if (entityManager) {
-            if (newAspect.entityState.isDetached()) {
-                if (!entityManager.isLoading) {
-                    entityManager.attachEntity(newValue, EntityState.Added);
-                }
-            } else {
-                if (newAspect.entityManager !== entityManager) {
-                    throw new Error("An Entity cannot be attached to an entity in another EntityManager. One of the two entities must be detached first.");
-                }
-            }
-        } else {
-            if (newAspect && newAspect.entityManager) {
-                entityManager = newAspect.entityManager;
-                if (!entityManager.isLoading) {
-                    entityManager.attachEntity(entityAspect.entity, EntityState.Added);
-                }
-            }
-        }
-    }
-
-    // process related updates ( the inverse relationship) first so that collection dups check works properly.
-    // update inverse relationship
-    if (inverseProp) {
-        ///
-        if (inverseProp.isScalar) {
-            // Example: bidirectional navProperty: 1->1: order -> internationalOrder
-            // order.internationalOrder <- internationalOrder || null
-            //    ==> (oldInternationalOrder.order = null)
-            //    ==> internationalOrder.order = order
-            if (oldValue != null) {
-                // TODO: null -> NullEntity later
-                oldValue.setProperty(inverseProp.name, null);
-            }
-            if (newValue != null) {
-                newValue.setProperty(inverseProp.name, parent);
-            }
-        } else {
-            // Example: bidirectional navProperty: 1->n: order -> orderDetails
-            // orderDetail.order <- newOrder || null
-            //    ==> (oldOrder).orderDetails.remove(orderDetail)
-            //    ==> order.orderDetails.push(newOrder)
-            if (oldValue != null) {
-                var oldSiblings = oldValue.getProperty(inverseProp.name);
-                var ix = oldSiblings.indexOf(parent);
-                if (ix !== -1) {
-                    oldSiblings.splice(ix, 1);
-                }
-            }
-            if (newValue != null) {
-                var siblings = newValue.getProperty(inverseProp.name);
-                // recursion check if already in the collection is performed by the relationArray
-                siblings.push(parent);
-            }
-        }
-    } else if (property.invForeignKeyNames && entityManager && !entityManager._inKeyFixup) {
-        var invForeignKeyNames = property.invForeignKeyNames;
-        if (newValue != null) {
-            // Example: unidirectional navProperty: 1->1: order -> internationalOrder
-            // order.InternationalOrder <- internationalOrder
-            //    ==> internationalOrder.orderId = orderId
-            //      and
-            // Example: unidirectional navProperty: 1->n: order -> orderDetails
-            // orderDetail.order <-xxx newOrder
-            //    ==> CAN'T HAPPEN because if unidirectional because orderDetail will not have an order prop
-            var pkValues = parent.entityAspect.getKey().values;
-            invForeignKeyNames.forEach(function (fkName, i) {
-                newValue.setProperty(fkName, pkValues[i]);
-            });
-        } else {
-            // Example: unidirectional navProperty: 1->1: order -> internationalOrder
-            // order.internationalOrder <- null
-            //    ==> (old internationalOrder).orderId = null
-            //        and
-            // Example: unidirectional navProperty: 1->n: order -> orderDetails
-            // orderDetail.order <-xxx newOrder
-            //    ==> CAN'T HAPPEN because if unidirectional because orderDetail will not have an order prop
-            if (oldValue != null) {
-                invForeignKeyNames.forEach(function (fkName) {
-                    var fkProp = oldValue.entityType.getProperty(fkName);
-                    if (!fkProp.isPartOfKey) {
-                        // don't update with null if fk is part of the key
-                        oldValue.setProperty(fkName, null);
-                    }
-                });
-            }
-        }
-    }
-
-    rawAccessorFn(newValue);
-
-    updateStateAndValidate(context);
-
-    // update fk data property - this can only occur if this navProperty has
-    // a corresponding fk on this entity.
-    if (property.relatedDataProperties) {
-        var entityState = entityAspect.entityState;
-        // if either side of nav prop is detached don't clear fks. Note: oldValue in next line cannot be null so no check is needed.
-        if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
-        if (entityState.isDeleted()) return;
-        var inverseKeyProps = property.entityType.keyProperties;
-        inverseKeyProps.forEach(function (keyProp, i) {
-            var relatedDataProp = property.relatedDataProperties[i];
-            // Do not trash related property if it is part of that entity's key
-            if (newValue || !relatedDataProp.isPartOfKey) {
-                var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
-                parent.setProperty(relatedDataProp.name, relatedValue);
-            }
+      // Example: unidirectional navProperty: 1->1: order -> internationalOrder
+      // order.InternationalOrder <- internationalOrder
+      //    ==> internationalOrder.orderId = orderId
+      //      and
+      // Example: unidirectional navProperty: 1->n: order -> orderDetails
+      // orderDetail.order <-xxx newOrder
+      //    ==> CAN'T HAPPEN because if unidirectional because orderDetail will not have an order prop
+      var pkValues = parent.entityAspect.getKey().values;
+      invForeignKeyNames.forEach(function (fkName, i) {
+        newValue.setProperty(fkName, pkValues[i]);
+      });
+    } else {
+      // Example: unidirectional navProperty: 1->1: order -> internationalOrder
+      // order.internationalOrder <- null
+      //    ==> (old internationalOrder).orderId = null
+      //        and
+      // Example: unidirectional navProperty: 1->n: order -> orderDetails
+      // orderDetail.order <-xxx newOrder
+      //    ==> CAN'T HAPPEN because if unidirectional because orderDetail will not have an order prop
+      if (oldValue != null) {
+        invForeignKeyNames.forEach(function (fkName) {
+          var fkProp = oldValue.entityType.getProperty(fkName);
+          if (!fkProp.isPartOfKey) {
+            // don't update with null if fk is part of the key
+            oldValue.setProperty(fkName, null);
+          }
         });
+      }
     }
+  }
+
+  rawAccessorFn(newValue);
+
+  updateStateAndValidate(context);
+
+  // update fk data property - this can only occur if this navProperty has
+  // a corresponding fk on this entity.
+  if (property.relatedDataProperties) {
+    var entityState = entityAspect.entityState;
+    // if either side of nav prop is detached don't clear fks. Note: oldValue in next line cannot be null so no check is needed.
+    if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
+    if (entityState.isDeleted()) return;
+    var inverseKeyProps = property.entityType.keyProperties;
+    inverseKeyProps.forEach(function (keyProp, i) {
+      var relatedDataProp = property.relatedDataProperties[i];
+      // Do not trash related property if it is part of that entity's key
+      if (newValue || !relatedDataProp.isPartOfKey) {
+        var relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
+        parent.setProperty(relatedDataProp.name, relatedValue);
+      }
+    });
+  }
 }
 
 function postChangeEvents(context) {
-    var entityAspect = context.entityAspect;
+  var entityAspect = context.entityAspect;
 
-    var entityManager = entityAspect.entityManager;
-    var entity = entityAspect.entity;
+  var entityManager = entityAspect.entityManager;
+  var entity = entityAspect.entity;
 
-    var propChangedArgs = { entity: entity, parent: context.parent, property: context.property, propertyName: context.propertyName, oldValue: context.oldValue, newValue: context.newValue };
-    if (entityManager) {
-        // propertyChanged will be fired during loading but we only want to fire it once per entity, not once per property.
-        // so propertyChanged is fired in the entityManager mergeEntity method if not fired here.
-        if ((!entityManager.isLoading) && (!entityManager.isRejectingChanges)) {
-            entityAspect.propertyChanged.publish(propChangedArgs);
-            // don't fire entityChanged event if propertyChanged is suppressed.
-            entityManager.entityChanged.publish({ entityAction: EntityAction.PropertyChange, entity: entity, args: propChangedArgs });
-        }
-    } else {
-        entityAspect.propertyChanged.publish(propChangedArgs);
+  var propChangedArgs = { entity: entity, parent: context.parent, property: context.property, propertyName: context.propertyName, oldValue: context.oldValue, newValue: context.newValue };
+  if (entityManager) {
+    // propertyChanged will be fired during loading but we only want to fire it once per entity, not once per property.
+    // so propertyChanged is fired in the entityManager mergeEntity method if not fired here.
+    if ((!entityManager.isLoading) && (!entityManager.isRejectingChanges)) {
+      entityAspect.propertyChanged.publish(propChangedArgs);
+      // don't fire entityChanged event if propertyChanged is suppressed.
+      entityManager.entityChanged.publish({ entityAction: EntityAction.PropertyChange, entity: entity, args: propChangedArgs });
     }
+  } else {
+    entityAspect.propertyChanged.publish(propChangedArgs);
+  }
 }
 
 function updateStateAndValidate(context) {
-    var entityAspect = context.entityAspect;
-    var entityManager = entityAspect.entityManager;
-    if (entityManager == null || entityManager.isLoading) return;
-    var property = context.property;
+  var entityAspect = context.entityAspect;
+  var entityManager = entityAspect.entityManager;
+  if (entityManager == null || entityManager.isLoading) return;
+  var property = context.property;
 
-    if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
-        entityAspect.setModified();
-    }
+  if (entityAspect.entityState.isUnchanged() && !property.isUnmapped) {
+    entityAspect.setModified();
+  }
 
-    if (entityManager.validationOptions.validateOnPropertyChange) {
-        // entityAspect.entity is NOT the same as parent in the code below. It's use is deliberate.
-        entityAspect._validateProperty(context.newValue,
-            { entity: entityAspect.entity, property: property, propertyName: context.propertyName, oldValue: context.oldValue });
-    }
+  if (entityManager.validationOptions.validateOnPropertyChange) {
+    // entityAspect.entity is NOT the same as parent in the code below. It's use is deliberate.
+    entityAspect._validateProperty(context.newValue,
+        { entity: entityAspect.entity, property: property, propertyName: context.propertyName, oldValue: context.oldValue });
+  }
 }
 ;/**
-  @module breeze
-  **/
+ @module breeze
+ **/
 
 var DataType = (function () {
-  
-    /**
-    DataType is an 'Enum' containing all of the supported data types.
 
-    @class DataType
-    @static
-    **/
+  /**
+   DataType is an 'Enum' containing all of the supported data types.
 
-    /**
-    The default value of this DataType.
-    @property defaultValue {any}
-    **/
+   @class DataType
+   @static
+   **/
 
-    /**
-    Whether this is a 'numeric' DataType. 
-    @property isNumeric {Boolean}
-    **/
+  /**
+   The default value of this DataType.
+   @property defaultValue {any}
+   **/
 
-    var dataTypeMethods = {
-        // default
+  /**
+   Whether this is a 'numeric' DataType.
+   @property isNumeric {Boolean}
+   **/
+
+  var dataTypeMethods = {
+    // default
+  };
+
+  var constants;
+  var resetConstants = function () {
+    constants = {
+      stringPrefix: "K_",
+      nextNumber: -1,
+      nextNumberIncrement: -1
     };
+  };
 
-    var constants;
-    var resetConstants = function () {
-        constants = {
-            stringPrefix: "K_",
-            nextNumber: -1,
-            nextNumberIncrement: -1
-        };
-    };
+  resetConstants();
 
-    resetConstants();
+  var getNextString = function () {
+    return constants.stringPrefix + getNextNumber().toString();
+  };
 
-    var getNextString = function () {
-        return constants.stringPrefix + getNextNumber().toString();
-    };
+  var getNextNumber = function () {
+    var result = constants.nextNumber;
+    constants.nextNumber += constants.nextNumberIncrement;
+    return result;
+  };
 
-    var getNextNumber = function () {
-        var result = constants.nextNumber;
-        constants.nextNumber += constants.nextNumberIncrement;
-        return result;
-    };
+  var getNextGuid = function () {
+    return __getUuid();
+  };
 
-    var getNextGuid = function () {
-        return __getUuid();
-    };
+  var getNextDateTime = function () {
+    return new Date();
+  };
 
-    var getNextDateTime = function () {
-        return new Date();
-    };
+  var coerceToString = function (source, sourceTypeName) {
+    return (source == null) ? source : source.toString();
+  };
 
-    var coerceToString = function (source, sourceTypeName) {
-        return (source == null) ? source : source.toString();
-    };
-
-    var coerceToInt = function (source, sourceTypeName) {
-        if (sourceTypeName === "string") {
-            var src = source.trim();
-            if (src === "") return null;
-            var val = parseInt(src, 10);
-            return isNaN(val) ? source : val;
-        } else if (sourceTypeName === "number") {
-            return Math.round(source);
-        }
-        // do we want to coerce floats -> ints
-        return source;
-    };
-
-    var coerceToFloat = function (source, sourceTypeName) {
-        if (sourceTypeName === "string") {
-            var src = source.trim();
-            if (src === "") return null;
-            var val = parseFloat(src);
-            return isNaN(val) ? source : val;
-        }
-        return source;
-    };
-
-    var coerceToDate = function (source, sourceTypeName) {
-        var val;
-        if (sourceTypeName === "string") {
-            var src = source.trim();
-            if (src === "") return null;
-            val = new Date(Date.parse(src));
-            return __isDate(val) ? val : source;
-        } else if (sourceTypeName === "number") {
-            val = new Date(source);
-            return __isDate(val) ? val : source;
-        }
-        return source;
-    };
-
-    var coerceToBool = function (source, sourceTypeName) {
-        if (sourceTypeName === "string") {
-            var src = source.trim().toLowerCase();
-            if (src === "false" || src ==="") {
-                return false;
-            } else if (src === "true") {
-                return true;
-            } else {
-                return source;
-            }
-        } 
-        return source;
-    };
-
-    var fmtString = function (val) {
-        return val == null ? null : "'" + val.replace(/'/g,"''") + "'";
-    };
-
-    var fmtInt = function (val) {
-        return val == null ? null : ((typeof val === "string") ? parseInt(val, 10) : val);
-    };
-
-    var makeFloatFmt = function (fmtSuffix) {
-        return function(val) {
-            if (val == null) return null;
-            if (typeof val === "string") {
-                val = parseFloat(val);
-            }
-            return val + fmtSuffix;
-        };
-    };
-
-    var fmtDateTime = function (val) {
-        if (val == null) return null;
-        try {
-            return "datetime'" + val.toISOString() + "'";
-        } catch (e) {
-            throwError("'%1' is not a valid dateTime", val);
-        }
-    };
-
-    var fmtDateTimeOffset = function (val) {
-        if (val == null) return null;
-        try {
-            return "datetimeoffset'" + val.toISOString() + "'";
-        } catch (e) {
-            throwError("'%1' is not a valid dateTime", val);
-        }
-    };
-
-    var fmtTime = function (val) {
-        if (val == null) return null;
-        if (!__isDuration(val)) {
-            throwError("'%1' is not a valid ISO 8601 duration", val);
-        }
-        return "time'" + val + "'";
-    };
-
-    var fmtGuid = function (val) {
-        if (val == null) return null;
-        if (!__isGuid(val)) {
-            throwError("'%1' is not a valid guid", val);
-        }
-        return "guid'" + val + "'";
-    };
-
-    var fmtBoolean = function (val) {
-        if (val == null) return null;
-        if (typeof val === "string") {
-            return val.trim().toLowerCase() === "true";
-        } else {
-            return !!val;
-        }
-    };
-    
-    var fmtBinary = function (val) {
-        if (val == null) return val;
-        return "binary'" + val + "'";
-    };
-
-    // TODO: __identity;
-    var fmtUndefined = function (val) {
-        return val;
-    };
-
-    function throwError(msg, val) {
-        msg = __formatString(msg, val);
-        throw new Error(msg);
+  var coerceToInt = function (source, sourceTypeName) {
+    if (sourceTypeName === "string") {
+      var src = source.trim();
+      if (src === "") return null;
+      var val = parseInt(src, 10);
+      return isNaN(val) ? source : val;
+    } else if (sourceTypeName === "number") {
+      return Math.round(source);
     }
-    
-    var DataType = new Enum("DataType", dataTypeMethods);
-    
-    
-    /**
-    @property String {DataType}
-    @final
-    @static
-    **/
-    DataType.String = DataType.addSymbol({
-        defaultValue: "",
-        parse: coerceToString,
-        fmtOData: fmtString,
-        getNext: getNextString
-    });
-    /**
-    @property Int64 {DataType}
-    @final
-    @static
-    **/
-    DataType.Int64 = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, isInteger: true, quoteJsonOData: true,
-        parse: coerceToInt,
-        fmtOData: makeFloatFmt("L"),
-        getNext: getNextNumber
-    });
-    /**
-    @property Int32 {DataType}
-    @final
-    @static
-    **/
-    DataType.Int32 = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, isInteger: true,
-        parse: coerceToInt,
-        fmtOData: fmtInt,
-        getNext: getNextNumber
-    });
-    /**
-    @property Int16 {DataType}
-    @final
-    @static
-    **/
-    DataType.Int16 = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, isInteger: true,
-        parse: coerceToInt,
-        fmtOData: fmtInt,
-        getNext: getNextNumber
-    });
-    /**
-    @property Byte {DataType}
-    @final
-    @static
-    **/
-    DataType.Byte = DataType.addSymbol({ defaultValue: 0, isNumeric: true, isInteger: true, parse: coerceToInt, fmtOData: fmtInt });
-    /**
-    @property Decimal {DataType}
-    @final
-    @static
-    **/
-    DataType.Decimal = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, quoteJsonOData: true, isFloat: true,
-        parse: coerceToFloat,
-        fmtOData: makeFloatFmt("m"),
-        getNext: getNextNumber
-    });
-    /**
-    @property Double {DataType}
-    @final
-    @static
-    **/
-    DataType.Double = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, isFloat: true,
-        parse: coerceToFloat,
-        fmtOData: makeFloatFmt("d"),
-        getNext: getNextNumber
-    });
-    /**
-    @property Single {DataType}
-    @final
-    @static
-    **/
-    DataType.Single = DataType.addSymbol({
-        defaultValue: 0, isNumeric: true, isFloat: true,
-        parse: coerceToFloat,
-        fmtOData: makeFloatFmt("f"),
-        getNext: getNextNumber
-    });
-    /**
-    @property DateTime {DataType}
-    @final
-    @static
-    **/
-    DataType.DateTime = DataType.addSymbol({
-        defaultValue: new Date(1900, 0, 1), isDate: true,
-        parse: coerceToDate,
-        fmtOData: fmtDateTime,
-        getNext: getNextDateTime
-    });
-    
-    /**
-    @property DateTimeOffset {DataType}
-    @final
-    @static
-    **/
-    DataType.DateTimeOffset = DataType.addSymbol({
-        defaultValue: new Date(1900, 0, 1), isDate: true,
-        parse: coerceToDate,
-        fmtOData: fmtDateTimeOffset,
-        getNext: getNextDateTime
-    });
-    /**
-    @property Time {DataType}
-    @final
-    @static
-    **/
-    DataType.Time = DataType.addSymbol({ defaultValue: "PT0S", fmtOData: fmtTime });
-    /**
-    @property Boolean {DataType}
-    @final
-    @static
-    **/
-    DataType.Boolean = DataType.addSymbol({ defaultValue: false, parse: coerceToBool, fmtOData: fmtBoolean });
-    /**
-    @property Guid {DataType}
-    @final
-    @static
-    **/
-    DataType.Guid = DataType.addSymbol({
-        defaultValue: "00000000-0000-0000-0000-000000000000",
-        fmtOData: fmtGuid,
-        getNext: getNextGuid
-    });
-  
-    /**
-    @property Binary {DataType}
-    @final
-    @static
-    **/
-    DataType.Binary = DataType.addSymbol({ defaultValue: null, fmtOData: fmtBinary });
-    /**
-    @property Undefined {DataType}
-    @final
-    @static
-    **/
-    DataType.Undefined = DataType.addSymbol({ defaultValue: undefined , fmtOData: fmtUndefined});
-    DataType.resolveSymbols();
+    // do we want to coerce floats -> ints
+    return source;
+  };
 
-    DataType.getComparableFn = function(dataType) {
-      if (dataType && dataType.isDate) {
-        // dates don't perform equality comparisons properly
-        return function (value) {
-          return value && value.getTime();
-        };
-      } else if (dataType === DataType.Time) {
-        // durations must be converted to compare them
-        return function (value) {
-          return value && __durationToSeconds(value);
-        };
+  var coerceToFloat = function (source, sourceTypeName) {
+    if (sourceTypeName === "string") {
+      var src = source.trim();
+      if (src === "") return null;
+      var val = parseFloat(src);
+      return isNaN(val) ? source : val;
+    }
+    return source;
+  };
+
+  var coerceToDate = function (source, sourceTypeName) {
+    var val;
+    if (sourceTypeName === "string") {
+      var src = source.trim();
+      if (src === "") return null;
+      val = new Date(Date.parse(src));
+      return __isDate(val) ? val : source;
+    } else if (sourceTypeName === "number") {
+      val = new Date(source);
+      return __isDate(val) ? val : source;
+    }
+    return source;
+  };
+
+  var coerceToBool = function (source, sourceTypeName) {
+    if (sourceTypeName === "string") {
+      var src = source.trim().toLowerCase();
+      if (src === "false" || src === "") {
+        return false;
+      } else if (src === "true") {
+        return true;
       } else {
-        // TODO: __identity
-        return function (value) {
-          return value;
-        };
+        return source;
       }
+    }
+    return source;
+  };
+
+  var fmtString = function (val) {
+    return val == null ? null : "'" + val.replace(/'/g, "''") + "'";
+  };
+
+  var fmtInt = function (val) {
+    return val == null ? null : ((typeof val === "string") ? parseInt(val, 10) : val);
+  };
+
+  var makeFloatFmt = function (fmtSuffix) {
+    return function (val) {
+      if (val == null) return null;
+      if (typeof val === "string") {
+        val = parseFloat(val);
+      }
+      return val + fmtSuffix;
     };
+  };
 
-    /**
-    Returns the DataType for a specified EDM type name.
-    @method fromEdmDataType
-    @static
-    @param typeName {String}
-    @return {DataType} A DataType.
-    **/
-    DataType.fromEdmDataType = function (typeName) {
-        var dt = null;
-        var parts = typeName.split(".");
-        if (parts.length > 1) {
-            var simpleName = parts[1];
-            if (simpleName === "image") {
-                // hack
-                dt = DataType.Byte;
-            } else if (parts.length === 2) {
-                dt = DataType.fromName(simpleName) || DataType.Undefined;
-            } else {
-                // enum
-                // dt = DataType.Int32;
-                dt = DataType.String;
-            }
-        }
+  var fmtDateTime = function (val) {
+    if (val == null) return null;
+    try {
+      return "datetime'" + val.toISOString() + "'";
+    } catch (e) {
+      throwError("'%1' is not a valid dateTime", val);
+    }
+  };
 
-        return dt;
-    };
+  var fmtDateTimeOffset = function (val) {
+    if (val == null) return null;
+    try {
+      return "datetimeoffset'" + val.toISOString() + "'";
+    } catch (e) {
+      throwError("'%1' is not a valid dateTime", val);
+    }
+  };
 
-    DataType.fromValue = function(val) {
-        if (__isDate(val)) return DataType.DateTime;
-        switch (typeof val) {
-            case "string":
-                if (__isGuid(val)) return DataType.Guid;
-                // the >3 below is a hack to insure that if we are inferring datatypes that 
-                // very short strings that are valid but unlikely ISO encoded Time's are treated as strings instead.
-                else if (__isDuration(val) && val.length > 3) return DataType.Time;
-                return DataType.String;
-            case "boolean":
-                return DataType.Boolean;
-            case "number":
-                return DataType.Double;
-        }
-        return DataType.Undefined;
-    };
-   
-    var _localTimeRegex = /.\d{3}$/;
+  var fmtTime = function (val) {
+    if (val == null) return null;
+    if (!__isDuration(val)) {
+      throwError("'%1' is not a valid ISO 8601 duration", val);
+    }
+    return "time'" + val + "'";
+  };
 
-    DataType.parseTimeFromServer = function (source) {
-        if (typeof source === 'string') {
-            return source;
-        }
-        // ODATA v3 format
-        if (source && source.__edmType === 'Edm.Time') {
-            var seconds = Math.floor(source.ms / 1000);
-            return 'PT' + seconds + 'S';
-        }
-        return source;
+  var fmtGuid = function (val) {
+    if (val == null) return null;
+    if (!__isGuid(val)) {
+      throwError("'%1' is not a valid guid", val);
+    }
+    return "guid'" + val + "'";
+  };
+
+  var fmtBoolean = function (val) {
+    if (val == null) return null;
+    if (typeof val === "string") {
+      return val.trim().toLowerCase() === "true";
+    } else {
+      return !!val;
+    }
+  };
+
+  var fmtBinary = function (val) {
+    if (val == null) return val;
+    return "binary'" + val + "'";
+  };
+
+  // TODO: __identity;
+  var fmtUndefined = function (val) {
+    return val;
+  };
+
+  function throwError(msg, val) {
+    msg = __formatString(msg, val);
+    throw new Error(msg);
+  }
+
+  var DataType = new Enum("DataType", dataTypeMethods);
+
+
+  /**
+   @property String {DataType}
+   @final
+   @static
+   **/
+  DataType.String = DataType.addSymbol({
+    defaultValue: "",
+    parse: coerceToString,
+    fmtOData: fmtString,
+    getNext: getNextString
+  });
+  /**
+   @property Int64 {DataType}
+   @final
+   @static
+   **/
+  DataType.Int64 = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, isInteger: true, quoteJsonOData: true,
+    parse: coerceToInt,
+    fmtOData: makeFloatFmt("L"),
+    getNext: getNextNumber
+  });
+  /**
+   @property Int32 {DataType}
+   @final
+   @static
+   **/
+  DataType.Int32 = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, isInteger: true,
+    parse: coerceToInt,
+    fmtOData: fmtInt,
+    getNext: getNextNumber
+  });
+  /**
+   @property Int16 {DataType}
+   @final
+   @static
+   **/
+  DataType.Int16 = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, isInteger: true,
+    parse: coerceToInt,
+    fmtOData: fmtInt,
+    getNext: getNextNumber
+  });
+  /**
+   @property Byte {DataType}
+   @final
+   @static
+   **/
+  DataType.Byte = DataType.addSymbol({ defaultValue: 0, isNumeric: true, isInteger: true, parse: coerceToInt, fmtOData: fmtInt });
+  /**
+   @property Decimal {DataType}
+   @final
+   @static
+   **/
+  DataType.Decimal = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, quoteJsonOData: true, isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("m"),
+    getNext: getNextNumber
+  });
+  /**
+   @property Double {DataType}
+   @final
+   @static
+   **/
+  DataType.Double = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("d"),
+    getNext: getNextNumber
+  });
+  /**
+   @property Single {DataType}
+   @final
+   @static
+   **/
+  DataType.Single = DataType.addSymbol({
+    defaultValue: 0, isNumeric: true, isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("f"),
+    getNext: getNextNumber
+  });
+  /**
+   @property DateTime {DataType}
+   @final
+   @static
+   **/
+  DataType.DateTime = DataType.addSymbol({
+    defaultValue: new Date(1900, 0, 1), isDate: true,
+    parse: coerceToDate,
+    fmtOData: fmtDateTime,
+    getNext: getNextDateTime
+  });
+
+  /**
+   @property DateTimeOffset {DataType}
+   @final
+   @static
+   **/
+  DataType.DateTimeOffset = DataType.addSymbol({
+    defaultValue: new Date(1900, 0, 1), isDate: true,
+    parse: coerceToDate,
+    fmtOData: fmtDateTimeOffset,
+    getNext: getNextDateTime
+  });
+  /**
+   @property Time {DataType}
+   @final
+   @static
+   **/
+  DataType.Time = DataType.addSymbol({ defaultValue: "PT0S", fmtOData: fmtTime });
+  /**
+   @property Boolean {DataType}
+   @final
+   @static
+   **/
+  DataType.Boolean = DataType.addSymbol({ defaultValue: false, parse: coerceToBool, fmtOData: fmtBoolean });
+  /**
+   @property Guid {DataType}
+   @final
+   @static
+   **/
+  DataType.Guid = DataType.addSymbol({
+    defaultValue: "00000000-0000-0000-0000-000000000000",
+    fmtOData: fmtGuid,
+    getNext: getNextGuid
+  });
+
+  /**
+   @property Binary {DataType}
+   @final
+   @static
+   **/
+  DataType.Binary = DataType.addSymbol({ defaultValue: null, fmtOData: fmtBinary });
+  /**
+   @property Undefined {DataType}
+   @final
+   @static
+   **/
+  DataType.Undefined = DataType.addSymbol({ defaultValue: undefined, fmtOData: fmtUndefined});
+  DataType.resolveSymbols();
+
+  DataType.getComparableFn = function (dataType) {
+    if (dataType && dataType.isDate) {
+      // dates don't perform equality comparisons properly
+      return function (value) {
+        return value && value.getTime();
+      };
+    } else if (dataType === DataType.Time) {
+      // durations must be converted to compare them
+      return function (value) {
+        return value && __durationToSeconds(value);
+      };
+    } else {
+      // TODO: __identity
+      return function (value) {
+        return value;
+      };
+    }
+  };
+
+  /**
+   Returns the DataType for a specified EDM type name.
+   @method fromEdmDataType
+   @static
+   @param typeName {String}
+   @return {DataType} A DataType.
+   **/
+  DataType.fromEdmDataType = function (typeName) {
+    var dt = null;
+    var parts = typeName.split(".");
+    if (parts.length > 1) {
+      var simpleName = parts[1];
+      if (simpleName === "image") {
+        // hack
+        dt = DataType.Byte;
+      } else if (parts.length === 2) {
+        dt = DataType.fromName(simpleName) || DataType.Undefined;
+      } else {
+        // enum
+        // dt = DataType.Int32;
+        dt = DataType.String;
+      }
     }
 
-    DataType.parseDateAsUTC = function (source) {
-        if (typeof source === 'string') {
-            // convert to UTC string if no time zone specifier.
-            var isLocalTime = _localTimeRegex.test(source);
-            source = isLocalTime ? source + 'Z' : source;
-        }
-        source = new Date(Date.parse(source));
-        return source;
-    };
+    return dt;
+  };
 
-    // NOT YET NEEDED --------------------------------------------------
-    // var _utcOffsetMs = (new Date()).getTimezoneOffset() * 60000;
-    
-    //DataType.parseDateAsLocal = function (source) {
-    //    var dt = DataType.parseDatesAsUTC(source);
-    //    if (__isDate(dt)) {
-    //        dt = new Date(dt.getTime() + _utcOffsetMs);
-    //    }
-    //    return dt;
-    //};
-    // -----------------------------------------------------------------
-
-    DataType.parseDateFromServer = DataType.parseDateAsUTC;
-
-    DataType.parseRawValue = function(val, dataType) {
-        // undefined values will be the default for most unmapped properties EXCEPT when they are set
-        // in a jsonResultsAdapter ( an unusual use case).
-        if (val === undefined) return undefined;
-        if (dataType.isDate && val) {
-            if (!__isDate(val)) {
-                val = DataType.parseDateFromServer(val);
-            }
-        } else if (dataType === DataType.Binary) {
-            if (val && val.$value !== undefined) {
-                val = val.$value; // this will be a byte[] encoded as a string
-            }
-        } else if (dataType === DataType.Time) {
-            val = DataType.parseTimeFromServer(val);
-        }
-        return val;
+  DataType.fromValue = function (val) {
+    if (__isDate(val)) return DataType.DateTime;
+    switch (typeof val) {
+      case "string":
+        if (__isGuid(val)) return DataType.Guid;
+        // the >3 below is a hack to insure that if we are inferring datatypes that
+        // very short strings that are valid but unlikely ISO encoded Time's are treated as strings instead.
+        else if (__isDuration(val) && val.length > 3) return DataType.Time;
+        return DataType.String;
+      case "boolean":
+        return DataType.Boolean;
+      case "number":
+        return DataType.Double;
     }
+    return DataType.Undefined;
+  };
 
-    DataType.constants = constants;
-    // for internal testing only
-    DataType._resetConstants = resetConstants;
+  var _localTimeRegex = /.\d{3}$/;
 
-    DataType.getSymbols().forEach(function (sym) {
-        sym.validatorCtor = getValidatorCtor(sym);
-    });
-
-    function getValidatorCtor(symbol) {
-        switch (symbol) {
-            case DataType.String:
-                return Validator.string;
-            case DataType.Int64:
-                return Validator.int64;
-            case DataType.Int32:
-                return Validator.int32;
-            case DataType.Int16:
-                return Validator.int16;
-            case DataType.Decimal:
-                return Validator.number;
-            case DataType.Double:
-                return Validator.number;
-            case DataType.Single:
-                return Validator.number;
-            case DataType.DateTime:
-                return Validator.date;
-            case DataType.DateTimeOffset:
-                return Validator.date;
-            case DataType.Boolean:
-                return Validator.bool;
-            case DataType.Guid:
-                return Validator.guid;
-            case DataType.Byte:
-                return Validator.byte;
-            case DataType.Binary:
-                // TODO: don't quite know how to validate this yet.
-                return Validator.none;
-            case DataType.Time:
-                return Validator.duration;
-            case DataType.Undefined:
-                return Validator.none;
-        }
+  DataType.parseTimeFromServer = function (source) {
+    if (typeof source === 'string') {
+      return source;
     }
+    // ODATA v3 format
+    if (source && source.__edmType === 'Edm.Time') {
+      var seconds = Math.floor(source.ms / 1000);
+      return 'PT' + seconds + 'S';
+    }
+    return source;
+  }
 
-    return DataType;
+  DataType.parseDateAsUTC = function (source) {
+    if (typeof source === 'string') {
+      // convert to UTC string if no time zone specifier.
+      var isLocalTime = _localTimeRegex.test(source);
+      source = isLocalTime ? source + 'Z' : source;
+    }
+    source = new Date(Date.parse(source));
+    return source;
+  };
+
+  // NOT YET NEEDED --------------------------------------------------
+  // var _utcOffsetMs = (new Date()).getTimezoneOffset() * 60000;
+
+  //DataType.parseDateAsLocal = function (source) {
+  //    var dt = DataType.parseDatesAsUTC(source);
+  //    if (__isDate(dt)) {
+  //        dt = new Date(dt.getTime() + _utcOffsetMs);
+  //    }
+  //    return dt;
+  //};
+  // -----------------------------------------------------------------
+
+  DataType.parseDateFromServer = DataType.parseDateAsUTC;
+
+  DataType.parseRawValue = function (val, dataType) {
+    // undefined values will be the default for most unmapped properties EXCEPT when they are set
+    // in a jsonResultsAdapter ( an unusual use case).
+    if (val === undefined) return undefined;
+    if (dataType.isDate && val) {
+      if (!__isDate(val)) {
+        val = DataType.parseDateFromServer(val);
+      }
+    } else if (dataType === DataType.Binary) {
+      if (val && val.$value !== undefined) {
+        val = val.$value; // this will be a byte[] encoded as a string
+      }
+    } else if (dataType === DataType.Time) {
+      val = DataType.parseTimeFromServer(val);
+    }
+    return val;
+  }
+
+  DataType.constants = constants;
+  // for internal testing only
+  DataType._resetConstants = resetConstants;
+
+  DataType.getSymbols().forEach(function (sym) {
+    sym.validatorCtor = getValidatorCtor(sym);
+  });
+
+  function getValidatorCtor(symbol) {
+    switch (symbol) {
+      case DataType.String:
+        return Validator.string;
+      case DataType.Int64:
+        return Validator.int64;
+      case DataType.Int32:
+        return Validator.int32;
+      case DataType.Int16:
+        return Validator.int16;
+      case DataType.Decimal:
+        return Validator.number;
+      case DataType.Double:
+        return Validator.number;
+      case DataType.Single:
+        return Validator.number;
+      case DataType.DateTime:
+        return Validator.date;
+      case DataType.DateTimeOffset:
+        return Validator.date;
+      case DataType.Boolean:
+        return Validator.bool;
+      case DataType.Guid:
+        return Validator.guid;
+      case DataType.Byte:
+        return Validator.byte;
+      case DataType.Binary:
+        // TODO: don't quite know how to validate this yet.
+        return Validator.none;
+      case DataType.Time:
+        return Validator.duration;
+      case DataType.Undefined:
+        return Validator.none;
+    }
+  }
+
+  return DataType;
 
 })();
 
 breeze.DataType = DataType;
 
 ;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var DataService = (function () {
-        
-    /**
-    A DataService instance is used to encapsulate the details of a single 'service'; this includes a serviceName, a dataService adapterInstance, 
-    and whether the service has server side metadata.  
 
-    You can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService 
-    is constructed for you.  (It can also be set via the EntityManager.setProperties method).
+  /**
+   A DataService instance is used to encapsulate the details of a single 'service'; this includes a serviceName, a dataService adapterInstance,
+   and whether the service has server side metadata.
 
-    The same applies to the MetadataStore.fetchMetadata method, i.e. it takes either a serviceName or a DataService instance.
+   You can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService
+   is constructed for you.  (It can also be set via the EntityManager.setProperties method).
 
-    Each metadataStore contains a list of DataServices, each accessible via its ‘serviceName’. 
-    ( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally 
-    anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or service name).
-    @class DataService
-    **/
+   The same applies to the MetadataStore.fetchMetadata method, i.e. it takes either a serviceName or a DataService instance.
 
-    /**
-    DataService constructor
+   Each metadataStore contains a list of DataServices, each accessible via its ‘serviceName’.
+   ( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally
+   anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or service name).
+   @class DataService
+   **/
 
-    @example
-        // 
-        var dataService = new DataService({
+  /**
+   DataService constructor
+
+   @example
+   //
+   var dataService = new DataService({
             serviceName: altServiceName,
             hasServerMetadata: false
         });
 
-        var metadataStore = new MetadataStore({
+   var metadataStore = new MetadataStore({
             namingConvention: NamingConvention.camelCase
         });
 
-        return new EntityManager({
+   return new EntityManager({
             dataService: dataService,
             metadataStore: metadataStore
         });
-            
-    @method <ctor> DataService
-    @param config {Object}
-    @param config.serviceName {String} The name of the service. 
-    @param [config.adapterName] {String} The name of the dataServiceAdapter to be used with this service. 
-    @param [config.hasServerMetadata] {bool} Whether the server can provide metadata for this service.
-    @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
-    @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
-    **/
-        
-    var ctor = function (config) {
-        this.uriBuilder = uriBuilderForOData;
-        updateWithConfig(this, config);
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = "DataService";
-        
-    /**
-    The serviceName for this DataService.
 
-    __readOnly__
-    @property serviceName {String}
-    **/
-        
-    /**
-    The adapter name for the dataServiceAdapter to be used with this service.
+   @method <ctor> DataService
+   @param config {Object}
+   @param config.serviceName {String} The name of the service.
+   @param [config.adapterName] {String} The name of the dataServiceAdapter to be used with this service.
+   @param [config.hasServerMetadata] {bool} Whether the server can provide metadata for this service.
+   @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
+   @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
+   **/
 
-    __readOnly__
-    @property adapterName {String}
-    **/
-        
-    /**
-    The "dataService" adapter implementation instance associated with this EntityManager.
+  var ctor = function (config) {
+    this.uriBuilder = uriBuilderForOData;
+    updateWithConfig(this, config);
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = "DataService";
 
-    __readOnly__
-    @property adapterInstance {an instance of the "dataService" adapter interface}
-    **/
+  /**
+   The serviceName for this DataService.
 
-    /**
-    Whether the server can provide metadata for this service.
+   __readOnly__
+   @property serviceName {String}
+   **/
 
-    __readOnly__
-    @property hasServerMetadata {Boolean}
-    **/
-        
-    /**
-    The JsonResultsAdapter used to process the results of any query against this DataService.
+  /**
+   The adapter name for the dataServiceAdapter to be used with this service.
 
-    __readOnly__
-    @property jsonResultsAdapter {JsonResultsAdapter}
-    **/
+   __readOnly__
+   @property adapterName {String}
+   **/
 
-    /**
-    Whether to use JSONP when performing a 'GET' request against this service.
-    
-    __readOnly__
-    @property useJsonP {Boolean}
-    **/
+  /**
+   The "dataService" adapter implementation instance associated with this EntityManager.
 
-    /**
-    Returns a copy of this DataService with the specified properties applied.
-    @method using
-    @param config {Configuration Object} The object to apply to create a new DataService.
-    @return {DataService}
-    @chainable
-    **/
-    proto.using = function (config) {
-        if (!config) return this;
-        var result = new DataService(this);
-        return updateWithConfig(result, config);
-    };
+   __readOnly__
+   @property adapterInstance {an instance of the "dataService" adapter interface}
+   **/
 
-    ctor.resolve = function (dataServices) {
-        // final defaults
-        dataServices.push({
-            hasServerMetadata: true,
-            useJsonp: false
-        });
-        var ds = new DataService(__resolveProperties(dataServices,
-            ["serviceName", "adapterName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
+  /**
+   Whether the server can provide metadata for this service.
 
-        if (!ds.serviceName) {
-            throw new Error("Unable to resolve a 'serviceName' for this dataService");
-        }
-        ds.adapterInstance = ds.adapterInstance || __config.getAdapterInstance("dataService", ds.adapterName);
-        ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
+   __readOnly__
+   @property hasServerMetadata {Boolean}
+   **/
 
-        return ds;
-    };
+  /**
+   The JsonResultsAdapter used to process the results of any query against this DataService.
 
-    function updateWithConfig(obj, config) {
-        if (config) {
-            assertConfig(config)
-                .whereParam("serviceName").isOptional()
-                .whereParam("adapterName").isString().isOptional()
-                .whereParam("hasServerMetadata").isBoolean().isOptional()
-                .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
-                .whereParam("useJsonp").isBoolean().isOptional()
-                .applyAll(obj);
-            obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
-            obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
+   __readOnly__
+   @property jsonResultsAdapter {JsonResultsAdapter}
+   **/
 
-        }
-        return obj;
+  /**
+   Whether to use JSONP when performing a 'GET' request against this service.
+
+   __readOnly__
+   @property useJsonP {Boolean}
+   **/
+
+  /**
+   Returns a copy of this DataService with the specified properties applied.
+   @method using
+   @param config {Configuration Object} The object to apply to create a new DataService.
+   @return {DataService}
+   @chainable
+   **/
+  proto.using = function (config) {
+    if (!config) return this;
+    var result = new DataService(this);
+    return updateWithConfig(result, config);
+  };
+
+  ctor.resolve = function (dataServices) {
+    // final defaults
+    dataServices.push({
+      hasServerMetadata: true,
+      useJsonp: false
+    });
+    var ds = new DataService(__resolveProperties(dataServices,
+        ["serviceName", "adapterName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
+
+    if (!ds.serviceName) {
+      throw new Error("Unable to resolve a 'serviceName' for this dataService");
     }
-        
-    ctor._normalizeServiceName = function(serviceName) {
-        serviceName = serviceName.trim();
-        if (serviceName.substr(-1) !== "/") {
-            return serviceName + '/';
-        } else {
-            return serviceName;
-        }
-    };
-        
-    proto.toJSON = function () {
-        // don't use default value here - because we want to be able to distinguish undefined props for inheritence purposes.
-        return __toJson(this, {
-            serviceName: null,
-            adapterName: null,
-            hasServerMetadata: null,
-            jsonResultsAdapter: function (v) { return v && v.name; },
-            useJsonp: null
-        });       
-    };
+    ds.adapterInstance = ds.adapterInstance || __config.getAdapterInstance("dataService", ds.adapterName);
+    ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
 
-    ctor.fromJSON = function(json) {
-        json.jsonResultsAdapter = __config._fetchObject(JsonResultsAdapter, json.jsonResultsAdapter);
-        return new DataService(json);
-    };
+    return ds;
+  };
 
-    proto.makeUrl = function(suffix) {
-        var url = this.serviceName;
-        // remove any trailing "/"
-        if (core.stringEndsWith(url, "/")) {
-            url = url.substr(0, url.length - 1);
-        }
-        // ensure that it ends with "/" + suffix
-        suffix = "/" + suffix;
-        if (!core.stringEndsWith(url, suffix)) {
-            url = url + suffix;
-        }
-        return url;
-    };
+  function updateWithConfig(obj, config) {
+    if (config) {
+      assertConfig(config)
+          .whereParam("serviceName").isOptional()
+          .whereParam("adapterName").isString().isOptional()
+          .whereParam("hasServerMetadata").isBoolean().isOptional()
+          .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
+          .whereParam("useJsonp").isBoolean().isOptional()
+          .applyAll(obj);
+      obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
+      obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
 
-    return ctor;
+    }
+    return obj;
+  }
+
+  ctor._normalizeServiceName = function (serviceName) {
+    serviceName = serviceName.trim();
+    if (serviceName.substr(-1) !== "/") {
+      return serviceName + '/';
+    } else {
+      return serviceName;
+    }
+  };
+
+  proto.toJSON = function () {
+    // don't use default value here - because we want to be able to distinguish undefined props for inheritence purposes.
+    return __toJson(this, {
+      serviceName: null,
+      adapterName: null,
+      hasServerMetadata: null,
+      jsonResultsAdapter: function (v) {
+        return v && v.name;
+      },
+      useJsonp: null
+    });
+  };
+
+  ctor.fromJSON = function (json) {
+    json.jsonResultsAdapter = __config._fetchObject(JsonResultsAdapter, json.jsonResultsAdapter);
+    return new DataService(json);
+  };
+
+  proto.makeUrl = function (suffix) {
+    var url = this.serviceName;
+    // remove any trailing "/"
+    if (core.stringEndsWith(url, "/")) {
+      url = url.substr(0, url.length - 1);
+    }
+    // ensure that it ends with "/" + suffix
+    suffix = "/" + suffix;
+    if (!core.stringEndsWith(url, suffix)) {
+      url = url + suffix;
+    }
+    return url;
+  };
+
+  return ctor;
 })();
-    
+
 var JsonResultsAdapter = (function () {
 
-    /**
-    A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service. 
-    This facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class 'breeze' citizens. 
+  /**
+   A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service.
+   This facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class 'breeze' citizens.
 
-    @class JsonResultsAdapter
-    **/
+   @class JsonResultsAdapter
+   **/
 
-    /**
-    JsonResultsAdapter constructor
+  /**
+   JsonResultsAdapter constructor
 
-    @example
-        // 
-        var jsonResultsAdapter = new JsonResultsAdapter({
+   @example
+   //
+   var jsonResultsAdapter = new JsonResultsAdapter({
             name: "test1e",
             extractResults: function(json) {
                 return json.results;
@@ -6058,46 +6093,46 @@ var JsonResultsAdapter = (function () {
             }
         });
 
-        var dataService = new DataService( {
+   var dataService = new DataService( {
                 serviceName: "breeze/foo",
                 jsonResultsAdapter: jsonResultsAdapter
         });
 
-        var entityManager = new EntityManager( {
+   var entityManager = new EntityManager( {
             dataService: dataService
         });
-            
-    @method <ctor> JsonResultsAdapter
-    @param config {Object}
-    @param config.name {String} The name of this adapter.  This name is used to uniquely identify and locate this instance when an 'exported' JsonResultsAdapter is later imported.
-    @param [config.extractResults] {Function} Called once per service operation to extract the 'payload' from any json received over the wire. 
-    This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query.
-    @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload. 
-    **/
-    var ctor = function (config) {
-        if (arguments.length !== 1) {
-            throw new Error("The JsonResultsAdapter ctor should be called with a single argument that is a configuration object.");
-        }
 
-        assertConfig(config)
-            .whereParam("name").isNonEmptyString()
-            .whereParam("extractResults").isFunction().isOptional().withDefault(extractResultsDefault)
-            .whereParam("visitNode").isFunction()
-            .applyAll(this);
-        __config._storeObject(this, proto._$typeName, this.name);
-    };
-        
-    var proto = ctor.prototype;
-    proto._$typeName = "JsonResultsAdapter";
-        
-    function extractResultsDefault(data) {
-        return data.results;
+   @method <ctor> JsonResultsAdapter
+   @param config {Object}
+   @param config.name {String} The name of this adapter.  This name is used to uniquely identify and locate this instance when an 'exported' JsonResultsAdapter is later imported.
+   @param [config.extractResults] {Function} Called once per service operation to extract the 'payload' from any json received over the wire.
+   This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query.
+   @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload.
+   **/
+  var ctor = function (config) {
+    if (arguments.length !== 1) {
+      throw new Error("The JsonResultsAdapter ctor should be called with a single argument that is a configuration object.");
     }
-        
-    return ctor;
+
+    assertConfig(config)
+        .whereParam("name").isNonEmptyString()
+        .whereParam("extractResults").isFunction().isOptional().withDefault(extractResultsDefault)
+        .whereParam("visitNode").isFunction()
+        .applyAll(this);
+    __config._storeObject(this, proto._$typeName, this.name);
+  };
+
+  var proto = ctor.prototype;
+  proto._$typeName = "JsonResultsAdapter";
+
+  function extractResultsDefault(data) {
+    return data.results;
+  }
+
+  return ctor;
 })();
 
-breeze.DataService= DataService;
+breeze.DataService = DataService;
 breeze.JsonResultsAdapter = JsonResultsAdapter;
 
 
@@ -7885,8 +7920,6 @@ var EntityType = (function () {
   };
 
 
-
-
 //  proto.getProperty = function (propertyPath, throwIfNotFound) {
 //    throwIfNotFound = throwIfNotFound || false;
 //    var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
@@ -8079,7 +8112,7 @@ var EntityType = (function () {
       var prop = __arrayFirst(parentType.getProperties(), __propEq("name", propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
-      } else  if (throwIfNotFound) {
+      } else if (throwIfNotFound) {
         throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
       } else {
         ok = false;
@@ -9277,240 +9310,239 @@ MetadataStore.normalizeTypeName = CsdlMetadataParser.normalizeTypeName;
  **/
 
 var KeyGenerator = (function () {
-    
-    /*
-    @class KeyGenerator
-    */
-    var ctor = function () {
-        // key is dataProperty.name + || + entityType.name, value is propEntry 
-        // propEntry = { entityType, propertyName, keyMap }
-        // keyMap has key of the actual value ( as a string) and a value of null or the real id.
-        this._tempIdMap = {};
-    };
-    var proto = ctor.prototype;
 
-    /*
-    Returns a unique 'temporary' id for the specified {{#crossLink "EntityType"}}{{/crossLink}}. 
-    Uniqueness is defined for this purpose as being unique within each instance of a KeyGenerator. This is sufficient 
-    because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
-    the EntityManager with temporary keys will have them regenerated and remapped on import.
+  /*
+   @class KeyGenerator
+   */
+  var ctor = function () {
+    // key is dataProperty.name + || + entityType.name, value is propEntry
+    // propEntry = { entityType, propertyName, keyMap }
+    // keyMap has key of the actual value ( as a string) and a value of null or the real id.
+    this._tempIdMap = {};
+  };
+  var proto = ctor.prototype;
 
-    The return value of this method must be of the correct type as determined by the keyProperties of the 
-    specified EntityType
-    @example
-        // Assume em1 is a preexisting EntityManager
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var cust1 = custType.createEntity();
-        // next line both sets cust1's 'CustomerId' property but also returns the value
-        var cid1 = em1.generateTempKeyValue(cust1);
-        em1.saveChanges()
-            .then( function( data) {
-                var sameCust1 = data.results[0];
-                // cust1 === sameCust1;
-                // but cust1.getProperty("CustomerId") != cid1
-                // because the server will have generated a new id 
-                // and the client will have been updated with this 
-                // new id.
-            })
-    @method generateTempKeyValue
-    @param entityType {EntityType}
-    */
-    proto.generateTempKeyValue = function (entityType, valueIfAvail) {
-        var keyProps = entityType.keyProperties;
-        if (keyProps.length > 1) {
-            throw new Error("Ids can not be autogenerated for entities with multipart keys");
-        }
-        var keyProp = keyProps[0];
-        var propEntry = getPropEntry(this, keyProp, true);
-        var nextId;
-        if (valueIfAvail != null) {
-            if (!propEntry.keyMap[valueIfAvail.toString()]) {
-                nextId = valueIfAvail;
-            }
-        }
+  /*
+   Returns a unique 'temporary' id for the specified {{#crossLink "EntityType"}}{{/crossLink}}.
+   Uniqueness is defined for this purpose as being unique within each instance of a KeyGenerator. This is sufficient
+   because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
+   the EntityManager with temporary keys will have them regenerated and remapped on import.
 
-        if (nextId === undefined) {
-            var dataType = keyProp.dataType;
-            if (dataType.getNext) {
-                nextId = dataType.getNext(this);
-                // need to watch out for collision with previously imported ids that might also get generated.
-                while (propEntry.keyMap[nextId.toString()] != null) {
-                    nextId = dataType.getNext(this);
-                }
-            } else {
-                throw new Error("Cannot use a property with a dataType of: " + dataType.toString() + " for id generation");
-            }
-        }
-        
-        propEntry.keyMap[nextId.toString()] = true;
-        return nextId;
-    };
-
-    proto.getTempKeys = function () {
-        var results = [];
-        //noinspection JSHint
-        for (var key in this._tempIdMap) {
-            var propEntry = this._tempIdMap[key];
-            var entityType = propEntry.entityType;
-            // var propName = propEntry.propertyName;
-            //noinspection JSHint
-            for (var keyValue in propEntry.keyMap) {
-                results.push(new EntityKey(entityType, [keyValue]));
-            }
-        }
-        return results;
-    };
-
-
-
-    // proto methods below are not part of the KeyGenerator interface.
-
-    proto.isTempKey = function (entityKey) {
-        var keyProps = entityKey.entityType.keyProperties;
-        if (keyProps.length > 1) return false;
-        var keyProp = keyProps[0];
-        var propEntry = getPropEntry(this, keyProp);
-        if (!propEntry) {
-            return false;
-        }
-        return (propEntry.keyMap[entityKey.values[0].toString()] !== undefined);
-    };
-
-    function getPropEntry(that, keyProp, createIfMissing) {
-        var key = keyProp.name + ".." + keyProp.parentType.name;
-        var propEntry = that._tempIdMap[key];
-        if (!propEntry) {
-            if (createIfMissing) {
-                propEntry = { entityType: keyProp.parentType, propertyName: keyProp.name, keyMap: {} };
-                that._tempIdMap[key] = propEntry;
-            }
-        }
-        return propEntry;
+   The return value of this method must be of the correct type as determined by the keyProperties of the
+   specified EntityType
+   @example
+   // Assume em1 is a preexisting EntityManager
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var cust1 = custType.createEntity();
+   // next line both sets cust1's 'CustomerId' property but also returns the value
+   var cid1 = em1.generateTempKeyValue(cust1);
+   em1.saveChanges()
+   .then( function( data) {
+   var sameCust1 = data.results[0];
+   // cust1 === sameCust1;
+   // but cust1.getProperty("CustomerId") != cid1
+   // because the server will have generated a new id
+   // and the client will have been updated with this
+   // new id.
+   })
+   @method generateTempKeyValue
+   @param entityType {EntityType}
+   */
+  proto.generateTempKeyValue = function (entityType, valueIfAvail) {
+    var keyProps = entityType.keyProperties;
+    if (keyProps.length > 1) {
+      throw new Error("Ids can not be autogenerated for entities with multipart keys");
+    }
+    var keyProp = keyProps[0];
+    var propEntry = getPropEntry(this, keyProp, true);
+    var nextId;
+    if (valueIfAvail != null) {
+      if (!propEntry.keyMap[valueIfAvail.toString()]) {
+        nextId = valueIfAvail;
+      }
     }
 
-    __config.registerType(ctor, "KeyGenerator");
+    if (nextId === undefined) {
+      var dataType = keyProp.dataType;
+      if (dataType.getNext) {
+        nextId = dataType.getNext(this);
+        // need to watch out for collision with previously imported ids that might also get generated.
+        while (propEntry.keyMap[nextId.toString()] != null) {
+          nextId = dataType.getNext(this);
+        }
+      } else {
+        throw new Error("Cannot use a property with a dataType of: " + dataType.toString() + " for id generation");
+      }
+    }
 
-    return ctor;
+    propEntry.keyMap[nextId.toString()] = true;
+    return nextId;
+  };
+
+  proto.getTempKeys = function () {
+    var results = [];
+    //noinspection JSHint
+    for (var key in this._tempIdMap) {
+      var propEntry = this._tempIdMap[key];
+      var entityType = propEntry.entityType;
+      // var propName = propEntry.propertyName;
+      //noinspection JSHint
+      for (var keyValue in propEntry.keyMap) {
+        results.push(new EntityKey(entityType, [keyValue]));
+      }
+    }
+    return results;
+  };
+
+
+  // proto methods below are not part of the KeyGenerator interface.
+
+  proto.isTempKey = function (entityKey) {
+    var keyProps = entityKey.entityType.keyProperties;
+    if (keyProps.length > 1) return false;
+    var keyProp = keyProps[0];
+    var propEntry = getPropEntry(this, keyProp);
+    if (!propEntry) {
+      return false;
+    }
+    return (propEntry.keyMap[entityKey.values[0].toString()] !== undefined);
+  };
+
+  function getPropEntry(that, keyProp, createIfMissing) {
+    var key = keyProp.name + ".." + keyProp.parentType.name;
+    var propEntry = that._tempIdMap[key];
+    if (!propEntry) {
+      if (createIfMissing) {
+        propEntry = { entityType: keyProp.parentType, propertyName: keyProp.name, keyMap: {} };
+        that._tempIdMap[key] = propEntry;
+      }
+    }
+    return propEntry;
+  }
+
+  __config.registerType(ctor, "KeyGenerator");
+
+  return ctor;
 })();
 
 breeze.KeyGenerator = KeyGenerator;;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var LocalQueryComparisonOptions = (function () {
 
-    /**
-    A LocalQueryComparisonOptions instance is used to specify the "comparison rules" used when performing "local queries" in order 
-    to match the semantics of these same queries when executed against a remote service.  These options should be set based on the 
-    manner in which your remote service interprets certain comparison operations.
-    
-    The default LocalQueryComparisonOptions stipulates 'caseInsensitive" queries with ANSI SQL rules regarding comparisons of unequal
-    length strings. 
-    
-    @class LocalQueryComparisonOptions
-    **/
+  /**
+   A LocalQueryComparisonOptions instance is used to specify the "comparison rules" used when performing "local queries" in order
+   to match the semantics of these same queries when executed against a remote service.  These options should be set based on the
+   manner in which your remote service interprets certain comparison operations.
 
-    /**
-    LocalQueryComparisonOptions constructor
-    @example
-        // create a 'caseSensitive - non SQL' instance.
-        var lqco = new LocalQueryComparisonOptions({
+   The default LocalQueryComparisonOptions stipulates 'caseInsensitive" queries with ANSI SQL rules regarding comparisons of unequal
+   length strings.
+
+   @class LocalQueryComparisonOptions
+   **/
+
+  /**
+   LocalQueryComparisonOptions constructor
+   @example
+   // create a 'caseSensitive - non SQL' instance.
+   var lqco = new LocalQueryComparisonOptions({
             name: "caseSensitive-nonSQL"
             isCaseSensitive: true;
             usesSql92CompliantStringComparison: false;
         });
-        // either apply it globally
-        lqco.setAsDefault();
-        // or to a specific MetadataStore
-        var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
-        var em = new EntityManager( { metadataStore: ms });
-    
-    @method <ctor> LocalQueryComparisonOptions
-    @param config {Object}
-    @param [config.name] {String}
-    @param [config.isCaseSensitive] {Boolean} Whether predicates that involve strings will be interpreted in a "caseSensitive" manner. Default is 'false'
-    @param [config.usesSql92CompliantStringComparison] {Boolean} Whether of not to enforce the ANSI SQL standard 
-        of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and 
-        inequality predicates, and not with operations like 'startsWith', 'endsWith' or 'contains'.  Default is true.
-    **/
+   // either apply it globally
+   lqco.setAsDefault();
+   // or to a specific MetadataStore
+   var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
+   var em = new EntityManager( { metadataStore: ms });
 
-    var ctor = function (config) {
-        assertConfig(config || {})
-            .whereParam("name").isOptional().isString()
-            .whereParam("isCaseSensitive").isOptional().isBoolean()
-            .whereParam("usesSql92CompliantStringComparison").isBoolean()
-            .applyAll(this);
-        if (!this.name) {
-            this.name = __getUuid();
-        }
-        __config._storeObject(this, proto._$typeName, this.name);
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = "LocalQueryComparisonOptions";
-        
-    // 
-    /**
-    Case insensitive SQL compliant options - this is also the default unless otherwise changed.
-    @property caseInsensitiveSQL {LocalQueryComparisonOptions}
-    @static
-    **/
-    ctor.caseInsensitiveSQL = new ctor({
-        name: "caseInsensitiveSQL",
-        isCaseSensitive: false,
-        usesSql92CompliantStringComparison: true
-    });
+   @method <ctor> LocalQueryComparisonOptions
+   @param config {Object}
+   @param [config.name] {String}
+   @param [config.isCaseSensitive] {Boolean} Whether predicates that involve strings will be interpreted in a "caseSensitive" manner. Default is 'false'
+   @param [config.usesSql92CompliantStringComparison] {Boolean} Whether of not to enforce the ANSI SQL standard
+   of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and
+   inequality predicates, and not with operations like 'startsWith', 'endsWith' or 'contains'.  Default is true.
+   **/
 
-    /**
-    The default value whenever LocalQueryComparisonOptions are not specified. By default this is 'caseInsensitiveSQL'.
-    @property defaultInstance {LocalQueryComparisonOptions}
-    @static
-    **/
-    ctor.defaultInstance = new ctor(ctor.caseInsensitiveSQL);
+  var ctor = function (config) {
+    assertConfig(config || {})
+        .whereParam("name").isOptional().isString()
+        .whereParam("isCaseSensitive").isOptional().isBoolean()
+        .whereParam("usesSql92CompliantStringComparison").isBoolean()
+        .applyAll(this);
+    if (!this.name) {
+      this.name = __getUuid();
+    }
+    __config._storeObject(this, proto._$typeName, this.name);
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = "LocalQueryComparisonOptions";
 
-    /**
-    Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @example
-        var lqco = new LocalQueryComparisonOptions({
+  //
+  /**
+   Case insensitive SQL compliant options - this is also the default unless otherwise changed.
+   @property caseInsensitiveSQL {LocalQueryComparisonOptions}
+   @static
+   **/
+  ctor.caseInsensitiveSQL = new ctor({
+    name: "caseInsensitiveSQL",
+    isCaseSensitive: false,
+    usesSql92CompliantStringComparison: true
+  });
+
+  /**
+   The default value whenever LocalQueryComparisonOptions are not specified. By default this is 'caseInsensitiveSQL'.
+   @property defaultInstance {LocalQueryComparisonOptions}
+   @static
+   **/
+  ctor.defaultInstance = new ctor(ctor.caseInsensitiveSQL);
+
+  /**
+   Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @method setAsDefault
+   @example
+   var lqco = new LocalQueryComparisonOptions({
             isCaseSensitive: false;
             usesSql92CompliantStringComparison: true;
         });
-        lqco.setAsDefault();
-    @chainable
-    **/
-    proto.setAsDefault = function () {
-        return __setAsDefault(this, ctor);
-    };
+   lqco.setAsDefault();
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
 
 
-    return ctor;
+  return ctor;
 })();
-       
+
 breeze.LocalQueryComparisonOptions = LocalQueryComparisonOptions;
 
 
 ;/**
-@module breeze
-**/
-    
+ @module breeze
+ **/
+
 var NamingConvention = (function () {
-    /**
-    A NamingConvention instance is used to specify the naming conventions under which a MetadataStore 
-    will translate property names between the server and the javascript client. 
-    
-    The default NamingConvention does not perform any translation, it simply passes property names thru unchanged.
-    
-    @class NamingConvention
-    **/
-        
-    /**
-    NamingConvention constructor
+  /**
+   A NamingConvention instance is used to specify the naming conventions under which a MetadataStore
+   will translate property names between the server and the javascript client.
 
-    @example
-        // A naming convention that converts the first character of every property name to uppercase on the server
-        // and lowercase on the client.
-        var namingConv = new NamingConvention({
+   The default NamingConvention does not perform any translation, it simply passes property names thru unchanged.
+
+   @class NamingConvention
+   **/
+
+  /**
+   NamingConvention constructor
+
+   @example
+   // A naming convention that converts the first character of every property name to uppercase on the server
+   // and lowercase on the client.
+   var namingConv = new NamingConvention({
             serverPropertyNameToClient: function(serverPropertyName) {
                 return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
             },
@@ -9518,89 +9550,89 @@ var NamingConvention = (function () {
                 return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
             }            
         });
-    var ms = new MetadataStore({ namingConvention: namingConv });
-    var em = new EntityManager( { metadataStore: ms });
-    @method <ctor> NamingConvention
-    @param config {Object}
-    @param config.serverPropertyNameToClient {Function} Function that takes a server property name add converts it into a client side property name.  
-    @param config.clientPropertyNameToServer {Function} Function that takes a client property name add converts it into a server side property name.  
-    **/
-    var ctor = function(config) {
-        assertConfig(config || {})
-            .whereParam("name").isOptional().isString()
-            .whereParam("serverPropertyNameToClient").isFunction()
-            .whereParam("clientPropertyNameToServer").isFunction()
-            .applyAll(this);
-        if (!this.name) {
-            this.name = __getUuid();
-        }
-        __config._storeObject(this, proto._$typeName, this.name);
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = "NamingConvention";
-        
-    /**
-    The function used to convert server side property names to client side property names.
+   var ms = new MetadataStore({ namingConvention: namingConv });
+   var em = new EntityManager( { metadataStore: ms });
+   @method <ctor> NamingConvention
+   @param config {Object}
+   @param config.serverPropertyNameToClient {Function} Function that takes a server property name add converts it into a client side property name.
+   @param config.clientPropertyNameToServer {Function} Function that takes a client property name add converts it into a server side property name.
+   **/
+  var ctor = function (config) {
+    assertConfig(config || {})
+        .whereParam("name").isOptional().isString()
+        .whereParam("serverPropertyNameToClient").isFunction()
+        .whereParam("clientPropertyNameToServer").isFunction()
+        .applyAll(this);
+    if (!this.name) {
+      this.name = __getUuid();
+    }
+    __config._storeObject(this, proto._$typeName, this.name);
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = "NamingConvention";
 
-    @method serverPropertyNameToClient
-    @param serverPropertyName {String}
-    @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
-    @return {String} The client side property name.
-    **/
+  /**
+   The function used to convert server side property names to client side property names.
 
-    /**
-    The function used to convert client side property names to server side property names.
+   @method serverPropertyNameToClient
+   @param serverPropertyName {String}
+   @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
+   @return {String} The client side property name.
+   **/
 
-    @method clientPropertyNameToServer
-    @param clientPropertyName {String}
-    @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
-    @return {String} The server side property name.
-    **/
-        
-    /**
-    A noop naming convention - This is the default unless another is specified.
-    @property none {NamingConvention}
-    @static
-    **/
-    ctor.none = new ctor({
-        name: "noChange",
-        serverPropertyNameToClient: function(serverPropertyName) {
-            return serverPropertyName;
-        },
-        clientPropertyNameToServer: function(clientPropertyName) {
-            return clientPropertyName;
-        }
-    });
-        
-    /**
-    The "camelCase" naming convention - This implementation only lowercases the first character of the server property name
-    but leaves the rest of the property name intact.  If a more complicated version is needed then one should be created via the ctor.
-    @property camelCase {NamingConvention}
-    @static
-    **/
-    ctor.camelCase = new ctor({
-        name: "camelCase",
-        serverPropertyNameToClient: function (serverPropertyName) {
-            return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-        },
-        clientPropertyNameToServer: function (clientPropertyName) {
-            return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-        }
-    });
-        
-    /**
-    The default value whenever NamingConventions are not specified.
-    @property defaultInstance {NamingConvention}
-    @static
-    **/
-    ctor.defaultInstance = new ctor(ctor.none);
-        
-    /**
-    Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @example
-        var namingConv = new NamingConvention({
+  /**
+   The function used to convert client side property names to server side property names.
+
+   @method clientPropertyNameToServer
+   @param clientPropertyName {String}
+   @param [property] {DataProperty|NavigationProperty} The actual DataProperty or NavigationProperty corresponding to the property name.
+   @return {String} The server side property name.
+   **/
+
+  /**
+   A noop naming convention - This is the default unless another is specified.
+   @property none {NamingConvention}
+   @static
+   **/
+  ctor.none = new ctor({
+    name: "noChange",
+    serverPropertyNameToClient: function (serverPropertyName) {
+      return serverPropertyName;
+    },
+    clientPropertyNameToServer: function (clientPropertyName) {
+      return clientPropertyName;
+    }
+  });
+
+  /**
+   The "camelCase" naming convention - This implementation only lowercases the first character of the server property name
+   but leaves the rest of the property name intact.  If a more complicated version is needed then one should be created via the ctor.
+   @property camelCase {NamingConvention}
+   @static
+   **/
+  ctor.camelCase = new ctor({
+    name: "camelCase",
+    serverPropertyNameToClient: function (serverPropertyName) {
+      return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+    },
+    clientPropertyNameToServer: function (clientPropertyName) {
+      return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+    }
+  });
+
+  /**
+   The default value whenever NamingConventions are not specified.
+   @property defaultInstance {NamingConvention}
+   @static
+   **/
+  ctor.defaultInstance = new ctor(ctor.none);
+
+  /**
+   Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @method setAsDefault
+   @example
+   var namingConv = new NamingConvention({
             serverPropertyNameToClient: function(serverPropertyName) {
                 return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
             },
@@ -9608,16 +9640,16 @@ var NamingConvention = (function () {
                 return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
             }            
         });
-        namingConv.setAsDefault();
-    @chainable
-    **/
-    proto.setAsDefault = function () {
-        return __setAsDefault(this, ctor);
-    };
-        
-    return ctor;
+   namingConv.setAsDefault();
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
+
+  return ctor;
 })();
-    
+
 breeze.NamingConvention = NamingConvention;
 
 
@@ -9679,14 +9711,14 @@ breeze.NamingConvention = NamingConvention;
           throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
         }
         // add function to the Predicate or Expr node.
-        var fn = wrapValidation( visitor[key]);
+        var fn = wrapValidation(visitor[key]);
         proto[fnName] = fn;
       });
     };
 
     var _nodeMap = {};
 
-    ctor._registerProto = function(name, proto, validateFn) {
+    ctor._registerProto = function (name, proto, validateFn) {
       _nodeMap[name.toLowerCase()] = proto;
       // perf improvement so that we don't keep revalidating
       proto.validate = validateFn ? cacheValidation(validateFn) : __noop;
@@ -9708,9 +9740,9 @@ breeze.NamingConvention = NamingConvention;
       return new UnaryPredicate("not", this);
     };
 
-    proto.toString = function() {
+    proto.toString = function () {
       // this._entityType may be null
-      return JSON.stringify(this.toJSON( {entityType: this._entityType }));
+      return JSON.stringify(this.toJSON({entityType: this._entityType }));
     };
 
     proto._initialize = function (name, validateFn, map) {
@@ -9825,7 +9857,7 @@ breeze.NamingConvention = NamingConvention;
     }
 
     function cacheValidation(fn) {
-      return function(entityType) {
+      return function (entityType) {
         // don't both rerunning the validation if its already been run for this entityType
         // but always run it for a null or undefined type
         if (entityType && this._entityType === entityType) return;
@@ -10002,7 +10034,7 @@ breeze.NamingConvention = NamingConvention;
       if (DataType.contains(dataType)) {
         return dataType;
       }
-      if ( __isString(dataType)) {
+      if (__isString(dataType)) {
         var dt = DataType.fromName(dataType);
         if (dt) return dt;
         throw new Error("Unable to resolve a dataType named: " + dataType);
@@ -10127,7 +10159,7 @@ breeze.NamingConvention = NamingConvention;
   })();
 
   // toFunction visitor
-  Predicate.attachVisitor(function() {
+  Predicate.attachVisitor(function () {
     var visitor = {
       fnName: "toFunction",
 
@@ -10216,7 +10248,7 @@ breeze.NamingConvention = NamingConvention;
         }
       },
 
-      fnExpr:  function (config) {
+      fnExpr: function (config) {
         var that = this;
         return function (entity) {
           var values = that.exprArgs.map(function (expr) {
@@ -10314,7 +10346,6 @@ breeze.NamingConvention = NamingConvention;
     }
 
 
-
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
       if (typeof b !== 'string') {
@@ -10360,7 +10391,7 @@ breeze.NamingConvention = NamingConvention;
 
 
   // toJSON visitor
-  Predicate.attachVisitor(function() {
+  Predicate.attachVisitor(function () {
     var visitor = {
       fnName: "toJSON",
 
@@ -10452,7 +10483,6 @@ breeze.NamingConvention = NamingConvention;
   }());
 
 
-
   var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
   // comma delimited expressions ignoring commas inside of both single and double quotes.
   var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
@@ -10480,7 +10510,7 @@ breeze.NamingConvention = NamingConvention;
 
     // TODO: get rid of isAnonymous below when we get the chance.
     if (is2ndExpr && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source )
+      return new LitExpr(source)
     }
 
     var regex = /\([^()]*\)/;
@@ -11780,234 +11810,234 @@ breeze.EntityQuery = EntityQuery;
 breeze.OrderByClause = OrderByClause;
 
 ;/**
-@module breeze
-**/
-   
-var MergeStrategy = (function() {
-    /**
-    MergeStrategy is an 'Enum' that determines how entities are merged into an EntityManager.
-    
-    @class MergeStrategy
-    @static
-    **/ 
-    var MergeStrategy = new Enum("MergeStrategy");
-    /**
-    MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed 
-    state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
-    remain {{#crossLink "EntityState/Unchanged"}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will 
-    be that of the imported entities.
-    
-    @property PreserveChanges {MergeStrategy}
-    @final
-    @static
-    **/
-    MergeStrategy.PreserveChanges = MergeStrategy.addSymbol();
-    /**
-    MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
-    a changed state (added, modified, deleted). After the merge, the pending changes are lost. 
-    The new EntityState will be  {{#crossLink "EntityState/Unchanged"}}{{/crossLink}} unless you’re importing entities 
-    in which case the new EntityState will be that of the imported entities.   
-    
-    @property OverwriteChanges {MergeStrategy}
-    @final
-    @static
-    **/
-    MergeStrategy.OverwriteChanges = MergeStrategy.addSymbol();
+ @module breeze
+ **/
 
-    /**
-    SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key. 
-    This is the fastest merge strategy but your existing cached data will remain “stale”.
-  
-    @property SkipMerge {MergeStrategy}
-    @final
-    @static
-    **/
-    MergeStrategy.SkipMerge = MergeStrategy.addSymbol();
+var MergeStrategy = (function () {
+  /**
+   MergeStrategy is an 'Enum' that determines how entities are merged into an EntityManager.
 
-    /**
-    Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.  
-    Use this strategy when you want to be sure that the incoming entity is not already in cache. 
-    This is the default strategy for EntityManager.attachEntity.
-  
-    @property Disallowed {MergeStrategy}
-    @final
-    @static
-    **/
-    MergeStrategy.Disallowed = MergeStrategy.addSymbol();
-    MergeStrategy.resolveSymbols();
-    return MergeStrategy;
+   @class MergeStrategy
+   @static
+   **/
+  var MergeStrategy = new Enum("MergeStrategy");
+  /**
+   MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed
+   state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
+   remain {{#crossLink "EntityState/Unchanged"}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will
+   be that of the imported entities.
+
+   @property PreserveChanges {MergeStrategy}
+   @final
+   @static
+   **/
+  MergeStrategy.PreserveChanges = MergeStrategy.addSymbol();
+  /**
+   MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
+   a changed state (added, modified, deleted). After the merge, the pending changes are lost.
+   The new EntityState will be  {{#crossLink "EntityState/Unchanged"}}{{/crossLink}} unless you’re importing entities
+   in which case the new EntityState will be that of the imported entities.
+
+   @property OverwriteChanges {MergeStrategy}
+   @final
+   @static
+   **/
+  MergeStrategy.OverwriteChanges = MergeStrategy.addSymbol();
+
+  /**
+   SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key.
+   This is the fastest merge strategy but your existing cached data will remain “stale”.
+
+   @property SkipMerge {MergeStrategy}
+   @final
+   @static
+   **/
+  MergeStrategy.SkipMerge = MergeStrategy.addSymbol();
+
+  /**
+   Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.
+   Use this strategy when you want to be sure that the incoming entity is not already in cache.
+   This is the default strategy for EntityManager.attachEntity.
+
+   @property Disallowed {MergeStrategy}
+   @final
+   @static
+   **/
+  MergeStrategy.Disallowed = MergeStrategy.addSymbol();
+  MergeStrategy.resolveSymbols();
+  return MergeStrategy;
 })();
 
-var FetchStrategy = (function() {
-    /**
-    FetchStrategy is an 'Enum' that determines how and where entities are retrieved from as a result of a query.
-    
-    @class FetchStrategy
-    @static
-    **/
-    var FetchStrategy = new Enum("FetchStrategy");
-    /**
-    FromServer is used to tell the query to execute the query against a remote data source on the server.
-    @property FromServer {MergeStrategy}
-    @final
-    @static
-    **/
-    FetchStrategy.FromServer = FetchStrategy.addSymbol();
-    /**
-    FromLocalCache is used to tell the query to execute the query against a local EntityManager instead of going to a remote server.
-    @property FromLocalCache {MergeStrategy}
-    @final
-    @static
-    **/
-    FetchStrategy.FromLocalCache = FetchStrategy.addSymbol();
-    FetchStrategy.resolveSymbols();
-    return FetchStrategy;
+var FetchStrategy = (function () {
+  /**
+   FetchStrategy is an 'Enum' that determines how and where entities are retrieved from as a result of a query.
+
+   @class FetchStrategy
+   @static
+   **/
+  var FetchStrategy = new Enum("FetchStrategy");
+  /**
+   FromServer is used to tell the query to execute the query against a remote data source on the server.
+   @property FromServer {MergeStrategy}
+   @final
+   @static
+   **/
+  FetchStrategy.FromServer = FetchStrategy.addSymbol();
+  /**
+   FromLocalCache is used to tell the query to execute the query against a local EntityManager instead of going to a remote server.
+   @property FromLocalCache {MergeStrategy}
+   @final
+   @static
+   **/
+  FetchStrategy.FromLocalCache = FetchStrategy.addSymbol();
+  FetchStrategy.resolveSymbols();
+  return FetchStrategy;
 })();
 
 var QueryOptions = (function () {
-    /**
-    A QueryOptions instance is used to specify the 'options' under which a query will occur.
+  /**
+   A QueryOptions instance is used to specify the 'options' under which a query will occur.
 
-    @class QueryOptions
-    **/
-        
-    /**
-    QueryOptions constructor
-    @example
-        var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-        // assume em1 is a preexisting EntityManager
-        em1.setProperties( { queryOptions: newQo });
+   @class QueryOptions
+   **/
 
-    Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e. 
-    -  from query.queryOptions 
-    -  to   entityManager.queryOptions 
-    -  to   QueryOptions.defaultInstance;
+  /**
+   QueryOptions constructor
+   @example
+   var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+   // assume em1 is a preexisting EntityManager
+   em1.setProperties( { queryOptions: newQo });
 
-    @method <ctor> QueryOptions
-    @param [config] {Object}
-    @param [config.fetchStrategy] {FetchStrategy}  
-    @param [config.mergeStrategy] {MergeStrategy} 
-    @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default) 
-    **/
-    var ctor = function (config) {
-        updateWithConfig(this, config);
-    };
-    var proto = ctor.prototype;
-    proto._$typeName = "QueryOptions";
-    
-    /**
-    A {{#crossLink "FetchStrategy"}}{{/crossLink}}
-    __readOnly__
-    @property fetchStrategy {FetchStrategy}
-    **/
+   Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e.
+   -  from query.queryOptions
+   -  to   entityManager.queryOptions
+   -  to   QueryOptions.defaultInstance;
 
-    /**
-    A {{#crossLink "MergeStrategy"}}{{/crossLink}}
-    __readOnly__
-    @property mergeStrategy {MergeStrategy}
-    **/
+   @method <ctor> QueryOptions
+   @param [config] {Object}
+   @param [config.fetchStrategy] {FetchStrategy}
+   @param [config.mergeStrategy] {MergeStrategy}
+   @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default)
+   **/
+  var ctor = function (config) {
+    updateWithConfig(this, config);
+  };
+  var proto = ctor.prototype;
+  proto._$typeName = "QueryOptions";
 
-    /**
-    Whether to include cached deleted entities in a query result (false by default).
+  /**
+   A {{#crossLink "FetchStrategy"}}{{/crossLink}}
+   __readOnly__
+   @property fetchStrategy {FetchStrategy}
+   **/
 
-    __readOnly__
-    @property includeDeleted {Boolean}
-    **/
+  /**
+   A {{#crossLink "MergeStrategy"}}{{/crossLink}}
+   __readOnly__
+   @property mergeStrategy {MergeStrategy}
+   **/
 
-    ctor.resolve = function (queryOptionsArray) {
-        return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy", "includeDeleted"]));
-    };
-    
-    /**
-    The default value whenever QueryOptions are not specified.
-    @property defaultInstance {QueryOptions}
-    @static
-    **/
-    ctor.defaultInstance = new ctor({
-        fetchStrategy: FetchStrategy.FromServer,
-        mergeStrategy: MergeStrategy.PreserveChanges,
-        includeDeleted: false
-    });
+  /**
+   Whether to include cached deleted entities in a query result (false by default).
 
-    /**
-    Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}}, 
-    {{#crossLink "FetchStrategy"}}{{/crossLink}}, or 'includeDeleted' option applied.
-    @example
-        // Given an EntityManager instance, em
-        var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
-    or
-    @example
-        var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
-    or
-    @example
-        var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
-    or
-    @example
-        var queryOptions = em.queryOptions.using({ 
+   __readOnly__
+   @property includeDeleted {Boolean}
+   **/
+
+  ctor.resolve = function (queryOptionsArray) {
+    return new QueryOptions(__resolveProperties(queryOptionsArray, ["fetchStrategy", "mergeStrategy", "includeDeleted"]));
+  };
+
+  /**
+   The default value whenever QueryOptions are not specified.
+   @property defaultInstance {QueryOptions}
+   @static
+   **/
+  ctor.defaultInstance = new ctor({
+    fetchStrategy: FetchStrategy.FromServer,
+    mergeStrategy: MergeStrategy.PreserveChanges,
+    includeDeleted: false
+  });
+
+  /**
+   Returns a copy of this QueryOptions with the specified {{#crossLink "MergeStrategy"}}{{/crossLink}},
+   {{#crossLink "FetchStrategy"}}{{/crossLink}}, or 'includeDeleted' option applied.
+   @example
+   // Given an EntityManager instance, em
+   var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
+   or
+   @example
+   var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
+   or
+   @example
+   var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+   or
+   @example
+   var queryOptions = em.queryOptions.using({
                 includeDeleted: true,
                 fetchStrategy:  FetchStrategy.FromLocalCache 
             });
-    @method using
-    @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
-    @return {QueryOptions}
-    @chainable
-    **/
-    proto.using = function (config) {
-        if (!config) return this;
-        var result = new QueryOptions(this);
-        if (MergeStrategy.contains(config)) {
-            config = { mergeStrategy: config };
-        } else if (FetchStrategy.contains(config)) {
-            config = { fetchStrategy: config };
-        } 
-        return updateWithConfig(result, config);
-    };
-        
-    /**
-    Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @example
-        var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-        newQo.setAsDefault();
-    @chainable
-    **/
-    proto.setAsDefault = function() {
-        return __setAsDefault(this, ctor);
-    };
-
-    proto.toJSON = function () {
-        return __toJson(this, {
-            fetchStrategy: null,
-            mergeStrategy: null,
-            includeDeleted: false
-        });
-    };
-
-    ctor.fromJSON = function (json) {
-        return new QueryOptions({
-            fetchStrategy: FetchStrategy.fromName(json.fetchStrategy),
-            mergeStrategy: MergeStrategy.fromName(json.mergeStrategy),
-            includeDeleted: json.includeDeleted === true
-        });       
-    };
-        
-    function updateWithConfig( obj, config ) {
-        if (config) {
-            assertConfig(config)
-                .whereParam("fetchStrategy").isEnumOf(FetchStrategy).isOptional()
-                .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional()
-                .whereParam("includeDeleted").isBoolean().isOptional()
-                .applyAll(obj);
-        }
-        return obj;
+   @method using
+   @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
+   @return {QueryOptions}
+   @chainable
+   **/
+  proto.using = function (config) {
+    if (!config) return this;
+    var result = new QueryOptions(this);
+    if (MergeStrategy.contains(config)) {
+      config = { mergeStrategy: config };
+    } else if (FetchStrategy.contains(config)) {
+      config = { fetchStrategy: config };
     }
-       
-    return ctor;
+    return updateWithConfig(result, config);
+  };
+
+  /**
+   Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @method setAsDefault
+   @example
+   var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+   newQo.setAsDefault();
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
+
+  proto.toJSON = function () {
+    return __toJson(this, {
+      fetchStrategy: null,
+      mergeStrategy: null,
+      includeDeleted: false
+    });
+  };
+
+  ctor.fromJSON = function (json) {
+    return new QueryOptions({
+      fetchStrategy: FetchStrategy.fromName(json.fetchStrategy),
+      mergeStrategy: MergeStrategy.fromName(json.mergeStrategy),
+      includeDeleted: json.includeDeleted === true
+    });
+  };
+
+  function updateWithConfig(obj, config) {
+    if (config) {
+      assertConfig(config)
+          .whereParam("fetchStrategy").isEnumOf(FetchStrategy).isOptional()
+          .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional()
+          .whereParam("includeDeleted").isBoolean().isOptional()
+          .applyAll(obj);
+    }
+    return obj;
+  }
+
+  return ctor;
 })();
 
-breeze.QueryOptions= QueryOptions;
-breeze.FetchStrategy= FetchStrategy;
+breeze.QueryOptions = QueryOptions;
+breeze.FetchStrategy = FetchStrategy;
 breeze.MergeStrategy = MergeStrategy;
 
 
@@ -12054,14 +12084,14 @@ breeze.MergeStrategy = MergeStrategy;
     function toOrderByODataFragment(orderByClause) {
       if (!orderByClause) return;
       orderByClause.validate(entityType);
-        var strings = orderByClause.items.map(function (item) {
-          return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
-        });
-        // should return something like CompanyName,Address/City desc
-        return strings.join(',');
+      var strings = orderByClause.items.map(function (item) {
+        return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
+      });
+      // should return something like CompanyName,Address/City desc
+      return strings.join(',');
     };
 
-    function toSelectODataFragment(selectClause ) {
+    function toSelectODataFragment(selectClause) {
       if (!selectClause) return;
       selectClause.validate(entityType);
       var frag = selectClause.propertyPaths.map(function (pp) {
@@ -12074,7 +12104,7 @@ breeze.MergeStrategy = MergeStrategy;
       if (!expandClause) return;
       // no validate on expand clauses currently.
       // expandClause.validate(entityType);
-      var frag = expandClause.propertyPaths.map(function(pp) {
+      var frag = expandClause.propertyPaths.map(function (pp) {
         return entityType._clientPropertyPathToServer(pp);
       }).join(",");
       return frag;
@@ -12207,396 +12237,394 @@ breeze.MergeStrategy = MergeStrategy;
 
 
 ;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var EntityGroup = (function () {
 
-    var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
-        
-    var ctor = function (entityManager, entityType) {
-        this.entityManager = entityManager;
-        this.entityType = entityType;
-        // freeze the entityType after the first instance of this type is either created or queried. 
-        this.entityType.isFrozen = true;
-        this._indexMap = {};
-        this._entities = [];
-        this._emptyIndexes = [];
-    };
-    var proto = ctor.prototype;
+  var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
 
-    proto.attachEntity = function (entity, entityState, mergeStrategy) {
-        // entity should already have an aspect.
-        var aspect = entity.entityAspect;
+  var ctor = function (entityManager, entityType) {
+    this.entityManager = entityManager;
+    this.entityType = entityType;
+    // freeze the entityType after the first instance of this type is either created or queried.
+    this.entityType.isFrozen = true;
+    this._indexMap = {};
+    this._entities = [];
+    this._emptyIndexes = [];
+  };
+  var proto = ctor.prototype;
 
-        if (!aspect._initialized) {
-            this.entityType._initializeInstance(entity);
-        }
-        delete aspect._initialized;
+  proto.attachEntity = function (entity, entityState, mergeStrategy) {
+    // entity should already have an aspect.
+    var aspect = entity.entityAspect;
 
-        var keyInGroup = aspect.getKey()._keyInGroup;
-        var ix = this._indexMap[keyInGroup];
-        if (ix >= 0) {
-            var targetEntity = this._entities[ix];
-            var targetEntityState = targetEntity.entityAspect.entityState;
-            var wasUnchanged = targetEntityState.isUnchanged();
-            if (targetEntity === entity) {
-                aspect.entityState = entityState;
-            } else if (mergeStrategy === MergeStrategy.Disallowed) {
-                throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
-            } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
-                // unwrapInstance returns an entity with server side property names - so we need to use DataProperty.getRawValueFromServer these when we apply
-                // the property values back to the target.
-                var rawServerEntity = this.entityManager.helper.unwrapInstance(entity);
-                this.entityType._updateTargetFromRaw(targetEntity, rawServerEntity, DataProperty.getRawValueFromServer);
-                targetEntity.entityAspect.setEntityState(entityState);
-            }
-            return targetEntity;
-        } else {
-            if (this._emptyIndexes.length === 0) {
-                ix = this._entities.push(entity) - 1;
-            } else {
-                ix = this._emptyIndexes.pop();
-                this._entities[ix] = entity;
-            }
-            this._indexMap[keyInGroup] = ix;
-            aspect.entityState = entityState;
-            aspect.entityGroup = this;
-            aspect.entityManager = this.entityManager;
-            return entity;
-        }
-    };
-
-    proto.detachEntity = function (entity) {
-        // by this point we have already determined that this entity 
-        // belongs to this group.
-        var aspect = entity.entityAspect;
-        var keyInGroup = aspect.getKey()._keyInGroup;
-        var ix = this._indexMap[keyInGroup];
-        if (ix === undefined) {
-            // shouldn't happen.
-            throw new Error("internal error - entity cannot be found in group");
-        }
-        delete this._indexMap[keyInGroup];
-        this._emptyIndexes.push(ix);
-        this._entities[ix] = null;
-        return entity;
-    };
-        
-
-
-    // returns entity based on an entity key defined either as an array of key values or an EntityKey
-    proto.findEntityByKey = function (entityKey) {
-        var keyInGroup;
-        if (entityKey instanceof EntityKey) {
-            keyInGroup = entityKey._keyInGroup;
-        } else {
-            keyInGroup = EntityKey.createKeyString(entityKey);
-        }
-        var ix = this._indexMap[keyInGroup];
-        // can't use just (ix) below because 0 is valid
-        return (ix !== undefined) ? this._entities[ix] : null;
-    };
-
-    proto.hasChanges = function() {
-        return this._entities.some(__changedFilter);
-    };
-
-    proto.getEntities = function (entityStates) {
-        var filter = getFilter(entityStates);
-        return this._entities.filter(filter);
-    };
-        
-    // do not expose this method. It is doing a special purpose INCOMPLETE fast detach operation
-    // just for the entityManager clear method - the entityGroup will be in an inconsistent state
-    // after this op, which is ok because it will be thrown away.
-    proto._clear = function() {
-        this._entities.forEach(function (entity) {
-            if (entity != null) {
-                entity.entityAspect._detach();
-            }
-        });
-        this._entities = null;
-        this._indexMap = null;
-        this._emptyIndexes = null;
-    };
-
-    proto._updateFkVal = function (fkProp, oldValue, newValue) {
-        var fkPropName = fkProp.name;
-        this._entities.forEach(function (entity) {
-            if (entity != null) {
-                if (entity.getProperty(fkPropName) == oldValue) {
-                    entity.setProperty(fkPropName, newValue);
-                }
-            }
-        });
+    if (!aspect._initialized) {
+      this.entityType._initializeInstance(entity);
     }
+    delete aspect._initialized;
 
-    proto._fixupKey = function (tempValue, realValue) {
-        // single part keys appear directly in map
-        var ix = this._indexMap[tempValue];
-        if (ix === undefined) {
-            throw new Error("Internal Error in key fixup - unable to locate entity");
-        }
-        var entity = this._entities[ix];
-        var keyPropName = entity.entityType.keyProperties[0].name;
-        // fks on related entities will automatically get updated by this as well
-        entity.setProperty(keyPropName, realValue);
-        delete entity.entityAspect.hasTempKey;
-        delete this._indexMap[tempValue];
-        this._indexMap[realValue] = ix;
-    };
-
-    proto._replaceKey = function(oldKey, newKey) {
-        var ix = this._indexMap[oldKey._keyInGroup];
-        delete this._indexMap[oldKey._keyInGroup];
-        this._indexMap[newKey._keyInGroup] = ix;
-    };
-        
-    function getFilter(entityStates) {
-        if (!entityStates) {
-            return function (e) {
-                return !!e;
-            };
-        } else if (entityStates.length === 1) {
-            var entityState = entityStates[0];
-            return function (e) {
-                if (!e) return false;
-                return e.entityAspect.entityState === entityState;
-            };
-        } else {
-            return function (e) {
-                if (!e) return false;
-                return entityStates.some(function (es) {
-                    return e.entityAspect.entityState === es;
-                });
-            };
-        }
+    var keyInGroup = aspect.getKey()._keyInGroup;
+    var ix = this._indexMap[keyInGroup];
+    if (ix >= 0) {
+      var targetEntity = this._entities[ix];
+      var targetEntityState = targetEntity.entityAspect.entityState;
+      var wasUnchanged = targetEntityState.isUnchanged();
+      if (targetEntity === entity) {
+        aspect.entityState = entityState;
+      } else if (mergeStrategy === MergeStrategy.Disallowed) {
+        throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
+      } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
+        // unwrapInstance returns an entity with server side property names - so we need to use DataProperty.getRawValueFromServer these when we apply
+        // the property values back to the target.
+        var rawServerEntity = this.entityManager.helper.unwrapInstance(entity);
+        this.entityType._updateTargetFromRaw(targetEntity, rawServerEntity, DataProperty.getRawValueFromServer);
+        targetEntity.entityAspect.setEntityState(entityState);
+      }
+      return targetEntity;
+    } else {
+      if (this._emptyIndexes.length === 0) {
+        ix = this._entities.push(entity) - 1;
+      } else {
+        ix = this._emptyIndexes.pop();
+        this._entities[ix] = entity;
+      }
+      this._indexMap[keyInGroup] = ix;
+      aspect.entityState = entityState;
+      aspect.entityGroup = this;
+      aspect.entityManager = this.entityManager;
+      return entity;
     }
+  };
 
-    return ctor;
+  proto.detachEntity = function (entity) {
+    // by this point we have already determined that this entity
+    // belongs to this group.
+    var aspect = entity.entityAspect;
+    var keyInGroup = aspect.getKey()._keyInGroup;
+    var ix = this._indexMap[keyInGroup];
+    if (ix === undefined) {
+      // shouldn't happen.
+      throw new Error("internal error - entity cannot be found in group");
+    }
+    delete this._indexMap[keyInGroup];
+    this._emptyIndexes.push(ix);
+    this._entities[ix] = null;
+    return entity;
+  };
+
+
+  // returns entity based on an entity key defined either as an array of key values or an EntityKey
+  proto.findEntityByKey = function (entityKey) {
+    var keyInGroup;
+    if (entityKey instanceof EntityKey) {
+      keyInGroup = entityKey._keyInGroup;
+    } else {
+      keyInGroup = EntityKey.createKeyString(entityKey);
+    }
+    var ix = this._indexMap[keyInGroup];
+    // can't use just (ix) below because 0 is valid
+    return (ix !== undefined) ? this._entities[ix] : null;
+  };
+
+  proto.hasChanges = function () {
+    return this._entities.some(__changedFilter);
+  };
+
+  proto.getEntities = function (entityStates) {
+    var filter = getFilter(entityStates);
+    return this._entities.filter(filter);
+  };
+
+  // do not expose this method. It is doing a special purpose INCOMPLETE fast detach operation
+  // just for the entityManager clear method - the entityGroup will be in an inconsistent state
+  // after this op, which is ok because it will be thrown away.
+  proto._clear = function () {
+    this._entities.forEach(function (entity) {
+      if (entity != null) {
+        entity.entityAspect._detach();
+      }
+    });
+    this._entities = null;
+    this._indexMap = null;
+    this._emptyIndexes = null;
+  };
+
+  proto._updateFkVal = function (fkProp, oldValue, newValue) {
+    var fkPropName = fkProp.name;
+    this._entities.forEach(function (entity) {
+      if (entity != null) {
+        if (entity.getProperty(fkPropName) == oldValue) {
+          entity.setProperty(fkPropName, newValue);
+        }
+      }
+    });
+  }
+
+  proto._fixupKey = function (tempValue, realValue) {
+    // single part keys appear directly in map
+    var ix = this._indexMap[tempValue];
+    if (ix === undefined) {
+      throw new Error("Internal Error in key fixup - unable to locate entity");
+    }
+    var entity = this._entities[ix];
+    var keyPropName = entity.entityType.keyProperties[0].name;
+    // fks on related entities will automatically get updated by this as well
+    entity.setProperty(keyPropName, realValue);
+    delete entity.entityAspect.hasTempKey;
+    delete this._indexMap[tempValue];
+    this._indexMap[realValue] = ix;
+  };
+
+  proto._replaceKey = function (oldKey, newKey) {
+    var ix = this._indexMap[oldKey._keyInGroup];
+    delete this._indexMap[oldKey._keyInGroup];
+    this._indexMap[newKey._keyInGroup] = ix;
+  };
+
+  function getFilter(entityStates) {
+    if (!entityStates) {
+      return function (e) {
+        return !!e;
+      };
+    } else if (entityStates.length === 1) {
+      var entityState = entityStates[0];
+      return function (e) {
+        if (!e) return false;
+        return e.entityAspect.entityState === entityState;
+      };
+    } else {
+      return function (e) {
+        if (!e) return false;
+        return entityStates.some(function (es) {
+          return e.entityAspect.entityState === es;
+        });
+      };
+    }
+  }
+
+  return ctor;
 
 })();
-   
+
 // do not expose EntityGroup - internal only
 
 
 ;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 var EntityManager = (function () {
-    /**
-    Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client. 
-    @class EntityManager
-    **/
-        
-    /** 
-    @example                    
-    At its most basic an EntityManager can be constructed with just a service name
-    @example                    
-        var entityManager = new EntityManager( "breeze/NorthwindIBModel");
-    This is the same as calling it with the following configuration object
-    @example                    
-        var entityManager = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-    Usually however, configuration objects will contain more than just the 'serviceName';
-    @example
-        var metadataStore = new MetadataStore();
-        var entityManager = new EntityManager( {
+  /**
+   Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client.
+   @class EntityManager
+   **/
+
+  /**
+   @example
+   At its most basic an EntityManager can be constructed with just a service name
+   @example
+   var entityManager = new EntityManager( "breeze/NorthwindIBModel");
+   This is the same as calling it with the following configuration object
+   @example
+   var entityManager = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+   Usually however, configuration objects will contain more than just the 'serviceName';
+   @example
+   var metadataStore = new MetadataStore();
+   var entityManager = new EntityManager( {
             serviceName: "breeze/NorthwindIBModel", 
             metadataStore: metadataStore 
         });
-    or
-    @example
-        return new QueryOptions({ 
+   or
+   @example
+   return new QueryOptions({
             mergeStrategy: obj, 
             fetchStrategy: this.fetchStrategy 
         });u
-        var queryOptions = new QueryOptions({ 
+   var queryOptions = new QueryOptions({
             mergeStrategy: MergeStrategy.OverwriteChanges, 
             fetchStrategy: FetchStrategy.FromServer 
         });
-        var validationOptions = new ValidationOptions({ 
+   var validationOptions = new ValidationOptions({
             validateOnAttach: true, 
             validateOnSave: true, 
             validateOnQuery: false
         });
-        var entityManager = new EntityManager({ 
+   var entityManager = new EntityManager({
             serviceName: "breeze/NorthwindIBModel", 
             queryOptions: queryOptions, 
             validationOptions: validationOptions 
         });
-    @method <ctor> EntityManager
-    @param [config] {Object|String} Configuration settings or a service name.
-    @param [config.serviceName] {String}
-    @param [config.dataService] {DataService} An entire DataService (instead of just the serviceName above).
-    @param [config.metadataStore=MetadataStore.defaultInstance] {MetadataStore}
-    @param [config.queryOptions] {QueryOptions}
-    @param [config.saveOptions] {SaveOptions}
-    @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
-    @param [config.keyGeneratorCtor] {Function}
-    **/
-    var ctor = function(config) {
+   @method <ctor> EntityManager
+   @param [config] {Object|String} Configuration settings or a service name.
+   @param [config.serviceName] {String}
+   @param [config.dataService] {DataService} An entire DataService (instead of just the serviceName above).
+   @param [config.metadataStore=MetadataStore.defaultInstance] {MetadataStore}
+   @param [config.queryOptions] {QueryOptions}
+   @param [config.saveOptions] {SaveOptions}
+   @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
+   @param [config.keyGeneratorCtor] {Function}
+   **/
+  var ctor = function (config) {
 
-        if (arguments.length > 1) {
-            throw new Error("The EntityManager ctor has a single optional argument that is either a 'serviceName' or a configuration object.");
-        }
-        if (arguments.length === 0) {
-            config = { serviceName: "" };
-        } else if (typeof config === 'string') {
-            config = { serviceName: config };
-        }
+    if (arguments.length > 1) {
+      throw new Error("The EntityManager ctor has a single optional argument that is either a 'serviceName' or a configuration object.");
+    }
+    if (arguments.length === 0) {
+      config = { serviceName: "" };
+    } else if (typeof config === 'string') {
+      config = { serviceName: config };
+    }
 
-        updateWithConfig(this, config, true);
+    updateWithConfig(this, config, true);
 
-        this.entityChanged = new Event("entityChanged", this);
-        this.validationErrorsChanged = new Event("validationErrorsChanged", this);
-        this.hasChangesChanged = new Event("hasChangesChanged", this);
-            
-        this.clear();
-            
-    };
+    this.entityChanged = new Event("entityChanged", this);
+    this.validationErrorsChanged = new Event("validationErrorsChanged", this);
+    this.hasChangesChanged = new Event("hasChangesChanged", this);
 
-    var proto = ctor.prototype;
-    proto._$typeName = "EntityManager";
-    Event.bubbleEvent(proto, null);
-    
-    /**
-    General purpose property set method.  Any of the properties documented below 
-    may be set.
-    @example
-            // assume em1 is a previously created EntityManager
-            // where we want to change some of its settings.
-            em1.setProperties( {
+    this.clear();
+
+  };
+
+  var proto = ctor.prototype;
+  proto._$typeName = "EntityManager";
+  Event.bubbleEvent(proto, null);
+
+  /**
+   General purpose property set method.  Any of the properties documented below
+   may be set.
+   @example
+   // assume em1 is a previously created EntityManager
+   // where we want to change some of its settings.
+   em1.setProperties( {
                 serviceName: "breeze/foo"
             });
-    @method setProperties
-    @param config {Object}
-        @param [config.serviceName] {String}
-        @param [config.dataService] {DataService}
-        @param [config.queryOptions] {QueryOptions}
-        @param [config.saveOptions] {SaveOptions}
-        @param [config.validationOptions] {ValidationOptions}
-        @param [config.keyGeneratorCtor] {Function}
-    **/
-    proto.setProperties = function (config) {
-        updateWithConfig(this, config, false);
-    };
-    
-    function updateWithConfig(em, config, isCtor) {
-        var defaultQueryOptions = isCtor ? QueryOptions.defaultInstance : em.queryOptions;
-        var defaultSaveOptions = isCtor ? SaveOptions.defaultInstance : em.saveOptions;
-        var defaultValidationOptions = isCtor ? ValidationOptions.defaultInstance : em.validationOptions;
-        
+   @method setProperties
+   @param config {Object}
+   @param [config.serviceName] {String}
+   @param [config.dataService] {DataService}
+   @param [config.queryOptions] {QueryOptions}
+   @param [config.saveOptions] {SaveOptions}
+   @param [config.validationOptions] {ValidationOptions}
+   @param [config.keyGeneratorCtor] {Function}
+   **/
+  proto.setProperties = function (config) {
+    updateWithConfig(this, config, false);
+  };
 
-        var configParam = assertConfig(config)
-            .whereParam("serviceName").isOptional().isString()
-            .whereParam("dataService").isOptional().isInstanceOf(DataService)
-            .whereParam("queryOptions").isInstanceOf(QueryOptions).isOptional().withDefault(defaultQueryOptions)
-            .whereParam("saveOptions").isInstanceOf(SaveOptions).isOptional().withDefault(defaultSaveOptions)
-            .whereParam("validationOptions").isInstanceOf(ValidationOptions).isOptional().withDefault(defaultValidationOptions)
-            .whereParam("keyGeneratorCtor").isFunction().isOptional();
-        if (isCtor) {
-            configParam = configParam
-                .whereParam("metadataStore").isInstanceOf(MetadataStore).isOptional().withDefault(new MetadataStore());
-        } 
-        configParam.applyAll(em);
-        
-        
-        // insure that entityManager's options versions are completely populated
-        __updateWithDefaults(em.queryOptions, defaultQueryOptions);
-        __updateWithDefaults(em.saveOptions, defaultSaveOptions);
-        __updateWithDefaults(em.validationOptions, defaultValidationOptions);
+  function updateWithConfig(em, config, isCtor) {
+    var defaultQueryOptions = isCtor ? QueryOptions.defaultInstance : em.queryOptions;
+    var defaultSaveOptions = isCtor ? SaveOptions.defaultInstance : em.saveOptions;
+    var defaultValidationOptions = isCtor ? ValidationOptions.defaultInstance : em.validationOptions;
 
-        if (config.serviceName) {
-            em.dataService = new DataService({
-                serviceName: em.serviceName
-            });
-        }
-        em.serviceName = em.dataService && em.dataService.serviceName;
 
-        em.keyGeneratorCtor = em.keyGeneratorCtor || KeyGenerator;
-        if (isCtor || config.keyGeneratorCtor) {
-            em.keyGenerator = new em.keyGeneratorCtor();
-        } 
+    var configParam = assertConfig(config)
+        .whereParam("serviceName").isOptional().isString()
+        .whereParam("dataService").isOptional().isInstanceOf(DataService)
+        .whereParam("queryOptions").isInstanceOf(QueryOptions).isOptional().withDefault(defaultQueryOptions)
+        .whereParam("saveOptions").isInstanceOf(SaveOptions).isOptional().withDefault(defaultSaveOptions)
+        .whereParam("validationOptions").isInstanceOf(ValidationOptions).isOptional().withDefault(defaultValidationOptions)
+        .whereParam("keyGeneratorCtor").isFunction().isOptional();
+    if (isCtor) {
+      configParam = configParam
+          .whereParam("metadataStore").isInstanceOf(MetadataStore).isOptional().withDefault(new MetadataStore());
     }
-        
-    /**
-    The service name associated with this EntityManager.
+    configParam.applyAll(em);
 
-    __readOnly__
-    @property serviceName {String}
-    **/
-        
-    /**
-    The DataService name associated with this EntityManager.
 
-    __readOnly__
-    @property dataService {DataService}
-    **/
+    // insure that entityManager's options versions are completely populated
+    __updateWithDefaults(em.queryOptions, defaultQueryOptions);
+    __updateWithDefaults(em.saveOptions, defaultSaveOptions);
+    __updateWithDefaults(em.validationOptions, defaultValidationOptions);
 
-    /**
-    The {{#crossLink "MetadataStore"}}{{/crossLink}} associated with this EntityManager. 
+    if (config.serviceName) {
+      em.dataService = new DataService({
+        serviceName: em.serviceName
+      });
+    }
+    em.serviceName = em.dataService && em.dataService.serviceName;
 
-        __readOnly__         
-    @property metadataStore {MetadataStore}
-    **/
+    em.keyGeneratorCtor = em.keyGeneratorCtor || KeyGenerator;
+    if (isCtor || config.keyGeneratorCtor) {
+      em.keyGenerator = new em.keyGeneratorCtor();
+    }
+  }
 
-    /**
-    The {{#crossLink "QueryOptions"}}{{/crossLink}} associated with this EntityManager.
+  /**
+   The service name associated with this EntityManager.
 
-    __readOnly__
-    @property queryOptions {QueryOptions}
-    **/
+   __readOnly__
+   @property serviceName {String}
+   **/
 
-    /**
-    The {{#crossLink "SaveOptions"}}{{/crossLink}} associated with this EntityManager.
+  /**
+   The DataService name associated with this EntityManager.
 
-    __readOnly__
-    @property saveOptions {SaveOptions}
-    **/
+   __readOnly__
+   @property dataService {DataService}
+   **/
 
-    /**
-    The {{#crossLink "ValidationOptions"}}{{/crossLink}} associated with this EntityManager.
+  /**
+   The {{#crossLink "MetadataStore"}}{{/crossLink}} associated with this EntityManager.
 
-    __readOnly__
-    @property validationOptions {ValidationOptions}
-    **/
+   __readOnly__
+   @property metadataStore {MetadataStore}
+   **/
 
-    /**
-    The {{#crossLink "KeyGenerator"}}{{/crossLink}} constructor associated with this EntityManager.
+  /**
+   The {{#crossLink "QueryOptions"}}{{/crossLink}} associated with this EntityManager.
 
-    __readOnly__
-    @property keyGeneratorCtor {KeyGenerator constructor}
-    **/
+   __readOnly__
+   @property queryOptions {QueryOptions}
+   **/
 
-       
-       
-    // events
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a change to any entity in this EntityManager occurs.
-    @example                    
-        var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-        em.entityChanged.subscribe(function(changeArgs) {
+  /**
+   The {{#crossLink "SaveOptions"}}{{/crossLink}} associated with this EntityManager.
+
+   __readOnly__
+   @property saveOptions {SaveOptions}
+   **/
+
+  /**
+   The {{#crossLink "ValidationOptions"}}{{/crossLink}} associated with this EntityManager.
+
+   __readOnly__
+   @property validationOptions {ValidationOptions}
+   **/
+
+  /**
+   The {{#crossLink "KeyGenerator"}}{{/crossLink}} constructor associated with this EntityManager.
+
+   __readOnly__
+   @property keyGeneratorCtor {KeyGenerator constructor}
+   **/
+
+
+  // events
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a change to any entity in this EntityManager occurs.
+   @example
+   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+   em.entityChanged.subscribe(function(changeArgs) {
             // This code will be executed any time any entity within the entityManager is added, modified, deleted or detached for any reason. 
             var action = changeArgs.entityAction;
             var entity = changeArgs.entity;
             // .. do something to this entity when it is changed.
         });
-    });
-        
-    @event entityChanged 
-    @param entityAction {EntityAction} The {{#crossLink "EntityAction"}}{{/crossLink}} that occured. 
-    @param entity {Object} The entity that changed.  If this is null, then all entities in the entityManager were affected. 
-    @param args {Object} Additional information about this event. This will differ based on the entityAction.
-    @readOnly
-    **/
+   });
 
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever validationErrors change for any entity in this EntityManager.
-    @example                    
-        var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-        em.validationErrorsChanged.subscribe(function(changeArgs) {
+   @event entityChanged
+   @param entityAction {EntityAction} The {{#crossLink "EntityAction"}}{{/crossLink}} that occured.
+   @param entity {Object} The entity that changed.  If this is null, then all entities in the entityManager were affected.
+   @param args {Object} Additional information about this event. This will differ based on the entityAction.
+   @readOnly
+   **/
+
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever validationErrors change for any entity in this EntityManager.
+   @example
+   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+   em.validationErrorsChanged.subscribe(function(changeArgs) {
             // This code will be executed any time any entity within the entityManager experiences a change to its validationErrors collection. 
             function (validationChangeArgs) {
                 var entity == validationChangeArgs.entity; 
@@ -12605,1037 +12633,1041 @@ var EntityManager = (function () {
                 // ... do something interesting with the order.
             });
         });
+   });
+   @event validationErrorsChanged
+   @param entity {Entity} The entity on which the validation errors have been added or removed.
+   @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
+   @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
+   errors that have been 'fixed'
+   @readOnly
+   **/
+
+  // class methods
+
+  /**
+   Creates a new entity of a specified type and optionally initializes it. By default the new entity is created with an EntityState of Added
+   but you can also optionally specify an EntityState.  An EntityState of 'Detached' will insure that the entity is created but not yet added
+   to the EntityManager.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   // create and add an entity;
+   var emp1 = em1.createEntity("Employee");
+   // create and add an initialized entity;
+   var emp2 = em1.createEntity("Employee", { lastName: Smith", firstName: "John" });
+   // create and attach (not add) an initialized entity
+   var emp3 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Unchanged);
+   // create but don't attach an entity;
+   var emp4 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Detached);
+
+   @method createEntity
+   @param entityType {String|EntityType} The EntityType or the name of the type for which an instance should be created.
+   @param [initialValues=null] {Config object} - Configuration object of the properties to set immediately after creation.
+   @param [entityState=EntityState.Added] {EntityState} - The EntityState of the entity after being created and added to this EntityManager.
+   @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} - How to handle conflicts if an entity with the same key already exists within this EntityManager.
+   @return {Entity} A new Entity of the specified type.
+   **/
+  proto.createEntity = function (entityType, initialValues, entityState, mergeStrategy) {
+    assertParam(entityType, "entityType").isString().or().isInstanceOf(EntityType).check();
+    assertParam(entityState, "entityState").isEnumOf(EntityState).isOptional().check();
+    assertParam(mergeStrategy, "mergeStrategy").isEnumOf(MergeStrategy).isOptional().check();
+    if (typeof entityType === "string") {
+      entityType = this.metadataStore._getEntityType(entityType);
+    }
+    entityState = entityState || EntityState.Added;
+    var entity;
+    __using(this, "isLoading", true, function () {
+      entity = entityType.createEntity(initialValues);
     });
-    @event validationErrorsChanged 
-    @param entity {Entity} The entity on which the validation errors have been added or removed.
-    @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
-    @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
-    errors that have been 'fixed'
-    @readOnly
-    **/
+    if (entityState !== EntityState.Detached) {
+      entity = this.attachEntity(entity, entityState, mergeStrategy);
+    }
+    return entity;
+  };
 
-    // class methods 
-          
-    /**
-    Creates a new entity of a specified type and optionally initializes it. By default the new entity is created with an EntityState of Added
-    but you can also optionally specify an EntityState.  An EntityState of 'Detached' will insure that the entity is created but not yet added 
-    to the EntityManager.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities.
-        // create and add an entity;
-        var emp1 = em1.createEntity("Employee");
-        // create and add an initialized entity;
-        var emp2 = em1.createEntity("Employee", { lastName: Smith", firstName: "John" });
-        // create and attach (not add) an initialized entity
-        var emp3 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Unchanged);
-        // create but don't attach an entity;
-        var emp4 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Detached);
 
-    @method createEntity
-    @param entityType {String|EntityType} The EntityType or the name of the type for which an instance should be created.
-    @param [initialValues=null] {Config object} - Configuration object of the properties to set immediately after creation.
-    @param [entityState=EntityState.Added] {EntityState} - The EntityState of the entity after being created and added to this EntityManager.
-    @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} - How to handle conflicts if an entity with the same key already exists within this EntityManager.
-    @return {Entity} A new Entity of the specified type.
-    **/
-    proto.createEntity = function (entityType, initialValues, entityState, mergeStrategy) {
-        assertParam(entityType, "entityType").isString().or().isInstanceOf(EntityType).check();
-        assertParam(entityState, "entityState").isEnumOf(EntityState).isOptional().check();
-        assertParam(mergeStrategy, "mergeStrategy").isEnumOf(MergeStrategy).isOptional().check();
-        if (typeof entityType === "string") {
-            entityType = this.metadataStore._getEntityType(entityType);
-        }
-        entityState = entityState || EntityState.Added;
-        var entity;
-        __using(this, "isLoading", true, function () {
-            entity = entityType.createEntity(initialValues);
+  /**
+   Creates a new EntityManager and imports a previously exported result into it.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var bundle = em1.exportEntities();
+   // can be stored via the web storage api
+   window.localStorage.setItem("myEntityManager", bundle);
+   // assume the code below occurs in a different session.
+   var bundleFromStorage = window.localStorage.getItem("myEntityManager");
+   // and imported
+   var em2 = EntityManager.importEntities(bundleFromStorage);
+   // em2 will now have a complete copy of what was in em1
+   @method importEntities
+   @static
+   @param exportedString {String} The result of a previous 'exportEntities' call.
+   @param [config] {Object} A configuration object.
+   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
+   merging into an existing EntityManager.
+   @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+   and may be used to perform version checking.
+   @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that
+   provided by the same named method on an EntityManager instance. Use that method if you need additional information
+   regarding the imported entities.
+   **/
+  ctor.importEntities = function (exportedString, config) {
+    var em = new EntityManager();
+    em.importEntities(exportedString, config);
+    return em;
+  };
+
+  // instance methods
+
+  /**
+   Calls EntityAspect.acceptChanges on every changed entity in this EntityManager.
+   @method acceptChanges
+   **/
+  proto.acceptChanges = function () {
+    this.getChanges().forEach(function (entity) {
+      entity.entityAspect.acceptChanges();
+    });
+  }
+
+  /**
+   Exports an entire EntityManager or just selected entities into a serialized string for external storage.
+   @example
+   This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
+   memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var bundle = em1.exportEntities();
+   // can be stored via the web storage api
+   window.localStorage.setItem("myEntityManager", bundle);
+   // assume the code below occurs in a different session.
+   var bundleFromStorage = window.localStorage.getItem("myEntityManager");
+   var em2 = new EntityManager({
+            serviceName: em1.serviceName, 
+            metadataStore: em1.metadataStore 
         });
-        if (entityState !== EntityState.Detached) {
-            entity = this.attachEntity(entity, entityState, mergeStrategy);
-        }
-        return entity;
-    };
+   em2.importEntities(bundleFromStorage);
+   // em2 will now have a complete copy of what was in em1
+   You can also control exactly which entities are exported.
+   @example
+   // assume entitiesToExport is an array of entities to export.
+   var bundle = em1.exportEntities(entitiesToExport);
+   // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+   em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+   @method exportEntities
+   @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
+   @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
 
-   
+   @return {String} A serialized version of the exported data.
+   **/
+  proto.exportEntities = function (entities, includeMetadata) {
+    assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
+    includeMetadata = (includeMetadata == null) ? true : includeMetadata;
 
-    /**
-    Creates a new EntityManager and imports a previously exported result into it.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities.
-        var bundle = em1.exportEntities();
-        // can be stored via the web storage api
-        window.localStorage.setItem("myEntityManager", bundle);
-        // assume the code below occurs in a different session.
-        var bundleFromStorage = window.localStorage.getItem("myEntityManager");
-        // and imported
-        var em2 = EntityManager.importEntities(bundleFromStorage);
-        // em2 will now have a complete copy of what was in em1
-    @method importEntities
-    @static
-    @param exportedString {String} The result of a previous 'exportEntities' call.
-    @param [config] {Object} A configuration object.
-    @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when 
-    merging into an existing EntityManager.
-    @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'} 
-        and may be used to perform version checking.
-    @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that 
-    provided by the same named method on an EntityManager instance. Use that method if you need additional information
-    regarding the imported entities.
-    **/
-    ctor.importEntities = function (exportedString, config) {
-        var em = new EntityManager();
-        em.importEntities(exportedString, config);
-        return em;
-    };
+    var exportBundle = exportEntityGroups(this, entities);
+    var json = __extend({}, exportBundle, ["tempKeys", "entityGroupMap"]);
 
-    // instance methods
-
-    /**
-    Calls EntityAspect.acceptChanges on every changed entity in this EntityManager. 
-    @method acceptChanges
-    **/
-    proto.acceptChanges = function () {
-        this.getChanges().forEach(function(entity) { entity.entityAspect.acceptChanges(); });
+    if (includeMetadata) {
+      json = __extend(json, this, ["dataService", "saveOptions", "queryOptions", "validationOptions"]);
+      json.metadataStore = this.metadataStore.exportMetadata();
+    } else {
+      json.metadataVersion = breeze.metadataVersion;
+      json.metadataStoreName = this.metadataStore.name;
     }
 
-    /**
-    Exports an entire EntityManager or just selected entities into a serialized string for external storage.
-    @example
-    This method can be used to take a snapshot of an EntityManager that can be either stored offline or held 
-    memory.  This snapshot can be restored or merged into an another EntityManager at some later date. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var bundle = em1.exportEntities();
-        // can be stored via the web storage api
-        window.localStorage.setItem("myEntityManager", bundle);
-        // assume the code below occurs in a different session.
-        var bundleFromStorage = window.localStorage.getItem("myEntityManager");
-        var em2 = new EntityManager({ 
+    var result = JSON.stringify(json, null, __config.stringifyPad);
+    return result;
+  };
+
+  /**
+   Imports a previously exported result into this EntityManager.
+   @example
+   This method can be used to make a complete copy of any previously created entityManager, even if created
+   in a previous session and stored in localStorage. The static version of this method performs a
+   very similar process.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var bundle = em1.exportEntities();
+   // bundle can be stored in window.localStorage or just held in memory.
+   var em2 = new EntityManager({
             serviceName: em1.serviceName, 
             metadataStore: em1.metadataStore 
         });
-        em2.importEntities(bundleFromStorage);
-        // em2 will now have a complete copy of what was in em1
-    You can also control exactly which entities are exported. 
-    @example
-        // assume entitiesToExport is an array of entities to export.
-        var bundle = em1.exportEntities(entitiesToExport);
-        // assume em2 is another entityManager containing some of the same entities possibly with modifications.
-        em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-    @method exportEntities
-    @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
-    @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
+   em2.importEntities(bundle);
+   // em2 will now have a complete copy of what was in em1
+   It can also be used to merge the contents of a previously created EntityManager with an
+   existing EntityManager with control over how the two are merged.
+   @example
+   var bundle = em1.exportEntities();
+   // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+   em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+   // em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously
+   // made modifications will not have been touched, but all other entities from em1 will have been imported.
+   @method importEntities
+   @param exportedString {String|Json} The result of a previous 'export' call.
+   @param [config] {Object} A configuration object.
+   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
+   merging into an existing EntityManager.
+   @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+   and may be used to perform version checking.
+   @return result {Object}
 
-    @return {String} A serialized version of the exported data.
-    **/
-    proto.exportEntities = function (entities, includeMetadata) {
-        assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
-        includeMetadata = (includeMetadata == null) ? true : includeMetadata;
-        
-        var exportBundle = exportEntityGroups(this, entities);
-        var json = __extend( {}, exportBundle, ["tempKeys", "entityGroupMap"]);
+   result.entities {Array of Entities} The entities that were imported.
+   result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager.
+   **/
+  proto.importEntities = function (exportedString, config) {
+    config = config || {};
+    assertConfig(config)
+        .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional().withDefault(this.queryOptions.mergeStrategy)
+        .whereParam("metadataVersionFn").isFunction().isOptional()
+        .applyAll(config);
+    var that = this;
 
-        if (includeMetadata) {
-            json = __extend(json, this, ["dataService", "saveOptions", "queryOptions", "validationOptions"]);
-            json.metadataStore = this.metadataStore.exportMetadata();
-        } else {
-            json.metadataVersion = breeze.metadataVersion;
-            json.metadataStoreName = this.metadataStore.name;
-        }
+    var json = (typeof exportedString === "string") ? JSON.parse(exportedString) : exportedString;
+    if (json.metadataStore) {
+      this.metadataStore.importMetadata(json.metadataStore);
+      // the || clause is for backwards compat with an earlier serialization format.
+      this.dataService = (json.dataService && DataService.fromJSON(json.dataService)) || new DataService({ serviceName: json.serviceName });
 
-        var result = JSON.stringify(json, null, __config.stringifyPad);
-        return result;
+      this.saveOptions = new SaveOptions(json.saveOptions);
+      this.queryOptions = QueryOptions.fromJSON(json.queryOptions);
+      this.validationOptions = new ValidationOptions(json.validationOptions);
+    } else {
+      config.metadataVersionFn && config.metadataVersionFn({
+        metadataVersion: json.metadataVersion,
+        metadataStoreName: json.metadataStoreName
+      });
+    }
+
+
+    var tempKeyMap = {};
+    json.tempKeys.forEach(function (k) {
+      var oldKey = EntityKey.fromJSON(k, that.metadataStore);
+      // try to use oldKey if not already used in this keyGenerator.
+      tempKeyMap[oldKey.toString()] = new EntityKey(oldKey.entityType, that.keyGenerator.generateTempKeyValue(oldKey.entityType, oldKey.values[0]));
+    });
+    var entitiesToLink = [];
+    config.tempKeyMap = tempKeyMap;
+    __wrapExecution(function () {
+      that._pendingPubs = [];
+    }, function (state) {
+      that._pendingPubs.forEach(function (fn) {
+        fn();
+      });
+      that._pendingPubs = null;
+      that._hasChangesAction && that._hasChangesAction();
+    }, function () {
+      __objectForEach(json.entityGroupMap, function (entityTypeName, jsonGroup) {
+        var entityType = that.metadataStore._getEntityType(entityTypeName, true);
+        var targetEntityGroup = findOrCreateEntityGroup(that, entityType);
+        var entities = importEntityGroup(targetEntityGroup, jsonGroup, config);
+        Array.prototype.push.apply(entitiesToLink, entities);
+      });
+      entitiesToLink.forEach(function (entity) {
+        that._linkRelatedEntities(entity);
+      });
+    });
+    return {
+      entities: entitiesToLink,
+      tempKeyMapping: tempKeyMap
     };
+  };
 
-    /**
-    Imports a previously exported result into this EntityManager.
-    @example
-    This method can be used to make a complete copy of any previously created entityManager, even if created
-    in a previous session and stored in localStorage. The static version of this method performs a
-    very similar process. 
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var bundle = em1.exportEntities();
-        // bundle can be stored in window.localStorage or just held in memory.
-        var em2 = new EntityManager({ 
-            serviceName: em1.serviceName, 
-            metadataStore: em1.metadataStore 
-        });
-        em2.importEntities(bundle);
-        // em2 will now have a complete copy of what was in em1
-    It can also be used to merge the contents of a previously created EntityManager with an 
-    existing EntityManager with control over how the two are merged.
-    @example
-        var bundle = em1.exportEntities();
-        // assume em2 is another entityManager containing some of the same entities possibly with modifications.
-        em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-        // em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously 
-        // made modifications will not have been touched, but all other entities from em1 will have been imported.
-    @method importEntities
-    @param exportedString {String|Json} The result of a previous 'export' call.
-    @param [config] {Object} A configuration object.
-        @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when 
-        merging into an existing EntityManager.
-        @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'} 
-        and may be used to perform version checking.
-    @return result {Object} 
 
-        result.entities {Array of Entities} The entities that were imported.
-        result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager. 
-    **/
-    proto.importEntities = function (exportedString, config) {
-        config = config || {};
-        assertConfig(config)
-            .whereParam("mergeStrategy").isEnumOf(MergeStrategy).isOptional().withDefault(this.queryOptions.mergeStrategy)
-            .whereParam("metadataVersionFn").isFunction().isOptional()
-            .applyAll(config);
-        var that = this;
-            
-        var json = (typeof exportedString === "string") ? JSON.parse(exportedString) : exportedString;
-        if (json.metadataStore) {
-            this.metadataStore.importMetadata(json.metadataStore);
-            // the || clause is for backwards compat with an earlier serialization format.           
-            this.dataService = (json.dataService && DataService.fromJSON(json.dataService)) || new DataService({ serviceName: json.serviceName });
+  /**
+   Clears this EntityManager's cache but keeps all other settings. Note that this
+   method is not as fast as creating a new EntityManager via 'new EntityManager'.
+   This is because clear actually detaches all of the entities from the EntityManager.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   em1.clear();
+   // em1 is will now contain no entities, but all other setting will be maintained.
+   @method clear
+   **/
+  proto.clear = function () {
+    __objectForEach(this._entityGroupMap, function (key, entityGroup) {
+      // remove en
+      entityGroup._clear();
+    });
 
-            this.saveOptions = new SaveOptions(json.saveOptions);
-            this.queryOptions = QueryOptions.fromJSON(json.queryOptions);
-            this.validationOptions = new ValidationOptions(json.validationOptions);
-        } else {
-            config.metadataVersionFn && config.metadataVersionFn({
-                metadataVersion: json.metadataVersion,
-                metadataStoreName: json.metadataStoreName
-            });
-        }
-        
+    this._entityGroupMap = {};
+    this._unattachedChildrenMap = new UnattachedChildrenMap();
+    this.keyGenerator = new this.keyGeneratorCtor();
+    this.entityChanged.publish({ entityAction: EntityAction.Clear });
+    this._setHasChanges(false);
+  };
 
-        var tempKeyMap = {};
-        json.tempKeys.forEach(function (k) {
-            var oldKey = EntityKey.fromJSON(k, that.metadataStore);
-            // try to use oldKey if not already used in this keyGenerator.
-            tempKeyMap[oldKey.toString()] = new EntityKey(oldKey.entityType, that.keyGenerator.generateTempKeyValue(oldKey.entityType, oldKey.values[0]));
-        });
-        var entitiesToLink = [];
-        config.tempKeyMap = tempKeyMap;
-        __wrapExecution(function() {
-            that._pendingPubs = [];
-        }, function(state) {
-            that._pendingPubs.forEach(function(fn) { fn(); });
-            that._pendingPubs = null;
-            that._hasChangesAction && that._hasChangesAction();
-        }, function () {
-            __objectForEach(json.entityGroupMap, function(entityTypeName, jsonGroup) {
-                var entityType = that.metadataStore._getEntityType(entityTypeName, true);
-                var targetEntityGroup = findOrCreateEntityGroup(that, entityType);
-                var entities = importEntityGroup(targetEntityGroup, jsonGroup, config);
-                Array.prototype.push.apply(entitiesToLink, entities);
-            });
-            entitiesToLink.forEach(function (entity) {
-                that._linkRelatedEntities(entity);
-            });
-        });
-        return {
-            entities: entitiesToLink,
-            tempKeyMapping: tempKeyMap
-        };
-    };
 
-        
-    /**
-    Clears this EntityManager's cache but keeps all other settings. Note that this 
-    method is not as fast as creating a new EntityManager via 'new EntityManager'.
-    This is because clear actually detaches all of the entities from the EntityManager.
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        em1.clear();
-        // em1 is will now contain no entities, but all other setting will be maintained.
-    @method clear
-    **/
-    proto.clear = function () {
-        __objectForEach(this._entityGroupMap, function (key, entityGroup) {
-            // remove en
-            entityGroup._clear();
-        });
-            
-        this._entityGroupMap = {};
-        this._unattachedChildrenMap = new UnattachedChildrenMap();
-        this.keyGenerator = new this.keyGeneratorCtor();
-        this.entityChanged.publish({ entityAction: EntityAction.Clear });
-        this._setHasChanges(false);
-    };
+  /**
+   Creates an empty copy of this EntityManager
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var em2 = em1.createEmptyCopy();
+   // em2 is a new EntityManager with all of em1's settings
+   // but no entities.
+   @method createEmptyCopy
+   @return {EntityManager} A new EntityManager.
+   **/
+  proto.createEmptyCopy = function () {
+    var copy = new ctor(__extend({}, this,
+        ["dataService", "metadataStore", "queryOptions", "saveOptions", "validationOptions", "keyGeneratorCtor"]));
+    return copy;
+  };
 
-  
+  /**
+   Attaches an entity to this EntityManager with an  {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var cust1 = custType.createEntity();
+   em1.addEntity(cust1);
+   Note that this is the same as using 'attachEntity' with an {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var cust1 = custType.createEntity();
+   em1.attachEntity(cust1, EntityState.Added);
+   @method addEntity
+   @param entity {Entity} The entity to add.
+   @return {Entity} The added entity.
+   **/
+  proto.addEntity = function (entity) {
+    return this.attachEntity(entity, EntityState.Added);
+  };
 
-    /**
-    Creates an empty copy of this EntityManager
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var em2 = em1.createEmptyCopy();
-        // em2 is a new EntityManager with all of em1's settings
-        // but no entities.
-    @method createEmptyCopy
-    @return {EntityManager} A new EntityManager.
-    **/
-    proto.createEmptyCopy = function () {
-        var copy = new ctor(__extend({}, this, 
-            ["dataService", "metadataStore", "queryOptions", "saveOptions", "validationOptions", "keyGeneratorCtor"]));
-        return copy;
-    };
+  /**
+   Attaches an entity to this EntityManager with a specified {{#crossLink "EntityState"}}{{/crossLink}}.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var cust1 = custType.createEntity();
+   em1.attachEntity(cust1, EntityState.Added);
+   @method attachEntity
+   @param entity {Entity} The entity to add.
+   @param [entityState=EntityState.Unchanged] {EntityState} The EntityState of the newly attached entity. If omitted this defaults to EntityState.Unchanged.
+   @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} How the specified entity should be merged into the EntityManager if this EntityManager already contains an entity with the same key.
+   @return {Entity} The attached entity.
+   **/
+  proto.attachEntity = function (entity, entityState, mergeStrategy) {
+    assertParam(entity, "entity").isRequired().check();
+    this.metadataStore._checkEntityType(entity);
+    entityState = assertParam(entityState, "entityState").isEnumOf(EntityState).isOptional().check(EntityState.Unchanged);
+    mergeStrategy = assertParam(mergeStrategy, "mergeStrategy").isEnumOf(MergeStrategy).isOptional().check(MergeStrategy.Disallowed);
 
-    /**
-    Attaches an entity to this EntityManager with an  {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var cust1 = custType.createEntity();
-        em1.addEntity(cust1);
-    Note that this is the same as using 'attachEntity' with an {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var cust1 = custType.createEntity();
-        em1.attachEntity(cust1, EntityState.Added);
-    @method addEntity
-    @param entity {Entity} The entity to add.
-    @return {Entity} The added entity.
-    **/
-    proto.addEntity = function (entity) {
-        return this.attachEntity(entity, EntityState.Added);
-    };
+    if (entity.entityType.metadataStore !== this.metadataStore) {
+      throw new Error("Cannot attach this entity because the EntityType (" + entity.entityType.name + ") and MetadataStore associated with this entity does not match this EntityManager's MetadataStore.");
+    }
+    var aspect = entity.entityAspect;
+    if (aspect) {
+      // to avoid reattaching an entity in progress
+      if (aspect._inProcessEntity) return aspect._inProcessEntity;
+    } else {
+      // this occur's when attaching an entity created via new instead of via createEntity.
+      aspect = new EntityAspect(entity);
+    }
+    var manager = aspect.entityManager;
+    if (manager) {
+      if (manager === this) {
+        return entity;
+      } else {
+        throw new Error("This entity already belongs to another EntityManager");
+      }
+    }
 
-    /**
-    Attaches an entity to this EntityManager with a specified {{#crossLink "EntityState"}}{{/crossLink}}.
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var cust1 = custType.createEntity();
-        em1.attachEntity(cust1, EntityState.Added);
-    @method attachEntity
-    @param entity {Entity} The entity to add.
-    @param [entityState=EntityState.Unchanged] {EntityState} The EntityState of the newly attached entity. If omitted this defaults to EntityState.Unchanged.
-    @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} How the specified entity should be merged into the EntityManager if this EntityManager already contains an entity with the same key.
-    @return {Entity} The attached entity.
-    **/
-    proto.attachEntity = function (entity, entityState, mergeStrategy) {
-        assertParam(entity, "entity").isRequired().check();
-        this.metadataStore._checkEntityType(entity);
-        entityState = assertParam(entityState, "entityState").isEnumOf(EntityState).isOptional().check(EntityState.Unchanged);
-        mergeStrategy = assertParam(mergeStrategy, "mergeStrategy").isEnumOf(MergeStrategy).isOptional().check(MergeStrategy.Disallowed);
+    var that = this;
+    var attachedEntity;
+    __using(this, "isLoading", true, function () {
+      if (entityState.isAdded()) {
+        checkEntityKey(that, entity);
+      }
+      // attachedEntity === entity EXCEPT in the case of a merge.
+      attachedEntity = that._attachEntityCore(entity, entityState, mergeStrategy);
+      aspect._inProcessEntity = attachedEntity;
+      try {
+        // entity ( not attachedEntity) is deliberate here.
+        attachRelatedEntities(that, entity, entityState, mergeStrategy);
+      } finally {
+        // insure that _inProcessEntity is cleared.
+        aspect._inProcessEntity = null;
+      }
+    });
+    if (this.validationOptions.validateOnAttach) {
+      attachedEntity.entityAspect.validateEntity();
+    }
+    if (!entityState.isUnchanged()) {
+      this._notifyStateChange(attachedEntity, true);
+    }
+    this.entityChanged.publish({ entityAction: EntityAction.Attach, entity: attachedEntity });
 
-        if (entity.entityType.metadataStore !== this.metadataStore) {
-            throw new Error("Cannot attach this entity because the EntityType (" + entity.entityType.name + ") and MetadataStore associated with this entity does not match this EntityManager's MetadataStore.");
-        }
-        var aspect = entity.entityAspect;
-        if (aspect) {
-            // to avoid reattaching an entity in progress
-            if (aspect._inProcessEntity) return aspect._inProcessEntity;
-        } else {
-            // this occur's when attaching an entity created via new instead of via createEntity.
-            aspect = new EntityAspect(entity);
-        }
-        var manager = aspect.entityManager;
-        if (manager) {
-            if (manager === this) {
-                return entity;
-            } else {
-                throw new Error("This entity already belongs to another EntityManager");
-            }
-        }
-            
-        var that = this;
-        var attachedEntity;
-        __using(this, "isLoading", true, function () {
-            if (entityState.isAdded()) {
-                checkEntityKey(that, entity);
-            }
-            // attachedEntity === entity EXCEPT in the case of a merge.
-            attachedEntity = that._attachEntityCore(entity, entityState, mergeStrategy);
-            aspect._inProcessEntity = attachedEntity;
-            try {
-                // entity ( not attachedEntity) is deliberate here.
-                attachRelatedEntities(that, entity, entityState, mergeStrategy);
-            } finally {
-                // insure that _inProcessEntity is cleared.
-                aspect._inProcessEntity = null;
-            }
-        });
-        if (this.validationOptions.validateOnAttach) {
-            attachedEntity.entityAspect.validateEntity();
-        }
-        if (!entityState.isUnchanged()) {
-            this._notifyStateChange(attachedEntity, true);
-        }
-        this.entityChanged.publish({ entityAction: EntityAction.Attach, entity: attachedEntity });
+    return attachedEntity;
+  };
 
-        return attachedEntity;
-    };
-        
 
-    /**
-    Detaches an entity from this EntityManager.
-    @example
-        // assume em1 is an EntityManager containing a number of existing entities.
-        // assume cust1 is a customer Entity previously attached to em1
-        em1.detachEntity(cust1);
-        // em1 will now no longer contain cust1 and cust1 will have an 
-        // entityAspect.entityState of EntityState.Detached
-    @method detachEntity
-    @param entity {Entity} The entity to detach.
-    @return {Boolean} Whether the entity could be detached. This will return false if the entity is already detached or was never attached.
-    **/
-    proto.detachEntity = function (entity) {
-        assertParam(entity, "entity").isEntity().check();
-        var aspect = entity.entityAspect;
-        if (!aspect) {
-            // no aspect means in couldn't appear in any group
-            return false;
-        }
-        
-        if (aspect.entityManager !== this) {
-            throw new Error("This entity does not belong to this EntityManager.");
-        }
-        return aspect.setDetached();
-    };
+  /**
+   Detaches an entity from this EntityManager.
+   @example
+   // assume em1 is an EntityManager containing a number of existing entities.
+   // assume cust1 is a customer Entity previously attached to em1
+   em1.detachEntity(cust1);
+   // em1 will now no longer contain cust1 and cust1 will have an
+   // entityAspect.entityState of EntityState.Detached
+   @method detachEntity
+   @param entity {Entity} The entity to detach.
+   @return {Boolean} Whether the entity could be detached. This will return false if the entity is already detached or was never attached.
+   **/
+  proto.detachEntity = function (entity) {
+    assertParam(entity, "entity").isEntity().check();
+    var aspect = entity.entityAspect;
+    if (!aspect) {
+      // no aspect means in couldn't appear in any group
+      return false;
+    }
 
-    /**
-    Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call
-    occurs internally before the first query to any service if the metadata hasn't already been
-    loaded.
-    @example
-    Usually you will not actually process the results of a fetchMetadata call directly, but will instead
-    ask for the metadata from the EntityManager after the fetchMetadata call returns.
-    @example
-            var em1 = new EntityManager( "breeze/NorthwindIBModel");
-            em1.fetchMetadata()
-            .then(function() {
+    if (aspect.entityManager !== this) {
+      throw new Error("This entity does not belong to this EntityManager.");
+    }
+    return aspect.setDetached();
+  };
+
+  /**
+   Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call
+   occurs internally before the first query to any service if the metadata hasn't already been
+   loaded.
+   @example
+   Usually you will not actually process the results of a fetchMetadata call directly, but will instead
+   ask for the metadata from the EntityManager after the fetchMetadata call returns.
+   @example
+   var em1 = new EntityManager( "breeze/NorthwindIBModel");
+   em1.fetchMetadata()
+   .then(function() {
                 var metadataStore = em1.metadataStore;
                 // do something with the metadata
             }
-            .fail(function(exception) {
+   .fail(function(exception) {
                 // handle exception here
             };
-    @method fetchMetadata
-    @async
-    @param [callback] {Function} Function called on success.
-        
-        successFunction([schema])
-        @param [callback.schema] {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
-        it is usually better to access metadata via the 'metadataStore' property of the EntityManager after this method's Promise or callback completes.
-    @param [errorCallback] {Function} Function called on failure.
-            
-        failureFunction([error])
-        @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-    @return {Promise} Promise 
+   @method fetchMetadata
+   @async
+   @param [callback] {Function} Function called on success.
 
-        promiseData.schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
-        it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.            
-    **/
-    proto.fetchMetadata = function (dataService, callback, errorCallback) {
-        if (typeof (dataService) === "function") {
-            // legacy support for when dataService was not an arg. i.e. first arg was callback
-            errorCallback = callback;
-            callback = dataService;
-            dataService = null;
-        } else {
-            assertParam(dataService, "dataService").isInstanceOf(DataService).isOptional().check();
-            assertParam(callback, "callback").isFunction().isOptional().check();
-            assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
-        }
+   successFunction([schema])
+   @param [callback.schema] {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
+   it is usually better to access metadata via the 'metadataStore' property of the EntityManager after this method's Promise or callback completes.
+   @param [errorCallback] {Function} Function called on failure.
 
-        var promise = this.metadataStore.fetchMetadata(dataService || this.dataService);
-        return promiseWithCallbacks(promise, callback, errorCallback);
-    };
+   failureFunction([error])
+   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+   @return {Promise} Promise
 
-    /**
-    Executes the specified query.
-    @example
-    This method can be called using a 'promises' syntax ( recommended)
-    @example
-            var em = new EntityManager(serviceName);
-            var query = new EntityQuery("Orders");
-            em.executeQuery(query)
-            .then( function(data) {
+   promiseData.schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
+   it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.
+   **/
+  proto.fetchMetadata = function (dataService, callback, errorCallback) {
+    if (typeof (dataService) === "function") {
+      // legacy support for when dataService was not an arg. i.e. first arg was callback
+      errorCallback = callback;
+      callback = dataService;
+      dataService = null;
+    } else {
+      assertParam(dataService, "dataService").isInstanceOf(DataService).isOptional().check();
+      assertParam(callback, "callback").isFunction().isOptional().check();
+      assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+    }
+
+    var promise = this.metadataStore.fetchMetadata(dataService || this.dataService);
+    return promiseWithCallbacks(promise, callback, errorCallback);
+  };
+
+  /**
+   Executes the specified query.
+   @example
+   This method can be called using a 'promises' syntax ( recommended)
+   @example
+   var em = new EntityManager(serviceName);
+   var query = new EntityQuery("Orders");
+   em.executeQuery(query)
+   .then( function(data) {
                 var orders = data.results;
                 ... query results processed here
             }).fail( function(err) {
                 ... query failure processed here
             });
-    or with callbacks
-    @example
-            var em = new EntityManager(serviceName);
-            var query = new EntityQuery("Orders");
-            em.executeQuery(query,
-            function(data) {
+   or with callbacks
+   @example
+   var em = new EntityManager(serviceName);
+   var query = new EntityQuery("Orders");
+   em.executeQuery(query,
+   function(data) {
                 var orders = data.results;
                 ... query results processed here
             },
-            function(err) {
+   function(err) {
                 ... query failure processed here
             });
-    Either way this method is the same as calling the The {{#crossLink "EntityQuery"}}{{/crossLink}} 'execute' method.
-    @example
-            var em = new EntityManager(serviceName);
-            var query = new EntityQuery("Orders").using(em);
-            query.execute()
-            .then( function(data) {
+   Either way this method is the same as calling the The {{#crossLink "EntityQuery"}}{{/crossLink}} 'execute' method.
+   @example
+   var em = new EntityManager(serviceName);
+   var query = new EntityQuery("Orders").using(em);
+   query.execute()
+   .then( function(data) {
                 var orders = data.results;
                 ... query results processed here
             }).fail( function(err) {
                 ... query failure processed here
             });
-         
-    @method executeQuery
-    @async
-    @param query {EntityQuery|String}  The {{#crossLink "EntityQuery"}}{{/crossLink}} or OData query string to execute.
-    @param [callback] {Function} Function called on success.
-        
-        successFunction([data])
-        @param callback.data {Object} 
-        @param callback.data.results {Array of Entity}
-        @param callback.data.query {EntityQuery} The original query
-        @param callback.data.entityManager {EntityManager} The EntityManager.
-        @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
-        @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of 
-        items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-        would have been applied. 
 
-    @param [errorCallback] {Function} Function called on failure.
-            
-        failureFunction([error])
-        @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-        @param [errorCallback.error.query] The query that caused the error.
-        @param [errorCallback.error.entityManager] The query that caused the error.
-        @param [errorCallback.error.httpResponse] {HttpResponse} The HttpResponse returned from the server.
-            
+   @method executeQuery
+   @async
+   @param query {EntityQuery|String}  The {{#crossLink "EntityQuery"}}{{/crossLink}} or OData query string to execute.
+   @param [callback] {Function} Function called on success.
 
-    @return {Promise} Promise
+   successFunction([data])
+   @param callback.data {Object}
+   @param callback.data.results {Array of Entity}
+   @param callback.data.query {EntityQuery} The original query
+   @param callback.data.entityManager {EntityManager} The EntityManager.
+   @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
+   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
+   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+   would have been applied.
 
-        promiseData.results {Array of Entity}
-        promiseData.query {EntityQuery} The original query
-        promiseData.entityManager {EntityManager} The EntityManager.
-        promiseData.httpResponse {HttpResponse} The  HttpResponse returned from the server.
-        promiseData.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of 
-        items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-        would have been applied. 
-    **/
-    proto.executeQuery = function (query, callback, errorCallback) {
-        // TODO: think about creating an executeOdataQuery or executeRawOdataQuery as a seperate method.
-        assertParam(query, "query").isInstanceOf(EntityQuery).or().isString().check();
-        assertParam(callback, "callback").isFunction().isOptional().check();
-        assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
-        var promise;
-        // 'resolve' methods create a new typed object with all of its properties fully resolved against a list of sources.
-        // Thought about creating a 'normalized' query with these 'resolved' objects
-        // but decided not to because the 'query' may not be an EntityQuery (it can be a string) and hence might not have a queryOptions or dataServices property on it.
-        var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
-        var dataService = DataService.resolve([ query.dataService, this.dataService]);
+   @param [errorCallback] {Function} Function called on failure.
 
-        if ( (!dataService.hasServerMetadata ) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
-            promise = executeQueryCore(this, query, queryOptions, dataService);
-        } else {
-            var that = this;
-            promise = this.fetchMetadata(dataService).then(function () {
-                return executeQueryCore(that, query, queryOptions, dataService);
-            });
-        }
+   failureFunction([error])
+   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+   @param [errorCallback.error.query] The query that caused the error.
+   @param [errorCallback.error.entityManager] The query that caused the error.
+   @param [errorCallback.error.httpResponse] {HttpResponse} The HttpResponse returned from the server.
 
-        return promiseWithCallbacks(promise, callback, errorCallback);
-    };
-    
-    /**
-    Executes the specified query against this EntityManager's local cache.
 
-    @example
-    Because this method is executed immediately there is no need for a promise or a callback
-    @example
-            var em = new EntityManager(serviceName);
-            var query = new EntityQuery("Orders");
-            var orders = em.executeQueryLocally(query);
-    Note that this can also be accomplished using the 'executeQuery' method with
-    a FetchStrategy of FromLocalCache and making use of the Promise or callback
-    @example
-            var em = new EntityManager(serviceName);
-            var query = new EntityQuery("Orders").using(FetchStrategy.FromLocalCache);
-            em.executeQuery(query)
-            .then( function(data) {
+   @return {Promise} Promise
+
+   promiseData.results {Array of Entity}
+   promiseData.query {EntityQuery} The original query
+   promiseData.entityManager {EntityManager} The EntityManager.
+   promiseData.httpResponse {HttpResponse} The  HttpResponse returned from the server.
+   promiseData.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
+   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+   would have been applied.
+   **/
+  proto.executeQuery = function (query, callback, errorCallback) {
+    // TODO: think about creating an executeOdataQuery or executeRawOdataQuery as a seperate method.
+    assertParam(query, "query").isInstanceOf(EntityQuery).or().isString().check();
+    assertParam(callback, "callback").isFunction().isOptional().check();
+    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+    var promise;
+    // 'resolve' methods create a new typed object with all of its properties fully resolved against a list of sources.
+    // Thought about creating a 'normalized' query with these 'resolved' objects
+    // but decided not to because the 'query' may not be an EntityQuery (it can be a string) and hence might not have a queryOptions or dataServices property on it.
+    var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
+    var dataService = DataService.resolve([ query.dataService, this.dataService]);
+
+    if ((!dataService.hasServerMetadata ) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
+      promise = executeQueryCore(this, query, queryOptions, dataService);
+    } else {
+      var that = this;
+      promise = this.fetchMetadata(dataService).then(function () {
+        return executeQueryCore(that, query, queryOptions, dataService);
+      });
+    }
+
+    return promiseWithCallbacks(promise, callback, errorCallback);
+  };
+
+  /**
+   Executes the specified query against this EntityManager's local cache.
+
+   @example
+   Because this method is executed immediately there is no need for a promise or a callback
+   @example
+   var em = new EntityManager(serviceName);
+   var query = new EntityQuery("Orders");
+   var orders = em.executeQueryLocally(query);
+   Note that this can also be accomplished using the 'executeQuery' method with
+   a FetchStrategy of FromLocalCache and making use of the Promise or callback
+   @example
+   var em = new EntityManager(serviceName);
+   var query = new EntityQuery("Orders").using(FetchStrategy.FromLocalCache);
+   em.executeQuery(query)
+   .then( function(data) {
                 var orders = data.results;
                 ... query results processed here
             }).fail( function(err) {
                 ... query failure processed here
             });
-    @method executeQueryLocally
-    @param query {EntityQuery}  The {{#crossLink "EntityQuery"}}{{/crossLink}} to execute.
-    @return  {Array of Entity}  Array of entities from cache that satisfy the query
-    **/
-    proto.executeQueryLocally = function (query) {
-        assertParam(query, "query").isInstanceOf(EntityQuery).check();
-        
-        var metadataStore = this.metadataStore;
-        var entityType = query._getFromEntityType(metadataStore, true);
-        // there may be multiple groups is this is a base entity type.
-        var groups = findOrCreateEntityGroups(this, entityType);
-        // filter then order then skip then take
-        var filterFunc = query.wherePredicate && query.wherePredicate.toFunction( { entityType: entityType});
+   @method executeQueryLocally
+   @param query {EntityQuery}  The {{#crossLink "EntityQuery"}}{{/crossLink}} to execute.
+   @return  {Array of Entity}  Array of entities from cache that satisfy the query
+   **/
+  proto.executeQueryLocally = function (query) {
+    assertParam(query, "query").isInstanceOf(EntityQuery).check();
 
-        var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
-        var includeDeleted = queryOptions.includeDeleted === true;
+    var metadataStore = this.metadataStore;
+    var entityType = query._getFromEntityType(metadataStore, true);
+    // there may be multiple groups is this is a base entity type.
+    var groups = findOrCreateEntityGroups(this, entityType);
+    // filter then order then skip then take
+    var filterFunc = query.wherePredicate && query.wherePredicate.toFunction({ entityType: entityType});
 
-        var newFilterFunc = function(entity) {
-            return entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
-        };
+    var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
+    var includeDeleted = queryOptions.includeDeleted === true;
 
-        var result = [];
-        groups.forEach(function (group) {
-            result.push.apply(result, group._entities.filter(newFilterFunc));
-        });
-
-        var orderByComparer = query.orderByClause && query.orderByClause.getComparer(entityType);
-        if (orderByComparer) {
-            result.sort(orderByComparer);
-        }
-        var skipCount = query.skipCount;
-        if (skipCount) {
-            result = result.slice(skipCount);
-        }
-        var takeCount = query.takeCount;
-        if (takeCount) {
-            result = result.slice(0, takeCount);
-        }
-
-        var selectClause = query.selectClause;
-        if (selectClause) {
-            var selectFn = selectClause.toFunction();
-            result = result.map(function(e) {
-                return selectFn(e);
-            });
-        }
-        return result;
+    var newFilterFunc = function (entity) {
+      return entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
     };
 
-    /**
-    Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities
-    specified then there will be no server side call made but a valid 'empty' saveResult will still be returned.
-    @example
-    Often we will be saving all of the entities within an EntityManager that are either added, modified or deleted
-    and we will let the 'saveChanges' call determine which entities these are. 
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        // This could include added, modified and deleted entities.
-        em.saveChanges().then(function(saveResult) {
+    var result = [];
+    groups.forEach(function (group) {
+      result.push.apply(result, group._entities.filter(newFilterFunc));
+    });
+
+    var orderByComparer = query.orderByClause && query.orderByClause.getComparer(entityType);
+    if (orderByComparer) {
+      result.sort(orderByComparer);
+    }
+    var skipCount = query.skipCount;
+    if (skipCount) {
+      result = result.slice(skipCount);
+    }
+    var takeCount = query.takeCount;
+    if (takeCount) {
+      result = result.slice(0, takeCount);
+    }
+
+    var selectClause = query.selectClause;
+    if (selectClause) {
+      var selectFn = selectClause.toFunction();
+      result = result.map(function (e) {
+        return selectFn(e);
+      });
+    }
+    return result;
+  };
+
+  /**
+   Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities
+   specified then there will be no server side call made but a valid 'empty' saveResult will still be returned.
+   @example
+   Often we will be saving all of the entities within an EntityManager that are either added, modified or deleted
+   and we will let the 'saveChanges' call determine which entities these are.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   // This could include added, modified and deleted entities.
+   em.saveChanges().then(function(saveResult) {
             var savedEntities = saveResult.entities;
             var keyMappings = saveResult.keyMappings;
         }).fail(function (e) {
             // e is any exception that was thrown.
         });
-    But we can also control exactly which entities to save and can specify specific SaveOptions
-    @example
-        // assume entitiesToSave is an array of entities to save.
-        var saveOptions = new SaveOptions({ allowConcurrentSaves: true });
-        em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
+   But we can also control exactly which entities to save and can specify specific SaveOptions
+   @example
+   // assume entitiesToSave is an array of entities to save.
+   var saveOptions = new SaveOptions({ allowConcurrentSaves: true });
+   em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
             var savedEntities = saveResult.entities;
             var keyMappings = saveResult.keyMappings;
         }).fail(function (e) {
             // e is any exception that was thrown.
         });
-    Callback methods can also be used
-    @example
-        em.saveChanges(entitiesToSave, null, 
-            function(saveResult) {
+   Callback methods can also be used
+   @example
+   em.saveChanges(entitiesToSave, null,
+   function(saveResult) {
                 var savedEntities = saveResult.entities;
                 var keyMappings = saveResult.keyMappings;
             }, function (e) {
                 // e is any exception that was thrown.
             }
-        );
-    @method saveChanges
-    @async
-    @param [entities] {Array of Entity} The list of entities to save.  
-    Every entity in that list will be sent to the server, whether changed or unchanged, 
-    as long as it is attached to this EntityManager.
-    If this parameter is omitted, null or empty (the usual case), 
-    every entity with pending changes in this EntityManager will be saved. 
-    @param [saveOptions] {SaveOptions} {{#crossLink "SaveOptions"}}{{/crossLink}} for the save - will default to
-    {{#crossLink "EntityManager/saveOptions"}}{{/crossLink}} if null.
-    @param [callback] {Function} Function called on success.
-        
-        successFunction([saveResult])
-        @param [callback.saveResult] {Object} 
-        @param [callback.saveResult.entities] {Array of Entity} The saved entities - with any temporary keys converted into 'real' keys.  
-        These entities are actually references to entities in the EntityManager cache that have been updated as a result of the
-        save.
-        @param [callback.saveResult.keyMappings] {Array of keyMappings} Each keyMapping has the following properties: 'entityTypeName', 'tempValue' and 'realValue'
-        @param [callback.saveResult.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
+   );
+   @method saveChanges
+   @async
+   @param [entities] {Array of Entity} The list of entities to save.
+   Every entity in that list will be sent to the server, whether changed or unchanged,
+   as long as it is attached to this EntityManager.
+   If this parameter is omitted, null or empty (the usual case),
+   every entity with pending changes in this EntityManager will be saved.
+   @param [saveOptions] {SaveOptions} {{#crossLink "SaveOptions"}}{{/crossLink}} for the save - will default to
+   {{#crossLink "EntityManager/saveOptions"}}{{/crossLink}} if null.
+   @param [callback] {Function} Function called on success.
 
-    @param [errorCallback] {Function} Function called on failure.
-            
-        failureFunction([error])
-        @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-        @param [errorCallback.error.entityErrors] { Array of server side errors }  These are typically validation errors but are generally any error that can be easily isolated to a single entity. 
-        @param [errorCallback.error.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
-        @param [errorCallback.error.saveResult] {Object} Some dataservice adapters return a 'saveResult' object 
-        when the failing save operation is non-transactional meaning some entities could be saved while others were not.
-        The 'saveResult' object identifies both that entities that were saved (with their keyMapping)
-        and that entities that were not saved (with their errors).
-        
-    @return {Promise} Promise
-    **/
-    proto.saveChanges = function (entities, saveOptions, callback, errorCallback) {
-        assertParam(entities, "entities").isOptional().isArray().isEntity().check();
-        assertParam(saveOptions, "saveOptions").isInstanceOf(SaveOptions).isOptional().check();
-        assertParam(callback, "callback").isFunction().isOptional().check();
-        assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+   successFunction([saveResult])
+   @param [callback.saveResult] {Object}
+   @param [callback.saveResult.entities] {Array of Entity} The saved entities - with any temporary keys converted into 'real' keys.
+   These entities are actually references to entities in the EntityManager cache that have been updated as a result of the
+   save.
+   @param [callback.saveResult.keyMappings] {Array of keyMappings} Each keyMapping has the following properties: 'entityTypeName', 'tempValue' and 'realValue'
+   @param [callback.saveResult.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
 
-        saveOptions = saveOptions || this.saveOptions || SaveOptions.defaultInstance;
-        var isFullSave = entities == null;
-        var entitiesToSave = getEntitiesToSave(this, entities);
-            
-        if (entitiesToSave.length === 0) {
-            var result =  { entities: [], keyMappings: [] };
-            if (callback) callback(result);
-            return Q.resolve(result);
-        }
-            
-        if (!saveOptions.allowConcurrentSaves) {
-            var anyPendingSaves = entitiesToSave.some(function (entity) {
-                return entity.entityAspect.isBeingSaved;
-            });                
-            if (anyPendingSaves) {
-                var err = new Error("Concurrent saves not allowed - SaveOptions.allowConcurrentSaves is false");
-                if (errorCallback) errorCallback(err);
-                return Q.reject(err);
-            }
-        }
+   @param [errorCallback] {Function} Function called on failure.
 
-        clearServerErrors(entitiesToSave);
-            
-        if (this.validationOptions.validateOnSave) {
-            var failedEntities = entitiesToSave.filter(function (entity) {
-                var aspect = entity.entityAspect;
-                var isValid = aspect.entityState.isDeleted() || aspect.validateEntity();
-                return !isValid;
-            });
-            if (failedEntities.length > 0) {
-                var valError = new Error("Client side validation errors encountered - see the entityErrors collection on this object for more detail");
-                valError.entityErrors = createEntityErrors(failedEntities);
-                if (errorCallback) errorCallback(valError);
-                return Q.reject(valError);
-            }
-        }
-           
-        var dataService = DataService.resolve([saveOptions.dataService, this.dataService]);
-        var saveContext = {
-            entityManager: this,
-            dataService: dataService,
-            processSavedEntities: processSavedEntities,
-            resourceName: saveOptions.resourceName || this.saveOptions.resourceName || "SaveChanges"
-        };       
+   failureFunction([error])
+   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+   @param [errorCallback.error.entityErrors] { Array of server side errors }  These are typically validation errors but are generally any error that can be easily isolated to a single entity.
+   @param [errorCallback.error.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
+   @param [errorCallback.error.saveResult] {Object} Some dataservice adapters return a 'saveResult' object
+   when the failing save operation is non-transactional meaning some entities could be saved while others were not.
+   The 'saveResult' object identifies both that entities that were saved (with their keyMapping)
+   and that entities that were not saved (with their errors).
 
-        // TODO: need to check that if we are doing a partial save that all entities whose temp keys 
-        // are referenced are also in the partial save group
+   @return {Promise} Promise
+   **/
+  proto.saveChanges = function (entities, saveOptions, callback, errorCallback) {
+    assertParam(entities, "entities").isOptional().isArray().isEntity().check();
+    assertParam(saveOptions, "saveOptions").isInstanceOf(SaveOptions).isOptional().check();
+    assertParam(callback, "callback").isFunction().isOptional().check();
+    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
 
-        var saveBundle = { entities: entitiesToSave, saveOptions: saveOptions };
+    saveOptions = saveOptions || this.saveOptions || SaveOptions.defaultInstance;
+    var isFullSave = entities == null;
+    var entitiesToSave = getEntitiesToSave(this, entities);
 
-        
-        try { // Guard against exception thrown in dataservice adapter before it goes async
-            updateConcurrencyProperties(entitiesToSave);
-            return dataService.adapterInstance.saveChanges(saveContext, saveBundle)
-                .then(saveSuccess).then(null, saveFail);
-        } catch (err) {
-            // undo the marking by updateConcurrencyProperties
-            markIsBeingSaved(entitiesToSave, false); 
-            if (errorCallback) errorCallback(err);
-            return Q.reject(err);
-        }
+    if (entitiesToSave.length === 0) {
+      var result = { entities: [], keyMappings: [] };
+      if (callback) callback(result);
+      return Q.resolve(result);
+    }
 
-        function saveSuccess(saveResult) {
-            var em = saveContext.entityManager;
-            var savedEntities = saveResult.entities = saveContext.processSavedEntities(saveResult);
+    if (!saveOptions.allowConcurrentSaves) {
+      var anyPendingSaves = entitiesToSave.some(function (entity) {
+        return entity.entityAspect.isBeingSaved;
+      });
+      if (anyPendingSaves) {
+        var err = new Error("Concurrent saves not allowed - SaveOptions.allowConcurrentSaves is false");
+        if (errorCallback) errorCallback(err);
+        return Q.reject(err);
+      }
+    }
 
-            // update _hasChanges after save.
-            var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
-            em._setHasChanges(hasChanges);
+    clearServerErrors(entitiesToSave);
 
-            markIsBeingSaved(entitiesToSave, false);
-            if (callback) callback(saveResult);
-            return Q.resolve(saveResult);
-        }
+    if (this.validationOptions.validateOnSave) {
+      var failedEntities = entitiesToSave.filter(function (entity) {
+        var aspect = entity.entityAspect;
+        var isValid = aspect.entityState.isDeleted() || aspect.validateEntity();
+        return !isValid;
+      });
+      if (failedEntities.length > 0) {
+        var valError = new Error("Client side validation errors encountered - see the entityErrors collection on this object for more detail");
+        valError.entityErrors = createEntityErrors(failedEntities);
+        if (errorCallback) errorCallback(valError);
+        return Q.reject(valError);
+      }
+    }
 
-        function processSavedEntities(saveResult) {
-
-            var savedEntities = saveResult.entities;
-            if (savedEntities.length === 0) { return []; }
-            var keyMappings = saveResult.keyMappings;
-            var em = saveContext.entityManager;
-
-            // must occur outside of isLoading block
-            fixupKeys(em, keyMappings);
-
-            __using(em, "isLoading", true, function () {
-                
-                var mappingContext = new MappingContext({
-                    query: null, // tells visitAndMerge this is a save instead of a query
-                    entityManager: em,
-                    mergeOptions: { mergeStrategy: MergeStrategy.OverwriteChanges },
-                    dataService: dataService
-                });
-
-                // The visitAndMerge operation has been optimized so that we do not actually perform a merge if the 
-                // the save operation did not actually return the entity - i.e. during OData and Mongo updates and deletes.
-                savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: "root" });
-            });
-            
-            return savedEntities;
-        }
-
-        function saveFail(error) {
-            markIsBeingSaved(entitiesToSave, false);
-            processServerErrors(saveContext, error);
-            if (errorCallback) errorCallback(error);
-            return Q.reject(error);
-        }
+    var dataService = DataService.resolve([saveOptions.dataService, this.dataService]);
+    var saveContext = {
+      entityManager: this,
+      dataService: dataService,
+      processSavedEntities: processSavedEntities,
+      resourceName: saveOptions.resourceName || this.saveOptions.resourceName || "SaveChanges"
     };
 
-    function clearServerErrors(entities) {
-        entities.forEach(function (entity) {
-            var serverKeys = [];
-            var aspect = entity.entityAspect;
-            __objectForEach(aspect._validationErrors, function (key, ve) {
-                if (ve.isServerError) serverKeys.push(key);
-            });
-            if (serverKeys.length === 0) return;
-            aspect._processValidationOpAndPublish(function () {
-                serverKeys.forEach(function (key) {
-                    aspect._removeValidationError(key);
-                });
-            });
+    // TODO: need to check that if we are doing a partial save that all entities whose temp keys
+    // are referenced are also in the partial save group
+
+    var saveBundle = { entities: entitiesToSave, saveOptions: saveOptions };
+
+
+    try { // Guard against exception thrown in dataservice adapter before it goes async
+      updateConcurrencyProperties(entitiesToSave);
+      return dataService.adapterInstance.saveChanges(saveContext, saveBundle)
+          .then(saveSuccess).then(null, saveFail);
+    } catch (err) {
+      // undo the marking by updateConcurrencyProperties
+      markIsBeingSaved(entitiesToSave, false);
+      if (errorCallback) errorCallback(err);
+      return Q.reject(err);
+    }
+
+    function saveSuccess(saveResult) {
+      var em = saveContext.entityManager;
+      var savedEntities = saveResult.entities = saveContext.processSavedEntities(saveResult);
+
+      // update _hasChanges after save.
+      var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
+      em._setHasChanges(hasChanges);
+
+      markIsBeingSaved(entitiesToSave, false);
+      if (callback) callback(saveResult);
+      return Q.resolve(saveResult);
+    }
+
+    function processSavedEntities(saveResult) {
+
+      var savedEntities = saveResult.entities;
+      if (savedEntities.length === 0) {
+        return [];
+      }
+      var keyMappings = saveResult.keyMappings;
+      var em = saveContext.entityManager;
+
+      // must occur outside of isLoading block
+      fixupKeys(em, keyMappings);
+
+      __using(em, "isLoading", true, function () {
+
+        var mappingContext = new MappingContext({
+          query: null, // tells visitAndMerge this is a save instead of a query
+          entityManager: em,
+          mergeOptions: { mergeStrategy: MergeStrategy.OverwriteChanges },
+          dataService: dataService
         });
+
+        // The visitAndMerge operation has been optimized so that we do not actually perform a merge if the
+        // the save operation did not actually return the entity - i.e. during OData and Mongo updates and deletes.
+        savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: "root" });
+      });
+
+      return savedEntities;
     }
 
-    function createEntityErrors(entities) {
-        var entityErrors = [];
-        entities.forEach(function (entity) {
-            __objectForEach(entity.entityAspect._validationErrors, function (key, ve)  {
-                var cfg = __extend( { 
-                    entity: entity,
-                    errorName: ve.validator.name 
-                }, ve, ["errorMessage", "propertyName", "isServerError"]);
-                entityErrors.push(cfg);
-            });
+    function saveFail(error) {
+      markIsBeingSaved(entitiesToSave, false);
+      processServerErrors(saveContext, error);
+      if (errorCallback) errorCallback(error);
+      return Q.reject(error);
+    }
+  };
+
+  function clearServerErrors(entities) {
+    entities.forEach(function (entity) {
+      var serverKeys = [];
+      var aspect = entity.entityAspect;
+      __objectForEach(aspect._validationErrors, function (key, ve) {
+        if (ve.isServerError) serverKeys.push(key);
+      });
+      if (serverKeys.length === 0) return;
+      aspect._processValidationOpAndPublish(function () {
+        serverKeys.forEach(function (key) {
+          aspect._removeValidationError(key);
         });
-        return entityErrors;
+      });
+    });
+  }
+
+  function createEntityErrors(entities) {
+    var entityErrors = [];
+    entities.forEach(function (entity) {
+      __objectForEach(entity.entityAspect._validationErrors, function (key, ve) {
+        var cfg = __extend({
+          entity: entity,
+          errorName: ve.validator.name
+        }, ve, ["errorMessage", "propertyName", "isServerError"]);
+        entityErrors.push(cfg);
+      });
+    });
+    return entityErrors;
+  }
+
+
+  function processServerErrors(saveContext, error) {
+    var serverErrors = error.entityErrors;
+    if (!serverErrors) return;
+    var entityManager = saveContext.entityManager;
+    var metadataStore = entityManager.metadataStore;
+    error.entityErrors = serverErrors.map(function (serr) {
+      var entity = null;
+      if (serr.keyValues) {
+        var entityType = metadataStore._getEntityType(serr.entityTypeName);
+        var ekey = new EntityKey(entityType, serr.keyValues);
+        entity = entityManager.findEntityByKey(ekey);
+      }
+
+      if (entity) {
+        var context = serr.propertyName ?
+                      {
+                        propertyName: serr.propertyName,
+                        property: entityType.getProperty(serr.propertyName)
+                      } : {
+                      };
+        var key = ValidationError.getKey(serr.errorName || serr.errorMessage, serr.propertyName);
+
+        var ve = new ValidationError(null, context, serr.errorMessage, key);
+        ve.isServerError = true;
+        entity.entityAspect.addValidationError(ve);
+      }
+
+      var entityError = __extend({
+        entity: entity,
+        isServerError: true
+      }, serr, ["errorName", "errorMessage", "propertyName"]);
+      return entityError;
+    });
+  }
+
+  function haveSameContents(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;
     }
-
-
-    function processServerErrors(saveContext, error) {
-        var serverErrors = error.entityErrors;
-        if (!serverErrors) return;
-        var entityManager = saveContext.entityManager;
-        var metadataStore = entityManager.metadataStore;
-        error.entityErrors = serverErrors.map(function (serr) {
-            var entity = null;
-            if (serr.keyValues) {
-                var entityType = metadataStore._getEntityType(serr.entityTypeName);
-                var ekey = new EntityKey(entityType, serr.keyValues);
-                entity = entityManager.findEntityByKey(ekey);
-            } 
-           
-            if (entity) {
-                var context = serr.propertyName ?
-                {
-                    propertyName: serr.propertyName,
-                    property: entityType.getProperty(serr.propertyName)
-                } : {
-                };
-                var key = ValidationError.getKey(serr.errorName || serr.errorMessage, serr.propertyName);
-
-                var ve = new ValidationError(null, context, serr.errorMessage, key);
-                ve.isServerError = true;
-                entity.entityAspect.addValidationError(ve);
-            }
-
-            var entityError = __extend({
-                entity: entity,
-                isServerError: true
-            }, serr, ["errorName", "errorMessage", "propertyName"]);
-            return entityError;
-        });
+    for (var i = 0, c = arr1.length; i < c; i++) {
+      if (arr1[i] !== arr2[i]) return false;
     }
-    
-    function haveSameContents(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-        for (var i=0, c=arr1.length; i<c; i++) {
-            if (arr1[i] !== arr2[i]) return false;
-        }
-        return true;
-    }
+    return true;
+  }
 
-    
-    proto._findEntityGroup = function (entityType) {
-        return this._entityGroupMap[entityType.name];
-    };
 
-        
-    /**
-    Attempts to locate an entity within this EntityManager by its key. 
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var employee = em1.getEntityByKey("Employee", 1);
-        // employee will either be an entity or null.
-    @method getEntityByKey
-    @param typeName {EntityType | String} The EntityType or EntityType name for this key.
-    @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
-    @return {Entity} An Entity or null;
-    **/
-        
-    /**
-    Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var employeeType = em1.metadataStore.getEntityType("Employee");
-        var employeeKey = new EntityKey(employeeType, 1);
-        var employee = em1.getEntityByKey(employeeKey);
-        // employee will either be an entity or null.
-    @method getEntityByKey - overload
-    @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-    @return {Entity} An Entity or null;
-    **/
-    proto.getEntityByKey = function () {
-        var entityKey = createEntityKey(this, arguments).entityKey;
-        var entityTypes = entityKey._subtypes || [entityKey.entityType];
-        var ek = null;
-        // hack use of some to simulate mapFirst logic.
-        entityTypes.some(function(et) {
-            var group = this._findEntityGroup(et);
-            // group version of findEntityByKey doesn't care about entityType
-            ek = group && group.findEntityByKey(entityKey);
-            return ek;
-        }, this);
-        return ek;
-    };
-        
-    /**
-    Attempts to fetch an entity from the server by its key with
-    an option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy 
-    will be used to merge any server side entity returned by this method.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        em1.fetchEntityByKey("Employee", 1).then(function(result) {
+  proto._findEntityGroup = function (entityType) {
+    return this._entityGroupMap[entityType.name];
+  };
+
+
+  /**
+   Attempts to locate an entity within this EntityManager by its key.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var employee = em1.getEntityByKey("Employee", 1);
+   // employee will either be an entity or null.
+   @method getEntityByKey
+   @param typeName {EntityType | String} The EntityType or EntityType name for this key.
+   @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
+   @return {Entity} An Entity or null;
+   **/
+
+  /**
+   Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var employeeType = em1.metadataStore.getEntityType("Employee");
+   var employeeKey = new EntityKey(employeeType, 1);
+   var employee = em1.getEntityByKey(employeeKey);
+   // employee will either be an entity or null.
+   @method getEntityByKey - overload
+   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+   @return {Entity} An Entity or null;
+   **/
+  proto.getEntityByKey = function () {
+    var entityKey = createEntityKey(this, arguments).entityKey;
+    var entityTypes = entityKey._subtypes || [entityKey.entityType];
+    var ek = null;
+    // hack use of some to simulate mapFirst logic.
+    entityTypes.some(function (et) {
+      var group = this._findEntityGroup(et);
+      // group version of findEntityByKey doesn't care about entityType
+      ek = group && group.findEntityByKey(entityKey);
+      return ek;
+    }, this);
+    return ek;
+  };
+
+  /**
+   Attempts to fetch an entity from the server by its key with
+   an option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy
+   will be used to merge any server side entity returned by this method.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   em1.fetchEntityByKey("Employee", 1).then(function(result) {
             var employee = result.entity;
             var entityKey = result.entityKey;
             var fromCache = result.fromCache;
         });
-    @method fetchEntityByKey
-    @async
-    @param typeName {EntityType | String} The EntityType or EntityType name for this key.
-    @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
-    @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
-    @return {Promise} 
+   @method fetchEntityByKey
+   @async
+   @param typeName {EntityType | String} The EntityType or EntityType name for this key.
+   @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
+   @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
+   @return {Promise}
 
-        promiseData.entity {Object} The entity returned or null
-        promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-        promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
-    **/
-        
-    /**
-    Attempts to fetch an entity from the server by its {{#crossLink "EntityKey"}}{{/crossLink}} with
-    an option to check the local cache first. 
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var employeeType = em1.metadataStore.getEntityType("Employee");
-        var employeeKey = new EntityKey(employeeType, 1);
-        em1.fetchEntityByKey(employeeKey).then(function(result) {
+   promiseData.entity {Object} The entity returned or null
+   promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
+   promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
+   **/
+
+  /**
+   Attempts to fetch an entity from the server by its {{#crossLink "EntityKey"}}{{/crossLink}} with
+   an option to check the local cache first.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var employeeType = em1.metadataStore.getEntityType("Employee");
+   var employeeKey = new EntityKey(employeeType, 1);
+   em1.fetchEntityByKey(employeeKey).then(function(result) {
             var employee = result.entity;
             var entityKey = result.entityKey;
             var fromCache = result.fromCache;
         });
-    @method fetchEntityByKey - overload
-    @async
-    @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-    @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
-    @return {Promise} 
-        
-        promiseData.entity {Object} The entity returned or null
-        promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-        promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
-    **/
-    proto.fetchEntityByKey = function () {
-        var dataService = DataService.resolve([this.dataService]);
-        if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
-            return fetchEntityByKeyCore(this, arguments);
-        } else {
-            var that = this;
-            var args = arguments;
-            return this.fetchMetadata(dataService).then(function () {
-                return fetchEntityByKeyCore(that, args);
-            });
-        }
-    };
+   @method fetchEntityByKey - overload
+   @async
+   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+   @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
+   @return {Promise}
 
-    function fetchEntityByKeyCore(em, args) {
+   promiseData.entity {Object} The entity returned or null
+   promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
+   promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
+   **/
+  proto.fetchEntityByKey = function () {
+    var dataService = DataService.resolve([this.dataService]);
+    if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
+      return fetchEntityByKeyCore(this, arguments);
+    } else {
+      var that = this;
+      var args = arguments;
+      return this.fetchMetadata(dataService).then(function () {
+        return fetchEntityByKeyCore(that, args);
+      });
+    }
+  };
 
-        var tpl = createEntityKey(em, args);
-        var entityKey = tpl.entityKey;
-        var checkLocalCacheFirst = tpl.remainingArgs.length === 0 ? false : !!tpl.remainingArgs[0];
-        var entity;
-        var foundIt = false;
-        if (checkLocalCacheFirst) {
-            entity = em.getEntityByKey(entityKey);
-            foundIt = !!entity;         
-            if (foundIt && 
-                // null the entity if it is deleted and we should exclude deleted entities  
-                !em.queryOptions.includeDeleted && entity.entityAspect.entityState.isDeleted()){
-                entity = null;
-                // but resume looking if we'd overwrite deleted entity with a remote entity
-                // note: em.queryOptions is always fully resolved by now
-                foundIt = em.queryOptions.mergeStrategy !== MergeStrategy.OverwriteChanges;
-            }
-        } 
-        if (foundIt) {
-            return Q.resolve({ entity: entity, entityKey: entityKey, fromCache: true });
-        } else {
-            return EntityQuery.fromEntityKey(entityKey).using(em).execute().then(function(data) {
-                entity = (data.results.length === 0) ? null : data.results[0];
-                return Q.resolve({ entity: entity, entityKey: entityKey, fromCache: false });
-            });
-        }
-    };
-        
-    /**
-    Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var employeeType = em1.metadataStore.getEntityType("Employee");
-        var employeeKey = new EntityKey(employeeType, 1);
-        var employee = em1.findEntityByKey(employeeKey);
-        // employee will either be an entity or null.
-    @method findEntityByKey
-    @deprecated - use getEntityByKey instead
-    @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-    @return {Entity} An Entity or null;
-    **/
-    proto.findEntityByKey = function (entityKey) {
-        return this.getEntityByKey(entityKey);
-    };
+  function fetchEntityByKeyCore(em, args) {
 
-    /**
-    Generates a temporary key for the specified entity.  This is used to insure that newly
-    created entities have unique keys and to register that these keys are temporary and
-    need to be automatically replaced with 'real' key values once these entities are saved.
+    var tpl = createEntityKey(em, args);
+    var entityKey = tpl.entityKey;
+    var checkLocalCacheFirst = tpl.remainingArgs.length === 0 ? false : !!tpl.remainingArgs[0];
+    var entity;
+    var foundIt = false;
+    if (checkLocalCacheFirst) {
+      entity = em.getEntityByKey(entityKey);
+      foundIt = !!entity;
+      if (foundIt &&
+        // null the entity if it is deleted and we should exclude deleted entities
+          !em.queryOptions.includeDeleted && entity.entityAspect.entityState.isDeleted()) {
+        entity = null;
+        // but resume looking if we'd overwrite deleted entity with a remote entity
+        // note: em.queryOptions is always fully resolved by now
+        foundIt = em.queryOptions.mergeStrategy !== MergeStrategy.OverwriteChanges;
+      }
+    }
+    if (foundIt) {
+      return Q.resolve({ entity: entity, entityKey: entityKey, fromCache: true });
+    } else {
+      return EntityQuery.fromEntityKey(entityKey).using(em).execute().then(function (data) {
+        entity = (data.results.length === 0) ? null : data.results[0];
+        return Q.resolve({ entity: entity, entityKey: entityKey, fromCache: false });
+      });
+    }
+  };
 
-    The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
-    the keys - See the  {{#crossLink "~keyGenerator-interface"}}{{/crossLink}} interface description to see
-    how a custom key generator can be plugged in.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var custumer = custType.createEntity();
-        var customerId = em.generateTempKeyValue(custumer);
-        // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value
-        // This property will change again after a successful save of the 'customer' entity.
+  /**
+   Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var employeeType = em1.metadataStore.getEntityType("Employee");
+   var employeeKey = new EntityKey(employeeType, 1);
+   var employee = em1.findEntityByKey(employeeKey);
+   // employee will either be an entity or null.
+   @method findEntityByKey
+   @deprecated - use getEntityByKey instead
+   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+   @return {Entity} An Entity or null;
+   **/
+  proto.findEntityByKey = function (entityKey) {
+    return this.getEntityByKey(entityKey);
+  };
 
-        em1.saveChanges()
-            .then( function( data) {
+  /**
+   Generates a temporary key for the specified entity.  This is used to insure that newly
+   created entities have unique keys and to register that these keys are temporary and
+   need to be automatically replaced with 'real' key values once these entities are saved.
+
+   The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
+   the keys - See the  {{#crossLink "~keyGenerator-interface"}}{{/crossLink}} interface description to see
+   how a custom key generator can be plugged in.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var custumer = custType.createEntity();
+   var customerId = em.generateTempKeyValue(custumer);
+   // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value
+   // This property will change again after a successful save of the 'customer' entity.
+
+   em1.saveChanges()
+   .then( function( data) {
                 var sameCust1 = data.results[0];
                 // cust1 === sameCust1;
                 // but cust1.getProperty("CustomerId") != customerId
@@ -13644,1883 +13676,1895 @@ var EntityManager = (function () {
                 // new id.
             })
 
-    @method generateTempKeyValue
-    @param entity {Entity} The Entity to generate a key for.
-    @return {Object} The new key value
-    **/
-    proto.generateTempKeyValue = function (entity) {
-        // TODO - check if this entity is attached to this EntityManager.
-        assertParam(entity, "entity").isEntity().check();
-        var entityType = entity.entityType;
-        var nextKeyValue = this.keyGenerator.generateTempKeyValue(entityType);
-        var keyProp = entityType.keyProperties[0];
-        entity.setProperty(keyProp.name, nextKeyValue);
-        entity.entityAspect.hasTempKey = true;
-        return nextKeyValue;
-    };
-        
-    /**
-    Returns whether there are any changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
-    has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
-    @example
-    This method can be used to determine if an EntityManager has any changes
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        if ( em1.hasChanges() {
+   @method generateTempKeyValue
+   @param entity {Entity} The Entity to generate a key for.
+   @return {Object} The new key value
+   **/
+  proto.generateTempKeyValue = function (entity) {
+    // TODO - check if this entity is attached to this EntityManager.
+    assertParam(entity, "entity").isEntity().check();
+    var entityType = entity.entityType;
+    var nextKeyValue = this.keyGenerator.generateTempKeyValue(entityType);
+    var keyProp = entityType.keyProperties[0];
+    entity.setProperty(keyProp.name, nextKeyValue);
+    entity.entityAspect.hasTempKey = true;
+    return nextKeyValue;
+  };
+
+  /**
+   Returns whether there are any changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
+   has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
+   @example
+   This method can be used to determine if an EntityManager has any changes
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   if ( em1.hasChanges() {
             // do something interesting
         }
-    or if it has any changes on to a specific {{#crossLink "EntityType"}}{{/crossLink}}
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        if ( em1.hasChanges(custType) {
+   or if it has any changes on to a specific {{#crossLink "EntityType"}}{{/crossLink}}
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   if ( em1.hasChanges(custType) {
             // do something interesting
         }
-    or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var orderType = em1.metadataStore.getEntityType("Order");
-        if ( em1.hasChanges( [custType, orderType]) {
+   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var orderType = em1.metadataStore.getEntityType("Order");
+   if ( em1.hasChanges( [custType, orderType]) {
             // do something interesting
         }
-    @method hasChanges
-    @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
-    If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names. 
-    @return {Boolean} Whether there were any changed entities.
-    **/
-    proto.hasChanges = function (entityTypes) {
-        if (!this._hasChanges) return false;
-        if (entityTypes === undefined) return this._hasChanges;
-        return this._hasChangesCore(entityTypes);
-    };
-        
-    /**
-    An {{#crossLink "Event"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes. 
-    @example                    
-        var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-        em.hasChangesChanged.subscribe(function(args) {
+   @method hasChanges
+   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
+   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+   @return {Boolean} Whether there were any changed entities.
+   **/
+  proto.hasChanges = function (entityTypes) {
+    if (!this._hasChanges) return false;
+    if (entityTypes === undefined) return this._hasChanges;
+    return this._hasChangesCore(entityTypes);
+  };
+
+  /**
+   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.
+   @example
+   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+   em.hasChangesChanged.subscribe(function(args) {
             var hasChangesChanged = args.hasChanges;
             var entityManager = args.entityManager;
         });
-    });
-      
-    @event hasChangesChanged
-    @param entityManager {EntityManager} The EntityManager whose 'hasChanges' status has changed. 
-    @param hasChanges {Boolean} Whether or not this EntityManager has changes.
-    @readOnly
-    **/
-        
-        
+   });
+
+   @event hasChangesChanged
+   @param entityManager {EntityManager} The EntityManager whose 'hasChanges' status has changed.
+   @param hasChanges {Boolean} Whether or not this EntityManager has changes.
+   @readOnly
+   **/
+
+
     // backdoor the "really" check for changes.
-    proto._hasChangesCore = function(entityTypes) {
-        entityTypes = checkEntityTypes(this, entityTypes);
-        var entityGroups = getEntityGroups(this, entityTypes);
-        return entityGroups.some(function(eg) {
-            return eg.hasChanges();
-        });
-    };
-        
-    /**
-    Returns a array of all changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
-    has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
-    @example
-    This method can be used to get all of the changed entities within an EntityManager
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var changedEntities = em1.getChanges();
-    or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var changedCustomers = em1.getChanges(custType);
-    or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var changedCustomersAndOrders = em1.getChanges([custType, orderType]);
-    @method getChanges
-    @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
-    If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names. 
-    @return {Array of Entity} Array of Entities
-    **/
-    proto.getChanges = function (entityTypes) {
-        entityTypes = checkEntityTypes(this, entityTypes);
-        var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-        return getEntitiesCore(this, entityTypes, entityStates);
-    };
+  proto._hasChangesCore = function (entityTypes) {
+    entityTypes = checkEntityTypes(this, entityTypes);
+    var entityGroups = getEntityGroups(this, entityTypes);
+    return entityGroups.some(function (eg) {
+      return eg.hasChanges();
+    });
+  };
 
-    /**
-    Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.
-    Calls EntityAspect.rejectChanges on every changed entity in this EntityManager. 
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities.
-        var entities = em1.rejectChanges();
-        
-    @method rejectChanges
-    @return {Array of Entity} The entities whose changes were rejected. These entities will all have EntityStates of 
-    either 'Unchanged' or 'Detached'
-    **/
-    proto.rejectChanges = function () {
-        if (!this._hasChanges) return [];
-        var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-        var changes = getEntitiesCore(this, null, entityStates);
-        // next line stops individual reject changes from each calling _hasChangesCore
-        this._hasChanges = false;
-        changes.forEach(function(e) {
-            e.entityAspect.rejectChanges();
-        });
-        this.hasChangesChanged.publish({ entityManager: this, hasChanges: false });
-        return changes;
-    };
-        
-    /**
-    Returns a array of all entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s with the specified {{#crossLink "EntityState"}}{{/crossLink}}s. 
-    @example
-    This method can be used to get all of the entities within an EntityManager
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var entities = em1.getEntities();
-    or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var customers = em1.getEntities(custType);
-    or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var customersAndOrders = em1.getChanges([custType, orderType]);
-    You can also ask for entities with a particular {{#crossLink "EntityState"}}{{/crossLink}} or EntityStates.
-    @example
-        // assume em1 is an EntityManager containing a number of preexisting entities. 
-        var custType = em1.metadataStore.getEntityType("Customer");
-        var orderType = em1.metadataStore.getEntityType("Order");
-        var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState.Added);
-    @method getEntities
-    @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which entities will be found.
-    If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names. 
-    @param [entityState] {EntityState|Array of EntityState} The {{#crossLink "EntityState"}}{{/crossLink}}s for which entities will be found.
-    If this parameter is omitted, entities of all EntityStates are returned. 
-    @return {Array of Entity} Array of Entities
-    **/
-    proto.getEntities = function (entityTypes, entityStates) {
-        entityTypes = checkEntityTypes(this, entityTypes);
-        assertParam(entityStates, "entityStates").isOptional().isEnumOf(EntityState).or().isNonEmptyArray().isEnumOf(EntityState).check();
-               
-        entityStates = entityStates && validateEntityStates(this, entityStates);
-        return getEntitiesCore(this, entityTypes, entityStates);
-    };
-        
-   
+  /**
+   Returns a array of all changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
+   has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
+   @example
+   This method can be used to get all of the changed entities within an EntityManager
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var changedEntities = em1.getChanges();
+   or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var changedCustomers = em1.getChanges(custType);
+   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var changedCustomersAndOrders = em1.getChanges([custType, orderType]);
+   @method getChanges
+   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
+   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+   @return {Array of Entity} Array of Entities
+   **/
+  proto.getChanges = function (entityTypes) {
+    entityTypes = checkEntityTypes(this, entityTypes);
+    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
+    return getEntitiesCore(this, entityTypes, entityStates);
+  };
 
-    // protected methods
+  /**
+   Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.
+   Calls EntityAspect.rejectChanges on every changed entity in this EntityManager.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var entities = em1.rejectChanges();
 
-    //proto._checkStateChange = function (entity, oldEntityState, newEntityState) {
-    //    if (oldEntityState == newEntityState) return;
-    //    var isUnchanged = newEntityState == EntityState.Unchanged;
-    //    this._notifyStateChange(entity, !isUnchanged);
-    //};
+   @method rejectChanges
+   @return {Array of Entity} The entities whose changes were rejected. These entities will all have EntityStates of
+   either 'Unchanged' or 'Detached'
+   **/
+  proto.rejectChanges = function () {
+    if (!this._hasChanges) return [];
+    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
+    var changes = getEntitiesCore(this, null, entityStates);
+    // next line stops individual reject changes from each calling _hasChangesCore
+    this._hasChanges = false;
+    changes.forEach(function (e) {
+      e.entityAspect.rejectChanges();
+    });
+    this.hasChangesChanged.publish({ entityManager: this, hasChanges: false });
+    return changes;
+  };
 
-    
-    proto._notifyStateChange = function (entity, needsSave) {
-        var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
-        
-        if (needsSave) {
-            if (!this._hasChanges) {
-                this._setHasChanges(true);
-                this.entityChanged.publish(ecArgs);
-            }
+  /**
+   Returns a array of all entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s with the specified {{#crossLink "EntityState"}}{{/crossLink}}s.
+   @example
+   This method can be used to get all of the entities within an EntityManager
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var entities = em1.getEntities();
+   or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var customers = em1.getEntities(custType);
+   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var customersAndOrders = em1.getChanges([custType, orderType]);
+   You can also ask for entities with a particular {{#crossLink "EntityState"}}{{/crossLink}} or EntityStates.
+   @example
+   // assume em1 is an EntityManager containing a number of preexisting entities.
+   var custType = em1.metadataStore.getEntityType("Customer");
+   var orderType = em1.metadataStore.getEntityType("Order");
+   var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState.Added);
+   @method getEntities
+   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which entities will be found.
+   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+   @param [entityState] {EntityState|Array of EntityState} The {{#crossLink "EntityState"}}{{/crossLink}}s for which entities will be found.
+   If this parameter is omitted, entities of all EntityStates are returned.
+   @return {Array of Entity} Array of Entities
+   **/
+  proto.getEntities = function (entityTypes, entityStates) {
+    entityTypes = checkEntityTypes(this, entityTypes);
+    assertParam(entityStates, "entityStates").isOptional().isEnumOf(EntityState).or().isNonEmptyArray().isEnumOf(EntityState).check();
+
+    entityStates = entityStates && validateEntityStates(this, entityStates);
+    return getEntitiesCore(this, entityTypes, entityStates);
+  };
+
+
+  // protected methods
+
+  //proto._checkStateChange = function (entity, oldEntityState, newEntityState) {
+  //    if (oldEntityState == newEntityState) return;
+  //    var isUnchanged = newEntityState == EntityState.Unchanged;
+  //    this._notifyStateChange(entity, !isUnchanged);
+  //};
+
+
+  proto._notifyStateChange = function (entity, needsSave) {
+    var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
+
+    if (needsSave) {
+      if (!this._hasChanges) {
+        this._setHasChanges(true);
+        this.entityChanged.publish(ecArgs);
+      }
+    } else {
+      // called when rejecting a change or merging an unchanged record.
+      // NOTE: this can be slow with lots of entities in the cache.
+      // so defer it during a query/import or save and call it once when complete ( if needed).
+      if (this._hasChanges) {
+        if (this.isLoading) {
+          this._hasChangesAction = this._hasChangesAction || function () {
+            this._setHasChanges(null);
+            this.entityChanged.publish(ecArgs);
+          }.bind(this);
         } else {
-            // called when rejecting a change or merging an unchanged record.
-            // NOTE: this can be slow with lots of entities in the cache.
-            // so defer it during a query/import or save and call it once when complete ( if needed).
-            if (this._hasChanges) {
-                if (this.isLoading) {
-                    this._hasChangesAction = this._hasChangesAction || function() {
-                        this._setHasChanges(null);
-                        this.entityChanged.publish(ecArgs);
-                    }.bind(this);
-                } else {
-                    this._setHasChanges(null);
-                    this.entityChanged.publish(ecArgs);
-                }
-            }
+          this._setHasChanges(null);
+          this.entityChanged.publish(ecArgs);
         }
-    };
-
-    proto._setHasChanges = function (hasChanges) {
-        if (hasChanges == null) hasChanges = this._hasChangesCore();
-        var hadChanges = this._hasChanges;
-        this._hasChanges = hasChanges;
-        if (hasChanges != hadChanges) {
-            this.hasChangesChanged.publish({ entityManager: this, hasChanges: hasChanges });
-        }
-        this._hasChangesAction = null;
+      }
     }
+  };
 
-    proto._linkRelatedEntities = function (entity) {
-        var em = this;
-        var entityAspect = entity.entityAspect;
-        // we do not want entityState to change as a result of linkage.
-        __using(em, "isLoading", true, function () {
+  proto._setHasChanges = function (hasChanges) {
+    if (hasChanges == null) hasChanges = this._hasChangesCore();
+    var hadChanges = this._hasChanges;
+    this._hasChanges = hasChanges;
+    if (hasChanges != hadChanges) {
+      this.hasChangesChanged.publish({ entityManager: this, hasChanges: hasChanges });
+    }
+    this._hasChangesAction = null;
+  }
 
-            var unattachedMap = em._unattachedChildrenMap;
-            var entityKey = entityAspect.getKey();
+  proto._linkRelatedEntities = function (entity) {
+    var em = this;
+    var entityAspect = entity.entityAspect;
+    // we do not want entityState to change as a result of linkage.
+    __using(em, "isLoading", true, function () {
 
-            // attach any unattachedChildren
-            var tuples = unattachedMap.getTuples(entityKey);
-            if (tuples) {
-                tuples.slice(0).forEach(function (tpl) {
+      var unattachedMap = em._unattachedChildrenMap;
+      var entityKey = entityAspect.getKey();
 
-                    var unattachedChildren = tpl.children.filter(function (e) {
-                        return e.entityAspect.entityState !== EntityState.Detached;
-                    });
+      // attach any unattachedChildren
+      var tuples = unattachedMap.getTuples(entityKey);
+      if (tuples) {
+        tuples.slice(0).forEach(function (tpl) {
 
-                    var childToParentNp, parentToChildNp;
+          var unattachedChildren = tpl.children.filter(function (e) {
+            return e.entityAspect.entityState !== EntityState.Detached;
+          });
 
-                    // np is usually childToParentNp 
-                    // except with unidirectional 1-n where it is parentToChildNp;
-                    var np = tpl.navigationProperty;
+          var childToParentNp, parentToChildNp;
 
-                    if (np.inverse) {
-                        // bidirectional
-                        childToParentNp = np;
-                        parentToChildNp = np.inverse;
+          // np is usually childToParentNp
+          // except with unidirectional 1-n where it is parentToChildNp;
+          var np = tpl.navigationProperty;
 
-                        if (parentToChildNp.isScalar) {
-                            var onlyChild = unattachedChildren[0];
-                            entity.setProperty(parentToChildNp.name, onlyChild);
-                            onlyChild.setProperty(childToParentNp.name, entity);
-                        } else {
-                            var currentChildren = entity.getProperty(parentToChildNp.name);
-                            unattachedChildren.forEach(function (child) {
-                                currentChildren.push(child);
-                                child.setProperty(childToParentNp.name, entity);
-                            });
-                        }
-                    } else {
-                        // unidirectional
-                        if (np.parentType === entity.entityType) {
+          if (np.inverse) {
+            // bidirectional
+            childToParentNp = np;
+            parentToChildNp = np.inverse;
 
-                            parentToChildNp = np;
-                            if (parentToChildNp.isScalar) {
-                                // 1 -> 1 eg parent: Order child: InternationalOrder
-                                entity.setProperty(parentToChildNp.name, unattachedChildren[0]);
-                            } else {
-                                // 1 -> n  eg: parent: Region child: Terr
-                                var currentChildren = entity.getProperty(parentToChildNp.name);
-                                unattachedChildren.forEach(function (child) {
-                                    // we know if can't already be there.
-                                    currentChildren._push(child);
-                                });
-                            }
-                        } else {
-                            // n -> 1  eg: parent: child: OrderDetail parent: Product
-                            childToParentNp = np;
+            if (parentToChildNp.isScalar) {
+              var onlyChild = unattachedChildren[0];
+              entity.setProperty(parentToChildNp.name, onlyChild);
+              onlyChild.setProperty(childToParentNp.name, entity);
+            } else {
+              var currentChildren = entity.getProperty(parentToChildNp.name);
+              unattachedChildren.forEach(function (child) {
+                currentChildren.push(child);
+                child.setProperty(childToParentNp.name, entity);
+              });
+            }
+          } else {
+            // unidirectional
+            if (np.parentType === entity.entityType) {
 
-                            unattachedChildren.forEach(function (child) {
-                                child.setProperty(childToParentNp.name, entity);
-                            });
-                        }
-                    }
-                    unattachedMap.removeChildren(entityKey, childToParentNp);
+              parentToChildNp = np;
+              if (parentToChildNp.isScalar) {
+                // 1 -> 1 eg parent: Order child: InternationalOrder
+                entity.setProperty(parentToChildNp.name, unattachedChildren[0]);
+              } else {
+                // 1 -> n  eg: parent: Region child: Terr
+                var currentChildren = entity.getProperty(parentToChildNp.name);
+                unattachedChildren.forEach(function (child) {
+                  // we know if can't already be there.
+                  currentChildren._push(child);
                 });
-            }
-
-            
-            // now add to unattachedMap if needed.
-            entity.entityType.navigationProperties.forEach(function (np) {
-                if (np.isScalar) {
-                    var value = entity.getProperty(np.name);
-                    // property is already linked up
-                    if (value) return;
-                }
-
-                // first determine if np contains a parent or child
-                // having a parentKey means that this is a child
-                // if a parent then no need for more work because children will attach to it.
-                var parentKey = entityAspect.getParentKey(np);
-                if (parentKey) {
-                    // check for empty keys - meaning that parent id's are not yet set.
-                    if (parentKey._isEmpty()) return;
-                    // if a child - look for parent in the em cache
-                    var parent = em.findEntityByKey(parentKey);
-                    if (parent) {
-                        // if found hook it up
-                        entity.setProperty(np.name, parent);
-                    } else {
-                        // else add parent to unresolvedParentMap;
-                        unattachedMap.addChild(parentKey, np, entity);
-                    }
-                } 
-            });
-
-            // handle unidirectional 1-x where we set x.fk
-            entity.entityType.foreignKeyProperties.forEach(function (fkProp) {
-                var invNp = fkProp.inverseNavigationProperty;
-                if (!invNp) return;
-                // unidirectional fk props only
-                var fkValue = entity.getProperty(fkProp.name);
-                var parentKey = new EntityKey(invNp.parentType, [fkValue]);
-                var parent = em.findEntityByKey(parentKey);
-                
-                if (parent) {
-                    if (invNp.isScalar) {
-                        parent.setProperty(invNp.name, entity);
-                    } else {
-                        if (em.isLoading) {
-                            parent.getProperty(invNp.name)._push(entity);
-                        } else {
-                            parent.getProperty(invNp.name).push(entity);
-                        }
-                    }
-                } else {
-                    // else add parent to unresolvedParentMap;
-                    unattachedMap.addChild(parentKey, invNp, entity);
-                }
-            });
-        });
-    };
-
-    // private fns
-
-    // takes in entityTypes as either strings or entityTypes or arrays of either
-    // and returns either an entityType or an array of entityTypes or throws an error
-    function checkEntityTypes(em, entityTypes) {
-        assertParam(entityTypes, "entityTypes").isString().isOptional().or().isNonEmptyArray().isString()
-            .or().isInstanceOf(EntityType).or().isNonEmptyArray().isInstanceOf(EntityType).check();
-        if (typeof entityTypes === "string") {
-            entityTypes = em.metadataStore._getEntityType(entityTypes, false);
-        } else if (Array.isArray(entityTypes) && typeof entityTypes[0] === "string") {
-            entityTypes = entityTypes.map(function (etName) {
-                return em.metadataStore._getEntityType(etName, false);
-            });
-        }
-        return entityTypes;
-    }
-
-    function getEntitiesCore(em, entityTypes, entityStates) {
-        var entityGroups = getEntityGroups(em, entityTypes);
-
-        // TODO: think about writing a core.mapMany method if we see more of these.
-        var selected;
-        entityGroups.forEach(function (eg) {
-            // eg may be undefined or null
-            if (!eg) return;
-            var entities = eg.getEntities(entityStates);
-            if (selected) {
-                selected.push.apply(selected, entities);
+              }
             } else {
-                selected = entities;
-            }
-        });
-        return selected || [];
-    }
-        
-    function createEntityKey(em, args) {
-        try {
-            if (args[0] instanceof EntityKey) {
-                return { entityKey: args[0], remainingArgs: __arraySlice(args, 1) };
-            } else if (args.length >= 2) {
-                var entityType = (typeof args[0] === 'string') ? em.metadataStore._getEntityType(args[0], false) : args[0];
-                return { entityKey: new EntityKey(entityType, args[1]), remainingArgs: __arraySlice(args, 2) };
-            }
-        } catch (e) {/* throw below */}
-        throw new Error("Must supply an EntityKey OR an EntityType name or EntityType followed by a key value or an array of key values.");
-    }      
-        
-    function markIsBeingSaved(entities, flag) {
-        entities.forEach(function(entity) {
-            entity.entityAspect.isBeingSaved = flag;
-        });
-    }
+              // n -> 1  eg: parent: child: OrderDetail parent: Product
+              childToParentNp = np;
 
-    function exportEntityGroups(em, entities) {
-        var entityGroupMap;
-        if (entities) {
-            // group entities by entityType and 
-            // create 'groups' that look like entityGroups.
-            entityGroupMap = {};
-            entities.forEach(function (e) {
-                var group = entityGroupMap[e.entityType.name];
-                if (!group) {
-                    group = {};
-                    group.entityType = e.entityType;
-                    group._entities = [];
-                    entityGroupMap[e.entityType.name] = group;
-                }
-                group._entities.push(e);
-            });
+              unattachedChildren.forEach(function (child) {
+                child.setProperty(childToParentNp.name, entity);
+              });
+            }
+          }
+          unattachedMap.removeChildren(entityKey, childToParentNp);
+        });
+      }
+
+
+      // now add to unattachedMap if needed.
+      entity.entityType.navigationProperties.forEach(function (np) {
+        if (np.isScalar) {
+          var value = entity.getProperty(np.name);
+          // property is already linked up
+          if (value) return;
+        }
+
+        // first determine if np contains a parent or child
+        // having a parentKey means that this is a child
+        // if a parent then no need for more work because children will attach to it.
+        var parentKey = entityAspect.getParentKey(np);
+        if (parentKey) {
+          // check for empty keys - meaning that parent id's are not yet set.
+          if (parentKey._isEmpty()) return;
+          // if a child - look for parent in the em cache
+          var parent = em.findEntityByKey(parentKey);
+          if (parent) {
+            // if found hook it up
+            entity.setProperty(np.name, parent);
+          } else {
+            // else add parent to unresolvedParentMap;
+            unattachedMap.addChild(parentKey, np, entity);
+          }
+        }
+      });
+
+      // handle unidirectional 1-x where we set x.fk
+      entity.entityType.foreignKeyProperties.forEach(function (fkProp) {
+        var invNp = fkProp.inverseNavigationProperty;
+        if (!invNp) return;
+        // unidirectional fk props only
+        var fkValue = entity.getProperty(fkProp.name);
+        var parentKey = new EntityKey(invNp.parentType, [fkValue]);
+        var parent = em.findEntityByKey(parentKey);
+
+        if (parent) {
+          if (invNp.isScalar) {
+            parent.setProperty(invNp.name, entity);
+          } else {
+            if (em.isLoading) {
+              parent.getProperty(invNp.name)._push(entity);
+            } else {
+              parent.getProperty(invNp.name).push(entity);
+            }
+          }
         } else {
-            entityGroupMap = em._entityGroupMap;
+          // else add parent to unresolvedParentMap;
+          unattachedMap.addChild(parentKey, invNp, entity);
         }
+      });
+    });
+  };
 
-        var tempKeys = [];
-        var newGroupMap = {};
-        __objectForEach(entityGroupMap, function (entityTypeName, entityGroup) {
-            newGroupMap[entityTypeName] = exportEntityGroup(entityGroup, tempKeys);
-        });
+  // private fns
 
-        return { entityGroupMap: newGroupMap, tempKeys: tempKeys };
+  // takes in entityTypes as either strings or entityTypes or arrays of either
+  // and returns either an entityType or an array of entityTypes or throws an error
+  function checkEntityTypes(em, entityTypes) {
+    assertParam(entityTypes, "entityTypes").isString().isOptional().or().isNonEmptyArray().isString()
+        .or().isInstanceOf(EntityType).or().isNonEmptyArray().isInstanceOf(EntityType).check();
+    if (typeof entityTypes === "string") {
+      entityTypes = em.metadataStore._getEntityType(entityTypes, false);
+    } else if (Array.isArray(entityTypes) && typeof entityTypes[0] === "string") {
+      entityTypes = entityTypes.map(function (etName) {
+        return em.metadataStore._getEntityType(etName, false);
+      });
     }
+    return entityTypes;
+  }
 
-    function exportEntityGroup(entityGroup, tempKeys) {
-        var resultGroup = {};
-        var entityType = entityGroup.entityType;
-        var dps = entityType.dataProperties;
-        var serializerFn = getSerializerFn(entityType);
-        var rawEntities = [];
-        entityGroup._entities.forEach(function (entity) {
-            if (entity) {
-                var rawEntity = structuralObjectToJson(entity, dps, serializerFn, tempKeys);
-                rawEntities.push(rawEntity);
-            }
-        });
-        resultGroup.entities = rawEntities;
-        return resultGroup;
+  function getEntitiesCore(em, entityTypes, entityStates) {
+    var entityGroups = getEntityGroups(em, entityTypes);
+
+    // TODO: think about writing a core.mapMany method if we see more of these.
+    var selected;
+    entityGroups.forEach(function (eg) {
+      // eg may be undefined or null
+      if (!eg) return;
+      var entities = eg.getEntities(entityStates);
+      if (selected) {
+        selected.push.apply(selected, entities);
+      } else {
+        selected = entities;
+      }
+    });
+    return selected || [];
+  }
+
+  function createEntityKey(em, args) {
+    try {
+      if (args[0] instanceof EntityKey) {
+        return { entityKey: args[0], remainingArgs: __arraySlice(args, 1) };
+      } else if (args.length >= 2) {
+        var entityType = (typeof args[0] === 'string') ? em.metadataStore._getEntityType(args[0], false) : args[0];
+        return { entityKey: new EntityKey(entityType, args[1]), remainingArgs: __arraySlice(args, 2) };
+      }
+    } catch (e) {/* throw below */
     }
+    throw new Error("Must supply an EntityKey OR an EntityType name or EntityType followed by a key value or an array of key values.");
+  }
 
-    function structuralObjectToJson(so, dps, serializerFn, tempKeys) {
-        
-        var result = {};
-        dps.forEach(function (dp) {
-            var dpName = dp.name;
-            var value = so.getProperty(dpName);
-            if (value == null && dp.defaultValue == null) return;
+  function markIsBeingSaved(entities, flag) {
+    entities.forEach(function (entity) {
+      entity.entityAspect.isBeingSaved = flag;
+    });
+  }
 
-            if (value && dp.isComplexProperty) {
-                var coDps = dp.dataType.dataProperties;
-                value = __map(value, function (v) {
-                    return structuralObjectToJson(v, coDps, serializerFn);
-                });
-            } else {
-                value = serializerFn ? serializerFn(dp, value) : value;
-                if (dp.isUnmapped) {
-                    value = __toJSONSafe(value);
-                }
-            }
-            if (value === undefined) return;
-            result[dpName] = value;
-        });
-        var aspect, newAspect;
-        if (so.entityAspect) {
-            aspect = so.entityAspect;
-            var entityState = aspect.entityState;
-            newAspect = {
-                tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
-                entityState: entityState.name
-            };
-            if (aspect.extraMetadata) {
-                newAspect.extraMetadata = aspect.extraMetadata;
-            }
-            if (entityState.isModified() || entityState.isDeleted()) {
-                newAspect.originalValuesMap = aspect.originalValues;
-            }
-            result.entityAspect = newAspect;
-        } else {
-            aspect = so.complexAspect;
-            newAspect = {};
-            if ( aspect.originalValues && !__isEmpty(aspect.originalValues)) {
-                newAspect.originalValuesMap = aspect.originalValues;
-            }
-            
-            result.complexAspect = newAspect;
-        }
-        
-        return result;
-    }
-
-    function exportTempKeyInfo(entityAspect, tempKeys) {
-        var entity = entityAspect.entity;
-        if (entityAspect.hasTempKey) {
-            tempKeys.push(entityAspect.getKey().toJSON());
-        }
-        // create map for this entity with foreignKeys that are 'temporary'
-        // map -> key: tempKey, value: fkPropName
-        var tempNavPropNames;
-        entity.entityType.navigationProperties.forEach(function (np) {
-            if (np.relatedDataProperties) {
-                var relatedValue = entity.getProperty(np.name);
-                if (relatedValue && relatedValue.entityAspect.hasTempKey) {
-                    tempNavPropNames = tempNavPropNames || [];
-                    tempNavPropNames.push(np.name);
-                }
-            }
-        });
-        return tempNavPropNames;
-    }
-
-    function importEntityGroup(entityGroup, jsonGroup, config) {
-
-        var tempKeyMap = config.tempKeyMap;
-
-        var entityType = entityGroup.entityType;
-        var mergeStrategy = config.mergeStrategy;
-
-        var targetEntity = null;
-        
-        var em = entityGroup.entityManager;
-        var entityChanged = em.entityChanged;
-        var entitiesToLink = [];
-        var rawValueFn = DataProperty.getRawValueFromClient;
-        jsonGroup.entities.forEach(function (rawEntity) {
-            var newAspect = rawEntity.entityAspect;
-            
-            var entityKey = entityType.getEntityKeyFromRawEntity(rawEntity, rawValueFn);
-            var entityState = EntityState.fromName(newAspect.entityState);
-            var newTempKey;
-            if (entityState.isAdded()) {
-                newTempKey = getMappedKey(tempKeyMap, entityKey);
-                // merge added records with non temp keys
-                targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
-            } else {
-                targetEntity = entityGroup.findEntityByKey(entityKey);
-            }
-
-            if (targetEntity) {
-                if (mergeStrategy === MergeStrategy.SkipMerge) {
-                    // deliberate fall thru
-                } else if (mergeStrategy === MergeStrategy.Disallowed) {
-                    throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
-                } else {
-                    var targetEntityState = targetEntity.entityAspect.entityState;
-                    var wasUnchanged = targetEntityState.isUnchanged();
-                    if (mergeStrategy === MergeStrategy.OverwriteChanges || wasUnchanged) {
-                        entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                        targetEntity.entityAspect.setEntityState(entityState);
-                        entityChanged.publish({ entityAction: EntityAction.MergeOnImport, entity: targetEntity });
-                    } 
-                }
-            } else {
-                targetEntity = entityType._createInstanceCore();
-                entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-                if (newTempKey != null) {
-                    targetEntity.entityAspect.hasTempKey = true;
-                    // fixup pk
-                    targetEntity.setProperty(entityType.keyProperties[0].name, newTempKey.values[0]);
-
-                    // fixup foreign keys
-                    // This is safe because the entity is detached here and therefore originalValues will not be updated.
-                    if (newAspect.tempNavPropNames) {
-                        newAspect.tempNavPropNames.forEach(function (npName) {
-                            var np = entityType.getNavigationProperty(npName);
-                            var fkPropName = np.relatedDataProperties[0].name;
-                            var oldFkValue = targetEntity.getProperty(fkPropName);
-                            var fk = new EntityKey(np.entityType, [oldFkValue]);
-                            var newFk = getMappedKey(tempKeyMap, fk);
-                            targetEntity.setProperty(fkPropName, newFk.values[0]);
-                        });
-                    }
-                }
-                // Now performed in attachEntity
-                targetEntity = entityGroup.attachEntity(targetEntity, entityState);
-                entityChanged.publish({ entityAction: EntityAction.AttachOnImport, entity: targetEntity });
-                if (!entityState.isUnchanged()) {
-                    em._notifyStateChange(targetEntity, true);
-                }
-                
-            }
-
-            entitiesToLink.push(targetEntity);
-        });
-        return entitiesToLink;
-    }
-
-    function getMappedKey(tempKeyMap, entityKey) {
-        var newKey = tempKeyMap[entityKey.toString()];
-        if (newKey) return newKey;
-        var subtypes = entityKey._subtypes;
-        if (!subtypes) return null;
-        for (var i = 0, j = subtypes.length; i < j; i++) {
-            newKey = tempKeyMap[entityKey.toString(subtypes[i])];
-            if (newKey) return newKey;
-        }
-        return null;
-    }
-
-    function promiseWithCallbacks(promise, callback, errorCallback) {
-        promise = promise.then(function (data) {
-            if (callback) callback(data);
-            return Q.resolve(data);
-        }, function (error) {
-            if (errorCallback) errorCallback(error);
-            return Q.reject(error);
-        });
-        return promise;
-    }
-
-    function getEntitiesToSave(em, entities) {
-        var entitiesToSave;
-        if (entities) {
-            entitiesToSave = entities.filter(function (e) {
-                if (e.entityAspect.entityManager !== em) {
-                    throw new Error("Only entities in this entityManager may be saved");
-                }
-                return !e.entityAspect.entityState.isDetached();
-            });
-        } else {
-            entitiesToSave = em.getChanges();
-        }
-        return entitiesToSave;
-    }
-
-    function fixupKeys(em, keyMappings) {
-        em._inKeyFixup = true;
-        keyMappings.forEach(function (km) {
-            var group = em._entityGroupMap[km.entityTypeName];
-            if (!group) {
-                throw new Error("Unable to locate the following fully qualified EntityType name: " + km.entityTypeName);
-            }
-            group._fixupKey(km.tempValue, km.realValue);
-        });
-        em._inKeyFixup = false;
-    }
-
-    function getEntityGroups(em, entityTypes) {
-        var groupMap = em._entityGroupMap;
-        if (entityTypes) {
-            return __toArray(entityTypes).map(function (et) {
-                if (et instanceof EntityType) {
-                    return groupMap[et.name];
-                } else {
-                    throw new Error("The EntityManager.getChanges() 'entityTypes' parameter must be either an entityType or an array of entityTypes or null");
-                }
-            });
-        } else {
-            return __getOwnPropertyValues(groupMap);
-        }
-    }
-
-    function checkEntityKey(em, entity) {
-        var ek = entity.entityAspect.getKey();
-        // return properties that are = to defaultValues
-        var keyPropsWithDefaultValues = __arrayZip(entity.entityType.keyProperties, ek.values, function (kp, kv) {
-            return (kp.defaultValue === kv) ? kp : null;
-        }).filter(function (kp) {
-            return kp !== null;
-        });
-        if (keyPropsWithDefaultValues.length) {
-            if (entity.entityType.autoGeneratedKeyType !== AutoGeneratedKeyType.None) {
-                em.generateTempKeyValue(entity);
-            } else {
-                // we will allow attaches of entities where only part of the key is set.
-                if (keyPropsWithDefaultValues.length === ek.values.length) {
-                    throw new Error("Cannot attach an object of type  (" + entity.entityType.name + ") to an EntityManager without first setting its key or setting its entityType 'AutoGeneratedKeyType' property to something other than 'None'");
-                }
-            }
-        }
-    }
-
-    function validateEntityStates(em, entityStates) {
-        if (!entityStates) return null;
-        entityStates = __toArray(entityStates);
-        entityStates.forEach(function(es) {
-            if (!EntityState.contains(es)) {
-                throw new Error("The EntityManager.getChanges() 'entityStates' parameter must either be null, an entityState or an array of entityStates");
-            }
-        });
-        return entityStates;
-    }
-
-    proto._attachEntityCore = function (entity, entityState, mergeStrategy) {
-        var group = findOrCreateEntityGroup(this, entity.entityType);
-        var attachedEntity = group.attachEntity(entity, entityState, mergeStrategy);
-        this._linkRelatedEntities(attachedEntity);
-        return attachedEntity;
-    }
-
-    proto._updateFkVal = function (fkProp, oldValue, newValue) {
-        var group = this._entityGroupMap[fkProp.parentType.name];
-        if (!group) return;
-        group._updateFkVal(fkProp, oldValue, newValue);
-    }
-
-    function attachRelatedEntities(em, entity, entityState, mergeStrategy) {
-        var navProps = entity.entityType.navigationProperties;
-        navProps.forEach(function (np) {
-            var related = entity.getProperty(np.name);
-            if (np.isScalar) {
-                if (!related) return;
-                em.attachEntity(related, entityState, mergeStrategy);
-            } else {
-                related.forEach(function (e) {
-                    em.attachEntity(e, entityState, mergeStrategy);
-                });
-            }
-        });
-    }
-
-    // returns a promise
-    function executeQueryCore(em, query, queryOptions, dataService) {
-        try {
-            var results;
-            var metadataStore = em.metadataStore;
-            
-            if (metadataStore.isEmpty() && dataService.hasServerMetadata) {
-                throw new Error("cannot execute _executeQueryCore until metadataStore is populated.");
-            }
-            
-            if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
-                try {
-                    results = em.executeQueryLocally(query);
-                    return Q.resolve({ results: results, query: query });
-                } catch(e) {
-                    return Q.reject(e);
-                }
-            }
-
-            var mappingContext = new MappingContext({
-                    query: query,
-                    entityManager: em,
-                    dataService: dataService,
-                    mergeOptions: {
-                        mergeStrategy: queryOptions.mergeStrategy,
-                        noTracking: !!query.noTrackingEnabled
-                    }
-            });
-            
-            var validateOnQuery = em.validationOptions.validateOnQuery;
-           
-            return dataService.adapterInstance.executeQuery(mappingContext).then(function (data) {
-                var result = __wrapExecution(function () {
-                    var state = { isLoading: em.isLoading };
-                    em.isLoading = true;
-                    em._pendingPubs = [];
-                    return state;
-                }, function (state) {
-                    // cleanup
-                    em.isLoading = state.isLoading;
-                    em._pendingPubs.forEach(function (fn) { fn(); });
-                    em._pendingPubs = null;
-                    em._hasChangesAction && em._hasChangesAction();
-                    // HACK for GC
-                    query = null;
-                    mappingContext = null;
-                    // HACK: some errors thrown in next function do not propogate properly - this catches them.
-                    
-                    if (state.error) {
-                        Q.reject(state.error);
-                    }
-
-                }, function () {
-                    var nodes = dataService.jsonResultsAdapter.extractResults(data);
-                    nodes = __toArray(nodes);
-                    
-                    results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
-                    if (validateOnQuery) {
-                        results.forEach(function (r) {
-                            // anon types and simple types will not have an entityAspect.
-                            r.entityAspect && r.entityAspect.validateEntity();
-                        });
-                    }
-                    mappingContext.processDeferred();
-                    // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
-                    markLoadedNavProps(results, query);
-                    var retrievedEntities = __objectMapToArray(mappingContext.refMap);
-                    return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
-                });
-                return Q.resolve(result);
-            }, function (e) {
-                if (e) {
-                    e.query = query;
-                    e.entityManager = em;
-                }
-                return Q.reject(e);
-            });
-            
-        } catch (e) {
-            if (e) {
-                e.query = query;
-            }
-            return Q.reject(e);
-        }
-    }
-
-    function markLoadedNavProps(entities, query) {
-        if (query.noTrackingEnabled) return;
-        var expandClause = query.expandClause;
-        if (expandClause == null) return;
-        expandClause.propertyPaths.forEach(function(propertyPath) {
-            var propNames = propertyPath.split('.');
-            markLoadedNavPath(entities, propNames);
-        });
-    }
-
-    function markLoadedNavPath(entities, propNames) {
-        var propName = propNames[0];
-        entities.forEach(function (entity) {
-            var ea = entity.entityAspect;
-            if (!ea) return; // entity may not be a 'real' entity in the case of a projection.
-            ea._markAsLoaded(propName);           
-            if (propNames.length === 1) return;
-            var next = entity.getProperty(propName);
-            if (!next) return; // no children to process.
-            // strange logic because nonscalar nav values are NOT really arrays 
-            // otherwise we could use Array.isArray
-            if (!next.arrayChanged) next = [next];
-            markLoadedNavPath(next, propNames.slice(1)); 
-        });
-    }
-   
-    function updateConcurrencyProperties(entities) {
-        var candidates = entities.filter(function (e) {
-            e.entityAspect.isBeingSaved = true;
-            return e.entityAspect.entityState.isModified()
-                && e.entityType.concurrencyProperties.length > 0;
-
-        });
-        if (candidates.length === 0) return;
-        candidates.forEach(function (c) {
-            c.entityType.concurrencyProperties.forEach(function (cp) {
-                updateConcurrencyProperty(c, cp);
-            });
-        });
-    }
-
-    function updateConcurrencyProperty(entity, property) {
-        // check if property has already been updated 
-        if (entity.entityAspect.originalValues[property.name]) return;
-        var value = entity.getProperty(property.name);
-        if (!value) value = property.dataType.defaultValue;
-        if (property.dataType.isNumeric) {
-            entity.setProperty(property.name, value + 1);
-        } else if (property.dataType.isDate) {
-            // use the current datetime but insure that it
-            // is different from previous call.
-            var dt = new Date();
-            var dt2 = new Date();
-            while (dt.getTime() === dt2.getTime()) {
-                dt2 = new Date();
-            }
-            entity.setProperty(property.name, dt2);
-        } else if (property.dataType === DataType.Guid) {
-            entity.setProperty(property.name, __getUuid());
-        } else if (property.dataType === DataType.Binary) {
-            // best guess - that this is a timestamp column and is computed on the server during save 
-            // - so no need to set it here.
-            return;
-        } else {
-            // this just leaves DataTypes of Boolean, String and Byte - none of which should be the
-            // type for a concurrency column.
-            // NOTE: thought about just returning here but would rather be safe for now. 
-            throw new Error("Unable to update the value of concurrency property before saving: " + property.name);
-        }
-    }
-
-
-    function findOrCreateEntityGroup(em, entityType) {
-        var group = em._entityGroupMap[entityType.name];
+  function exportEntityGroups(em, entities) {
+    var entityGroupMap;
+    if (entities) {
+      // group entities by entityType and
+      // create 'groups' that look like entityGroups.
+      entityGroupMap = {};
+      entities.forEach(function (e) {
+        var group = entityGroupMap[e.entityType.name];
         if (!group) {
-            group = new EntityGroup(em, entityType);
-            em._entityGroupMap[entityType.name] = group;
+          group = {};
+          group.entityType = e.entityType;
+          group._entities = [];
+          entityGroupMap[e.entityType.name] = group;
         }
-        return group;
+        group._entities.push(e);
+      });
+    } else {
+      entityGroupMap = em._entityGroupMap;
     }
 
-    function findOrCreateEntityGroups(em, entityType) {
-        var entityTypes = entityType.getSelfAndSubtypes();
-        return entityTypes.map(function (et) {
-            return findOrCreateEntityGroup(em, et);
-        });
-    }
-        
+    var tempKeys = [];
+    var newGroupMap = {};
+    __objectForEach(entityGroupMap, function (entityTypeName, entityGroup) {
+      newGroupMap[entityTypeName] = exportEntityGroup(entityGroup, tempKeys);
+    });
 
-    proto.helper = {
-        unwrapInstance: unwrapInstance,
-        unwrapOriginalValues: unwrapOriginalValues,
-        unwrapChangedValues: unwrapChangedValues
-    };
-    
-   
-    function unwrapInstance(structObj, transformFn) {
-        
-        var rawObject = {};
-        var stype = structObj.entityType || structObj.complexType;
-        var serializerFn = getSerializerFn(stype);
-        var unmapped = {};
-        stype.dataProperties.forEach(function (dp) {
-            if (dp.isComplexProperty) {
-                rawObject[dp.nameOnServer] = __map(structObj.getProperty(dp.name), function (co) {
-                    return unwrapInstance(co, transformFn);
-                });
-            } else {
-                var val = structObj.getProperty(dp.name);
-                val = transformFn ? transformFn(dp, val) : val;
-                if (val === undefined) return;
-                val = serializerFn ? serializerFn(dp, val) : val;
-                if (val !== undefined) {
-                    if (dp.isUnmapped) {
-                        // unmapped[dp.name] = __toJSONSafe(val);
-                        unmapped[dp.nameOnServer] = __toJSONSafe(val);
-                    } else {
-                        rawObject[dp.nameOnServer] = val;
-                    }
-                }
-            }
+    return { entityGroupMap: newGroupMap, tempKeys: tempKeys };
+  }
+
+  function exportEntityGroup(entityGroup, tempKeys) {
+    var resultGroup = {};
+    var entityType = entityGroup.entityType;
+    var dps = entityType.dataProperties;
+    var serializerFn = getSerializerFn(entityType);
+    var rawEntities = [];
+    entityGroup._entities.forEach(function (entity) {
+      if (entity) {
+        var rawEntity = structuralObjectToJson(entity, dps, serializerFn, tempKeys);
+        rawEntities.push(rawEntity);
+      }
+    });
+    resultGroup.entities = rawEntities;
+    return resultGroup;
+  }
+
+  function structuralObjectToJson(so, dps, serializerFn, tempKeys) {
+
+    var result = {};
+    dps.forEach(function (dp) {
+      var dpName = dp.name;
+      var value = so.getProperty(dpName);
+      if (value == null && dp.defaultValue == null) return;
+
+      if (value && dp.isComplexProperty) {
+        var coDps = dp.dataType.dataProperties;
+        value = __map(value, function (v) {
+          return structuralObjectToJson(v, coDps, serializerFn);
         });
-        
-        if (!__isEmpty(unmapped)) {
-            rawObject.__unmapped = unmapped;
+      } else {
+        value = serializerFn ? serializerFn(dp, value) : value;
+        if (dp.isUnmapped) {
+          value = __toJSONSafe(value);
         }
-        return rawObject;
-    }
-    
-    function unwrapOriginalValues(target, metadataStore, transformFn) {
-        var stype = target.entityType || target.complexType;
-        var aspect = target.entityAspect || target.complexAspect;
-        var fn = metadataStore.namingConvention.clientPropertyNameToServer;
-        var result = {};
-        __objectForEach(aspect.originalValues, function (propName, val) {
-            var prop = stype.getProperty(propName);
-            val = transformFn ? transformFn(prop, val) : val;
-            if (val !== undefined) {
-                result[fn(propName, prop)] = val;
-            }
-        });
-        stype.complexProperties.forEach(function (cp) {
-            var nextTarget = target.getProperty(cp.name);
-            if (cp.isScalar) {
-                var unwrappedCo = unwrapOriginalValues(nextTarget, metadataStore, transformFn);
-                if (!__isEmpty(unwrappedCo)) {
-                    result[fn(cp.name, cp)] = unwrappedCo;
-                }
-            } else {
-                var unwrappedCos = nextTarget.map(function (item) {
-                    return unwrapOriginalValues(item, metadataStore, transformFn);
-                });
-                result[fn(cp.name, cp)] = unwrappedCos;
-            }
-        });
-        return result;
-    }
-    
-    function unwrapChangedValues(entity, metadataStore, transformFn) {
-        var stype = entity.entityType; 
-        var serializerFn = getSerializerFn(stype);
-        var fn = metadataStore.namingConvention.clientPropertyNameToServer;
-        var result = {};
-        __objectForEach(entity.entityAspect.originalValues, function (propName, value) {
-            var prop = stype.getProperty(propName);
-            var val = entity.getProperty(propName);
-            val = transformFn ? transformFn(prop, val) : val;
-            if (val === undefined) return;
-            val = serializerFn ? serializerFn(prop, val) : val;
-            if (val !== undefined) {
-                result[fn(propName, prop)] = val;
-            }
-        });
-        // any change to any complex object or array of complex objects returns the ENTIRE
-        // current complex object or complex object array.  This is by design. Complex Objects
-        // are atomic. 
-        stype.complexProperties.forEach(function (cp) {
-            if (cpHasOriginalValues(entity, cp)) {
-                var coOrCos = entity.getProperty(cp.name);
-                result[fn(cp.name, cp)] = __map(coOrCos, function(co) {
-                    return unwrapInstance(co, transformFn);
-                });
-            } 
-        });
-        return result;
+      }
+      if (value === undefined) return;
+      result[dpName] = value;
+    });
+    var aspect, newAspect;
+    if (so.entityAspect) {
+      aspect = so.entityAspect;
+      var entityState = aspect.entityState;
+      newAspect = {
+        tempNavPropNames: exportTempKeyInfo(aspect, tempKeys),
+        entityState: entityState.name
+      };
+      if (aspect.extraMetadata) {
+        newAspect.extraMetadata = aspect.extraMetadata;
+      }
+      if (entityState.isModified() || entityState.isDeleted()) {
+        newAspect.originalValuesMap = aspect.originalValues;
+      }
+      result.entityAspect = newAspect;
+    } else {
+      aspect = so.complexAspect;
+      newAspect = {};
+      if (aspect.originalValues && !__isEmpty(aspect.originalValues)) {
+        newAspect.originalValuesMap = aspect.originalValues;
+      }
+
+      result.complexAspect = newAspect;
     }
 
-    function cpHasOriginalValues(structuralObject, cp) {
-        var coOrCos = structuralObject.getProperty(cp.name);
-        if (cp.isScalar) {
-            return coHasOriginalValues(coOrCos);
+    return result;
+  }
+
+  function exportTempKeyInfo(entityAspect, tempKeys) {
+    var entity = entityAspect.entity;
+    if (entityAspect.hasTempKey) {
+      tempKeys.push(entityAspect.getKey().toJSON());
+    }
+    // create map for this entity with foreignKeys that are 'temporary'
+    // map -> key: tempKey, value: fkPropName
+    var tempNavPropNames;
+    entity.entityType.navigationProperties.forEach(function (np) {
+      if (np.relatedDataProperties) {
+        var relatedValue = entity.getProperty(np.name);
+        if (relatedValue && relatedValue.entityAspect.hasTempKey) {
+          tempNavPropNames = tempNavPropNames || [];
+          tempNavPropNames.push(np.name);
+        }
+      }
+    });
+    return tempNavPropNames;
+  }
+
+  function importEntityGroup(entityGroup, jsonGroup, config) {
+
+    var tempKeyMap = config.tempKeyMap;
+
+    var entityType = entityGroup.entityType;
+    var mergeStrategy = config.mergeStrategy;
+
+    var targetEntity = null;
+
+    var em = entityGroup.entityManager;
+    var entityChanged = em.entityChanged;
+    var entitiesToLink = [];
+    var rawValueFn = DataProperty.getRawValueFromClient;
+    jsonGroup.entities.forEach(function (rawEntity) {
+      var newAspect = rawEntity.entityAspect;
+
+      var entityKey = entityType.getEntityKeyFromRawEntity(rawEntity, rawValueFn);
+      var entityState = EntityState.fromName(newAspect.entityState);
+      var newTempKey;
+      if (entityState.isAdded()) {
+        newTempKey = getMappedKey(tempKeyMap, entityKey);
+        // merge added records with non temp keys
+        targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
+      } else {
+        targetEntity = entityGroup.findEntityByKey(entityKey);
+      }
+
+      if (targetEntity) {
+        if (mergeStrategy === MergeStrategy.SkipMerge) {
+          // deliberate fall thru
+        } else if (mergeStrategy === MergeStrategy.Disallowed) {
+          throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
         } else {
-            // this occurs when a nonscalar co array has had cos added or removed.
-            if (coOrCos._origValues) return true;
-            return coOrCos.some(function (co) {
-                return coHasOriginalValues(co);
+          var targetEntityState = targetEntity.entityAspect.entityState;
+          var wasUnchanged = targetEntityState.isUnchanged();
+          if (mergeStrategy === MergeStrategy.OverwriteChanges || wasUnchanged) {
+            entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
+            targetEntity.entityAspect.setEntityState(entityState);
+            entityChanged.publish({ entityAction: EntityAction.MergeOnImport, entity: targetEntity });
+          }
+        }
+      } else {
+        targetEntity = entityType._createInstanceCore();
+        entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
+        if (newTempKey != null) {
+          targetEntity.entityAspect.hasTempKey = true;
+          // fixup pk
+          targetEntity.setProperty(entityType.keyProperties[0].name, newTempKey.values[0]);
+
+          // fixup foreign keys
+          // This is safe because the entity is detached here and therefore originalValues will not be updated.
+          if (newAspect.tempNavPropNames) {
+            newAspect.tempNavPropNames.forEach(function (npName) {
+              var np = entityType.getNavigationProperty(npName);
+              var fkPropName = np.relatedDataProperties[0].name;
+              var oldFkValue = targetEntity.getProperty(fkPropName);
+              var fk = new EntityKey(np.entityType, [oldFkValue]);
+              var newFk = getMappedKey(tempKeyMap, fk);
+              targetEntity.setProperty(fkPropName, newFk.values[0]);
             });
+          }
         }
-    }
-
-    function coHasOriginalValues(co) {
-        // next line checks all non complex properties of the co.
-        if (!__isEmpty(co.complexAspect.originalValues)) return true;
-        // now need to recursively check each of the cps
-        return co.complexType.complexProperties.some(function(cp) {
-            return cpHasOriginalValues(co, cp);
-        });
-    }
-
-    function getSerializerFn(stype) {
-        return stype.serializerFn || (stype.metadataStore && stype.metadataStore.serializerFn);
-    }
-
-
-    function UnattachedChildrenMap() {
-        // key is EntityKey.toString(), value is array of { navigationProperty, children }
-        this.map = {};
-    }
-
-    UnattachedChildrenMap.prototype.addChild = function (parentEntityKey, navigationProperty, child) {
-        var tuple = this.getTuple(parentEntityKey, navigationProperty);
-        if (!tuple) {
-            tuple = { navigationProperty: navigationProperty, children: [] };
-            __getArray(this.map, parentEntityKey.toString()).push(tuple);
+        // Now performed in attachEntity
+        targetEntity = entityGroup.attachEntity(targetEntity, entityState);
+        entityChanged.publish({ entityAction: EntityAction.AttachOnImport, entity: targetEntity });
+        if (!entityState.isUnchanged()) {
+          em._notifyStateChange(targetEntity, true);
         }
-        tuple.children.push(child);
-    };
 
-    UnattachedChildrenMap.prototype.removeChildren = function (parentEntityKey, navigationProperty) {
-        var tuples = this.getTuples(parentEntityKey);
-        if (!tuples) return;
-        __arrayRemoveItem(tuples, function (t) {
-            return t.navigationProperty === navigationProperty;
-        });
-        if (!tuples.length) {
-            delete this.map[parentEntityKey.toString()];
+      }
+
+      entitiesToLink.push(targetEntity);
+    });
+    return entitiesToLink;
+  }
+
+  function getMappedKey(tempKeyMap, entityKey) {
+    var newKey = tempKeyMap[entityKey.toString()];
+    if (newKey) return newKey;
+    var subtypes = entityKey._subtypes;
+    if (!subtypes) return null;
+    for (var i = 0, j = subtypes.length; i < j; i++) {
+      newKey = tempKeyMap[entityKey.toString(subtypes[i])];
+      if (newKey) return newKey;
+    }
+    return null;
+  }
+
+  function promiseWithCallbacks(promise, callback, errorCallback) {
+    promise = promise.then(function (data) {
+      if (callback) callback(data);
+      return Q.resolve(data);
+    }, function (error) {
+      if (errorCallback) errorCallback(error);
+      return Q.reject(error);
+    });
+    return promise;
+  }
+
+  function getEntitiesToSave(em, entities) {
+    var entitiesToSave;
+    if (entities) {
+      entitiesToSave = entities.filter(function (e) {
+        if (e.entityAspect.entityManager !== em) {
+          throw new Error("Only entities in this entityManager may be saved");
         }
-    };
+        return !e.entityAspect.entityState.isDetached();
+      });
+    } else {
+      entitiesToSave = em.getChanges();
+    }
+    return entitiesToSave;
+  }
 
-    UnattachedChildrenMap.prototype.getChildren = function (parentEntityKey, navigationProperty) {
-        var tuple = this.getTuple(parentEntityKey, navigationProperty);
-        if (tuple) {
-            return tuple.children.filter(function (child) {
-                // it may have later been detached.
-                return !child.entityAspect.entityState.isDetached();
-            });
+  function fixupKeys(em, keyMappings) {
+    em._inKeyFixup = true;
+    keyMappings.forEach(function (km) {
+      var group = em._entityGroupMap[km.entityTypeName];
+      if (!group) {
+        throw new Error("Unable to locate the following fully qualified EntityType name: " + km.entityTypeName);
+      }
+      group._fixupKey(km.tempValue, km.realValue);
+    });
+    em._inKeyFixup = false;
+  }
+
+  function getEntityGroups(em, entityTypes) {
+    var groupMap = em._entityGroupMap;
+    if (entityTypes) {
+      return __toArray(entityTypes).map(function (et) {
+        if (et instanceof EntityType) {
+          return groupMap[et.name];
         } else {
-            return null;
+          throw new Error("The EntityManager.getChanges() 'entityTypes' parameter must be either an entityType or an array of entityTypes or null");
         }
-    };
+      });
+    } else {
+      return __getOwnPropertyValues(groupMap);
+    }
+  }
 
-    UnattachedChildrenMap.prototype.getTuple = function (parentEntityKey, navigationProperty) {
-        var tuples = this.getTuples(parentEntityKey);
-        if (!tuples) return null;
-        var tuple = __arrayFirst(tuples, function (t) {
-            return t.navigationProperty === navigationProperty;
+  function checkEntityKey(em, entity) {
+    var ek = entity.entityAspect.getKey();
+    // return properties that are = to defaultValues
+    var keyPropsWithDefaultValues = __arrayZip(entity.entityType.keyProperties, ek.values, function (kp, kv) {
+      return (kp.defaultValue === kv) ? kp : null;
+    }).filter(function (kp) {
+      return kp !== null;
+    });
+    if (keyPropsWithDefaultValues.length) {
+      if (entity.entityType.autoGeneratedKeyType !== AutoGeneratedKeyType.None) {
+        em.generateTempKeyValue(entity);
+      } else {
+        // we will allow attaches of entities where only part of the key is set.
+        if (keyPropsWithDefaultValues.length === ek.values.length) {
+          throw new Error("Cannot attach an object of type  (" + entity.entityType.name + ") to an EntityManager without first setting its key or setting its entityType 'AutoGeneratedKeyType' property to something other than 'None'");
+        }
+      }
+    }
+  }
+
+  function validateEntityStates(em, entityStates) {
+    if (!entityStates) return null;
+    entityStates = __toArray(entityStates);
+    entityStates.forEach(function (es) {
+      if (!EntityState.contains(es)) {
+        throw new Error("The EntityManager.getChanges() 'entityStates' parameter must either be null, an entityState or an array of entityStates");
+      }
+    });
+    return entityStates;
+  }
+
+  proto._attachEntityCore = function (entity, entityState, mergeStrategy) {
+    var group = findOrCreateEntityGroup(this, entity.entityType);
+    var attachedEntity = group.attachEntity(entity, entityState, mergeStrategy);
+    this._linkRelatedEntities(attachedEntity);
+    return attachedEntity;
+  }
+
+  proto._updateFkVal = function (fkProp, oldValue, newValue) {
+    var group = this._entityGroupMap[fkProp.parentType.name];
+    if (!group) return;
+    group._updateFkVal(fkProp, oldValue, newValue);
+  }
+
+  function attachRelatedEntities(em, entity, entityState, mergeStrategy) {
+    var navProps = entity.entityType.navigationProperties;
+    navProps.forEach(function (np) {
+      var related = entity.getProperty(np.name);
+      if (np.isScalar) {
+        if (!related) return;
+        em.attachEntity(related, entityState, mergeStrategy);
+      } else {
+        related.forEach(function (e) {
+          em.attachEntity(e, entityState, mergeStrategy);
         });
-        return tuple;
-    };
+      }
+    });
+  }
 
-    
-    UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
-        var tuples = this.map[parentEntityKey.toString()];
-        var entityType = parentEntityKey.entityType;
-        while (!tuples && entityType.baseEntityType) {
-            entityType = entityType.baseEntityType;
-            var baseKey = parentEntityKey.toString(entityType);
-            tuples = this.map[baseKey];
+  // returns a promise
+  function executeQueryCore(em, query, queryOptions, dataService) {
+    try {
+      var results;
+      var metadataStore = em.metadataStore;
+
+      if (metadataStore.isEmpty() && dataService.hasServerMetadata) {
+        throw new Error("cannot execute _executeQueryCore until metadataStore is populated.");
+      }
+
+      if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
+        try {
+          results = em.executeQueryLocally(query);
+          return Q.resolve({ results: results, query: query });
+        } catch (e) {
+          return Q.reject(e);
         }
-        return tuples;
-    };
+      }
 
-    return ctor;
+      var mappingContext = new MappingContext({
+        query: query,
+        entityManager: em,
+        dataService: dataService,
+        mergeOptions: {
+          mergeStrategy: queryOptions.mergeStrategy,
+          noTracking: !!query.noTrackingEnabled
+        }
+      });
+
+      var validateOnQuery = em.validationOptions.validateOnQuery;
+
+      return dataService.adapterInstance.executeQuery(mappingContext).then(function (data) {
+        var result = __wrapExecution(function () {
+          var state = { isLoading: em.isLoading };
+          em.isLoading = true;
+          em._pendingPubs = [];
+          return state;
+        }, function (state) {
+          // cleanup
+          em.isLoading = state.isLoading;
+          em._pendingPubs.forEach(function (fn) {
+            fn();
+          });
+          em._pendingPubs = null;
+          em._hasChangesAction && em._hasChangesAction();
+          // HACK for GC
+          query = null;
+          mappingContext = null;
+          // HACK: some errors thrown in next function do not propogate properly - this catches them.
+
+          if (state.error) {
+            Q.reject(state.error);
+          }
+
+        }, function () {
+          var nodes = dataService.jsonResultsAdapter.extractResults(data);
+          nodes = __toArray(nodes);
+
+          results = mappingContext.visitAndMerge(nodes, { nodeType: "root" });
+          if (validateOnQuery) {
+            results.forEach(function (r) {
+              // anon types and simple types will not have an entityAspect.
+              r.entityAspect && r.entityAspect.validateEntity();
+            });
+          }
+          mappingContext.processDeferred();
+          // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
+          markLoadedNavProps(results, query);
+          var retrievedEntities = __objectMapToArray(mappingContext.refMap);
+          return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
+        });
+        return Q.resolve(result);
+      }, function (e) {
+        if (e) {
+          e.query = query;
+          e.entityManager = em;
+        }
+        return Q.reject(e);
+      });
+
+    } catch (e) {
+      if (e) {
+        e.query = query;
+      }
+      return Q.reject(e);
+    }
+  }
+
+  function markLoadedNavProps(entities, query) {
+    if (query.noTrackingEnabled) return;
+    var expandClause = query.expandClause;
+    if (expandClause == null) return;
+    expandClause.propertyPaths.forEach(function (propertyPath) {
+      var propNames = propertyPath.split('.');
+      markLoadedNavPath(entities, propNames);
+    });
+  }
+
+  function markLoadedNavPath(entities, propNames) {
+    var propName = propNames[0];
+    entities.forEach(function (entity) {
+      var ea = entity.entityAspect;
+      if (!ea) return; // entity may not be a 'real' entity in the case of a projection.
+      ea._markAsLoaded(propName);
+      if (propNames.length === 1) return;
+      var next = entity.getProperty(propName);
+      if (!next) return; // no children to process.
+      // strange logic because nonscalar nav values are NOT really arrays
+      // otherwise we could use Array.isArray
+      if (!next.arrayChanged) next = [next];
+      markLoadedNavPath(next, propNames.slice(1));
+    });
+  }
+
+  function updateConcurrencyProperties(entities) {
+    var candidates = entities.filter(function (e) {
+      e.entityAspect.isBeingSaved = true;
+      return e.entityAspect.entityState.isModified()
+          && e.entityType.concurrencyProperties.length > 0;
+
+    });
+    if (candidates.length === 0) return;
+    candidates.forEach(function (c) {
+      c.entityType.concurrencyProperties.forEach(function (cp) {
+        updateConcurrencyProperty(c, cp);
+      });
+    });
+  }
+
+  function updateConcurrencyProperty(entity, property) {
+    // check if property has already been updated
+    if (entity.entityAspect.originalValues[property.name]) return;
+    var value = entity.getProperty(property.name);
+    if (!value) value = property.dataType.defaultValue;
+    if (property.dataType.isNumeric) {
+      entity.setProperty(property.name, value + 1);
+    } else if (property.dataType.isDate) {
+      // use the current datetime but insure that it
+      // is different from previous call.
+      var dt = new Date();
+      var dt2 = new Date();
+      while (dt.getTime() === dt2.getTime()) {
+        dt2 = new Date();
+      }
+      entity.setProperty(property.name, dt2);
+    } else if (property.dataType === DataType.Guid) {
+      entity.setProperty(property.name, __getUuid());
+    } else if (property.dataType === DataType.Binary) {
+      // best guess - that this is a timestamp column and is computed on the server during save
+      // - so no need to set it here.
+      return;
+    } else {
+      // this just leaves DataTypes of Boolean, String and Byte - none of which should be the
+      // type for a concurrency column.
+      // NOTE: thought about just returning here but would rather be safe for now.
+      throw new Error("Unable to update the value of concurrency property before saving: " + property.name);
+    }
+  }
+
+
+  function findOrCreateEntityGroup(em, entityType) {
+    var group = em._entityGroupMap[entityType.name];
+    if (!group) {
+      group = new EntityGroup(em, entityType);
+      em._entityGroupMap[entityType.name] = group;
+    }
+    return group;
+  }
+
+  function findOrCreateEntityGroups(em, entityType) {
+    var entityTypes = entityType.getSelfAndSubtypes();
+    return entityTypes.map(function (et) {
+      return findOrCreateEntityGroup(em, et);
+    });
+  }
+
+
+  proto.helper = {
+    unwrapInstance: unwrapInstance,
+    unwrapOriginalValues: unwrapOriginalValues,
+    unwrapChangedValues: unwrapChangedValues
+  };
+
+
+  function unwrapInstance(structObj, transformFn) {
+
+    var rawObject = {};
+    var stype = structObj.entityType || structObj.complexType;
+    var serializerFn = getSerializerFn(stype);
+    var unmapped = {};
+    stype.dataProperties.forEach(function (dp) {
+      if (dp.isComplexProperty) {
+        rawObject[dp.nameOnServer] = __map(structObj.getProperty(dp.name), function (co) {
+          return unwrapInstance(co, transformFn);
+        });
+      } else {
+        var val = structObj.getProperty(dp.name);
+        val = transformFn ? transformFn(dp, val) : val;
+        if (val === undefined) return;
+        val = serializerFn ? serializerFn(dp, val) : val;
+        if (val !== undefined) {
+          if (dp.isUnmapped) {
+            // unmapped[dp.name] = __toJSONSafe(val);
+            unmapped[dp.nameOnServer] = __toJSONSafe(val);
+          } else {
+            rawObject[dp.nameOnServer] = val;
+          }
+        }
+      }
+    });
+
+    if (!__isEmpty(unmapped)) {
+      rawObject.__unmapped = unmapped;
+    }
+    return rawObject;
+  }
+
+  function unwrapOriginalValues(target, metadataStore, transformFn) {
+    var stype = target.entityType || target.complexType;
+    var aspect = target.entityAspect || target.complexAspect;
+    var fn = metadataStore.namingConvention.clientPropertyNameToServer;
+    var result = {};
+    __objectForEach(aspect.originalValues, function (propName, val) {
+      var prop = stype.getProperty(propName);
+      val = transformFn ? transformFn(prop, val) : val;
+      if (val !== undefined) {
+        result[fn(propName, prop)] = val;
+      }
+    });
+    stype.complexProperties.forEach(function (cp) {
+      var nextTarget = target.getProperty(cp.name);
+      if (cp.isScalar) {
+        var unwrappedCo = unwrapOriginalValues(nextTarget, metadataStore, transformFn);
+        if (!__isEmpty(unwrappedCo)) {
+          result[fn(cp.name, cp)] = unwrappedCo;
+        }
+      } else {
+        var unwrappedCos = nextTarget.map(function (item) {
+          return unwrapOriginalValues(item, metadataStore, transformFn);
+        });
+        result[fn(cp.name, cp)] = unwrappedCos;
+      }
+    });
+    return result;
+  }
+
+  function unwrapChangedValues(entity, metadataStore, transformFn) {
+    var stype = entity.entityType;
+    var serializerFn = getSerializerFn(stype);
+    var fn = metadataStore.namingConvention.clientPropertyNameToServer;
+    var result = {};
+    __objectForEach(entity.entityAspect.originalValues, function (propName, value) {
+      var prop = stype.getProperty(propName);
+      var val = entity.getProperty(propName);
+      val = transformFn ? transformFn(prop, val) : val;
+      if (val === undefined) return;
+      val = serializerFn ? serializerFn(prop, val) : val;
+      if (val !== undefined) {
+        result[fn(propName, prop)] = val;
+      }
+    });
+    // any change to any complex object or array of complex objects returns the ENTIRE
+    // current complex object or complex object array.  This is by design. Complex Objects
+    // are atomic.
+    stype.complexProperties.forEach(function (cp) {
+      if (cpHasOriginalValues(entity, cp)) {
+        var coOrCos = entity.getProperty(cp.name);
+        result[fn(cp.name, cp)] = __map(coOrCos, function (co) {
+          return unwrapInstance(co, transformFn);
+        });
+      }
+    });
+    return result;
+  }
+
+  function cpHasOriginalValues(structuralObject, cp) {
+    var coOrCos = structuralObject.getProperty(cp.name);
+    if (cp.isScalar) {
+      return coHasOriginalValues(coOrCos);
+    } else {
+      // this occurs when a nonscalar co array has had cos added or removed.
+      if (coOrCos._origValues) return true;
+      return coOrCos.some(function (co) {
+        return coHasOriginalValues(co);
+      });
+    }
+  }
+
+  function coHasOriginalValues(co) {
+    // next line checks all non complex properties of the co.
+    if (!__isEmpty(co.complexAspect.originalValues)) return true;
+    // now need to recursively check each of the cps
+    return co.complexType.complexProperties.some(function (cp) {
+      return cpHasOriginalValues(co, cp);
+    });
+  }
+
+  function getSerializerFn(stype) {
+    return stype.serializerFn || (stype.metadataStore && stype.metadataStore.serializerFn);
+  }
+
+
+  function UnattachedChildrenMap() {
+    // key is EntityKey.toString(), value is array of { navigationProperty, children }
+    this.map = {};
+  }
+
+  UnattachedChildrenMap.prototype.addChild = function (parentEntityKey, navigationProperty, child) {
+    var tuple = this.getTuple(parentEntityKey, navigationProperty);
+    if (!tuple) {
+      tuple = { navigationProperty: navigationProperty, children: [] };
+      __getArray(this.map, parentEntityKey.toString()).push(tuple);
+    }
+    tuple.children.push(child);
+  };
+
+  UnattachedChildrenMap.prototype.removeChildren = function (parentEntityKey, navigationProperty) {
+    var tuples = this.getTuples(parentEntityKey);
+    if (!tuples) return;
+    __arrayRemoveItem(tuples, function (t) {
+      return t.navigationProperty === navigationProperty;
+    });
+    if (!tuples.length) {
+      delete this.map[parentEntityKey.toString()];
+    }
+  };
+
+  UnattachedChildrenMap.prototype.getChildren = function (parentEntityKey, navigationProperty) {
+    var tuple = this.getTuple(parentEntityKey, navigationProperty);
+    if (tuple) {
+      return tuple.children.filter(function (child) {
+        // it may have later been detached.
+        return !child.entityAspect.entityState.isDetached();
+      });
+    } else {
+      return null;
+    }
+  };
+
+  UnattachedChildrenMap.prototype.getTuple = function (parentEntityKey, navigationProperty) {
+    var tuples = this.getTuples(parentEntityKey);
+    if (!tuples) return null;
+    var tuple = __arrayFirst(tuples, function (t) {
+      return t.navigationProperty === navigationProperty;
+    });
+    return tuple;
+  };
+
+
+  UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
+    var tuples = this.map[parentEntityKey.toString()];
+    var entityType = parentEntityKey.entityType;
+    while (!tuples && entityType.baseEntityType) {
+      entityType = entityType.baseEntityType;
+      var baseKey = parentEntityKey.toString(entityType);
+      tuples = this.map[baseKey];
+    }
+    return tuples;
+  };
+
+  return ctor;
 })();
 
-   
+
 // expose
 breeze.EntityManager = EntityManager;
 
 ;/**
-@module breeze
-**/
+ @module breeze
+ **/
 
 // Internal helper class
 
 var MappingContext = (function () {
-    
-    var ctor = function (config) {
 
-        __extend(this, config, [
-            "query", "entityManager", "dataService", "mergeOptions"
-        ]);
+  var ctor = function (config) {
 
-        // calc'd props
-        this.refMap = {};
-        this.deferredFns = [];
-        this.jsonResultsAdapter = this.dataService.jsonResultsAdapter;
-        this.metadataStore = this.entityManager.metadataStore;
-        this.rawValueFn = DataProperty.getRawValueFromServer; // think about passing this in later.
-    };
+    __extend(this, config, [
+      "query", "entityManager", "dataService", "mergeOptions"
+    ]);
 
-    var proto = ctor.prototype;
-    var parseRawValue = DataType.parseRawValue;
-    proto._$typeName = "MappingContext";
+    // calc'd props
+    this.refMap = {};
+    this.deferredFns = [];
+    this.jsonResultsAdapter = this.dataService.jsonResultsAdapter;
+    this.metadataStore = this.entityManager.metadataStore;
+    this.rawValueFn = DataProperty.getRawValueFromServer; // think about passing this in later.
+  };
 
-    proto.getUrl = function () {
-        var query = this.query;
-        if (!query) {
-          throw new Error("query cannot be empty");
-        }
-        var uriString;
-        if (typeof query === 'string') {
-          uriString = query;
-        } else if (query instanceof EntityQuery) {
-          uriString = this.dataService.uriBuilder.buildUri(query, this.metadataStore);
-        } else {
-          throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
-        }
-        return  this.dataService.makeUrl(uriString);
+  var proto = ctor.prototype;
+  var parseRawValue = DataType.parseRawValue;
+  proto._$typeName = "MappingContext";
+
+  proto.getUrl = function () {
+    var query = this.query;
+    if (!query) {
+      throw new Error("query cannot be empty");
     }
+    var uriString;
+    if (typeof query === 'string') {
+      uriString = query;
+    } else if (query instanceof EntityQuery) {
+      uriString = this.dataService.uriBuilder.buildUri(query, this.metadataStore);
+    } else {
+      throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
+    }
+    return  this.dataService.makeUrl(uriString);
+  }
 
-    proto.visitAndMerge = function (nodes, nodeContext) {
-        var query = this.query;
-        var jra = this.jsonResultsAdapter;
-        nodeContext = nodeContext || {};
-        var that = this;
-        return __map(nodes, function (node) {
-            if (query == null && node.entityAspect) {
-                // don't bother merging a result from a save that was not returned from the server.
-                if (node.entityAspect.entityState.isDeleted()) {
-                    that.entityManager.detachEntity(node);
-                } else {
-                    node.entityAspect.acceptChanges();
-                }
-                return node;
-            }
-            
-            var meta = jra.visitNode(node, that, nodeContext) || {};
-            node = meta.node || node;
-            if (query && nodeContext.nodeType === "root" && !meta.entityType) {
-                meta.entityType = query._getToEntityType && query._getToEntityType(that.metadataStore);
-            }
-            return processMeta(that, node, meta);
+  proto.visitAndMerge = function (nodes, nodeContext) {
+    var query = this.query;
+    var jra = this.jsonResultsAdapter;
+    nodeContext = nodeContext || {};
+    var that = this;
+    return __map(nodes, function (node) {
+      if (query == null && node.entityAspect) {
+        // don't bother merging a result from a save that was not returned from the server.
+        if (node.entityAspect.entityState.isDeleted()) {
+          that.entityManager.detachEntity(node);
+        } else {
+          node.entityAspect.acceptChanges();
+        }
+        return node;
+      }
+
+      var meta = jra.visitNode(node, that, nodeContext) || {};
+      node = meta.node || node;
+      if (query && nodeContext.nodeType === "root" && !meta.entityType) {
+        meta.entityType = query._getToEntityType && query._getToEntityType(that.metadataStore);
+      }
+      return processMeta(that, node, meta);
+    });
+  };
+
+  proto.processDeferred = function () {
+    if (this.deferredFns.length > 0) {
+      this.deferredFns.forEach(function (fn) {
+        fn();
+      });
+    }
+  }
+
+  function processMeta(mc, node, meta, assignFn) {
+    // == is deliberate here instead of ===
+    if (meta.ignore || node == null) {
+      return null;
+    } else if (meta.nodeRefId) {
+      var refValue = resolveEntityRef(mc, meta.nodeRefId);
+      if (typeof refValue === "function" && assignFn != null) {
+        mc.deferredFns.push(function () {
+          assignFn(refValue);
         });
-    };
-
-    proto.processDeferred = function () {
-        if (this.deferredFns.length > 0) {
-            this.deferredFns.forEach(function (fn) {
-                fn();
-            });
+        return undefined; // deferred and will be set later;
+      }
+      return refValue;
+    } else if (meta.entityType) {
+      var entityType = meta.entityType;
+      if (mc.mergeOptions.noTracking) {
+        node = processNoMerge(mc, entityType, node);
+        if (entityType.noTrackingFn) {
+          node = entityType.noTrackingFn(node, entityType);
         }
-    }
-
-    function processMeta(mc, node, meta, assignFn) {
-        // == is deliberate here instead of ===
-        if (meta.ignore || node == null) {
-            return null;
-        } else if (meta.nodeRefId) {
-            var refValue = resolveEntityRef(mc, meta.nodeRefId);
-            if (typeof refValue === "function" && assignFn != null) {
-                mc.deferredFns.push(function () {
-                    assignFn(refValue);
-                });
-                return undefined; // deferred and will be set later;
-            }
-            return refValue;
-        } else if (meta.entityType) {
-            var entityType = meta.entityType;
-            if (mc.mergeOptions.noTracking) {
-                node = processNoMerge(mc, entityType, node);
-                if (entityType.noTrackingFn) {
-                    node = entityType.noTrackingFn(node, entityType);
-                } 
-                if (meta.nodeId) {
-                    mc.refMap[meta.nodeId] = node;
-                }
-                return node;
-            } else {
-                if (entityType.isComplexType) {
-                    // because we still need to do serverName to client name processing
-                    return processNoMerge(mc, entityType, node);
-                } else {
-                    return mergeEntity(mc, node, meta);
-                }
-            }
+        if (meta.nodeId) {
+          mc.refMap[meta.nodeId] = node;
+        }
+        return node;
+      } else {
+        if (entityType.isComplexType) {
+          // because we still need to do serverName to client name processing
+          return processNoMerge(mc, entityType, node);
         } else {
-            if (typeof node === 'object' && !__isDate(node)) {
-                node = processAnonType(mc, node);
-            }
-
-            // updating the refMap for entities is handled by updateEntityRef for entities.
-            if (meta.nodeId) {
-                mc.refMap[meta.nodeId] = node;
-            }
-            return node;
+          return mergeEntity(mc, node, meta);
         }
+      }
+    } else {
+      if (typeof node === 'object' && !__isDate(node)) {
+        node = processAnonType(mc, node);
+      }
+
+      // updating the refMap for entities is handled by updateEntityRef for entities.
+      if (meta.nodeId) {
+        mc.refMap[meta.nodeId] = node;
+      }
+      return node;
     }
+  }
 
-    function processNoMerge(mc, stype, node) {
-        var result = {};
+  function processNoMerge(mc, stype, node) {
+    var result = {};
 
-        stype.dataProperties.forEach(function (dp) {
-            if (dp.isComplexProperty) {
-                result[dp.name] = __map(node[dp.nameOnServer], function (v) {
-                    return processNoMerge(mc, dp.dataType, v);
-                });
-            } else {
-                result[dp.name] = parseRawValue(node[dp.nameOnServer], dp.dataType);
-            }
+    stype.dataProperties.forEach(function (dp) {
+      if (dp.isComplexProperty) {
+        result[dp.name] = __map(node[dp.nameOnServer], function (v) {
+          return processNoMerge(mc, dp.dataType, v);
         });
+      } else {
+        result[dp.name] = parseRawValue(node[dp.nameOnServer], dp.dataType);
+      }
+    });
 
-        stype.navigationProperties && stype.navigationProperties.forEach(function (np) {
-            var nodeContext = { nodeType: "navProp", navigationProperty: np };
-            visitNode(node[np.nameOnServer], mc, nodeContext, result, np.name);
+    stype.navigationProperties && stype.navigationProperties.forEach(function (np) {
+      var nodeContext = { nodeType: "navProp", navigationProperty: np };
+      visitNode(node[np.nameOnServer], mc, nodeContext, result, np.name);
+    });
+
+    return result;
+  }
+
+  function processAnonType(mc, node) {
+    // node is guaranteed to be an object by this point, i.e. not a scalar
+    var keyFn = mc.metadataStore.namingConvention.serverPropertyNameToClient;
+    var result = {};
+
+    __objectForEach(node, function (key, value) {
+      var newKey = keyFn(key);
+      var nodeContext = { nodeType: "anonProp", propertyName: newKey };
+      visitNode(value, mc, nodeContext, result, newKey);
+    });
+    return result;
+  }
+
+  function visitNode(node, mc, nodeContext, result, key) {
+    var jra = mc.jsonResultsAdapter;
+    var meta = jra.visitNode(node, mc, nodeContext) || {};
+    // allows visitNode to change the value;
+    node = meta.node || node;
+
+    if (meta.ignore) return;
+
+    if (Array.isArray(node)) {
+      nodeContext.nodeType = nodeContext.nodeType + "Item";
+      result[key] = node.map(function (v, ix) {
+        meta = jra.visitNode(v, mc, nodeContext) || {};
+        v = meta.node || v;
+        return processMeta(mc, v, meta, function (refValue) {
+          result[key][ix] = refValue();
         });
-
-        return result;
+      });
+    } else {
+      result[key] = processMeta(mc, node, meta, function (refValue) {
+        result[key] = refValue();
+      });
     }
+  }
 
-    function processAnonType(mc, node) {
-        // node is guaranteed to be an object by this point, i.e. not a scalar          
-        var keyFn = mc.metadataStore.namingConvention.serverPropertyNameToClient;
-        var result = {};
-
-        __objectForEach(node, function (key, value) {
-            var newKey = keyFn(key);
-            var nodeContext = { nodeType: "anonProp", propertyName: newKey };
-            visitNode(value, mc, nodeContext, result, newKey);
-        });
-        return result;
+  function resolveEntityRef(mc, nodeRefId) {
+    var entity = mc.refMap[nodeRefId];
+    if (entity === undefined) {
+      return function () {
+        return mc.refMap[nodeRefId];
+      };
+    } else {
+      return entity;
     }
+  }
 
-    function visitNode(node, mc, nodeContext, result, key) {
-        var jra = mc.jsonResultsAdapter;
-        var meta = jra.visitNode(node, mc, nodeContext) || {};
-        // allows visitNode to change the value;
-        node = meta.node || node;
-
-        if (meta.ignore) return;
-
-        if (Array.isArray(node)) {
-            nodeContext.nodeType = nodeContext.nodeType + "Item";
-            result[key] = node.map(function (v, ix) {
-                meta = jra.visitNode(v, mc, nodeContext) || {};
-                v = meta.node || v;
-                return processMeta(mc, v, meta, function (refValue) {
-                    result[key][ix] = refValue();
-                });
-            });
-        } else {
-            result[key] = processMeta(mc, node, meta, function (refValue) {
-                result[key] = refValue();
-            });
-        }
+  function updateEntityRef(mc, targetEntity, node) {
+    var nodeId = node._$meta.nodeId;
+    if (nodeId != null) {
+      mc.refMap[nodeId] = targetEntity;
     }
+  }
 
-    function resolveEntityRef(mc, nodeRefId) {
-        var entity = mc.refMap[nodeRefId];
-        if (entity === undefined) {
-            return function () { return mc.refMap[nodeRefId]; };
-        } else {
-            return entity;
-        }
+  function mergeEntity(mc, node, meta) {
+    node._$meta = meta;
+    var em = mc.entityManager;
+
+    var entityType = meta.entityType;
+    if (typeof (entityType) === 'string') {
+      entityType = mc.metadataStore._getEntityType(entityType, false);
     }
+    node.entityType = entityType;
 
-    function updateEntityRef(mc, targetEntity, node) {
-        var nodeId = node._$meta.nodeId;
-        if (nodeId != null) {
-            mc.refMap[nodeId] = targetEntity;
-        }
-    }
+    var mergeStrategy = mc.mergeOptions.mergeStrategy;
+    var isSaving = mc.query == null;
 
-    function mergeEntity(mc, node, meta) {
-        node._$meta = meta;
-        var em = mc.entityManager;
-        
-        var entityType = meta.entityType;
-        if (typeof (entityType) === 'string') {
-            entityType = mc.metadataStore._getEntityType(entityType, false);
-        }
-        node.entityType = entityType;
-
-        var mergeStrategy = mc.mergeOptions.mergeStrategy;
-        var isSaving = mc.query == null;
-
-        var entityKey = entityType.getEntityKeyFromRawEntity(node, mc.rawValueFn);
-        var targetEntity = em.findEntityByKey(entityKey);
-        if (targetEntity) {
-            if (isSaving && targetEntity.entityAspect.entityState.isDeleted()) {
-                em.detachEntity(targetEntity);
-                return targetEntity;
-            }
-            var targetEntityState = targetEntity.entityAspect.entityState;
-            if (mergeStrategy === MergeStrategy.Disallowed) {
-                throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
-            } else if (mergeStrategy === MergeStrategy.SkipMerge) {
-                updateEntityNoMerge(mc, targetEntity, node);
-            } else {
-                if (mergeStrategy === MergeStrategy.OverwriteChanges
-                        || targetEntityState.isUnchanged()) {
-                    updateEntity(mc, targetEntity, node);
-                    targetEntity.entityAspect.wasLoaded = true;
-                    if (meta.extraMetadata) {
-                        targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
-                    }
-                    targetEntity.entityAspect.entityState = EntityState.Unchanged;
-                    targetEntity.entityAspect.originalValues = {};
-                    targetEntity.entityAspect.propertyChanged.publish({ entity: targetEntity, propertyName: null });
-                    var action = isSaving ? EntityAction.MergeOnSave : EntityAction.MergeOnQuery;
-                    em.entityChanged.publish({ entityAction: action, entity: targetEntity });
-                    // this is needed to handle an overwrite of a modified entity with an unchanged entity 
-                    // which might in turn cause _hasChanges to change.
-                    if (!targetEntityState.isUnchanged()) {
-                        em._notifyStateChange(targetEntity, false);
-                    }
-                } else {
-                    updateEntityNoMerge(mc, targetEntity, node);
-                }
-            }
-        } else {
-            targetEntity = entityType._createInstanceCore();
-          
-            updateEntity(mc, targetEntity, node);
-            
-            if (meta.extraMetadata) {
-                targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
-            }
-            em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
-            targetEntity.entityAspect.wasLoaded = true;
-            em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
-        }
+    var entityKey = entityType.getEntityKeyFromRawEntity(node, mc.rawValueFn);
+    var targetEntity = em.findEntityByKey(entityKey);
+    if (targetEntity) {
+      if (isSaving && targetEntity.entityAspect.entityState.isDeleted()) {
+        em.detachEntity(targetEntity);
         return targetEntity;
-    }
-
-    function updateEntityNoMerge(mc, targetEntity, node) {
-        updateEntityRef(mc, targetEntity, node);
-        // we still need to merge related entities even if top level entity wasn't modified.
-        node.entityType.navigationProperties.forEach(function (np) {
-            if (np.isScalar) {
-                mergeRelatedEntityCore(mc, node, np);
-            } else {
-                mergeRelatedEntitiesCore(mc, node, np);
-            }
-        });
-    }
-
-    function updateEntity(mc, targetEntity, node) {
-        updateEntityRef(mc, targetEntity, node);
-        var entityType = targetEntity.entityType;
-        entityType._updateTargetFromRaw(targetEntity, node, mc.rawValueFn);
-        
-        entityType.navigationProperties.forEach(function (np) {
-            if (np.isScalar) {
-                mergeRelatedEntity(mc, np, targetEntity, node);
-            } else {
-                mergeRelatedEntities(mc, np, targetEntity, node);
-            }
-        });
-    }
-
-    function mergeRelatedEntity(mc, navigationProperty, targetEntity, rawEntity) {
-
-        var relatedEntity = mergeRelatedEntityCore(mc, rawEntity, navigationProperty);
-        if (relatedEntity == null) return;
-        if (typeof relatedEntity === 'function') {
-            mc.deferredFns.push(function () {
-                relatedEntity = relatedEntity();
-                updateRelatedEntity(relatedEntity, targetEntity, navigationProperty);
-            });
+      }
+      var targetEntityState = targetEntity.entityAspect.entityState;
+      if (mergeStrategy === MergeStrategy.Disallowed) {
+        throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
+      } else if (mergeStrategy === MergeStrategy.SkipMerge) {
+        updateEntityNoMerge(mc, targetEntity, node);
+      } else {
+        if (mergeStrategy === MergeStrategy.OverwriteChanges
+            || targetEntityState.isUnchanged()) {
+          updateEntity(mc, targetEntity, node);
+          targetEntity.entityAspect.wasLoaded = true;
+          if (meta.extraMetadata) {
+            targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
+          }
+          targetEntity.entityAspect.entityState = EntityState.Unchanged;
+          targetEntity.entityAspect.originalValues = {};
+          targetEntity.entityAspect.propertyChanged.publish({ entity: targetEntity, propertyName: null });
+          var action = isSaving ? EntityAction.MergeOnSave : EntityAction.MergeOnQuery;
+          em.entityChanged.publish({ entityAction: action, entity: targetEntity });
+          // this is needed to handle an overwrite of a modified entity with an unchanged entity
+          // which might in turn cause _hasChanges to change.
+          if (!targetEntityState.isUnchanged()) {
+            em._notifyStateChange(targetEntity, false);
+          }
         } else {
-            updateRelatedEntity(relatedEntity, targetEntity, navigationProperty);
+          updateEntityNoMerge(mc, targetEntity, node);
         }
+      }
+    } else {
+      targetEntity = entityType._createInstanceCore();
+
+      updateEntity(mc, targetEntity, node);
+
+      if (meta.extraMetadata) {
+        targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
+      }
+      em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
+      targetEntity.entityAspect.wasLoaded = true;
+      em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
     }
+    return targetEntity;
+  }
 
-    function mergeRelatedEntities(mc, navigationProperty, targetEntity, rawEntity) {
-        var relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
-        if (relatedEntities == null) return;
-        
-        var inverseProperty = navigationProperty.inverse;
-        if (!inverseProperty) return;
+  function updateEntityNoMerge(mc, targetEntity, node) {
+    updateEntityRef(mc, targetEntity, node);
+    // we still need to merge related entities even if top level entity wasn't modified.
+    node.entityType.navigationProperties.forEach(function (np) {
+      if (np.isScalar) {
+        mergeRelatedEntityCore(mc, node, np);
+      } else {
+        mergeRelatedEntitiesCore(mc, node, np);
+      }
+    });
+  }
 
-        var originalRelatedEntities = targetEntity.getProperty(navigationProperty.name);
-        originalRelatedEntities.wasLoaded = true;
-        
-        relatedEntities.forEach(function (relatedEntity) {
-            if (typeof relatedEntity === 'function') {
-                mc.deferredFns.push(function () {
-                    relatedEntity = relatedEntity();
-                    updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
-                });
-            } else {
-                updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
-            }
+  function updateEntity(mc, targetEntity, node) {
+    updateEntityRef(mc, targetEntity, node);
+    var entityType = targetEntity.entityType;
+    entityType._updateTargetFromRaw(targetEntity, node, mc.rawValueFn);
+
+    entityType.navigationProperties.forEach(function (np) {
+      if (np.isScalar) {
+        mergeRelatedEntity(mc, np, targetEntity, node);
+      } else {
+        mergeRelatedEntities(mc, np, targetEntity, node);
+      }
+    });
+  }
+
+  function mergeRelatedEntity(mc, navigationProperty, targetEntity, rawEntity) {
+
+    var relatedEntity = mergeRelatedEntityCore(mc, rawEntity, navigationProperty);
+    if (relatedEntity == null) return;
+    if (typeof relatedEntity === 'function') {
+      mc.deferredFns.push(function () {
+        relatedEntity = relatedEntity();
+        updateRelatedEntity(relatedEntity, targetEntity, navigationProperty);
+      });
+    } else {
+      updateRelatedEntity(relatedEntity, targetEntity, navigationProperty);
+    }
+  }
+
+  function mergeRelatedEntities(mc, navigationProperty, targetEntity, rawEntity) {
+    var relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
+    if (relatedEntities == null) return;
+
+    var inverseProperty = navigationProperty.inverse;
+    if (!inverseProperty) return;
+
+    var originalRelatedEntities = targetEntity.getProperty(navigationProperty.name);
+    originalRelatedEntities.wasLoaded = true;
+
+    relatedEntities.forEach(function (relatedEntity) {
+      if (typeof relatedEntity === 'function') {
+        mc.deferredFns.push(function () {
+          relatedEntity = relatedEntity();
+          updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
         });
+      } else {
+        updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
+      }
+    });
+  }
+
+  function mergeRelatedEntityCore(mc, rawEntity, navigationProperty) {
+    var relatedRawEntity = rawEntity[navigationProperty.nameOnServer];
+    if (!relatedRawEntity) return null;
+
+    var relatedEntity = mc.visitAndMerge(relatedRawEntity, { nodeType: "navProp", navigationProperty: navigationProperty });
+    return relatedEntity;
+  }
+
+  function mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty) {
+    var relatedRawEntities = rawEntity[navigationProperty.nameOnServer];
+    if (!relatedRawEntities) return null;
+
+    // needed if what is returned is not an array and we expect one - this happens with __deferred in OData.
+    if (!Array.isArray(relatedRawEntities)) {
+      // return null;
+      relatedRawEntities = relatedRawEntities.results; // OData v3 will look like this with an expand
+      if (!relatedRawEntities) {
+        return null;
+      }
     }
 
-    function mergeRelatedEntityCore(mc, rawEntity, navigationProperty) {
-        var relatedRawEntity = rawEntity[navigationProperty.nameOnServer];
-        if (!relatedRawEntity) return null;
+    var relatedEntities = mc.visitAndMerge(relatedRawEntities, { nodeType: "navPropItem", navigationProperty: navigationProperty });
+    return relatedEntities;
+  }
 
-        var relatedEntity = mc.visitAndMerge(relatedRawEntity, { nodeType: "navProp", navigationProperty: navigationProperty });
-        return relatedEntity;
+  function updateRelatedEntity(relatedEntity, targetEntity, navigationProperty) {
+    if (!relatedEntity) return;
+    var propName = navigationProperty.name;
+    var currentRelatedEntity = targetEntity.getProperty(propName);
+
+    // check if the related entity is already hooked up
+    if (currentRelatedEntity !== relatedEntity) {
+      // if not hook up both directions.
+      targetEntity.setProperty(propName, relatedEntity);
+      var inverseProperty = navigationProperty.inverse;
+      if (!inverseProperty) return;
+      if (inverseProperty.isScalar) {
+        relatedEntity.setProperty(inverseProperty.name, targetEntity);
+      } else {
+        var collection = relatedEntity.getProperty(inverseProperty.name);
+        collection.push(targetEntity);
+
+      }
     }
+  }
 
-    function mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty) {
-        var relatedRawEntities = rawEntity[navigationProperty.nameOnServer];
-        if (!relatedRawEntities) return null;
+  function updateRelatedEntityInCollection(relatedEntity, relatedEntities, targetEntity, inverseProperty) {
+    if (!relatedEntity) return;
 
-        // needed if what is returned is not an array and we expect one - this happens with __deferred in OData.
-        if (!Array.isArray(relatedRawEntities)) {
-            // return null;
-            relatedRawEntities = relatedRawEntities.results; // OData v3 will look like this with an expand
-            if (!relatedRawEntities) {
-                return null;
-            }
-        }
-        
-        var relatedEntities = mc.visitAndMerge(relatedRawEntities, { nodeType: "navPropItem", navigationProperty: navigationProperty });
-        return relatedEntities;
+    // check if the related entity is already hooked up
+    var thisEntity = relatedEntity.getProperty(inverseProperty.name);
+    if (thisEntity !== targetEntity) {
+      // if not - hook it up.
+      relatedEntities.push(relatedEntity);
+      relatedEntity.setProperty(inverseProperty.name, targetEntity);
     }
+  }
 
-    function updateRelatedEntity(relatedEntity, targetEntity, navigationProperty) {
-        if (!relatedEntity) return;
-        var propName = navigationProperty.name;
-        var currentRelatedEntity = targetEntity.getProperty(propName);
 
-        // check if the related entity is already hooked up
-        if (currentRelatedEntity !== relatedEntity) {
-            // if not hook up both directions.
-            targetEntity.setProperty(propName, relatedEntity);
-            var inverseProperty = navigationProperty.inverse;
-            if (!inverseProperty) return;
-            if (inverseProperty.isScalar) {
-                relatedEntity.setProperty(inverseProperty.name, targetEntity);
-            } else {
-                var collection = relatedEntity.getProperty(inverseProperty.name);
-                collection.push(targetEntity);
-
-            }
-        }
-    } 
-
-    function updateRelatedEntityInCollection(relatedEntity, relatedEntities, targetEntity, inverseProperty) {
-        if (!relatedEntity) return;
-
-        // check if the related entity is already hooked up
-        var thisEntity = relatedEntity.getProperty(inverseProperty.name);
-        if (thisEntity !== targetEntity) {
-            // if not - hook it up.
-            relatedEntities.push(relatedEntity);
-            relatedEntity.setProperty(inverseProperty.name, targetEntity);
-        }
-    }
-     
-    
-    return ctor;
+  return ctor;
 })();
    
 
 
 ;/**
-@module breeze
-**/
-   
+ @module breeze
+ **/
+
 var SaveOptions = (function () {
-    /**
-    A SaveOptions instance is used to specify the 'options' under which a save will occur.
+  /**
+   A SaveOptions instance is used to specify the 'options' under which a save will occur.
 
-    @class SaveOptions
-    **/
-        
-    /**
-    @method <ctor> SaveOptions
-    @param config {Object}
-    @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
-    @param [config.resourceName] {String} Resource name to be used during the save - this defaults to "SaveChanges"
-    @param [config.dataService] {DataService} The DataService to be used for this save.
-    @param [config.tag] {Object} Free form value that will be sent to the server during the save. 
-    **/
-    var ctor = function (config) {
-        updateWithConfig(this, config);
-    };
-    
-    var proto = ctor.prototype;
-    proto._$typeName = "SaveOptions";
-        
-    /**
-    Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance. 
-    The current instance is returned unchanged.
-    @method setAsDefault
-    @chainable
-    **/
-    proto.setAsDefault = function() {
-        return __setAsDefault(this, ctor);
-    };
-    
-    /**
-    Whether another save can be occuring at the same time as this one - default is false.
+   @class SaveOptions
+   **/
 
-    __readOnly__
-    @property allowConcurrentSaves {Boolean}
-    **/
-    
-    /**
-    A {{#crossLink "DataService"}}{{/crossLink}}. 
-    __readOnly__
-    @property dataService {DataService}
-    **/
+  /**
+   @method <ctor> SaveOptions
+   @param config {Object}
+   @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
+   @param [config.resourceName] {String} Resource name to be used during the save - this defaults to "SaveChanges"
+   @param [config.dataService] {DataService} The DataService to be used for this save.
+   @param [config.tag] {Object} Free form value that will be sent to the server during the save.
+   **/
+  var ctor = function (config) {
+    updateWithConfig(this, config);
+  };
 
-    /**
-    The resource name to call to perform the save.
-    __readOnly__
-    @property resourceName {String}
-    **/
+  var proto = ctor.prototype;
+  proto._$typeName = "SaveOptions";
 
-    /**
-    A free form value that will be sent to the server.
+  /**
+   Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.
+   The current instance is returned unchanged.
+   @method setAsDefault
+   @chainable
+   **/
+  proto.setAsDefault = function () {
+    return __setAsDefault(this, ctor);
+  };
 
-    __readOnly__
-    @property tag {Object}
-    **/
+  /**
+   Whether another save can be occuring at the same time as this one - default is false.
 
-    /**
-    The default value whenever SaveOptions are not specified.
-    @property defaultInstance {SaveOptions}
-    @static
-    **/
-    
-    /**
-    Returns a copy of this SaveOptions with the specified config options applied.
-    @example
-        var saveOptions = em1.saveOptions.using( {resourceName: "anotherResource" });
-    
-    @method using
-    @param config {Configuration Object|} The object to apply to create a new SaveOptions.
-    @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
-    @param [config.resourceName] {String} Resource name to be used during the save - this defaults to "SaveChanges"
-    @param [config.dataService] {DataService} The DataService to be used for this save.
-    @param [config.tag] {Object} Free form value that will be sent to the server during the save. 
-    @chainable
-    **/
-    proto.using = function (config) {
-        return updateWithConfig(this, config);
-    };
+   __readOnly__
+   @property allowConcurrentSaves {Boolean}
+   **/
 
-    function updateWithConfig(obj, config) {
-        if (config) {
-            assertConfig(config)
-              .whereParam("resourceName").isOptional().isString()
-              .whereParam("dataService").isOptional().isInstanceOf(DataService)
-              .whereParam("allowConcurrentSaves").isBoolean().isOptional()
-              .whereParam("tag").isOptional()
-              .applyAll(obj);
-        }
-        return obj;
+  /**
+   A {{#crossLink "DataService"}}{{/crossLink}}.
+   __readOnly__
+   @property dataService {DataService}
+   **/
+
+  /**
+   The resource name to call to perform the save.
+   __readOnly__
+   @property resourceName {String}
+   **/
+
+  /**
+   A free form value that will be sent to the server.
+
+   __readOnly__
+   @property tag {Object}
+   **/
+
+  /**
+   The default value whenever SaveOptions are not specified.
+   @property defaultInstance {SaveOptions}
+   @static
+   **/
+
+  /**
+   Returns a copy of this SaveOptions with the specified config options applied.
+   @example
+   var saveOptions = em1.saveOptions.using( {resourceName: "anotherResource" });
+
+   @method using
+   @param config {Configuration Object|} The object to apply to create a new SaveOptions.
+   @param [config.allowConcurrentSaves] {Boolean} Whether multiple saves can be in-flight at the same time. The default is false.
+   @param [config.resourceName] {String} Resource name to be used during the save - this defaults to "SaveChanges"
+   @param [config.dataService] {DataService} The DataService to be used for this save.
+   @param [config.tag] {Object} Free form value that will be sent to the server during the save.
+   @chainable
+   **/
+  proto.using = function (config) {
+    return updateWithConfig(this, config);
+  };
+
+  function updateWithConfig(obj, config) {
+    if (config) {
+      assertConfig(config)
+          .whereParam("resourceName").isOptional().isString()
+          .whereParam("dataService").isOptional().isInstanceOf(DataService)
+          .whereParam("allowConcurrentSaves").isBoolean().isOptional()
+          .whereParam("tag").isOptional()
+          .applyAll(obj);
     }
+    return obj;
+  }
 
-    ctor.defaultInstance = new ctor({ allowConcurrentSaves: false});
-    return ctor;
+  ctor.defaultInstance = new ctor({ allowConcurrentSaves: false});
+  return ctor;
 })();
 
-breeze.SaveOptions= SaveOptions;
+breeze.SaveOptions = SaveOptions;
 
 
 ;breeze.AbstractDataServiceAdapter = (function () {
-    
-    var ajaxImpl;
-    
-    var ctor = function () { };
 
-    var proto = ctor.prototype; // minifies better (as seen in jQuery)
+  var ajaxImpl;
 
-    proto.checkForRecomposition = function (interfaceInitializedArgs) {
-        if (interfaceInitializedArgs.interfaceName === "ajax" && interfaceInitializedArgs.isDefault) {
-            this.initialize();
+  var ctor = function () {
+  };
+
+  var proto = ctor.prototype; // minifies better (as seen in jQuery)
+
+  proto.checkForRecomposition = function (interfaceInitializedArgs) {
+    if (interfaceInitializedArgs.interfaceName === "ajax" && interfaceInitializedArgs.isDefault) {
+      this.initialize();
+    }
+  };
+
+  proto.initialize = function () {
+    ajaxImpl = breeze.config.getAdapterInstance("ajax");
+
+    // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues.
+    if (ajaxImpl && ajaxImpl.ajax) {
+      return;
+    }
+    throw new Error("Unable to find ajax adapter for dataservice adapter '" + (this.name || '') + "'.");
+  };
+
+  proto.fetchMetadata = function (metadataStore, dataService) {
+    var serviceName = dataService.serviceName;
+    var url = dataService.makeUrl("Metadata");
+
+    var deferred = Q.defer();
+
+    ajaxImpl.ajax({
+      type: "GET",
+      url: url,
+      dataType: 'json',
+      success: function (httpResponse) {
+
+        // might have been fetched by another query
+        if (metadataStore.hasMetadataFor(serviceName)) {
+          return deferred.resolve("already fetched");
         }
+        var data = httpResponse.data;
+        try {
+          var metadata = typeof (data) === "string" ? JSON.parse(data) : data;
+          metadataStore.importMetadata(metadata);
+        } catch (e) {
+          var errMsg = "Unable to either parse or import metadata: " + e.message;
+          return handleHttpError(deferred, httpResponse, "Metadata query failed for: " + url + ". " + errMsg);
+        }
+
+        // import may have brought in the service.
+        if (!metadataStore.hasMetadataFor(serviceName)) {
+          metadataStore.addDataService(dataService);
+        }
+
+        return deferred.resolve(metadata);
+
+      },
+      error: function (httpResponse) {
+        handleHttpError(deferred, httpResponse, "Metadata query failed for: " + url);
+      }
+    });
+    return deferred.promise;
+  };
+
+  proto.executeQuery = function (mappingContext) {
+
+    var deferred = Q.defer();
+    var url = mappingContext.getUrl();
+
+    var params = {
+      type: "GET",
+      url: url,
+      params: mappingContext.query.parameters,
+      dataType: 'json',
+      success: function (httpResponse) {
+        var data = httpResponse.data;
+        try {
+          var rData;
+          if (data && data.Results) {
+            rData = { results: data.Results, inlineCount: data.InlineCount, httpResponse: httpResponse };
+          } else {
+            rData = { results: data, httpResponse: httpResponse };
+          }
+
+          deferred.resolve(rData);
+        } catch (e) {
+          if (e instanceof Error) {
+            deferred.reject(e);
+          } else {
+            handleHttpError(httpResponse);
+          }
+        }
+
+      },
+      error: function (httpResponse) {
+        handleHttpError(deferred, httpResponse);
+      }
     };
-    
-    proto.initialize = function () {
-        ajaxImpl = breeze.config.getAdapterInstance("ajax");
+    if (mappingContext.dataService.useJsonp) {
+      params.dataType = 'jsonp';
+      params.crossDomain = true;
+    }
+    ajaxImpl.ajax(params);
+    return deferred.promise;
+  };
 
-        // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues. 
-        if (ajaxImpl && ajaxImpl.ajax) { return; }
-        throw new Error("Unable to find ajax adapter for dataservice adapter '"+(this.name||'')+"'.");
-    };
+  proto.saveChanges = function (saveContext, saveBundle) {
+    var adapter = saveContext.adapter = this;
+    var deferred = Q.defer();
+    saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
+    var bundle = JSON.stringify(saveBundle);
 
-    proto.fetchMetadata = function (metadataStore, dataService) {
-        var serviceName = dataService.serviceName;
-        var url = dataService.makeUrl("Metadata");
-        
-        var deferred = Q.defer();
+    var url = saveContext.dataService.makeUrl(saveContext.resourceName);
 
-        ajaxImpl.ajax({
-            type: "GET",
-            url: url,
-            dataType: 'json',
-            success: function (httpResponse) {
-                
-                // might have been fetched by another query
-                if (metadataStore.hasMetadataFor(serviceName)) {
-                    return deferred.resolve("already fetched");
-                }
-                var data = httpResponse.data;
-                try {
-                    var metadata = typeof (data) === "string" ? JSON.parse(data) : data;
-                    metadataStore.importMetadata(metadata);
-                } catch(e) {
-                    var errMsg = "Unable to either parse or import metadata: " + e.message;
-                    return handleHttpError(deferred, httpResponse, "Metadata query failed for: " + url + ". " + errMsg);
-                }
+    ajaxImpl.ajax({
+      type: "POST",
+      url: url,
+      dataType: 'json',
+      contentType: "application/json",
+      data: bundle,
+      success: function (httpResponse) {
+        var data = httpResponse.data;
+        httpResponse.saveContext = saveContext;
+        var entityErrors = data.Errors || data.errors;
+        if (entityErrors) {
+          handleHttpError(deferred, httpResponse);
+        } else {
+          var saveResult = adapter._prepareSaveResult(saveContext, data);
+          saveResult.httpResponse = httpResponse;
+          deferred.resolve(saveResult);
+        }
 
-                // import may have brought in the service.
-                if (!metadataStore.hasMetadataFor(serviceName)) {
-                    metadataStore.addDataService(dataService);
-                }
+      },
+      error: function (httpResponse) {
+        httpResponse.saveContext = saveContext;
+        handleHttpError(deferred, httpResponse);
+      }
+    });
 
-                return deferred.resolve(metadata);
-                
-            },
-            error: function (httpResponse) {
-                handleHttpError(deferred, httpResponse, "Metadata query failed for: " + url);
-            }
-        });
-        return deferred.promise;
-    };
+    return deferred.promise;
+  };
 
-    proto.executeQuery = function (mappingContext) {
+  proto._prepareSaveBundle = function (/*saveContext, saveBundle*/) {
+    // The implementor should call _createChangeRequestInterceptor
+    throw new Error("Need a concrete implementation of _prepareSaveBundle");
+  };
 
-        var deferred = Q.defer();
-        var url = mappingContext.getUrl();
+  /**
+   Returns a constructor function for a "ChangeRequestInterceptor"
+   that can tweak the saveBundle both as it is built and when it is completed
+   by a concrete DataServiceAdapater.
 
-        var params = {
-            type: "GET",
-            url: url,
-            params: mappingContext.query.parameters,
-            dataType: 'json',
-            success: function (httpResponse) {
-                var data = httpResponse.data;
-                try {
-                    var rData;
-                    if (data && data.Results) {
-                        rData = { results: data.Results, inlineCount: data.InlineCount, httpResponse: httpResponse };
-                    } else {
-                        rData = { results: data, httpResponse: httpResponse };
-                    }
-                    
-                    deferred.resolve(rData);
-                } catch (e) {
-                    if (e instanceof Error) {
-                        deferred.reject(e);
-                    } else {
-                        handleHttpError(httpResponse);
-                    }
-                }
+   Initialized with a default, no-op implementation that developers can replace with a
+   substantive implementation that changes the individual entity change requests
+   or aspects of the entire 'saveBundle' without having to write their own DataService adapters.
 
-            },
-            error: function(httpResponse) {
-                handleHttpError(deferred, httpResponse);
-            }
+   @example
+   var adapter = breeze.config.getAdapterInstance('dataService');
+   adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
+        this.getRequest = function (request, entity, index) {
+            // alter the request that the adapter prepared for this entity
+            // based on the entity, saveContext, and saveBundle
+            // e.g., add a custom header or prune the originalValuesMap
+            return request;
         };
-        if (mappingContext.dataService.useJsonp) {
-            params.dataType = 'jsonp';
-            params.crossDomain = true;
-        }
-        ajaxImpl.ajax(params);
-        return deferred.promise;
-    };
+        this.done = function (requests) {
+            // alter the array of requests representing the entire change-set 
+            // based on the saveContext and saveBundle
+        };
+    }
+   @method changeRequestInterceptor
+   @param saveContext {Object} The BreezeJS "context" for the save operation.
+   @param saveBundle {Object} Contains the array of entities-to-be-saved (AKA, the entity change-set).
+   @return {Function} Constructor for a "ChangeRequestInterceptor".
+   **/
+  proto.changeRequestInterceptor = DefaultChangeRequestInterceptor;
 
-    proto.saveChanges = function (saveContext, saveBundle) {
-        var adapter = saveContext.adapter = this;     
-        var deferred = Q.defer();
-        saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
-        var bundle = JSON.stringify(saveBundle);
-        
-        var url = saveContext.dataService.makeUrl(saveContext.resourceName);
+  //This is a default, no-op implementation that developers can replace.
+  function DefaultChangeRequestInterceptor(saveContext, saveBundle) {
+    /**
+     Prepare and return the save data for an entity change-set.
 
-        ajaxImpl.ajax({
-            type: "POST",
-            url: url,
-            dataType: 'json',
-            contentType: "application/json",
-            data: bundle,
-            success: function (httpResponse) {
-                var data = httpResponse.data;
-                httpResponse.saveContext = saveContext;
-                var entityErrors = data.Errors || data.errors;
-                if (entityErrors) {
-                    handleHttpError(deferred, httpResponse);
-                } else {
-                    var saveResult = adapter._prepareSaveResult(saveContext, data);
-                    saveResult.httpResponse = httpResponse;
-                    deferred.resolve(saveResult);
-                }
-                
-            },
-            error: function (httpResponse) {
-                httpResponse.saveContext = saveContext;
-                handleHttpError(deferred, httpResponse);
-            }
-        });
+     The adapter calls this method for each entity in the change-set,
+     after it has prepared a "change request" for that object.
 
-        return deferred.promise;
-    };
-
-    proto._prepareSaveBundle = function(/*saveContext, saveBundle*/) {
-        // The implementor should call _createChangeRequestInterceptor
-        throw new Error("Need a concrete implementation of _prepareSaveBundle");
+     The method can do anything to the request but it must return a valid, non-null request.
+     @example
+     this.getRequest = function (request, entity, index) {
+            // alter the request that the adapter prepared for this entity
+            // based on the entity, saveContext, and saveBundle
+            // e.g., add a custom header or prune the originalValuesMap
+            return request;
+        };
+     @method getRequest
+     @param request {Object} The object representing the adapter's request to save this entity.
+     @param entity {Entity} The entity-to-be-save as it is in cache
+     @param index {Integer} The zero-based index of this entity in the change-set array
+     @return {Function} The potentially revised request.
+     **/
+    this.getRequest = function (request, entity, index) {
+      return request;
     };
 
     /**
-    Returns a constructor function for a "ChangeRequestInterceptor"
-    that can tweak the saveBundle both as it is built and when it is completed
-    by a concrete DataServiceAdapater.
+     Last chance to change anything about the 'requests' array
+     after it has been built with requests for all of the entities-to-be-saved.
 
-    Initialized with a default, no-op implementation that developers can replace with a
-    substantive implementation that changes the individual entity change requests 
-    or aspects of the entire 'saveBundle' without having to write their own DataService adapters.
+     The 'requests' array is the same as 'saveBundle.entities' in many implementations
 
-    @example
-    var adapter = breeze.config.getAdapterInstance('dataService');
-    adapter.changeRequestInterceptor = function (saveContext, saveBundle) {
-        this.getRequest = function (request, entity, index) {
-            // alter the request that the adapter prepared for this entity
-            // based on the entity, saveContext, and saveBundle
-            // e.g., add a custom header or prune the originalValuesMap
-            return request;
-        };
-        this.done = function (requests) {
+     This method can do anything to the array including add and remove requests.
+     It's up to you to ensure that server will accept the requests array data as valid.
+
+     Returned value is ignored.
+     @example
+     this.done = function (requests) {
             // alter the array of requests representing the entire change-set 
             // based on the saveContext and saveBundle
         };
-    }
-    @method changeRequestInterceptor
-    @param saveContext {Object} The BreezeJS "context" for the save operation.
-    @param saveBundle {Object} Contains the array of entities-to-be-saved (AKA, the entity change-set).
-    @return {Function} Constructor for a "ChangeRequestInterceptor".
-    **/
-    proto.changeRequestInterceptor = DefaultChangeRequestInterceptor;
-
-    //This is a default, no-op implementation that developers can replace.
-    function DefaultChangeRequestInterceptor(saveContext, saveBundle) {
-        /**
-        Prepare and return the save data for an entity change-set. 
-        
-        The adapter calls this method for each entity in the change-set,
-        after it has prepared a "change request" for that object.
-
-        The method can do anything to the request but it must return a valid, non-null request.
-        @example
-        this.getRequest = function (request, entity, index) {
-            // alter the request that the adapter prepared for this entity
-            // based on the entity, saveContext, and saveBundle
-            // e.g., add a custom header or prune the originalValuesMap
-            return request;
-        };
-        @method getRequest
-        @param request {Object} The object representing the adapter's request to save this entity.       
-        @param entity {Entity} The entity-to-be-save as it is in cache
-        @param index {Integer} The zero-based index of this entity in the change-set array
-        @return {Function} The potentially revised request.
-        **/
-        this.getRequest = function (request, entity, index){return request;};
-
-        /**
-        Last chance to change anything about the 'requests' array
-        after it has been built with requests for all of the entities-to-be-saved. 
-        
-        The 'requests' array is the same as 'saveBundle.entities' in many implementations
-
-        This method can do anything to the array including add and remove requests.
-        It's up to you to ensure that server will accept the requests array data as valid.
-
-        Returned value is ignored.
-        @example
-        this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
-            // based on the saveContext and saveBundle
-        };
-        @method done
-        @param requests {Array of Object} The adapter's array of request for this changeset.       
-        **/
-        this.done = function(requests) {};    
-    }
-
-    proto._createChangeRequestInterceptor = function(saveContext, saveBundle){
-        var adapter = saveContext.adapter;
-        var isFn = __isFunction;
-        var CRI = adapter.changeRequestInterceptor;
-        var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
-        var post = " is missing or not a function.";
-        if (isFn(CRI)) {
-            var interceptor = new CRI(saveContext, saveBundle);
-            if (!isFn(interceptor.getRequest)) {
-                throw new Error(pre + '.getRequest' + post);
-            }
-            if (!isFn(interceptor.done)) {
-                throw new Error(pre + '.done' + post);
-            }
-            return interceptor;
-        } else {
-            return new DefaultChangeRequestInterceptor(saveContext, saveBundle);
-        }
-    }
-
-    proto._prepareSaveResult = function (/* saveContext, data */) {
-        throw new Error("Need a concrete implementation of _prepareSaveResult");
+     @method done
+     @param requests {Array of Object} The adapter's array of request for this changeset.
+     **/
+    this.done = function (requests) {
     };
-    
-    proto.jsonResultsAdapter = new JsonResultsAdapter( {
-        name: "noop",
-        
-        visitNode: function (/* node, mappingContext, nodeContext */) {
-            return {};
-        }
+  }
 
-    });
-   
-    function handleHttpError(deferred, httpResponse, messagePrefix) {
-        var err = createHttpError(httpResponse);
-        if (messagePrefix) {
-            err.message = messagePrefix + "; " + err.message;
-        }
-        return deferred.reject(err);
-    };
-
-    function createHttpError(httpResponse) {
-        var err = new Error();
-        err.httpResponse = httpResponse;
-        err.status = httpResponse.status;
-        var errObj = httpResponse.data;
-        // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
-        // if not do it here.
-        if (typeof errObj === "string") {
-            try {
-                errObj = JSON.parse(errObj);
-            } catch (e) { };
-        }
-        
-        processErrors(err, errObj, httpResponse);
-        proto._catchNoConnectionError(err);
-        return err;
-    };
-
-    // Put this at the bottom of your http error analysis
-    proto._catchNoConnectionError = function (err){
-        if (err.status == 0 && err.message == null){
-            err.message = "HTTP response status 0 and no message.  " +
-            "Likely did not or could not reach server. Is the server running?";
-        }
+  proto._createChangeRequestInterceptor = function (saveContext, saveBundle) {
+    var adapter = saveContext.adapter;
+    var isFn = __isFunction;
+    var CRI = adapter.changeRequestInterceptor;
+    var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
+    var post = " is missing or not a function.";
+    if (isFn(CRI)) {
+      var interceptor = new CRI(saveContext, saveBundle);
+      if (!isFn(interceptor.getRequest)) {
+        throw new Error(pre + '.getRequest' + post);
+      }
+      if (!isFn(interceptor.done)) {
+        throw new Error(pre + '.done' + post);
+      }
+      return interceptor;
+    } else {
+      return new DefaultChangeRequestInterceptor(saveContext, saveBundle);
     }
-    
-    function processErrors(err, errObj, httpResponse) {
-        if (errObj) {
-            var tmp = errObj;
-            do {
-                err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
-                tmp = tmp.InnerException;
-            } while (tmp);
-            var saveContext = httpResponse.saveContext;
-            var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
-            if (saveContext && entityErrors) {
-                var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
-                err.entityErrors = entityErrors.map(function(e) {
-                    return {
-                        errorName: e.ErrorName,
-                        entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
-                        keyValues: e.KeyValues,
-                        propertyName: e.PropertyName && propNameFn(e.PropertyName),
-                        errorMessage: e.ErrorMessage
-                    };
-                });
-                if (!err.message) {
-                    err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
-                }
-            }
-        } else {
-            err.message = httpResponse.error && httpResponse.error.toString();
-        }
+  }
+
+  proto._prepareSaveResult = function (/* saveContext, data */) {
+    throw new Error("Need a concrete implementation of _prepareSaveResult");
+  };
+
+  proto.jsonResultsAdapter = new JsonResultsAdapter({
+    name: "noop",
+
+    visitNode: function (/* node, mappingContext, nodeContext */) {
+      return {};
     }
-    
-    return ctor;
+
+  });
+
+  function handleHttpError(deferred, httpResponse, messagePrefix) {
+    var err = createHttpError(httpResponse);
+    if (messagePrefix) {
+      err.message = messagePrefix + "; " + err.message;
+    }
+    return deferred.reject(err);
+  };
+
+  function createHttpError(httpResponse) {
+    var err = new Error();
+    err.httpResponse = httpResponse;
+    err.status = httpResponse.status;
+    var errObj = httpResponse.data;
+    // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
+    // if not do it here.
+    if (typeof errObj === "string") {
+      try {
+        errObj = JSON.parse(errObj);
+      } catch (e) {
+      }
+      ;
+    }
+
+    processErrors(err, errObj, httpResponse);
+    proto._catchNoConnectionError(err);
+    return err;
+  };
+
+  // Put this at the bottom of your http error analysis
+  proto._catchNoConnectionError = function (err) {
+    if (err.status == 0 && err.message == null) {
+      err.message = "HTTP response status 0 and no message.  " +
+          "Likely did not or could not reach server. Is the server running?";
+    }
+  }
+
+  function processErrors(err, errObj, httpResponse) {
+    if (errObj) {
+      var tmp = errObj;
+      do {
+        err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
+        tmp = tmp.InnerException;
+      } while (tmp);
+      var saveContext = httpResponse.saveContext;
+      var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
+      if (saveContext && entityErrors) {
+        var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
+        err.entityErrors = entityErrors.map(function (e) {
+          return {
+            errorName: e.ErrorName,
+            entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
+            keyValues: e.KeyValues,
+            propertyName: e.PropertyName && propNameFn(e.PropertyName),
+            errorMessage: e.ErrorMessage
+          };
+        });
+        if (!err.message) {
+          err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
+        }
+      }
+    } else {
+      err.message = httpResponse.error && httpResponse.error.toString();
+    }
+  }
+
+  return ctor;
 
 })();
 ;

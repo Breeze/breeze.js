@@ -41,14 +41,14 @@
     function toOrderByODataFragment(orderByClause) {
       if (!orderByClause) return;
       orderByClause.validate(entityType);
-        var strings = orderByClause.items.map(function (item) {
-          return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
-        });
-        // should return something like CompanyName,Address/City desc
-        return strings.join(',');
+      var strings = orderByClause.items.map(function (item) {
+        return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
+      });
+      // should return something like CompanyName,Address/City desc
+      return strings.join(',');
     };
 
-    function toSelectODataFragment(selectClause ) {
+    function toSelectODataFragment(selectClause) {
       if (!selectClause) return;
       selectClause.validate(entityType);
       var frag = selectClause.propertyPaths.map(function (pp) {
@@ -61,7 +61,7 @@
       if (!expandClause) return;
       // no validate on expand clauses currently.
       // expandClause.validate(entityType);
-      var frag = expandClause.propertyPaths.map(function(pp) {
+      var frag = expandClause.propertyPaths.map(function (pp) {
         return entityType._clientPropertyPathToServer(pp);
       }).join(",");
       return frag;
