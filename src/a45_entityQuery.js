@@ -831,12 +831,12 @@ var EntityQuery = (function () {
 
         var eq = this;
         var queryOptions = {};
-        queryOptions["$filter"] = toFilterString();
-        queryOptions["$orderby"] = toOrderByString();
+        queryOptions["$filter"] =  toODataFragment(eq.wherePredicate);
+        queryOptions["$orderby"] = toODataFragment(eq.orderByClause);
         queryOptions["$skip"] = toSkipString();
         queryOptions["$top"] = toTopString();
-        queryOptions["$expand"] = toExpandString();
-        queryOptions["$select"] = toSelectString();
+        queryOptions["$expand"] = toODataFragment(eq.expandClause);
+        queryOptions["$select"] =   toODataFragment(eq.selectClause);
         queryOptions["$inlinecount"] = toInlineCountString();
             
         var qoText = toQueryOptionsString(queryOptions);
@@ -844,28 +844,17 @@ var EntityQuery = (function () {
 
         // private methods to this func.
 
-        function toFilterString() {
-            Predicate._next = 0;
-            return validateToOData(eq.wherePredicate);
+        function toODataFragment(clause) {
+          if (!clause) return;
+          if (clause.validate && !entityType.isAnonymous) {
+            clause.validate(entityType);
+          }
+          return clause.toODataFragment( { entityType: entityType});
         }
-            
+
         function toInlineCountString() {
             if (!eq.inlineCountEnabled) return;
             return eq.inlineCountEnabled ? "allpages" : "none";
-        }
-
-        function toOrderByString() {
-            return validateToOData(eq.orderByClause);
-        }
-            
-        function toSelectString() {
-            return validateToOData(eq.selectClause);
-        }
-            
-        function toExpandString() {
-            var clause = eq.expandClause;
-            if (!clause) return;
-            return clause.toODataFragment(entityType);
         }
 
         function toSkipString() {
@@ -902,21 +891,13 @@ var EntityQuery = (function () {
             }
         }
 
-        function validateToOData(clause) {
-            if (!clause) return;
-            if (!entityType.isAnonymous) {
-                clause.validate(entityType);
-            }
-            return clause.toODataFragment(entityType);
-        }
+
     };
 
     proto._toFilterFunction = function (entityType) {
         var wherePredicate = this.wherePredicate;
         if (!wherePredicate) return null;
-        // may throw an exception
-        wherePredicate.validate(entityType);
-        return wherePredicate.toFunction(entityType);
+        return wherePredicate.toFunction( { entityType: entityType});
     };
 
     proto._toOrderByComparer = function (entityType) {
@@ -1271,7 +1252,8 @@ var SimpleOrderByClause = (function () {
         this.lastProperty = entityType.getProperty(this.propertyPath, true);
     };
 
-    proto.toODataFragment = function (entityType) {
+    proto.toODataFragment = function (config) {
+        var entityType = config.entityType;
         return entityType._clientPropertyPathToServer(this.propertyPath) + (this.isDesc ? " desc" : "");
     };
 
@@ -1341,9 +1323,9 @@ var CompositeOrderByClause = (function () {
         });
     };
 
-    proto.toODataFragment = function (entityType) {
+    proto.toODataFragment = function (config) {
         var strings = this._orderByClauses.map(function (obc) {
-            return obc.toODataFragment(entityType);
+            return obc.toODataFragment(config);
         });
         // should return something like CompanyName,Address/City desc
         return strings.join(',');
@@ -1385,14 +1367,15 @@ var SelectClause = (function () {
         });
     };
 
-    proto.toODataFragment = function(entityType) {
+    proto.toODataFragment = function(config) {
+        var entityType = config.entityType;
         var frag = this.propertyPaths.map(function (pp) {
                 return entityType._clientPropertyPathToServer(pp);
             }).join(",");
             return frag;
     };
         
-    proto.toFunction = function (entityType) {
+    proto.toFunction = function ( /* config */) {
         var that = this;
         return function (entity) {
             var result = {};
@@ -1416,7 +1399,8 @@ var ExpandClause = (function () {
         
     var proto = ctor.prototype;
 
-    proto.toODataFragment = function(entityType) {
+    proto.toODataFragment = function(config) {
+        var entityType = config.entityType;
         var frag = this.propertyPaths.map(function(pp) {
             return entityType._clientPropertyPathToServer(pp);
         }).join(",");

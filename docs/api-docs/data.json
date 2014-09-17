@@ -6574,7 +6574,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1014,
+            "line": 995,
             "description": "Aliases: \"eq\", \"==\"",
             "itemtype": "property",
             "name": "Equals",
@@ -6586,7 +6586,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1021,
+            "line": 1002,
             "description": "Aliases: \"ne\", \"!=\"",
             "itemtype": "property",
             "name": "NotEquals",
@@ -6598,7 +6598,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1028,
+            "line": 1009,
             "description": "Aliases: \"gt\", \">\"",
             "itemtype": "property",
             "name": "GreaterThan",
@@ -6610,7 +6610,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1035,
+            "line": 1016,
             "description": "Aliases: \"lt\", \"<\"",
             "itemtype": "property",
             "name": "LessThan",
@@ -6622,7 +6622,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1042,
+            "line": 1023,
             "description": "Aliases: \"ge\", \">=\"",
             "itemtype": "property",
             "name": "GreaterThanOrEqual",
@@ -6634,7 +6634,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1049,
+            "line": 1030,
             "description": "Aliases: \"le\", \"<=\"",
             "itemtype": "property",
             "name": "LessThanOrEqual",
@@ -6646,7 +6646,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1056,
+            "line": 1037,
             "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
             "itemtype": "property",
             "name": "Contains",
@@ -6658,7 +6658,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1064,
+            "line": 1045,
             "itemtype": "property",
             "name": "StartsWith",
             "type": "FilterQueryOp",
@@ -6669,7 +6669,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1070,
+            "line": 1051,
             "itemtype": "property",
             "name": "EndsWith",
             "type": "FilterQueryOp",
@@ -6680,7 +6680,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1077,
+            "line": 1058,
             "description": "Aliases: \"some\"",
             "itemtype": "property",
             "name": "Any",
@@ -6692,7 +6692,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1085,
+            "line": 1066,
             "description": "Aliases: \"every\"",
             "itemtype": "property",
             "name": "All",

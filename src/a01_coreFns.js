@@ -471,7 +471,11 @@ function __durationToSeconds(duration) {
 
 }
     
-// is functions 
+// is functions
+
+function __noop() {
+  // does nothing
+}
 
 function __classof(o) {
     if (o === null) {
