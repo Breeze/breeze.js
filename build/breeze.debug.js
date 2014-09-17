@@ -11315,12 +11315,8 @@ var EntityQuery = (function () {
         var pred = buildNavigationPredicate(entity, navProperty);
         q = q.where(pred);
         var em = entity.entityAspect.entityManager;
-        if (em) {
-            q = q.using(em);
-        }
-        return q;
+        return em ? q.using(em) : q;
     };
-
 
     // protected methods
         
@@ -11482,20 +11478,6 @@ var EntityQuery = (function () {
         }
 
 
-    };
-
-    proto._toFilterFunction = function (entityType) {
-        var wherePredicate = this.wherePredicate;
-        if (!wherePredicate) return null;
-        return wherePredicate.toFunction( { entityType: entityType});
-    };
-
-    proto._toOrderByComparer = function (entityType) {
-        var orderByClause = this.orderByClause;
-        if (!orderByClause) return null;
-        // may throw an exception
-        // getComparer performs validate
-        return orderByClause.getComparer(entityType);
     };
 
     // private functions
@@ -13235,7 +13217,8 @@ var EntityManager = (function () {
         // there may be multiple groups is this is a base entity type.
         var groups = findOrCreateEntityGroups(this, entityType);
         // filter then order then skip then take
-        var filterFunc = query._toFilterFunction(entityType);
+        var filterFunc = query.wherePredicate && query.wherePredicate.toFunction( { entityType: entityType});
+
         var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
         var includeDeleted = queryOptions.includeDeleted === true;
 
@@ -13247,8 +13230,8 @@ var EntityManager = (function () {
         groups.forEach(function (group) {
             result.push.apply(result, group._entities.filter(newFilterFunc));
         });
-            
-        var orderByComparer = query._toOrderByComparer(entityType);
+
+        var orderByComparer = query.orderByClause && query.orderByClause.getComparer(entityType);
         if (orderByComparer) {
             result.sort(orderByComparer);
         }

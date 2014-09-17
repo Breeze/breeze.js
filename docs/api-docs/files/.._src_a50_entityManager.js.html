@@ -998,7 +998,8 @@ var EntityManager = (function () {
         // there may be multiple groups is this is a base entity type.
         var groups = findOrCreateEntityGroups(this, entityType);
         // filter then order then skip then take
-        var filterFunc = query._toFilterFunction(entityType);
+        var filterFunc = query.wherePredicate &amp;&amp; query.wherePredicate.toFunction( { entityType: entityType});
+
         var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
         var includeDeleted = queryOptions.includeDeleted === true;
 
@@ -1010,8 +1011,8 @@ var EntityManager = (function () {
         groups.forEach(function (group) {
             result.push.apply(result, group._entities.filter(newFilterFunc));
         });
-            
-        var orderByComparer = query._toOrderByComparer(entityType);
+
+        var orderByComparer = query.orderByClause &amp;&amp; query.orderByClause.getComparer(entityType);
         if (orderByComparer) {
             result.sort(orderByComparer);
         }

@@ -725,12 +725,8 @@ var EntityQuery = (function () {
         var pred = buildNavigationPredicate(entity, navProperty);
         q = q.where(pred);
         var em = entity.entityAspect.entityManager;
-        if (em) {
-            q = q.using(em);
-        }
-        return q;
+        return em ? q.using(em) : q;
     };
-
 
     // protected methods
         
@@ -892,20 +888,6 @@ var EntityQuery = (function () {
         }
 
 
-    };
-
-    proto._toFilterFunction = function (entityType) {
-        var wherePredicate = this.wherePredicate;
-        if (!wherePredicate) return null;
-        return wherePredicate.toFunction( { entityType: entityType});
-    };
-
-    proto._toOrderByComparer = function (entityType) {
-        var orderByClause = this.orderByClause;
-        if (!orderByClause) return null;
-        // may throw an exception
-        // getComparer performs validate
-        return orderByClause.getComparer(entityType);
     };
 
     // private functions
