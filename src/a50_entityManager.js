@@ -540,7 +540,8 @@ var EntityManager = (function () {
     mergeStrategy = assertParam(mergeStrategy, "mergeStrategy").isEnumOf(MergeStrategy).isOptional().check(MergeStrategy.Disallowed);
 
     if (entity.entityType.metadataStore !== this.metadataStore) {
-      throw new Error("Cannot attach this entity because the EntityType (" + entity.entityType.name + ") and MetadataStore associated with this entity does not match this EntityManager's MetadataStore.");
+      throw new Error("Cannot attach this entity because the EntityType (" + entity.entityType.name +
+          ") and MetadataStore associated with this entity does not match this EntityManager's MetadataStore.");
     }
     var aspect = entity.entityAspect;
     if (aspect) {
@@ -736,7 +737,6 @@ var EntityManager = (function () {
    would have been applied.
    **/
   proto.executeQuery = function (query, callback, errorCallback) {
-    // TODO: think about creating an executeOdataQuery or executeRawOdataQuery as a seperate method.
     assertParam(query, "query").isInstanceOf(EntityQuery).or().isString().check();
     assertParam(callback, "callback").isFunction().isOptional().check();
     assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
@@ -822,9 +822,7 @@ var EntityManager = (function () {
     var selectClause = query.selectClause;
     if (selectClause) {
       var selectFn = selectClause.toFunction();
-      result = result.map(function (e) {
-        return selectFn(e);
-      });
+      result = result.map(selectFn);
     }
     return result;
   };
@@ -1193,7 +1191,6 @@ var EntityManager = (function () {
   };
 
   function fetchEntityByKeyCore(em, args) {
-
     var tpl = createEntityKey(em, args);
     var entityKey = tpl.entityKey;
     var checkLocalCacheFirst = tpl.remainingArgs.length === 0 ? false : !!tpl.remainingArgs[0];
