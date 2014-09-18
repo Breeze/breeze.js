@@ -22,7 +22,10 @@
    @param [resourceName] {String}
    **/
   var ctor = function (resourceName) {
-    assertParam(resourceName, "resourceName").isOptional().isString().check();
+    if ( resourceName != null && !__isString(resourceName)) {
+      return fromJSON(this, resourceName);
+    }
+
     this.resourceName = resourceName;
     this.fromEntityType = null;
     this.wherePredicate = null;
@@ -43,6 +46,9 @@
   var proto = ctor.prototype;
   proto._$typeName = "EntityQuery";
 
+  ctor.fromJSON = function(json) {
+
+  }
   /**
    The resource name used by this query.
 
@@ -537,28 +543,6 @@
     return eq;
   };
 
-  function processUsing(eq, map, value, propertyName) {
-    var typeName = value._$typeName || (value.parentEnum && value.parentEnum.name);
-    var key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
-    if (propertyName && key != propertyName) {
-      throw new Error("Invalid value for property: " + propertyName);
-    }
-    if (key) {
-      var fn = map[key];
-      if (fn === undefined) {
-        throw new Error("Invalid config property: " + key);
-      } else if (fn === null) {
-        eq[key] = value;
-      } else {
-        fn(eq, value);
-      }
-    } else {
-      __objectForEach(value, function (propName, val) {
-        processUsing(eq, map, val, propName)
-      });
-    }
-  }
-
   /**
    Executes this query.  This method requires that an EntityManager has been previously specified via the "using" method.
    @example
@@ -643,6 +627,55 @@
     }
     return this.entityManager.executeQueryLocally(this);
   };
+
+  proto.toJSON = function() {
+    var that = this;
+    return __toJson(this, {
+      resourceName: null,
+      resultEntityType: function(v) {
+        return v ? v.name : undefined;
+      },
+      wherePredicate: function(v) {
+        return v ? v.toJSON(that.fromEntityType) : undefined;
+      },
+      orderByClause: null,
+      selectClause: null,
+      skipCount: null,
+      takeCount: null,
+      expandClause: null,
+      parameters: function(v) {
+        return __isEmpty(v) ? undefined : v;
+      },
+      inlineCountEnabled: false,
+      noTrackingEnabled: false,
+      queryOptions: null
+    });
+
+  }
+
+  function fromJSON(eq, json) {
+    __toJson(json, {
+      resourceName: null,
+//      resultEntityType: function(v) {
+//        return v ? v.name : undefined;
+//      },
+      wherePredicate: function(v) {
+        return v ? new Predicate(v) : undefined;
+      },
+      orderByClause: null,
+      selectClause: null,
+      skipCount: null,
+      takeCount: null,
+      expandClause: null,
+      parameters: function(v) {
+        return __isEmpty(v) ? undefined : v;
+      },
+      inlineCountEnabled: false,
+      noTrackingEnabled: false,
+      queryOptions: null
+    }, eq);
+    return eq;
+  }
 
   /**
    Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
@@ -795,6 +828,13 @@
     }
   };
 
+  // for testing
+  proto._toUri = function (em) {
+    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+  }
+
+// private functions
+
   function clone(that, propName, value) {
     // immutable queries mean that we don't need to clone if no change in value.
     if (propName) {
@@ -824,12 +864,27 @@
     return copy;
   }
 
-  // for testing
-  proto._toUri = function (em) {
-    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+  function processUsing(eq, map, value, propertyName) {
+    var typeName = value._$typeName || (value.parentEnum && value.parentEnum.name);
+    var key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
+    if (propertyName && key != propertyName) {
+      throw new Error("Invalid value for property: " + propertyName);
+    }
+    if (key) {
+      var fn = map[key];
+      if (fn === undefined) {
+        throw new Error("Invalid config property: " + key);
+      } else if (fn === null) {
+        eq[key] = value;
+      } else {
+        fn(eq, value);
+      }
+    } else {
+      __objectForEach(value, function (propName, val) {
+        processUsing(eq, map, val, propName)
+      });
+    }
   }
-
-  // private functions
 
   function normalizePropertyPaths(propertyPaths) {
     assertParam(propertyPaths, "propertyPaths").isOptional().isString().or().isArray().isString().check();
@@ -1078,6 +1133,12 @@ var OrderByClause = (function () {
     };
   };
 
+  proto.toJSON = function() {
+    return {
+      items: this.items
+    }
+  }
+
   var OrderByItem = function (propertyPath, isDesc) {
     if (!(typeof propertyPath === 'string')) {
       throw new Error("propertyPath is not a string");
@@ -1145,6 +1206,13 @@ var OrderByClause = (function () {
     };
   };
 
+  itemProto.toJSON = function() {
+    return {
+      propertyPath: this.propertyPath,
+      isDesc: this.isDesc
+    }
+  };
+
   return ctor;
 })();
 
@@ -1160,7 +1228,7 @@ var SelectClause = (function () {
   var proto = ctor.prototype;
 
   proto.validate = function (entityType) {
-    if (!entityType) return; // can't validate yet
+    if (entityType == null || entityType.isAnonymous) return; // can't validate yet
     // will throw an exception on bad propertyPath
     this.propertyPaths.forEach(function (path) {
       entityType.getProperty(path, true);
@@ -1178,6 +1246,12 @@ var SelectClause = (function () {
     };
   };
 
+  proto.toJSON = function() {
+    return {
+      propertyPaths: this.propertyPaths
+    }
+  };
+
   return ctor;
 })();
 
@@ -1188,10 +1262,18 @@ var ExpandClause = (function () {
   var ctor = function (propertyPaths) {
     this.propertyPaths = propertyPaths;
   };
+  var proto = ctor.prototype;
+
+  proto.toJSON = function() {
+    return {
+      propertyPaths: this.propertyPaths
+    }
+  };
 
   return ctor;
 })();
 
+// also used by Predicate
 function getPropertyPathValue(obj, propertyPath) {
   var properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(".");
   if (properties.length === 1) {

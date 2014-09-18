@@ -46,11 +46,10 @@
     }
 
     ctor.attachVisitor = function (visitor) {
-      var fnName = visitor.fnName;
-
+      var fnName = visitor.config.fnName;
       Object.keys(visitor).forEach(function (key) {
         var lcKey = key.toLowerCase();
-        if (lcKey == "fnname") return;
+        if (lcKey == "config") return;
         var proto = _nodeMap[lcKey];
         if (proto == null) {
           throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
@@ -191,13 +190,15 @@
     }
 
     function wrapValidation(fn) {
-      return function (config) {
-        if (!__hasOwnProperty(config, "entityType")) {
+      return function (context) {
+        if (context == null || context instanceof EntityType) {
+          context = { entityType: context };
+        } else  if (!__hasOwnProperty(context, "entityType")) {
           throw new Error("All visitor methods must be called with a config object containing at least an 'entityType' property");
         }
         // don't need to capture return value because validation fn doesn't have one.
-        this.validate(config.entityType);
-        return fn.apply(this, arguments);
+        this.validate(context.entityType);
+        return fn.call(this, context);
       }
     }
 
@@ -506,16 +507,16 @@
   // toFunction visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toFunction",
+      config: { fnName: "toFunction" },
 
       passthruPredicate: function () {
         throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
 
-      unaryPredicate: function (config) {
+      unaryPredicate: function (context) {
         switch (this.op.key) {
           case "not":
-            var func = this.pred.toFunction(config);
+            var func = this.pred.toFunction(context);
             return function (entity) {
               return !func(entity);
             };
@@ -524,19 +525,19 @@
         }
       },
 
-      binaryPredicate: function (config) {
+      binaryPredicate: function (context) {
         var dataType = this.expr1.dataType || this.expr2.dataType;
-        var predFn = getBinaryPredicateFn(config.entityType, this.op, dataType);
-        var v1Fn = this.expr1.toFunction(config);
-        var v2Fn = this.expr2.toFunction(config);
+        var predFn = getBinaryPredicateFn(context.entityType, this.op, dataType);
+        var v1Fn = this.expr1.toFunction(context);
+        var v2Fn = this.expr2.toFunction(context);
         return function (entity) {
           return predFn(v1Fn(entity), v2Fn(entity));
         };
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         var funcs = this.preds.map(function (pred) {
-          return pred.toFunction(config);
+          return pred.toFunction(context);
         });
         switch (this.op.key) {
           case "and":
@@ -558,12 +559,12 @@
         }
       },
 
-      anyAllPredicate: function (config) {
-        var v1Fn = this.expr.toFunction(config);
+      anyAllPredicate: function (context) {
+        var v1Fn = this.expr.toFunction(context);
 
         var predFn = getAnyAllPredicateFn(this.op);
 
-        var newConfig = __extend({}, config);
+        var newConfig = __extend({}, context);
         newConfig.entityType = this.expr.dataType;
         var fn2 = this.pred.toFunction(newConfig);
 
@@ -593,11 +594,11 @@
         }
       },
 
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var that = this;
         return function (entity) {
           var values = that.exprArgs.map(function (expr) {
-            var value = expr.toFunction(config)(entity);
+            var value = expr.toFunction(context)(entity);
             return value;
           });
           var result = that.localFn.apply(null, values);
@@ -738,34 +739,34 @@
   // toJSON visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toJSON",
+      config: { fnName: "toJSON" },
 
       passthruPredicate: function () {
         return this.value;
       },
 
-      unaryPredicate: function (config) {
+      unaryPredicate: function (context) {
         var json = {};
-        json[this.op.key] = this.pred.toJSON(config);
+        json[this.op.key] = this.pred.toJSON(context);
         return json;
       },
 
-      binaryPredicate: function (config) {
+      binaryPredicate: function (context) {
         var json = {};
         if (this.op.key === "eq") {
-          json[this.expr1Source] = this.expr2.toJSON(config);
+          json[this.expr1Source] = this.expr2.toJSON(context);
         } else {
           var value = {};
           json[this.expr1Source] = value;
-          value[this.op.key] = this.expr2.toJSON(config);
+          value[this.op.key] = this.expr2.toJSON(context);
         }
         return json;
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         var json;
         var jsonValues = this.preds.map(function (pred) {
-          return pred.toJSON(config);
+          return pred.toJSON(context);
         });
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
         if (this.op.key == 'or' || jsonValues.some(__isString)) {
@@ -778,36 +779,36 @@
         return json;
       },
 
-      anyAllPredicate: function (config) {
+      anyAllPredicate: function (context) {
         var json = {};
         var value = {};
 
-        var newConfig = __extend({}, config);
-        newConfig.entityType = this.expr.dataType;
-        value[this.op.key] = this.pred.toJSON(newConfig);
+        var newContext = __extend({}, context);
+        newContext.entityType = this.expr.dataType;
+        value[this.op.key] = this.pred.toJSON(newContext);
         json[this.exprSource] = value;
         return json;
       },
 
-      litExpr: function (config) {
-        if (this.hasExplicitDataType || config.useExplicitDataType) {
+      litExpr: function (context) {
+        if (this.hasExplicitDataType || context.useExplicitDataType) {
           return { value: this.value, dataType: this.dataType.name }
         } else {
           return this.value;
         }
       },
 
-      propExpr: function (config) {
-        if (config.toServer) {
-          var entityType = config.entityType;
+      propExpr: function (context) {
+        if (context.toServer) {
+          var entityType = context.entityType;
           return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
         } else {
           return this.propertyPath;
         }
       },
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
-          return expr.toJSON(config);
+          return expr.toJSON(context);
         });
         return this.fnName + "(" + frags.join(",") + ")";
       }
@@ -929,6 +930,13 @@
       return new FnExpr(fnName, exprArgs);
     } catch (e) {
       return null;
+    }
+  }
+
+  function coerceEntityTypeConfig(fn) {
+    return function( arg ) {
+      arg = ( arg instanceof EntityType) ? { entityType: arg } : arguments;
+      fn(newArgs);
     }
   }
 

@@ -119,7 +119,6 @@ var EntityManager = (function () {
     }
     configParam.applyAll(em);
 
-
     // insure that entityManager's options versions are completely populated
     __updateWithDefaults(em.queryOptions, defaultQueryOptions);
     __updateWithDefaults(em.saveOptions, defaultSaveOptions);
@@ -423,7 +422,6 @@ var EntityManager = (function () {
         metadataStoreName: json.metadataStoreName
       });
     }
-
 
     var tempKeyMap = {};
     json.tempKeys.forEach(function (k) {
@@ -802,6 +800,7 @@ var EntityManager = (function () {
     };
 
     var result = [];
+    // TODO: mapMany
     groups.forEach(function (group) {
       result.push.apply(result, group._entities.filter(newFilterFunc));
     });
@@ -2172,7 +2171,6 @@ var EntityManager = (function () {
         val = serializerFn ? serializerFn(dp, val) : val;
         if (val !== undefined) {
           if (dp.isUnmapped) {
-            // unmapped[dp.name] = __toJSONSafe(val);
             unmapped[dp.nameOnServer] = __toJSONSafe(val);
           } else {
             rawObject[dp.nameOnServer] = val;

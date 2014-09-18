@@ -133,8 +133,8 @@ function __setAsDefault(target, ctor) {
 
 // template keys are the keys to return
 // template values are the 'default' value of these keys - value is not serialized if it == the default value
-function __toJson(source, template) {
-  var target = {};
+function __toJson(source, template, target) {
+  target = target || {};
 
   for (var propName in template) {
     if (!(propName in source)) continue;
@@ -155,6 +155,7 @@ function __toJson(source, template) {
   }
   return target;
 }
+
 
 function __toJSONSafe(obj, replacer) {
   if (obj !== Object(obj)) return obj; // primitive value

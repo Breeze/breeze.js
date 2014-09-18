@@ -4,9 +4,9 @@
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
     if (!entityType) {
+      // anonymous type but still has naming convention info avail
       entityType = new EntityType(metadataStore);
     }
-
 
     var queryOptions = {};
     queryOptions["$filter"] = toWhereODataFragment(entityQuery.wherePredicate);
@@ -94,24 +94,24 @@
   // toODataFragment visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toODataFragment",
+      config: { fnName: "toODataFragment"   },
 
       passthruPredicate: function () {
         return this.value;
       },
 
-      unaryPredicate: function (config) {
-        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(config) + ")";
+      unaryPredicate: function (context) {
+        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(context) + ")";
       },
 
-      binaryPredicate: function (config) {
-        var v1Expr = this.expr1.toODataFragment(config);
-        var prefix = config.prefix;
+      binaryPredicate: function (context) {
+        var v1Expr = this.expr1.toODataFragment(context);
+        var prefix = context.prefix;
         if (prefix) {
           v1Expr = prefix + "/" + v1Expr;
         }
 
-        var v2Expr = this.expr2.toODataFragment(config);
+        var v2Expr = this.expr2.toODataFragment(context);
 
         var odataOp = odataOpFrom(this);
 
@@ -126,25 +126,25 @@
         }
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         if (this.preds.length === 0) return;
         var result = this.preds.map(function (pred) {
-          return "(" + pred.toODataFragment(config) + ")";
+          return "(" + pred.toODataFragment(context) + ")";
         }).join(" " + odataOpFrom(this) + " ");
         return result;
       },
 
-      anyAllPredicate: function (config) {
-        var v1Expr = this.expr.toODataFragment(config);
+      anyAllPredicate: function (context) {
+        var v1Expr = this.expr.toODataFragment(context);
 
-        var prefix = config.prefix;
+        var prefix = context.prefix;
         if (prefix) {
           v1Expr = prefix + "/" + v1Expr;
           prefix = "x" + (parseInt(prefix.substring(1)) + 1);
         } else {
           prefix = "x1";
         }
-        var newConfig = __extend({}, config);
+        var newConfig = __extend({}, context);
         newConfig.entityType = this.expr.dataType;
         newConfig.prefix = prefix;
         return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
@@ -154,14 +154,14 @@
         return this.dataType.fmtOData(this.value);
       },
 
-      propExpr: function (config) {
-        var entityType = config.entityType;
+      propExpr: function (context) {
+        var entityType = context.entityType;
         return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
       },
 
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
-          return expr.toODataFragment(config);
+          return expr.toODataFragment(context);
         });
         return this.fnName + "(" + frags.join(",") + ")";
       }

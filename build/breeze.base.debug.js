@@ -161,8 +161,8 @@ function __setAsDefault(target, ctor) {
 
 // template keys are the keys to return
 // template values are the 'default' value of these keys - value is not serialized if it == the default value
-function __toJson(source, template) {
-  var target = {};
+function __toJson(source, template, target) {
+  target = target || {};
 
   for (var propName in template) {
     if (!(propName in source)) continue;
@@ -183,6 +183,7 @@ function __toJson(source, template) {
   }
   return target;
 }
+
 
 function __toJSONSafe(obj, replacer) {
   if (obj !== Object(obj)) return obj; // primitive value
@@ -9699,11 +9700,10 @@ breeze.NamingConvention = NamingConvention;
     }
 
     ctor.attachVisitor = function (visitor) {
-      var fnName = visitor.fnName;
-
+      var fnName = visitor.config.fnName;
       Object.keys(visitor).forEach(function (key) {
         var lcKey = key.toLowerCase();
-        if (lcKey == "fnname") return;
+        if (lcKey == "config") return;
         var proto = _nodeMap[lcKey];
         if (proto == null) {
           throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
@@ -9844,13 +9844,15 @@ breeze.NamingConvention = NamingConvention;
     }
 
     function wrapValidation(fn) {
-      return function (config) {
-        if (!__hasOwnProperty(config, "entityType")) {
+      return function (context) {
+        if (context == null || context instanceof EntityType) {
+          context = { entityType: context };
+        } else  if (!__hasOwnProperty(context, "entityType")) {
           throw new Error("All visitor methods must be called with a config object containing at least an 'entityType' property");
         }
         // don't need to capture return value because validation fn doesn't have one.
-        this.validate(config.entityType);
-        return fn.apply(this, arguments);
+        this.validate(context.entityType);
+        return fn.call(this, context);
       }
     }
 
@@ -10159,16 +10161,16 @@ breeze.NamingConvention = NamingConvention;
   // toFunction visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toFunction",
+      config: { fnName: "toFunction" },
 
       passthruPredicate: function () {
         throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
 
-      unaryPredicate: function (config) {
+      unaryPredicate: function (context) {
         switch (this.op.key) {
           case "not":
-            var func = this.pred.toFunction(config);
+            var func = this.pred.toFunction(context);
             return function (entity) {
               return !func(entity);
             };
@@ -10177,19 +10179,19 @@ breeze.NamingConvention = NamingConvention;
         }
       },
 
-      binaryPredicate: function (config) {
+      binaryPredicate: function (context) {
         var dataType = this.expr1.dataType || this.expr2.dataType;
-        var predFn = getBinaryPredicateFn(config.entityType, this.op, dataType);
-        var v1Fn = this.expr1.toFunction(config);
-        var v2Fn = this.expr2.toFunction(config);
+        var predFn = getBinaryPredicateFn(context.entityType, this.op, dataType);
+        var v1Fn = this.expr1.toFunction(context);
+        var v2Fn = this.expr2.toFunction(context);
         return function (entity) {
           return predFn(v1Fn(entity), v2Fn(entity));
         };
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         var funcs = this.preds.map(function (pred) {
-          return pred.toFunction(config);
+          return pred.toFunction(context);
         });
         switch (this.op.key) {
           case "and":
@@ -10211,12 +10213,12 @@ breeze.NamingConvention = NamingConvention;
         }
       },
 
-      anyAllPredicate: function (config) {
-        var v1Fn = this.expr.toFunction(config);
+      anyAllPredicate: function (context) {
+        var v1Fn = this.expr.toFunction(context);
 
         var predFn = getAnyAllPredicateFn(this.op);
 
-        var newConfig = __extend({}, config);
+        var newConfig = __extend({}, context);
         newConfig.entityType = this.expr.dataType;
         var fn2 = this.pred.toFunction(newConfig);
 
@@ -10246,11 +10248,11 @@ breeze.NamingConvention = NamingConvention;
         }
       },
 
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var that = this;
         return function (entity) {
           var values = that.exprArgs.map(function (expr) {
-            var value = expr.toFunction(config)(entity);
+            var value = expr.toFunction(context)(entity);
             return value;
           });
           var result = that.localFn.apply(null, values);
@@ -10391,34 +10393,34 @@ breeze.NamingConvention = NamingConvention;
   // toJSON visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toJSON",
+      config: { fnName: "toJSON" },
 
       passthruPredicate: function () {
         return this.value;
       },
 
-      unaryPredicate: function (config) {
+      unaryPredicate: function (context) {
         var json = {};
-        json[this.op.key] = this.pred.toJSON(config);
+        json[this.op.key] = this.pred.toJSON(context);
         return json;
       },
 
-      binaryPredicate: function (config) {
+      binaryPredicate: function (context) {
         var json = {};
         if (this.op.key === "eq") {
-          json[this.expr1Source] = this.expr2.toJSON(config);
+          json[this.expr1Source] = this.expr2.toJSON(context);
         } else {
           var value = {};
           json[this.expr1Source] = value;
-          value[this.op.key] = this.expr2.toJSON(config);
+          value[this.op.key] = this.expr2.toJSON(context);
         }
         return json;
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         var json;
         var jsonValues = this.preds.map(function (pred) {
-          return pred.toJSON(config);
+          return pred.toJSON(context);
         });
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
         if (this.op.key == 'or' || jsonValues.some(__isString)) {
@@ -10431,36 +10433,36 @@ breeze.NamingConvention = NamingConvention;
         return json;
       },
 
-      anyAllPredicate: function (config) {
+      anyAllPredicate: function (context) {
         var json = {};
         var value = {};
 
-        var newConfig = __extend({}, config);
-        newConfig.entityType = this.expr.dataType;
-        value[this.op.key] = this.pred.toJSON(newConfig);
+        var newContext = __extend({}, context);
+        newContext.entityType = this.expr.dataType;
+        value[this.op.key] = this.pred.toJSON(newContext);
         json[this.exprSource] = value;
         return json;
       },
 
-      litExpr: function (config) {
-        if (this.hasExplicitDataType || config.useExplicitDataType) {
+      litExpr: function (context) {
+        if (this.hasExplicitDataType || context.useExplicitDataType) {
           return { value: this.value, dataType: this.dataType.name }
         } else {
           return this.value;
         }
       },
 
-      propExpr: function (config) {
-        if (config.toServer) {
-          var entityType = config.entityType;
+      propExpr: function (context) {
+        if (context.toServer) {
+          var entityType = context.entityType;
           return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
         } else {
           return this.propertyPath;
         }
       },
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
-          return expr.toJSON(config);
+          return expr.toJSON(context);
         });
         return this.fnName + "(" + frags.join(",") + ")";
       }
@@ -10585,6 +10587,13 @@ breeze.NamingConvention = NamingConvention;
     }
   }
 
+  function coerceEntityTypeConfig(fn) {
+    return function( arg ) {
+      arg = ( arg instanceof EntityType) ? { entityType: arg } : arguments;
+      fn(newArgs);
+    }
+  }
+
   return Predicate;
 
 })();
@@ -10615,7 +10624,10 @@ breeze.Predicate = Predicate;
    @param [resourceName] {String}
    **/
   var ctor = function (resourceName) {
-    assertParam(resourceName, "resourceName").isOptional().isString().check();
+    if ( resourceName != null && !__isString(resourceName)) {
+      return fromJSON(this, resourceName);
+    }
+
     this.resourceName = resourceName;
     this.fromEntityType = null;
     this.wherePredicate = null;
@@ -10636,6 +10648,9 @@ breeze.Predicate = Predicate;
   var proto = ctor.prototype;
   proto._$typeName = "EntityQuery";
 
+  ctor.fromJSON = function(json) {
+
+  }
   /**
    The resource name used by this query.
 
@@ -11130,28 +11145,6 @@ breeze.Predicate = Predicate;
     return eq;
   };
 
-  function processUsing(eq, map, value, propertyName) {
-    var typeName = value._$typeName || (value.parentEnum && value.parentEnum.name);
-    var key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
-    if (propertyName && key != propertyName) {
-      throw new Error("Invalid value for property: " + propertyName);
-    }
-    if (key) {
-      var fn = map[key];
-      if (fn === undefined) {
-        throw new Error("Invalid config property: " + key);
-      } else if (fn === null) {
-        eq[key] = value;
-      } else {
-        fn(eq, value);
-      }
-    } else {
-      __objectForEach(value, function (propName, val) {
-        processUsing(eq, map, val, propName)
-      });
-    }
-  }
-
   /**
    Executes this query.  This method requires that an EntityManager has been previously specified via the "using" method.
    @example
@@ -11236,6 +11229,55 @@ breeze.Predicate = Predicate;
     }
     return this.entityManager.executeQueryLocally(this);
   };
+
+  proto.toJSON = function() {
+    var that = this;
+    return __toJson(this, {
+      resourceName: null,
+      resultEntityType: function(v) {
+        return v ? v.name : undefined;
+      },
+      wherePredicate: function(v) {
+        return v ? v.toJSON(that.fromEntityType) : undefined;
+      },
+      orderByClause: null,
+      selectClause: null,
+      skipCount: null,
+      takeCount: null,
+      expandClause: null,
+      parameters: function(v) {
+        return __isEmpty(v) ? undefined : v;
+      },
+      inlineCountEnabled: false,
+      noTrackingEnabled: false,
+      queryOptions: null
+    });
+
+  }
+
+  function fromJSON(eq, json) {
+    __toJson(json, {
+      resourceName: null,
+//      resultEntityType: function(v) {
+//        return v ? v.name : undefined;
+//      },
+      wherePredicate: function(v) {
+        return v ? new Predicate(v) : undefined;
+      },
+      orderByClause: null,
+      selectClause: null,
+      skipCount: null,
+      takeCount: null,
+      expandClause: null,
+      parameters: function(v) {
+        return __isEmpty(v) ? undefined : v;
+      },
+      inlineCountEnabled: false,
+      noTrackingEnabled: false,
+      queryOptions: null
+    }, eq);
+    return eq;
+  }
 
   /**
    Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
@@ -11388,6 +11430,13 @@ breeze.Predicate = Predicate;
     }
   };
 
+  // for testing
+  proto._toUri = function (em) {
+    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+  }
+
+// private functions
+
   function clone(that, propName, value) {
     // immutable queries mean that we don't need to clone if no change in value.
     if (propName) {
@@ -11417,12 +11466,27 @@ breeze.Predicate = Predicate;
     return copy;
   }
 
-  // for testing
-  proto._toUri = function (em) {
-    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+  function processUsing(eq, map, value, propertyName) {
+    var typeName = value._$typeName || (value.parentEnum && value.parentEnum.name);
+    var key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
+    if (propertyName && key != propertyName) {
+      throw new Error("Invalid value for property: " + propertyName);
+    }
+    if (key) {
+      var fn = map[key];
+      if (fn === undefined) {
+        throw new Error("Invalid config property: " + key);
+      } else if (fn === null) {
+        eq[key] = value;
+      } else {
+        fn(eq, value);
+      }
+    } else {
+      __objectForEach(value, function (propName, val) {
+        processUsing(eq, map, val, propName)
+      });
+    }
   }
-
-  // private functions
 
   function normalizePropertyPaths(propertyPaths) {
     assertParam(propertyPaths, "propertyPaths").isOptional().isString().or().isArray().isString().check();
@@ -11671,6 +11735,12 @@ var OrderByClause = (function () {
     };
   };
 
+  proto.toJSON = function() {
+    return {
+      items: this.items
+    }
+  }
+
   var OrderByItem = function (propertyPath, isDesc) {
     if (!(typeof propertyPath === 'string')) {
       throw new Error("propertyPath is not a string");
@@ -11738,6 +11808,13 @@ var OrderByClause = (function () {
     };
   };
 
+  itemProto.toJSON = function() {
+    return {
+      propertyPath: this.propertyPath,
+      isDesc: this.isDesc
+    }
+  };
+
   return ctor;
 })();
 
@@ -11753,7 +11830,7 @@ var SelectClause = (function () {
   var proto = ctor.prototype;
 
   proto.validate = function (entityType) {
-    if (!entityType) return; // can't validate yet
+    if (entityType == null || entityType.isAnonymous) return; // can't validate yet
     // will throw an exception on bad propertyPath
     this.propertyPaths.forEach(function (path) {
       entityType.getProperty(path, true);
@@ -11771,6 +11848,12 @@ var SelectClause = (function () {
     };
   };
 
+  proto.toJSON = function() {
+    return {
+      propertyPaths: this.propertyPaths
+    }
+  };
+
   return ctor;
 })();
 
@@ -11781,10 +11864,18 @@ var ExpandClause = (function () {
   var ctor = function (propertyPaths) {
     this.propertyPaths = propertyPaths;
   };
+  var proto = ctor.prototype;
+
+  proto.toJSON = function() {
+    return {
+      propertyPaths: this.propertyPaths
+    }
+  };
 
   return ctor;
 })();
 
+// also used by Predicate
 function getPropertyPathValue(obj, propertyPath) {
   var properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(".");
   if (properties.length === 1) {
@@ -12045,9 +12136,9 @@ breeze.MergeStrategy = MergeStrategy;
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
     if (!entityType) {
+      // anonymous type but still has naming convention info avail
       entityType = new EntityType(metadataStore);
     }
-
 
     var queryOptions = {};
     queryOptions["$filter"] = toWhereODataFragment(entityQuery.wherePredicate);
@@ -12135,24 +12226,24 @@ breeze.MergeStrategy = MergeStrategy;
   // toODataFragment visitor
   Predicate.attachVisitor(function () {
     var visitor = {
-      fnName: "toODataFragment",
+      config: { fnName: "toODataFragment"   },
 
       passthruPredicate: function () {
         return this.value;
       },
 
-      unaryPredicate: function (config) {
-        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(config) + ")";
+      unaryPredicate: function (context) {
+        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(context) + ")";
       },
 
-      binaryPredicate: function (config) {
-        var v1Expr = this.expr1.toODataFragment(config);
-        var prefix = config.prefix;
+      binaryPredicate: function (context) {
+        var v1Expr = this.expr1.toODataFragment(context);
+        var prefix = context.prefix;
         if (prefix) {
           v1Expr = prefix + "/" + v1Expr;
         }
 
-        var v2Expr = this.expr2.toODataFragment(config);
+        var v2Expr = this.expr2.toODataFragment(context);
 
         var odataOp = odataOpFrom(this);
 
@@ -12167,25 +12258,25 @@ breeze.MergeStrategy = MergeStrategy;
         }
       },
 
-      andOrPredicate: function (config) {
+      andOrPredicate: function (context) {
         if (this.preds.length === 0) return;
         var result = this.preds.map(function (pred) {
-          return "(" + pred.toODataFragment(config) + ")";
+          return "(" + pred.toODataFragment(context) + ")";
         }).join(" " + odataOpFrom(this) + " ");
         return result;
       },
 
-      anyAllPredicate: function (config) {
-        var v1Expr = this.expr.toODataFragment(config);
+      anyAllPredicate: function (context) {
+        var v1Expr = this.expr.toODataFragment(context);
 
-        var prefix = config.prefix;
+        var prefix = context.prefix;
         if (prefix) {
           v1Expr = prefix + "/" + v1Expr;
           prefix = "x" + (parseInt(prefix.substring(1)) + 1);
         } else {
           prefix = "x1";
         }
-        var newConfig = __extend({}, config);
+        var newConfig = __extend({}, context);
         newConfig.entityType = this.expr.dataType;
         newConfig.prefix = prefix;
         return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
@@ -12195,14 +12286,14 @@ breeze.MergeStrategy = MergeStrategy;
         return this.dataType.fmtOData(this.value);
       },
 
-      propExpr: function (config) {
-        var entityType = config.entityType;
+      propExpr: function (context) {
+        var entityType = context.entityType;
         return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
       },
 
-      fnExpr: function (config) {
+      fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
-          return expr.toODataFragment(config);
+          return expr.toODataFragment(context);
         });
         return this.fnName + "(" + frags.join(",") + ")";
       }
@@ -12529,7 +12620,6 @@ var EntityManager = (function () {
     }
     configParam.applyAll(em);
 
-
     // insure that entityManager's options versions are completely populated
     __updateWithDefaults(em.queryOptions, defaultQueryOptions);
     __updateWithDefaults(em.saveOptions, defaultSaveOptions);
@@ -12833,7 +12923,6 @@ var EntityManager = (function () {
         metadataStoreName: json.metadataStoreName
       });
     }
-
 
     var tempKeyMap = {};
     json.tempKeys.forEach(function (k) {
@@ -13212,6 +13301,7 @@ var EntityManager = (function () {
     };
 
     var result = [];
+    // TODO: mapMany
     groups.forEach(function (group) {
       result.push.apply(result, group._entities.filter(newFilterFunc));
     });
@@ -14582,7 +14672,6 @@ var EntityManager = (function () {
         val = serializerFn ? serializerFn(dp, val) : val;
         if (val !== undefined) {
           if (dp.isUnmapped) {
-            // unmapped[dp.name] = __toJSONSafe(val);
             unmapped[dp.nameOnServer] = __toJSONSafe(val);
           } else {
             rawObject[dp.nameOnServer] = val;
