@@ -46,9 +46,7 @@
   var proto = ctor.prototype;
   proto._$typeName = "EntityQuery";
 
-  ctor.fromJSON = function(json) {
 
-  }
   /**
    The resource name used by this query.
 
@@ -631,23 +629,29 @@
   proto.toJSON = function() {
     var that = this;
     return __toJson(this, {
-      resourceName: null,
-      resultEntityType: function(v) {
+      "from,resourceName": null,
+      "toType,resultEntityType": function(v) {
         return v ? v.name : undefined;
       },
-      wherePredicate: function(v) {
+      "where,wherePredicate": function(v) {
         return v ? v.toJSON(that.fromEntityType) : undefined;
       },
-      orderByClause: null,
-      selectClause: null,
-      skipCount: null,
-      takeCount: null,
-      expandClause: null,
+      "orderBy,orderByClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "select,selectClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "expand,expandClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "skip,skipCount": null,
+      "take,takeCount": null,
       parameters: function(v) {
         return __isEmpty(v) ? undefined : v;
       },
-      inlineCountEnabled: false,
-      noTrackingEnabled: false,
+      "inlineCount,inlineCountEnabled": false,
+      "noTracking,noTrackingEnabled": false,
       queryOptions: null
     });
 
@@ -655,23 +659,29 @@
 
   function fromJSON(eq, json) {
     __toJson(json, {
-      resourceName: null,
+      "resourceName,from": null,
 //      resultEntityType: function(v) {
 //        return v ? v.name : undefined;
 //      },
-      wherePredicate: function(v) {
+      "wherePredicate,where": function(v) {
         return v ? new Predicate(v) : undefined;
       },
-      orderByClause: null,
-      selectClause: null,
-      skipCount: null,
-      takeCount: null,
-      expandClause: null,
+      "orderByClause,orderBy": function(v) {
+        return v ? new OrderByClause(v) : undefined;
+      },
+      "selectClause,select": function(v) {
+        return v ? new SelectClause(v) : undefined;
+      },
+      "expandClause,expand": function(v) {
+        return v ? new ExpandClause(v) : undefined;
+      },
+      "skipCount,skip": null,
+      "takeCount,take": null,
       parameters: function(v) {
         return __isEmpty(v) ? undefined : v;
       },
-      inlineCountEnabled: false,
-      noTrackingEnabled: false,
+      "inlineCountEnabled,inlineCount": false,
+      "noTrackingEnabled,noTracking": false,
       queryOptions: null
     }, eq);
     return eq;
@@ -1134,10 +1144,10 @@ var OrderByClause = (function () {
   };
 
   proto.toJSON = function() {
-    return {
-      items: this.items
-    }
-  }
+    return this.items.map(function(item) {
+      return item.propertyPath + (item.isDesc ? " desc" : "");
+    });
+  };
 
   var OrderByItem = function (propertyPath, isDesc) {
     if (!(typeof propertyPath === 'string')) {
@@ -1206,13 +1216,6 @@ var OrderByClause = (function () {
     };
   };
 
-  itemProto.toJSON = function() {
-    return {
-      propertyPath: this.propertyPath,
-      isDesc: this.isDesc
-    }
-  };
-
   return ctor;
 })();
 
@@ -1247,9 +1250,7 @@ var SelectClause = (function () {
   };
 
   proto.toJSON = function() {
-    return {
-      propertyPaths: this.propertyPaths
-    }
+    return this.propertyPaths;
   };
 
   return ctor;
@@ -1265,9 +1266,7 @@ var ExpandClause = (function () {
   var proto = ctor.prototype;
 
   proto.toJSON = function() {
-    return {
-      propertyPaths: this.propertyPaths
-    }
+    return this.propertyPaths;
   };
 
   return ctor;

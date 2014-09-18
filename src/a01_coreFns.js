@@ -21,19 +21,7 @@ function __objectForEach(obj, kvFn) {
   }
 }
 
-function __objectFirst(obj, kvPredicate) {
-  for (var key in obj) {
-    if (__hasOwnProperty(obj, key)) {
-      var value = obj[key];
-      if (kvPredicate(key, value)) {
-        return { key: key, value: value };
-      }
-    }
-  }
-  return null;
-}
-
-function __objectMapToArray(obj, kvFn) {
+function __objectMap(obj, kvFn) {
   var results = [];
   for (var key in obj) {
     if (__hasOwnProperty(obj, key)) {
@@ -44,6 +32,18 @@ function __objectMapToArray(obj, kvFn) {
     }
   }
   return results;
+}
+
+function __objectFirst(obj, kvPredicate) {
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      var value = obj[key];
+      if (kvPredicate(key, value)) {
+        return { key: key, value: value };
+      }
+    }
+  }
+  return null;
 }
 
 function __isSettable(entity, propertyName) {
@@ -130,33 +130,54 @@ function __setAsDefault(target, ctor) {
   return target;
 }
 
-
-// template keys are the keys to return
-// template values are the 'default' value of these keys - value is not serialized if it == the default value
+// 'source' is an object that will be transformed into another
+// 'template' is a map where the
+//    keys: are the keys to return
+//      if a key contains ','s then the key is treated as a delimited string with first of the
+//      keys being the key to return and the others all valid aliases for this key
+//    'values' are either
+//        1) the 'default' value of the key
+//        2) a function that takes in the source value and should return the value to set
+//      The value from the source is then set on the target,
+//      after first passing thru the fn, if provided, UNLESS:
+//        1) it is the default value
+//        2) it is undefined ( nulls WILL be set)
+// 'target' is optional
+//    - if it exists then properties of the target will be set ( overwritten if the exist)
+//    - if it does not exist then a new object will be created as filled.
+// 'target is returned.
 function __toJson(source, template, target) {
   target = target || {};
 
-  for (var propName in template) {
-    if (!(propName in source)) continue;
-    var value = source[propName];
-    var defaultValue = template[propName];
-    // == is deliberate here - idea is that null or undefined values will never get serialized if default value is set to null.
-    if (value == defaultValue) continue;
-    if (Array.isArray(value) && value.length === 0) continue;
-    if (typeof(defaultValue) === "function") {
-      value = defaultValue(value);
-    } else if (typeof (value) === "object") {
-      if (value && value.parentEnum) {
-        value = value.name;
+  for (var key in template) {
+    var aliases = key.split(",");
+    var defaultValue = template[key];
+    // using some as a forEach with a 'break'
+    aliases.some(function(propName) {
+      if (!(propName in source)) return false;
+      var value = source[propName];
+      // there is a functional property defined with this alias ( not what we want to replace).
+      if (typeof value == 'function') return false;
+      // '==' is deliberate here - idea is that null or undefined values will never get serialized
+      // if default value is set to null.
+      if (value == defaultValue) return true;
+      if (Array.isArray(value) && value.length === 0) return true;
+      if (typeof(defaultValue) === "function") {
+        value = defaultValue(value);
+      } else if (typeof (value) === "object") {
+        if (value && value.parentEnum) {
+          value = value.name;
+        }
       }
-    }
-    if (value === undefined) continue;
-    target[propName] = value;
+      if (value === undefined) return true;
+      target[aliases[0]] = value;
+      return true;
+    });
   }
   return target;
 }
 
-
+// safely perform toJSON logic on objects with cycles.
 function __toJSONSafe(obj, replacer) {
   if (obj !== Object(obj)) return obj; // primitive value
   if (obj._$visited) return undefined;
@@ -336,6 +357,7 @@ function __arrayEquals(a1, a2, equalsFn) {
 
 // end of array functions
 
+// returns and array for a source and a prop, and creates the prop if needed.
 function __getArray(source, propName) {
   var arr = source[propName];
   if (!arr) {
@@ -440,7 +462,6 @@ function __memoize(fn) {
 }
 
 function __getUuid() {
-
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     //noinspection NonShortCircuitBooleanExpressionJS
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -532,6 +553,15 @@ function __isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// returns true for booleans, numbers, strings and dates
+// false for null, and non-date objects, functions, and arrays
+function __isPrimitive(obj) {
+  if (obj == null) return false;
+  // true for numbers, strings, booleans and null, false for objects
+  if (obj != Object(obj)) return true;
+  return _isDate(obj);
+}
+
 // end of is Functions
 
 // string functions
@@ -584,33 +614,27 @@ if (!Object.create) {
 
 var core = {};
 
-
+// not all methods above are exported
 core.__isES5Supported = __isES5Supported;
 
-// core.getOwnPropertyValues = __getOwnPropertyValues;
 core.objectForEach = __objectForEach;
-// core.objectMapToArray= __objectMapToArray;
-// core.objectFirst= __objectFirst;
 
 core.extend = __extend;
 core.propEq = __propEq;
 core.pluck = __pluck;
 
 core.arrayEquals = __arrayEquals;
-// core.arrayDistinct = __arrayDistinct;
 core.arrayFirst = __arrayFirst;
 core.arrayIndexOf = __arrayIndexOf;
-// core.__arrayAddUnique = __arrayAddUnique;
 core.arrayRemoveItem = __arrayRemoveItem;
 core.arrayZip = __arrayZip;
 
 core.requireLib = __requireLib;
 core.using = __using;
-// core.wrapExecution = __wrapExecution;
+
 core.memoize = __memoize;
 core.getUuid = __getUuid;
 core.durationToSeconds = __durationToSeconds;
-
 
 core.isDate = __isDate;
 core.isGuid = __isGuid;

@@ -358,7 +358,12 @@
 
     function validate(entityType) {
       this.expr = createExpr(this.exprSource, entityType);
+      // can't really know the predicateEntityType unless the original entity type was known.
+      if  (entityType == null || entityType.isAnonymous) {
+        this.expr.dataType = null;
+      }
       this.pred.validate(this.expr.dataType);
+
     }
 
     return ctor;

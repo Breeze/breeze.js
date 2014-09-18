@@ -49,19 +49,7 @@ function __objectForEach(obj, kvFn) {
   }
 }
 
-function __objectFirst(obj, kvPredicate) {
-  for (var key in obj) {
-    if (__hasOwnProperty(obj, key)) {
-      var value = obj[key];
-      if (kvPredicate(key, value)) {
-        return { key: key, value: value };
-      }
-    }
-  }
-  return null;
-}
-
-function __objectMapToArray(obj, kvFn) {
+function __objectMap(obj, kvFn) {
   var results = [];
   for (var key in obj) {
     if (__hasOwnProperty(obj, key)) {
@@ -72,6 +60,18 @@ function __objectMapToArray(obj, kvFn) {
     }
   }
   return results;
+}
+
+function __objectFirst(obj, kvPredicate) {
+  for (var key in obj) {
+    if (__hasOwnProperty(obj, key)) {
+      var value = obj[key];
+      if (kvPredicate(key, value)) {
+        return { key: key, value: value };
+      }
+    }
+  }
+  return null;
 }
 
 function __isSettable(entity, propertyName) {
@@ -158,33 +158,54 @@ function __setAsDefault(target, ctor) {
   return target;
 }
 
-
-// template keys are the keys to return
-// template values are the 'default' value of these keys - value is not serialized if it == the default value
+// 'source' is an object that will be transformed into another
+// 'template' is a map where the
+//    keys: are the keys to return
+//      if a key contains ','s then the key is treated as a delimited string with first of the
+//      keys being the key to return and the others all valid aliases for this key
+//    'values' are either
+//        1) the 'default' value of the key
+//        2) a function that takes in the source value and should return the value to set
+//      The value from the source is then set on the target,
+//      after first passing thru the fn, if provided, UNLESS:
+//        1) it is the default value
+//        2) it is undefined ( nulls WILL be set)
+// 'target' is optional
+//    - if it exists then properties of the target will be set ( overwritten if the exist)
+//    - if it does not exist then a new object will be created as filled.
+// 'target is returned.
 function __toJson(source, template, target) {
   target = target || {};
 
-  for (var propName in template) {
-    if (!(propName in source)) continue;
-    var value = source[propName];
-    var defaultValue = template[propName];
-    // == is deliberate here - idea is that null or undefined values will never get serialized if default value is set to null.
-    if (value == defaultValue) continue;
-    if (Array.isArray(value) && value.length === 0) continue;
-    if (typeof(defaultValue) === "function") {
-      value = defaultValue(value);
-    } else if (typeof (value) === "object") {
-      if (value && value.parentEnum) {
-        value = value.name;
+  for (var key in template) {
+    var aliases = key.split(",");
+    var defaultValue = template[key];
+    // using some as a forEach with a 'break'
+    aliases.some(function(propName) {
+      if (!(propName in source)) return false;
+      var value = source[propName];
+      // there is a functional property defined with this alias ( not what we want to replace).
+      if (typeof value == 'function') return false;
+      // '==' is deliberate here - idea is that null or undefined values will never get serialized
+      // if default value is set to null.
+      if (value == defaultValue) return true;
+      if (Array.isArray(value) && value.length === 0) return true;
+      if (typeof(defaultValue) === "function") {
+        value = defaultValue(value);
+      } else if (typeof (value) === "object") {
+        if (value && value.parentEnum) {
+          value = value.name;
+        }
       }
-    }
-    if (value === undefined) continue;
-    target[propName] = value;
+      if (value === undefined) return true;
+      target[aliases[0]] = value;
+      return true;
+    });
   }
   return target;
 }
 
-
+// safely perform toJSON logic on objects with cycles.
 function __toJSONSafe(obj, replacer) {
   if (obj !== Object(obj)) return obj; // primitive value
   if (obj._$visited) return undefined;
@@ -364,6 +385,7 @@ function __arrayEquals(a1, a2, equalsFn) {
 
 // end of array functions
 
+// returns and array for a source and a prop, and creates the prop if needed.
 function __getArray(source, propName) {
   var arr = source[propName];
   if (!arr) {
@@ -468,7 +490,6 @@ function __memoize(fn) {
 }
 
 function __getUuid() {
-
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     //noinspection NonShortCircuitBooleanExpressionJS
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -560,6 +581,15 @@ function __isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// returns true for booleans, numbers, strings and dates
+// false for null, and non-date objects, functions, and arrays
+function __isPrimitive(obj) {
+  if (obj == null) return false;
+  // true for numbers, strings, booleans and null, false for objects
+  if (obj != Object(obj)) return true;
+  return _isDate(obj);
+}
+
 // end of is Functions
 
 // string functions
@@ -612,33 +642,27 @@ if (!Object.create) {
 
 var core = {};
 
-
+// not all methods above are exported
 core.__isES5Supported = __isES5Supported;
 
-// core.getOwnPropertyValues = __getOwnPropertyValues;
 core.objectForEach = __objectForEach;
-// core.objectMapToArray= __objectMapToArray;
-// core.objectFirst= __objectFirst;
 
 core.extend = __extend;
 core.propEq = __propEq;
 core.pluck = __pluck;
 
 core.arrayEquals = __arrayEquals;
-// core.arrayDistinct = __arrayDistinct;
 core.arrayFirst = __arrayFirst;
 core.arrayIndexOf = __arrayIndexOf;
-// core.__arrayAddUnique = __arrayAddUnique;
 core.arrayRemoveItem = __arrayRemoveItem;
 core.arrayZip = __arrayZip;
 
 core.requireLib = __requireLib;
 core.using = __using;
-// core.wrapExecution = __wrapExecution;
+
 core.memoize = __memoize;
 core.getUuid = __getUuid;
 core.durationToSeconds = __durationToSeconds;
-
 
 core.isDate = __isDate;
 core.isGuid = __isGuid;
@@ -1724,7 +1748,7 @@ var __config = (function () {
         .whereParam("ajax").isOptional()
       // .whereParam("uriBuilder").isOptional()
         .applyAll(this, false);
-    return __objectMapToArray(config, __config.initializeAdapterInstance);
+    return __objectMap(config, __config.initializeAdapterInstance);
 
   };
 
@@ -6379,7 +6403,7 @@ var MetadataStore = (function () {
       "namingConvention": this.namingConvention.name,
       "localQueryComparisonOptions": this.localQueryComparisonOptions.name,
       "dataServices": this.dataServices,
-      "structuralTypes": __objectMapToArray(this._structuralTypeMap),
+      "structuralTypes": __objectMap(this._structuralTypeMap),
       "resourceEntityTypeMap": this._resourceEntityTypeMap
     }, null, __config.stringifyPad);
     return result;
@@ -6696,7 +6720,7 @@ var MetadataStore = (function () {
   };
 
   proto.getIncompleteNavigationProperties = function () {
-    return __objectMapToArray(this._incompleteTypeMap, function (key, value) {
+    return __objectMap(this._incompleteTypeMap, function (key, value) {
       return value;
     });
   };
@@ -10012,7 +10036,12 @@ breeze.NamingConvention = NamingConvention;
 
     function validate(entityType) {
       this.expr = createExpr(this.exprSource, entityType);
+      // can't really know the predicateEntityType unless the original entity type was known.
+      if  (entityType == null || entityType.isAnonymous) {
+        this.expr.dataType = null;
+      }
       this.pred.validate(this.expr.dataType);
+
     }
 
     return ctor;
@@ -10648,9 +10677,7 @@ breeze.Predicate = Predicate;
   var proto = ctor.prototype;
   proto._$typeName = "EntityQuery";
 
-  ctor.fromJSON = function(json) {
 
-  }
   /**
    The resource name used by this query.
 
@@ -11233,23 +11260,29 @@ breeze.Predicate = Predicate;
   proto.toJSON = function() {
     var that = this;
     return __toJson(this, {
-      resourceName: null,
-      resultEntityType: function(v) {
+      "from,resourceName": null,
+      "toType,resultEntityType": function(v) {
         return v ? v.name : undefined;
       },
-      wherePredicate: function(v) {
+      "where,wherePredicate": function(v) {
         return v ? v.toJSON(that.fromEntityType) : undefined;
       },
-      orderByClause: null,
-      selectClause: null,
-      skipCount: null,
-      takeCount: null,
-      expandClause: null,
+      "orderBy,orderByClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "select,selectClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "expand,expandClause": function(v) {
+        return v ? v.toJSON() : undefined;
+      },
+      "skip,skipCount": null,
+      "take,takeCount": null,
       parameters: function(v) {
         return __isEmpty(v) ? undefined : v;
       },
-      inlineCountEnabled: false,
-      noTrackingEnabled: false,
+      "inlineCount,inlineCountEnabled": false,
+      "noTracking,noTrackingEnabled": false,
       queryOptions: null
     });
 
@@ -11257,23 +11290,29 @@ breeze.Predicate = Predicate;
 
   function fromJSON(eq, json) {
     __toJson(json, {
-      resourceName: null,
+      "resourceName,from": null,
 //      resultEntityType: function(v) {
 //        return v ? v.name : undefined;
 //      },
-      wherePredicate: function(v) {
+      "wherePredicate,where": function(v) {
         return v ? new Predicate(v) : undefined;
       },
-      orderByClause: null,
-      selectClause: null,
-      skipCount: null,
-      takeCount: null,
-      expandClause: null,
+      "orderByClause,orderBy": function(v) {
+        return v ? new OrderByClause(v) : undefined;
+      },
+      "selectClause,select": function(v) {
+        return v ? new SelectClause(v) : undefined;
+      },
+      "expandClause,expand": function(v) {
+        return v ? new ExpandClause(v) : undefined;
+      },
+      "skipCount,skip": null,
+      "takeCount,take": null,
       parameters: function(v) {
         return __isEmpty(v) ? undefined : v;
       },
-      inlineCountEnabled: false,
-      noTrackingEnabled: false,
+      "inlineCountEnabled,inlineCount": false,
+      "noTrackingEnabled,noTracking": false,
       queryOptions: null
     }, eq);
     return eq;
@@ -11736,10 +11775,10 @@ var OrderByClause = (function () {
   };
 
   proto.toJSON = function() {
-    return {
-      items: this.items
-    }
-  }
+    return this.items.map(function(item) {
+      return item.propertyPath + (item.isDesc ? " desc" : "");
+    });
+  };
 
   var OrderByItem = function (propertyPath, isDesc) {
     if (!(typeof propertyPath === 'string')) {
@@ -11808,13 +11847,6 @@ var OrderByClause = (function () {
     };
   };
 
-  itemProto.toJSON = function() {
-    return {
-      propertyPath: this.propertyPath,
-      isDesc: this.isDesc
-    }
-  };
-
   return ctor;
 })();
 
@@ -11849,9 +11881,7 @@ var SelectClause = (function () {
   };
 
   proto.toJSON = function() {
-    return {
-      propertyPaths: this.propertyPaths
-    }
+    return this.propertyPaths;
   };
 
   return ctor;
@@ -11867,9 +11897,7 @@ var ExpandClause = (function () {
   var proto = ctor.prototype;
 
   proto.toJSON = function() {
-    return {
-      propertyPaths: this.propertyPaths
-    }
+    return this.propertyPaths;
   };
 
   return ctor;
@@ -14538,7 +14566,7 @@ var EntityManager = (function () {
           mappingContext.processDeferred();
           // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
           markLoadedNavProps(results, query);
-          var retrievedEntities = __objectMapToArray(mappingContext.refMap);
+          var retrievedEntities = __objectMap(mappingContext.refMap);
           return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
         });
         return Q.resolve(result);

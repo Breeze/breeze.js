@@ -139,7 +139,7 @@ var __config = (function () {
         .whereParam("ajax").isOptional()
       // .whereParam("uriBuilder").isOptional()
         .applyAll(this, false);
-    return __objectMapToArray(config, __config.initializeAdapterInstance);
+    return __objectMap(config, __config.initializeAdapterInstance);
 
   };
 

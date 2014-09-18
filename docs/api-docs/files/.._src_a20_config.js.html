@@ -344,7 +344,7 @@ var __config = (function () {
         .whereParam(&quot;ajax&quot;).isOptional()
       // .whereParam(&quot;uriBuilder&quot;).isOptional()
         .applyAll(this, false);
-    return __objectMapToArray(config, __config.initializeAdapterInstance);
+    return __objectMap(config, __config.initializeAdapterInstance);
 
   };
 

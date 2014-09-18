@@ -242,7 +242,7 @@ var MetadataStore = (function () {
       "namingConvention": this.namingConvention.name,
       "localQueryComparisonOptions": this.localQueryComparisonOptions.name,
       "dataServices": this.dataServices,
-      "structuralTypes": __objectMapToArray(this._structuralTypeMap),
+      "structuralTypes": __objectMap(this._structuralTypeMap),
       "resourceEntityTypeMap": this._resourceEntityTypeMap
     }, null, __config.stringifyPad);
     return result;
@@ -559,7 +559,7 @@ var MetadataStore = (function () {
   };
 
   proto.getIncompleteNavigationProperties = function () {
-    return __objectMapToArray(this._incompleteTypeMap, function (key, value) {
+    return __objectMap(this._incompleteTypeMap, function (key, value) {
       return value;
     });
   };
