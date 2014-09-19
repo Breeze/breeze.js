@@ -1781,62 +1781,6 @@ var EntityType = (function () {
     return props ? props[props.length - 1] : null;
   };
 
-
-//  proto.getProperty = function (propertyPath, throwIfNotFound) {
-//    throwIfNotFound = throwIfNotFound || false;
-//    var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
-//
-//    var prop = __arrayFirst(this.getProperties(), __propEq("name", propertyNames[0]));
-//    if (propertyNames.length !== 1) {
-//      propertyNames.shift();
-//      // dataType is line below will be a complexType
-//      var nextParentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
-//      if (nextParentType) {
-//        prop = nextParentType.getProperty(propertyNames, throwIfNotFound);
-//      }
-//    }
-//    if (prop) {
-//      return prop;
-//    } else if (!throwIfNotFound) {
-//      return null;
-//    } else {
-//      throw new Error("unable to locate property: " + propertyNames[0] + " on entityType: " + this.name);
-//    }
-//  };
-
-//  proto.getProperty = function (propertyPath, throwIfNotFound) {
-//    throwIfNotFound = throwIfNotFound || false;
-//    var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
-//    var propertyName = propertyNames[0];
-//    var prop = __arrayFirst(this.getProperties(), __propEq("name", propertyName));
-//    if (propertyNames.length === 1) {
-//      if (prop) {
-//        return prop;
-//      } else if (throwIfNotFound) {
-//        throw new Error("unable to locate property: " + propertyName + " on entityType: " + this.name);
-//      } else {
-//        return null;
-//      }
-//    } else {
-//      if (prop) {
-//        propertyNames.shift();
-//        // dataType is line below will be a complexType
-//        var nextParentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
-//        if (nextParentType) {
-//          return nextParentType.getProperty(propertyNames, throwIfNotFound);
-//        } else {
-//          throw new Error("should not get here - unknown property type for: " + prop.name);
-//        }
-//      } else {
-//        if (throwIfNotFound) {
-//          throw new Error("unable to locate property: " + propertyName + " on type: " + this.name);
-//        } else {
-//          return null;
-//        }
-//      }
-//    }
-//  };
-
   proto.getEntityKeyFromRawEntity = function (rawEntity, rawValueFn) {
     var keyValues = this.keyProperties.map(function (dp) {
       var val = rawValueFn(rawEntity, dp);

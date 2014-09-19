@@ -15,7 +15,31 @@
     var FetchStrategy = breeze.FetchStrategy;
     var MergeStrategy = breeze.MergeStrategy;
 
-    var newEm = testFns.newEm;
+    var newEm = wrapEm(testFns.newEm);
+    
+    function wrapEm(fn) {
+      return function () {
+        var em = fn.apply(this, arguments);
+        em.executeQuery = wrapEq(em.executeQuery);
+        return em;
+      }
+    }
+
+    function wrapEq(fn) {
+      return function (query) {
+        var qString = JSON.stringify(query);
+        var qJson = JSON.parse(qString);
+        var newQuery = new EntityQuery(qJson);
+        if (query.entityManager) {
+          newQuery = newQuery.using(query.entityManager);
+        }
+        if (query.dataService || query.jsonResultsAdapter) {
+          newQuery = newQuery.using(query.dataService);
+        }
+        return fn.call(this, newQuery);
+      }
+    }
+
     var wellKnownData = testFns.wellKnownData;
 
     module("query", {
