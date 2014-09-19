@@ -546,7 +546,9 @@ function __isDate(o) {
 }
 
 function __isDateString(s) {
-  return (typeof value === "string") && /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.test(value);
+  // var rx = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/;
+  var rx = /^((\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)))$/;
+  return (typeof s === "string") && rx.test(s);
 }
 
 function __isFunction(o) {
@@ -9945,9 +9947,7 @@ breeze.NamingConvention = NamingConvention;
         throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
       }
 
-      if (this.expr1.dataType != DataType.Undefined) {
-        this.expr2.dataType = this.expr1.dataType;
-      } else {
+      if (this.expr1.dataType == null) {
         this.expr1.dataType = this.expr2.dataType;
       }
     }
@@ -10021,13 +10021,15 @@ breeze.NamingConvention = NamingConvention;
       // if the DataType comes in as Undefined this means
       // that we should NOT attempt to parse it but just leave it alone
       // for now - this is usually because it is part of a Func expr.
-      if (dataType != DataType.Undefined && dataType.parse) {
+      dataType = dataType || DataType.fromValue(value);
+      if (dataType && dataType.parse) {
         this.value = dataType.parse(value, typeof value);
       } else {
         this.value = value;
       }
+      this.dataType = dataType;
       this.hasExplicitDataType = hasExplicitDataType;
-      this.dataType = dataType || DataType.fromValue(value);
+
 
     };
     var proto = ctor.prototype;
@@ -10054,7 +10056,7 @@ breeze.NamingConvention = NamingConvention;
     // two public props: propertyPath, dateType
     var ctor = function (propertyPath) {
       this.propertyPath = propertyPath;
-      this.dataType = DataType.Undefined;
+      //this.dataType = DataType.Undefined;
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype;
@@ -10508,18 +10510,17 @@ breeze.NamingConvention = NamingConvention;
           // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
           // because we want to insure that if we roundtrip thru toJSON that we don't
           // accidently reinterpret this node as a PropExpr.
-          return new LitExpr(source.value, source.dataType || DataType.fromValue(source.value), !!source.dataType);
+          // return new LitExpr(source.value, source.dataType || context.dataType, !!source.dataType);
+          return new LitExpr(source.value, source.dataType || context.dataType, true);
         }
       } else {
-        // return new LitExpr(source, context.dataType, false);
-        // treat this as if it has an explicit datatype
-        return new LitExpr(source, context.dataType, true);
+        return new LitExpr(source, context.dataType);
       }
     }
 
     // if entityType is unknown then assume that the rhs is a literal
-    if (context.isRHS == 2 && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source, context.dataType, false);
+    if (context.isRHS && (entityType == null || entityType.isAnonymous)) {
+      return new LitExpr(source, context.dataType);
     }
 
     var regex = /\([^()]*\)/;
@@ -10555,8 +10556,7 @@ breeze.NamingConvention = NamingConvention;
     var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
     if (isQuoted) {
       var unquotedValue = value.substr(1, value.length - 2);
-      var dataType = (context.dataType != null && context.dataType != DataType.Undefined) ? context.dataType : DataType.String;
-      return new LitExpr(unquotedValue, dataType);
+      return new LitExpr(unquotedValue, context.dataType || DataType.String);
     } else {
       var entityType = context.entityType;
       // TODO: get rid of isAnonymous below when we get the chance.
