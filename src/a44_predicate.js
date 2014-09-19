@@ -388,8 +388,8 @@
 
   var LitExpr = (function () {
     // 2 public props: value, dataType
-    var ctor = function (value, dataType) {
-
+    var ctor = function (value, dataType, hasExplicitDataType) {
+      // dataType may come is an a string
       dataType = resolveDataType(dataType);
       // if the DataType comes in as Undefined this means
       // that we should NOT attempt to parse it but just leave it alone
@@ -399,11 +399,9 @@
       } else {
         this.value = value;
       }
-      this.hasExplicitDataType = dataType != null && dataType != DataType.Undefined;
+      this.hasExplicitDataType = hasExplicitDataType;
       this.dataType = dataType || DataType.fromValue(value);
-      if (this.dataType == DataType.DateTime || this.dataType == DataType.DateTimeOffset) {
-        this.hasExplicitDataType = true;
-      }
+
     };
     var proto = ctor.prototype;
     Predicate._registerProto('LitExpr', proto);
@@ -883,16 +881,18 @@
           // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
           // because we want to insure that if we roundtrip thru toJSON that we don't
           // accidently reinterpret this node as a PropExpr.
-          return new LitExpr(source.value, source.dataType || DataType.fromValue(source.value));
+          return new LitExpr(source.value, source.dataType || DataType.fromValue(source.value), !!source.dataType);
         }
       } else {
-        return new LitExpr(source, context.dataType);
+        // return new LitExpr(source, context.dataType, false);
+        // treat this as if it has an explicit datatype
+        return new LitExpr(source, context.dataType, true);
       }
     }
 
     // if entityType is unknown then assume that the rhs is a literal
     if (context.isRHS == 2 && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source, context.dataType);
+      return new LitExpr(source, context.dataType, false);
     }
 
     var regex = /\([^()]*\)/;
@@ -928,7 +928,8 @@
     var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
     if (isQuoted) {
       var unquotedValue = value.substr(1, value.length - 2);
-      return new LitExpr(unquotedValue);
+      var dataType = (context.dataType != null && context.dataType != DataType.Undefined) ? context.dataType : DataType.String;
+      return new LitExpr(unquotedValue, dataType);
     } else {
       var entityType = context.entityType;
       // TODO: get rid of isAnonymous below when we get the chance.
@@ -947,7 +948,7 @@
       // we don't really know the datatype here because even though it comes in as a string
       // its usually a string BUT it might be a number  i.e. the "1" or the "2" from an expr
       // like "toUpper(substring(companyName, 1, 2))"
-      return new LitExpr(value, DataType.Undefined);
+      return new LitExpr(value, context.dataType);
     }
   }
 

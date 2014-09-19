@@ -545,6 +545,10 @@ function __isDate(o) {
   return __classof(o) === "date" && !isNaN(o.getTime());
 }
 
+function __isDateString(s) {
+  return (typeof value === "string") && /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.test(value);
+}
+
 function __isFunction(o) {
   return __classof(o) === "function";
 }
@@ -5779,6 +5783,7 @@ var DataType = (function () {
         // the >3 below is a hack to insure that if we are inferring datatypes that
         // very short strings that are valid but unlikely ISO encoded Time's are treated as strings instead.
         else if (__isDuration(val) && val.length > 3) return DataType.Time;
+        else if (__isDateString(val)) return DataType.DateTime;
         return DataType.String;
       case "boolean":
         return DataType.Boolean;
@@ -10010,8 +10015,8 @@ breeze.NamingConvention = NamingConvention;
 
   var LitExpr = (function () {
     // 2 public props: value, dataType
-    var ctor = function (value, dataType) {
-
+    var ctor = function (value, dataType, hasExplicitDataType) {
+      // dataType may come is an a string
       dataType = resolveDataType(dataType);
       // if the DataType comes in as Undefined this means
       // that we should NOT attempt to parse it but just leave it alone
@@ -10021,11 +10026,9 @@ breeze.NamingConvention = NamingConvention;
       } else {
         this.value = value;
       }
-      this.hasExplicitDataType = dataType != null && dataType != DataType.Undefined;
+      this.hasExplicitDataType = hasExplicitDataType;
       this.dataType = dataType || DataType.fromValue(value);
-      if (this.dataType == DataType.DateTime || this.dataType == DataType.DateTimeOffset) {
-        this.hasExplicitDataType = true;
-      }
+
     };
     var proto = ctor.prototype;
     Predicate._registerProto('LitExpr', proto);
@@ -10505,16 +10508,18 @@ breeze.NamingConvention = NamingConvention;
           // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
           // because we want to insure that if we roundtrip thru toJSON that we don't
           // accidently reinterpret this node as a PropExpr.
-          return new LitExpr(source.value, source.dataType || DataType.fromValue(source.value));
+          return new LitExpr(source.value, source.dataType || DataType.fromValue(source.value), !!source.dataType);
         }
       } else {
-        return new LitExpr(source, context.dataType);
+        // return new LitExpr(source, context.dataType, false);
+        // treat this as if it has an explicit datatype
+        return new LitExpr(source, context.dataType, true);
       }
     }
 
     // if entityType is unknown then assume that the rhs is a literal
     if (context.isRHS == 2 && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source, context.dataType);
+      return new LitExpr(source, context.dataType, false);
     }
 
     var regex = /\([^()]*\)/;
@@ -10550,7 +10555,8 @@ breeze.NamingConvention = NamingConvention;
     var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
     if (isQuoted) {
       var unquotedValue = value.substr(1, value.length - 2);
-      return new LitExpr(unquotedValue);
+      var dataType = (context.dataType != null && context.dataType != DataType.Undefined) ? context.dataType : DataType.String;
+      return new LitExpr(unquotedValue, dataType);
     } else {
       var entityType = context.entityType;
       // TODO: get rid of isAnonymous below when we get the chance.
@@ -10569,7 +10575,7 @@ breeze.NamingConvention = NamingConvention;
       // we don't really know the datatype here because even though it comes in as a string
       // its usually a string BUT it might be a number  i.e. the "1" or the "2" from an expr
       // like "toUpper(substring(companyName, 1, 2))"
-      return new LitExpr(value, DataType.Undefined);
+      return new LitExpr(value, context.dataType);
     }
   }
 

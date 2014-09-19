@@ -517,6 +517,10 @@ function __isDate(o) {
   return __classof(o) === "date" && !isNaN(o.getTime());
 }
 
+function __isDateString(s) {
+  return (typeof value === "string") && /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/.test(value);
+}
+
 function __isFunction(o) {
   return __classof(o) === "function";
 }

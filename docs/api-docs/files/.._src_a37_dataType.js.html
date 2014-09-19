@@ -590,6 +590,7 @@ var DataType = (function () {
         // the &gt;3 below is a hack to insure that if we are inferring datatypes that
         // very short strings that are valid but unlikely ISO encoded Time&#x27;s are treated as strings instead.
         else if (__isDuration(val) &amp;&amp; val.length &gt; 3) return DataType.Time;
+        else if (__isDateString(val)) return DataType.DateTime;
         return DataType.String;
       case &quot;boolean&quot;:
         return DataType.Boolean;
