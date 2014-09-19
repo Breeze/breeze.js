@@ -170,7 +170,7 @@
       if ((typeof value !== 'object') || value == null || __isDate(value)) {
         // { foo: bar } key='foo', value = bar ( where bar is a literal i.e. a string, a number, a boolean or a date.
         return new BinaryPredicate("eq", key, value);
-      } else if ( __hasOwnProperty(value, 'value') && __hasOwnProperty(value, 'dataType')) {
+      } else if ( __hasOwnProperty(value, 'value') ) {
         // { foo: { value: bar, dataType: xxx} } key='foo', value = bar ( where bar is an object representing a literal
         return new BinaryPredicate("eq", key, value);
       }
@@ -191,12 +191,13 @@
         if (BinaryPredicate.prototype._resolveOp(op, true)) {
           // { a: { ">": b }} op = ">", expr=a, value[op] = b
           return new BinaryPredicate(op, expr, value[op]);
-        } else {
+        } else if (__hasOwnProperty(value[op], 'value')) {
           // { a: { ">": { value: b, dataType: 'Int32' }} expr = a value[op] = { value: b, dataType: 'Int32' }
           return new BinaryPredicate("eq", expr, value[op]);
         }
 
-        // throw new Error("Unable to resolve predicate after the phrase: " + expr + " for operator: " + op + " and value: " + value[op]);
+        var msg = __formatString("Unable to resolve predicate after the phrase: '%1' for operator: '%2'  and value: '%3'", expr, op, value[op]);
+        throw new Error(msg);
 
       });
 
