@@ -640,15 +640,6 @@
       "orderBy,orderByClause": null,
       "select,selectClause": null,
       "expand,expandClause": null,
-//      "orderBy,orderByClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
-//      "select,selectClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
-//      "expand,expandClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
       "skip,skipCount": null,
       "take,takeCount": null,
       parameters: function(v) {

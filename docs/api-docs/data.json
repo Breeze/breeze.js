@@ -733,7 +733,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 958,
+            "line": 949,
             "description": "FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink \"Predicate\"}}{{/crossLink}}\nfilter operators for an {{#crossLink \"EntityQuery\"}}{{/crossLink}}.",
             "static": 1
         },
@@ -6483,7 +6483,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 695,
+            "line": 686,
             "description": "Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful\nto force a requery of selected entities, or to restrict an existing collection of entities according to some filter.",
             "example": [
                 "\n// assuming 'customers' is an array of 'Customer' entities retrieved earlier.\nvar customersQuery = EntityQuery.fromEntities(customers);\nThe resulting query can, of course, be extended",
@@ -6510,7 +6510,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 736,
+            "line": 727,
             "description": "Creates an EntityQuery for the specified {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\nvar empType = metadataStore.getEntityType(\"Employee\");\nvar entityKey = new EntityKey(empType, 1);\nvar query = EntityQuery.fromEntityKey(entityKey);\nor",
@@ -6536,7 +6536,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 761,
+            "line": 752,
             "description": "Creates an EntityQuery for the specified entity and {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
             "example": [
                 "\n// 'employee' is a previously queried employee\nvar ordersNavProp = employee.entityType.getProperty(\"Orders\");\nvar query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);\nwill return a query for the \"Orders\" of the specified 'employee'."
@@ -6566,7 +6566,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 966,
+            "line": 957,
             "description": "Aliases: \"eq\", \"==\"",
             "itemtype": "property",
             "name": "Equals",
@@ -6578,7 +6578,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 973,
+            "line": 964,
             "description": "Aliases: \"ne\", \"!=\"",
             "itemtype": "property",
             "name": "NotEquals",
@@ -6590,7 +6590,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 980,
+            "line": 971,
             "description": "Aliases: \"gt\", \">\"",
             "itemtype": "property",
             "name": "GreaterThan",
@@ -6602,7 +6602,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 987,
+            "line": 978,
             "description": "Aliases: \"lt\", \"<\"",
             "itemtype": "property",
             "name": "LessThan",
@@ -6614,7 +6614,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 994,
+            "line": 985,
             "description": "Aliases: \"ge\", \">=\"",
             "itemtype": "property",
             "name": "GreaterThanOrEqual",
@@ -6626,7 +6626,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1001,
+            "line": 992,
             "description": "Aliases: \"le\", \"<=\"",
             "itemtype": "property",
             "name": "LessThanOrEqual",
@@ -6638,7 +6638,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1008,
+            "line": 999,
             "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
             "itemtype": "property",
             "name": "Contains",
@@ -6650,7 +6650,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1016,
+            "line": 1007,
             "itemtype": "property",
             "name": "StartsWith",
             "type": "FilterQueryOp",
@@ -6661,7 +6661,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1022,
+            "line": 1013,
             "itemtype": "property",
             "name": "EndsWith",
             "type": "FilterQueryOp",
@@ -6672,7 +6672,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1029,
+            "line": 1020,
             "description": "Aliases: \"some\"",
             "itemtype": "property",
             "name": "Any",
@@ -6684,7 +6684,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1037,
+            "line": 1028,
             "description": "Aliases: \"every\"",
             "itemtype": "property",
             "name": "All",

@@ -127,7 +127,6 @@
       },
 
       andOrPredicate: function (context) {
-        if (this.preds.length === 0) return;
         var result = this.preds.map(function (pred) {
           return "(" + pred.toODataFragment(context) + ")";
         }).join(" " + odataOpFrom(this) + " ");

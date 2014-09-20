@@ -579,7 +579,6 @@
       },
 
       andOrPredicate: function (context) {
-        if (this.preds.length == 0) return __noop;
         var funcs = this.preds.map(function (pred) {
           return pred.toFunction(context);
         });
@@ -809,7 +808,6 @@
 
       andOrPredicate: function (context) {
         var json;
-        if (this.preds.length == 0) return ;
         var jsonValues = this.preds.map(function (pred) {
           return pred.toJSONExt(context);
         });

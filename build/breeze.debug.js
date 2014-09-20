@@ -10208,7 +10208,6 @@ breeze.NamingConvention = NamingConvention;
       },
 
       andOrPredicate: function (context) {
-        if (this.preds.length == 0) return __noop;
         var funcs = this.preds.map(function (pred) {
           return pred.toFunction(context);
         });
@@ -10438,7 +10437,6 @@ breeze.NamingConvention = NamingConvention;
 
       andOrPredicate: function (context) {
         var json;
-        if (this.preds.length == 0) return ;
         var jsonValues = this.preds.map(function (pred) {
           return pred.toJSONExt(context);
         });
@@ -11270,15 +11268,6 @@ breeze.Predicate = Predicate;
       "orderBy,orderByClause": null,
       "select,selectClause": null,
       "expand,expandClause": null,
-//      "orderBy,orderByClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
-//      "select,selectClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
-//      "expand,expandClause": function(v) {
-//        return v ? v.toJSON() : undefined;
-//      },
       "skip,skipCount": null,
       "take,takeCount": null,
       parameters: function(v) {
@@ -12291,7 +12280,6 @@ breeze.MergeStrategy = MergeStrategy;
       },
 
       andOrPredicate: function (context) {
-        if (this.preds.length === 0) return;
         var result = this.preds.map(function (pred) {
           return "(" + pred.toODataFragment(context) + ")";
         }).join(" " + odataOpFrom(this) + " ");
