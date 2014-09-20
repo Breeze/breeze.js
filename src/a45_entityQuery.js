@@ -631,20 +631,24 @@
     return __toJson(this, {
       "from,resourceName": null,
       "toType,resultEntityType": function(v) {
-        return v ? v.name : undefined;
+        // resultEntityType can be either a string or an entityType
+        return v ? ( __isString(v) ? v : v.name) : undefined;
       },
       "where,wherePredicate": function(v) {
         return v ? v.toJSON(that.fromEntityType) : undefined;
       },
-      "orderBy,orderByClause": function(v) {
-        return v ? v.toJSON() : undefined;
-      },
-      "select,selectClause": function(v) {
-        return v ? v.toJSON() : undefined;
-      },
-      "expand,expandClause": function(v) {
-        return v ? v.toJSON() : undefined;
-      },
+      "orderBy,orderByClause": null,
+      "select,selectClause": null,
+      "expand,expandClause": null,
+//      "orderBy,orderByClause": function(v) {
+//        return v ? v.toJSON() : undefined;
+//      },
+//      "select,selectClause": function(v) {
+//        return v ? v.toJSON() : undefined;
+//      },
+//      "expand,expandClause": function(v) {
+//        return v ? v.toJSON() : undefined;
+//      },
       "skip,skipCount": null,
       "take,takeCount": null,
       parameters: function(v) {
@@ -660,9 +664,8 @@
   function fromJSON(eq, json) {
     __toJson(json, {
       "resourceName,from": null,
-//      resultEntityType: function(v) {
-//        return v ? v.name : undefined;
-//      },
+      // just the name comes back and will be resolved later
+      "resultEntityType,toType": null,
       "wherePredicate,where": function(v) {
         return v ? new Predicate(v) : undefined;
       },
@@ -682,7 +685,9 @@
       },
       "inlineCountEnabled,inlineCount": false,
       "noTrackingEnabled,noTracking": false,
-      queryOptions: null
+      queryOptions: function(v) {
+        return v ? QueryOptions.fromJSON(v) : undefined;
+      }
     }, eq);
     return eq;
   }

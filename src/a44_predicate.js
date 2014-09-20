@@ -38,11 +38,14 @@
     ctor.create = ctor;
 
     ctor.and = function () {
-      return new AndOrPredicate("and", __arraySlice(arguments));
+      var pred = new AndOrPredicate("and", __arraySlice(arguments));
+      // return undefined if empty
+      return pred.op && pred;
     }
 
     ctor.or = function () {
-      return new AndOrPredicate("or", __arraySlice(arguments));
+      var pred = new AndOrPredicate("or", __arraySlice(arguments));
+      return pred.op && pred;
     }
 
     ctor.attachVisitor = function (visitor) {
@@ -339,6 +342,13 @@
       }).map(function (pred) {
         return Predicate(pred);
       });
+      if (this.preds.length == 0) {
+        // marker for an empty predicate
+        this.op = null;
+      }
+      if( this.preds.length == 1) {
+        return preds[0];
+      }
     };
 
     var proto = ctor.prototype = new Predicate();
@@ -569,6 +579,7 @@
       },
 
       andOrPredicate: function (context) {
+        if (this.preds.length == 0) return __noop;
         var funcs = this.preds.map(function (pred) {
           return pred.toFunction(context);
         });
@@ -798,6 +809,7 @@
 
       andOrPredicate: function (context) {
         var json;
+        if (this.preds.length == 0) return ;
         var jsonValues = this.preds.map(function (pred) {
           return pred.toJSONExt(context);
         });
