@@ -41,12 +41,16 @@
       var pred = new AndOrPredicate("and", __arraySlice(arguments));
       // return undefined if empty
       return pred.op && pred;
-    }
+    };
 
     ctor.or = function () {
       var pred = new AndOrPredicate("or", __arraySlice(arguments));
       return pred.op && pred;
-    }
+    };
+
+    ctor.not = function(pred) {
+      return pred.not();
+    };
 
     ctor.attachVisitor = function (visitor) {
       var fnName = visitor.config.fnName;

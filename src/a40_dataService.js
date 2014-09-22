@@ -42,13 +42,14 @@ var DataService = (function () {
    @param config {Object}
    @param config.serviceName {String} The name of the service.
    @param [config.adapterName] {String} The name of the dataServiceAdapter to be used with this service.
+   @param [config.uriBuilderName] {String} The name of the uriBuilder to be used with this service.
    @param [config.hasServerMetadata] {bool} Whether the server can provide metadata for this service.
    @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
    @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
    **/
 
   var ctor = function (config) {
-    this.uriBuilder = uriBuilderForOData;
+    // this.uriBuilder = uriBuilderForOData;
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;
@@ -116,14 +117,14 @@ var DataService = (function () {
       useJsonp: false
     });
     var ds = new DataService(__resolveProperties(dataServices,
-        ["serviceName", "adapterName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
+        ["serviceName", "adapterName", "uriBuilderName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
 
     if (!ds.serviceName) {
       throw new Error("Unable to resolve a 'serviceName' for this dataService");
     }
     ds.adapterInstance = ds.adapterInstance || __config.getAdapterInstance("dataService", ds.adapterName);
     ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
-
+    ds.uriBuilder = ds.uriBuilder || __config.getAdapterInstance("uriBuilder", ds.uriBuilderName);
     return ds;
   };
 
@@ -132,13 +133,14 @@ var DataService = (function () {
       assertConfig(config)
           .whereParam("serviceName").isOptional()
           .whereParam("adapterName").isString().isOptional()
+          .whereParam("uriBuilderName").isString().isOptional()
           .whereParam("hasServerMetadata").isBoolean().isOptional()
           .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
           .whereParam("useJsonp").isBoolean().isOptional()
           .applyAll(obj);
       obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
       obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
-
+      obj.uriBuilder = obj.uriBuilderName && __config.getAdapterInstance("uriBuilder", obj.uriBuilderName);
     }
     return obj;
   }
@@ -157,6 +159,7 @@ var DataService = (function () {
     return __toJson(this, {
       serviceName: null,
       adapterName: null,
+      uriBuilderName: null,
       hasServerMetadata: null,
       jsonResultsAdapter: function (v) {
         return v && v.name;
@@ -170,7 +173,7 @@ var DataService = (function () {
     return new DataService(json);
   };
 
-  proto.makeUrl = function (suffix) {
+  proto.qualifyUrl = function (suffix) {
     var url = this.serviceName;
     // remove any trailing "/"
     if (core.stringEndsWith(url, "/")) {

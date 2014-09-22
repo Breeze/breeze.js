@@ -840,7 +840,7 @@
         return v ? ( __isString(v) ? v : v.name) : undefined;
       },
       &quot;where,wherePredicate&quot;: function(v) {
-        return v ? v.toJSON(that.fromEntityType) : undefined;
+        return v ? v.toJSONExt(this.fromEntityType) : undefined;
       },
       &quot;orderBy,orderByClause&quot;: null,
       &quot;select,selectClause&quot;: null,
@@ -1041,7 +1041,8 @@
 
   // for testing
   proto._toUri = function (em) {
-    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+    var ds = DataService.resolve([em.dataService]);
+    return ds.uriBuilder.buildUri(this, em.metadataStore);
   }
 
 // private functions

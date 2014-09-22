@@ -591,7 +591,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a40_dataService.js",
-            "line": 192,
+            "line": 195,
             "description": "A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service.\nThis facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class 'breeze' citizens."
         },
         "MetadataStore": {
@@ -733,7 +733,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 949,
+            "line": 950,
             "description": "FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink \"Predicate\"}}{{/crossLink}}\nfilter operators for an {{#crossLink \"EntityQuery\"}}{{/crossLink}}.",
             "static": 1
         },
@@ -3679,6 +3679,12 @@
                             "optional": true
                         },
                         {
+                            "name": "uriBuilderName",
+                            "description": "The name of the uriBuilder to be used with this service.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
                             "name": "hasServerMetadata",
                             "description": "Whether the server can provide metadata for this service.",
                             "type": "Bool",
@@ -3704,7 +3710,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 57,
+            "line": 58,
             "description": "The serviceName for this DataService.\n\n__readOnly__",
             "itemtype": "property",
             "name": "serviceName",
@@ -3714,7 +3720,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 64,
+            "line": 65,
             "description": "The adapter name for the dataServiceAdapter to be used with this service.\n\n__readOnly__",
             "itemtype": "property",
             "name": "adapterName",
@@ -3724,7 +3730,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 71,
+            "line": 72,
             "description": "The \"dataService\" adapter implementation instance associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
             "name": "adapterInstance",
@@ -3734,7 +3740,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 78,
+            "line": 79,
             "description": "Whether the server can provide metadata for this service.\n\n__readOnly__",
             "itemtype": "property",
             "name": "hasServerMetadata",
@@ -3744,7 +3750,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 85,
+            "line": 86,
             "description": "The JsonResultsAdapter used to process the results of any query against this DataService.\n\n__readOnly__",
             "itemtype": "property",
             "name": "jsonResultsAdapter",
@@ -3754,7 +3760,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 92,
+            "line": 93,
             "description": "Whether to use JSONP when performing a 'GET' request against this service.\n\n__readOnly__",
             "itemtype": "property",
             "name": "useJsonP",
@@ -3764,7 +3770,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 99,
+            "line": 100,
             "description": "Returns a copy of this DataService with the specified properties applied.",
             "itemtype": "method",
             "name": "using",
@@ -3785,7 +3791,7 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 199,
+            "line": 202,
             "description": "JsonResultsAdapter constructor",
             "example": [
                 "\n//\nvar jsonResultsAdapter = new JsonResultsAdapter({\n         name: \"test1e\",\n         extractResults: function(json) {\n             return json.results;\n         },\n         visitNode: function(node, mappingContext, nodeContext) {\n             var entityType = normalizeTypeName(node.$type);\n             var propertyName = nodeContext.propertyName;\n             var ignore = propertyName && propertyName.substr(0, 1) === \"$\";\n\n             return {\n                 entityType: entityType,\n                 nodeId: node.$id,\n                 nodeRefId: node.$ref,\n                 ignore: ignore\n             };\n         }\n     });\n\nvar dataService = new DataService( {\n             serviceName: \"breeze/foo\",\n             jsonResultsAdapter: jsonResultsAdapter\n     });\n\nvar entityManager = new EntityManager( {\n         dataService: dataService\n     });"
@@ -6566,7 +6572,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 957,
+            "line": 958,
             "description": "Aliases: \"eq\", \"==\"",
             "itemtype": "property",
             "name": "Equals",
@@ -6578,7 +6584,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 964,
+            "line": 965,
             "description": "Aliases: \"ne\", \"!=\"",
             "itemtype": "property",
             "name": "NotEquals",
@@ -6590,7 +6596,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 971,
+            "line": 972,
             "description": "Aliases: \"gt\", \">\"",
             "itemtype": "property",
             "name": "GreaterThan",
@@ -6602,7 +6608,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 978,
+            "line": 979,
             "description": "Aliases: \"lt\", \"<\"",
             "itemtype": "property",
             "name": "LessThan",
@@ -6614,7 +6620,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 985,
+            "line": 986,
             "description": "Aliases: \"ge\", \">=\"",
             "itemtype": "property",
             "name": "GreaterThanOrEqual",
@@ -6626,7 +6632,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 992,
+            "line": 993,
             "description": "Aliases: \"le\", \"<=\"",
             "itemtype": "property",
             "name": "LessThanOrEqual",
@@ -6638,7 +6644,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 999,
+            "line": 1000,
             "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
             "itemtype": "property",
             "name": "Contains",
@@ -6650,7 +6656,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1007,
+            "line": 1008,
             "itemtype": "property",
             "name": "StartsWith",
             "type": "FilterQueryOp",
@@ -6661,7 +6667,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1013,
+            "line": 1014,
             "itemtype": "property",
             "name": "EndsWith",
             "type": "FilterQueryOp",
@@ -6672,7 +6678,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1020,
+            "line": 1021,
             "description": "Aliases: \"some\"",
             "itemtype": "property",
             "name": "Any",
@@ -6684,7 +6690,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1028,
+            "line": 1029,
             "description": "Aliases: \"every\"",
             "itemtype": "property",
             "name": "All",

@@ -1,6 +1,25 @@
-﻿var uriBuilderForOData = (function () {
+﻿(function (factory) {
+  if (breeze) {
+    factory(breeze);
+  } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+    // CommonJS or Node: hard-coded dependency on "breeze"
+    factory(require("breeze"));
+  } else if (typeof define === "function" && define["amd"] && !breeze) {
+    // AMD anonymous module with hard-coded dependency on "breeze"
+    define(["breeze"], factory);
+  }
+}(function (breeze) {
+  "use strict";
+  var EntityType = breeze.EntityType;
 
-  var buildUri = function (entityQuery, metadataStore) {
+  var ctor = function() {
+    this.name = "odata";
+  };
+  var proto = ctor.prototype;
+
+  proto.initialize = function() {};
+
+  proto.buildUri = function (entityQuery, metadataStore) {
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
     if (!entityType) {
@@ -92,7 +111,7 @@
   };
 
   // toODataFragment visitor
-  Predicate.attachVisitor(function () {
+  breeze.Predicate.attachVisitor(function () {
     var visitor = {
       config: { fnName: "toODataFragment"   },
 
@@ -143,7 +162,7 @@
         } else {
           prefix = "x1";
         }
-        var newConfig = __extend({}, context);
+        var newConfig = breeze.core.extend({}, context);
         newConfig.entityType = this.expr.dataType;
         newConfig.prefix = prefix;
         return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
@@ -184,11 +203,11 @@
     return visitor;
   }());
 
-  return {
-    buildUri: buildUri
-  };
+  breeze.config.registerAdapter("uriBuilder", ctor);
 
-})();
+}));
+
+
 
 
 

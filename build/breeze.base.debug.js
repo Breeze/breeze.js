@@ -1649,8 +1649,8 @@ var __config = (function () {
   __config.interfaceRegistry = {
     ajax: new InterfaceDef("ajax"),
     modelLibrary: new InterfaceDef("modelLibrary"),
-    dataService: new InterfaceDef("dataService")
-    // uriBuilder: new InterfaceDef("uriBuilder")
+    dataService: new InterfaceDef("dataService"),
+    uriBuilder: new InterfaceDef("uriBuilder")
   };
 
   __config.interfaceRegistry.modelLibrary.getDefaultInstance = function () {
@@ -1752,7 +1752,7 @@ var __config = (function () {
         .whereParam("dataService").isOptional()
         .whereParam("modelLibrary").isOptional()
         .whereParam("ajax").isOptional()
-      // .whereParam("uriBuilder").isOptional()
+        .whereParam("uriBuilder").isOptional()
         .applyAll(this, false);
     return __objectMap(config, __config.initializeAdapterInstance);
 
@@ -5945,13 +5945,14 @@ var DataService = (function () {
    @param config {Object}
    @param config.serviceName {String} The name of the service.
    @param [config.adapterName] {String} The name of the dataServiceAdapter to be used with this service.
+   @param [config.uriBuilderName] {String} The name of the uriBuilder to be used with this service.
    @param [config.hasServerMetadata] {bool} Whether the server can provide metadata for this service.
    @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
    @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
    **/
 
   var ctor = function (config) {
-    this.uriBuilder = uriBuilderForOData;
+    // this.uriBuilder = uriBuilderForOData;
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;
@@ -6019,14 +6020,14 @@ var DataService = (function () {
       useJsonp: false
     });
     var ds = new DataService(__resolveProperties(dataServices,
-        ["serviceName", "adapterName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
+        ["serviceName", "adapterName", "uriBuilderName", "hasServerMetadata", "jsonResultsAdapter", "useJsonp"]));
 
     if (!ds.serviceName) {
       throw new Error("Unable to resolve a 'serviceName' for this dataService");
     }
     ds.adapterInstance = ds.adapterInstance || __config.getAdapterInstance("dataService", ds.adapterName);
     ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
-
+    ds.uriBuilder = ds.uriBuilder || __config.getAdapterInstance("uriBuilder", ds.uriBuilderName);
     return ds;
   };
 
@@ -6035,13 +6036,14 @@ var DataService = (function () {
       assertConfig(config)
           .whereParam("serviceName").isOptional()
           .whereParam("adapterName").isString().isOptional()
+          .whereParam("uriBuilderName").isString().isOptional()
           .whereParam("hasServerMetadata").isBoolean().isOptional()
           .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
           .whereParam("useJsonp").isBoolean().isOptional()
           .applyAll(obj);
       obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
       obj.adapterInstance = obj.adapterName && __config.getAdapterInstance("dataService", obj.adapterName);
-
+      obj.uriBuilder = obj.uriBuilderName && __config.getAdapterInstance("uriBuilder", obj.uriBuilderName);
     }
     return obj;
   }
@@ -6060,6 +6062,7 @@ var DataService = (function () {
     return __toJson(this, {
       serviceName: null,
       adapterName: null,
+      uriBuilderName: null,
       hasServerMetadata: null,
       jsonResultsAdapter: function (v) {
         return v && v.name;
@@ -6073,7 +6076,7 @@ var DataService = (function () {
     return new DataService(json);
   };
 
-  proto.makeUrl = function (suffix) {
+  proto.qualifyUrl = function (suffix) {
     var url = this.serviceName;
     // remove any trailing "/"
     if (core.stringEndsWith(url, "/")) {
@@ -9670,12 +9673,16 @@ breeze.NamingConvention = NamingConvention;
       var pred = new AndOrPredicate("and", __arraySlice(arguments));
       // return undefined if empty
       return pred.op && pred;
-    }
+    };
 
     ctor.or = function () {
       var pred = new AndOrPredicate("or", __arraySlice(arguments));
       return pred.op && pred;
-    }
+    };
+
+    ctor.not = function(pred) {
+      return pred.not();
+    };
 
     ctor.attachVisitor = function (visitor) {
       var fnName = visitor.config.fnName;
@@ -11263,7 +11270,7 @@ breeze.Predicate = Predicate;
         return v ? ( __isString(v) ? v : v.name) : undefined;
       },
       "where,wherePredicate": function(v) {
-        return v ? v.toJSON(that.fromEntityType) : undefined;
+        return v ? v.toJSONExt(this.fromEntityType) : undefined;
       },
       "orderBy,orderByClause": null,
       "select,selectClause": null,
@@ -11464,7 +11471,8 @@ breeze.Predicate = Predicate;
 
   // for testing
   proto._toUri = function (em) {
-    return em.dataService.uriBuilder.buildUri(this, em.metadataStore);
+    var ds = DataService.resolve([em.dataService]);
+    return ds.uriBuilder.buildUri(this, em.metadataStore);
   }
 
 // private functions
@@ -12151,9 +12159,52 @@ breeze.FetchStrategy = FetchStrategy;
 breeze.MergeStrategy = MergeStrategy;
 
 
-;var uriBuilderForOData = (function () {
+;var uriBuilderForJson = (function () {
 
   var buildUri = function (entityQuery, metadataStore) {
+    // force entityType validation;
+    var entityType = entityQuery._getFromEntityType(metadataStore, false);
+
+    var json = entityQuery.toJSON();
+    json.from = undefined;
+    json.queryOptions = undefined;
+
+    var jsonString = JSON.stringify(json);
+    var urlBody = uriEncodeComponent(jsonString);
+    return entityQuery.resourceName + "?" + urlBody;
+
+  };
+
+  return {
+    buildUri: buildUri
+  };
+
+})();
+
+
+
+;(function (factory) {
+  if (breeze) {
+    factory(breeze);
+  } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+    // CommonJS or Node: hard-coded dependency on "breeze"
+    factory(require("breeze"));
+  } else if (typeof define === "function" && define["amd"] && !breeze) {
+    // AMD anonymous module with hard-coded dependency on "breeze"
+    define(["breeze"], factory);
+  }
+}(function (breeze) {
+  "use strict";
+  var EntityType = breeze.EntityType;
+
+  var ctor = function() {
+    this.name = "odata";
+  };
+  var proto = ctor.prototype;
+
+  proto.initialize = function() {};
+
+  proto.buildUri = function (entityQuery, metadataStore) {
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
     if (!entityType) {
@@ -12245,7 +12296,7 @@ breeze.MergeStrategy = MergeStrategy;
   };
 
   // toODataFragment visitor
-  Predicate.attachVisitor(function () {
+  breeze.Predicate.attachVisitor(function () {
     var visitor = {
       config: { fnName: "toODataFragment"   },
 
@@ -12296,7 +12347,7 @@ breeze.MergeStrategy = MergeStrategy;
         } else {
           prefix = "x1";
         }
-        var newConfig = __extend({}, context);
+        var newConfig = breeze.core.extend({}, context);
         newConfig.entityType = this.expr.dataType;
         newConfig.prefix = prefix;
         return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
@@ -12337,11 +12388,11 @@ breeze.MergeStrategy = MergeStrategy;
     return visitor;
   }());
 
-  return {
-    buildUri: buildUri
-  };
+  breeze.config.registerAdapter("uriBuilder", ctor);
 
-})();
+}));
+
+
 
 
 
@@ -14895,7 +14946,7 @@ var MappingContext = (function () {
     } else {
       throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
     }
-    return  this.dataService.makeUrl(uriString);
+    return  this.dataService.qualifyUrl(uriString);
   }
 
   proto.visitAndMerge = function (nodes, nodeContext) {
@@ -15371,7 +15422,7 @@ breeze.SaveOptions = SaveOptions;
 
   proto.fetchMetadata = function (metadataStore, dataService) {
     var serviceName = dataService.serviceName;
-    var url = dataService.makeUrl("Metadata");
+    var url = dataService.qualifyUrl("Metadata");
 
     var deferred = Q.defer();
 
@@ -15457,7 +15508,7 @@ breeze.SaveOptions = SaveOptions;
     saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
     var bundle = JSON.stringify(saveBundle);
 
-    var url = saveContext.dataService.makeUrl(saveContext.resourceName);
+    var url = saveContext.dataService.qualifyUrl(saveContext.resourceName);
 
     ajaxImpl.ajax({
       type: "POST",
@@ -15674,7 +15725,8 @@ breeze.SaveOptions = SaveOptions;
 ;
 // set defaults
 // will no longer fail at initialization time if jQuery is not found.
-breeze.config.initializeAdapterInstances( { dataService: "webApi", ajax: "jQuery" });
+breeze.config.initializeAdapterInstances( { dataService: "webApi", ajax: "jQuery", uriBuilder: "odata" });
+
 
 var ko = __requireLibCore("ko");
 

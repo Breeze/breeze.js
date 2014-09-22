@@ -37,7 +37,7 @@ var MappingContext = (function () {
     } else {
       throw new Error("unable to recognize query parameter as either a string or an EntityQuery");
     }
-    return  this.dataService.makeUrl(uriString);
+    return  this.dataService.qualifyUrl(uriString);
   }
 
   proto.visitAndMerge = function (nodes, nodeContext) {

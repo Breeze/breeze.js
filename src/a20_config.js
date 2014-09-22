@@ -34,8 +34,8 @@ var __config = (function () {
   __config.interfaceRegistry = {
     ajax: new InterfaceDef("ajax"),
     modelLibrary: new InterfaceDef("modelLibrary"),
-    dataService: new InterfaceDef("dataService")
-    // uriBuilder: new InterfaceDef("uriBuilder")
+    dataService: new InterfaceDef("dataService"),
+    uriBuilder: new InterfaceDef("uriBuilder")
   };
 
   __config.interfaceRegistry.modelLibrary.getDefaultInstance = function () {
@@ -137,7 +137,7 @@ var __config = (function () {
         .whereParam("dataService").isOptional()
         .whereParam("modelLibrary").isOptional()
         .whereParam("ajax").isOptional()
-      // .whereParam("uriBuilder").isOptional()
+        .whereParam("uriBuilder").isOptional()
         .applyAll(this, false);
     return __objectMap(config, __config.initializeAdapterInstance);
 

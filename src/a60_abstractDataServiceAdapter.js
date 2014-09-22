@@ -25,7 +25,7 @@
 
   proto.fetchMetadata = function (metadataStore, dataService) {
     var serviceName = dataService.serviceName;
-    var url = dataService.makeUrl("Metadata");
+    var url = dataService.qualifyUrl("Metadata");
 
     var deferred = Q.defer();
 
@@ -111,7 +111,7 @@
     saveBundle = adapter._prepareSaveBundle(saveContext, saveBundle);
     var bundle = JSON.stringify(saveBundle);
 
-    var url = saveContext.dataService.makeUrl(saveContext.resourceName);
+    var url = saveContext.dataService.qualifyUrl(saveContext.resourceName);
 
     ajaxImpl.ajax({
       type: "POST",

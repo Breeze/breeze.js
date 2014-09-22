@@ -64,7 +64,7 @@
     var deferred = Q.defer();
 
     var serviceName = dataService.serviceName;
-    var url = dataService.makeUrl('$metadata');
+    var url = dataService.qualifyUrl('$metadata');
     // OData.read(url,
     OData.read({
           requestUri: url,
@@ -113,7 +113,7 @@
     var adapter = saveContext.adapter = this;
     var deferred = Q.defer();
     saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
-    var url = saveContext.dataService.makeUrl("$batch");
+    var url = saveContext.dataService.qualifyUrl("$batch");
 
     var requestData = createChangeRequests(saveContext, saveBundle);
     var tempKeys = saveContext.tempKeys;
