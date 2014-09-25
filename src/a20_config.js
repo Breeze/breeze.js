@@ -180,20 +180,19 @@ var __config = (function () {
   __config.getAdapterInstance = function (interfaceName, adapterName) {
     var idef = getInterfaceDef(interfaceName);
     var impl;
-    if (adapterName && adapterName !== "") {
-      impl = idef.getImpl(adapterName);
-      return impl ? impl.defaultInstance : null;
+
+    var isDefault = adapterName == null || adapterName == "";
+    if (isDefault) {
+      if (idef.defaultInstance) return idef.defaultInstance;
+      impl = idef.getFirstImpl();
     } else {
-      if (idef.defaultInstance) {
-        return idef.defaultInstance;
-      } else {
-        impl = idef.getFirstImpl();
-        if (impl.defaultInstance) {
-          return impl.defaultInstance;
-        } else {
-          return initializeAdapterInstanceCore(idef, impl, true);
-        }
-      }
+      impl = idef.getImpl(adapterName);
+    }
+    if (!impl) return null;
+    if (impl.defaultInstance) {
+      return impl.defaultInstance;
+    } else {
+      return initializeAdapterInstanceCore(idef, impl, isDefault);
     }
   };
 

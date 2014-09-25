@@ -503,6 +503,10 @@ function __noop() {
   // does nothing
 }
 
+function __identity(x) {
+  return x;
+}
+
 function __classof(o) {
   if (o === null) {
     return "null";

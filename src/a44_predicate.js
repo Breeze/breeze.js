@@ -69,8 +69,9 @@
 
     var _nodeMap = {};
 
-    ctor._registerProto = function (name, proto, validateFn) {
-      _nodeMap[name.toLowerCase()] = proto;
+    ctor._registerProto = function (typeName, proto, validateFn) {
+      _nodeMap[typeName.toLowerCase()] = proto;
+      proto.typeName = typeName;
       // perf improvement so that we don't keep revalidating
       proto.validate = validateFn ? cacheValidation(validateFn) : __noop;
     };
@@ -103,8 +104,8 @@
       return JSON.stringify(this);
     };
 
-    proto._initialize = function (name, validateFn, map) {
-      ctor._registerProto(name, this, validateFn);
+    proto._initialize = function (typeName, validateFn, map) {
+      ctor._registerProto(typeName, this, validateFn);
       var aliasMap = {};
       for (var key in (map || {})) {
         var value = map[key];
@@ -847,8 +848,8 @@
 
       propExpr: function (context) {
         if (context.toServer) {
-          var entityType = context.entityType;
-          return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
+          // '/' is the OData path delimiter
+          return context.entityType.clientPropertyPathToServer(this.propertyPath, "/");
         } else {
           return this.propertyPath;
         }

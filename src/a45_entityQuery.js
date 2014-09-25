@@ -627,19 +627,29 @@
   };
 
   proto.toJSON = function() {
+    return this.toJSONExt();
+  }
+
+  proto.toJSONExt = function(context) {
+    context = context || {};
+    context.entityType = this.fromEntityType;
+    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer : __identity;
+
     var that = this;
+
+    var toJSONExtFn = function(v) {
+      return v ? v.toJSONExt(context) : undefined;
+    };
     return __toJson(this, {
       "from,resourceName": null,
       "toType,resultEntityType": function(v) {
         // resultEntityType can be either a string or an entityType
         return v ? ( __isString(v) ? v : v.name) : undefined;
       },
-      "where,wherePredicate": function(v) {
-        return v ? v.toJSONExt(this.fromEntityType) : undefined;
-      },
-      "orderBy,orderByClause": null,
-      "select,selectClause": null,
-      "expand,expandClause": null,
+      "where,wherePredicate": toJSONExtFn,
+      "orderBy,orderByClause": toJSONExtFn,
+      "select,selectClause": toJSONExtFn,
+      "expand,expandClause": toJSONExtFn,
       "skip,skipCount": null,
       "take,takeCount": null,
       parameters: function(v) {
@@ -1140,9 +1150,9 @@ var OrderByClause = (function () {
     };
   };
 
-  proto.toJSON = function() {
+  proto.toJSONExt = function(context) {
     return this.items.map(function(item) {
-      return item.propertyPath + (item.isDesc ? " desc" : "");
+      return  context.propertyPathFn(item.propertyPath) + (item.isDesc ? " desc" : "");
     });
   };
 
@@ -1246,8 +1256,10 @@ var SelectClause = (function () {
     };
   };
 
-  proto.toJSON = function() {
-    return this.propertyPaths;
+  proto.toJSONExt = function(context) {
+    return this.propertyPaths.map(function(pp) {
+      return context.propertyPathFn(pp);
+    })
   };
 
   return ctor;
@@ -1262,14 +1274,16 @@ var ExpandClause = (function () {
   };
   var proto = ctor.prototype;
 
-  proto.toJSON = function() {
-    return this.propertyPaths;
+  proto.toJSONExt = function(context) {
+    return this.propertyPaths.map(function(pp) {
+      return context.propertyPathFn(pp);
+    })
   };
 
   return ctor;
 })();
 
-// also used by Predicate
+// used by EntityQuery and Predicate
 function getPropertyPathValue(obj, propertyPath) {
   var properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(".");
   if (properties.length === 1) {

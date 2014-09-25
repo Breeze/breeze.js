@@ -10,7 +10,6 @@
   }
 }(function (breeze) {
   "use strict";
-  var EntityType = breeze.EntityType;
 
   var ctor = function() {
     this.name = "json";
@@ -23,12 +22,12 @@
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
 
-    var json = entityQuery.toJSON();
+    var json = entityQuery.toJSONExt( { onServer: true});
     json.from = undefined;
     json.queryOptions = undefined;
 
     var jsonString = JSON.stringify(json);
-    var urlBody = uriEncodeComponent(jsonString);
+    var urlBody = encodeURIComponent(jsonString);
     return entityQuery.resourceName + "?" + urlBody;
 
   };

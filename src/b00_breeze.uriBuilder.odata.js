@@ -61,7 +61,7 @@
       if (!orderByClause) return;
       orderByClause.validate(entityType);
       var strings = orderByClause.items.map(function (item) {
-        return entityType._clientPropertyPathToServer(item.propertyPath) + (item.isDesc ? " desc" : "");
+        return entityType.clientPropertyPathToServer(item.propertyPath, "/") + (item.isDesc ? " desc" : "");
       });
       // should return something like CompanyName,Address/City desc
       return strings.join(',');
@@ -71,7 +71,7 @@
       if (!selectClause) return;
       selectClause.validate(entityType);
       var frag = selectClause.propertyPaths.map(function (pp) {
-        return entityType._clientPropertyPathToServer(pp);
+        return  entityType.clientPropertyPathToServer(pp, "/");
       }).join(",");
       return frag;
     };
@@ -81,7 +81,7 @@
       // no validate on expand clauses currently.
       // expandClause.validate(entityType);
       var frag = expandClause.propertyPaths.map(function (pp) {
-        return entityType._clientPropertyPathToServer(pp);
+        return entityType.clientPropertyPathToServer(pp, "/");
       }).join(",");
       return frag;
     };
@@ -107,8 +107,10 @@
         return "";
       }
     }
-
   };
+
+
+
 
   // toODataFragment visitor
   breeze.Predicate.attachVisitor(function () {
@@ -174,7 +176,8 @@
 
       propExpr: function (context) {
         var entityType = context.entityType;
-        return entityType ? entityType._clientPropertyPathToServer(this.propertyPath) : this.propertyPath;
+        // '/' is the OData path delimiter
+        return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
       },
 
       fnExpr: function (context) {

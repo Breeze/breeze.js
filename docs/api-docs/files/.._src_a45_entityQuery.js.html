@@ -832,19 +832,29 @@
   };
 
   proto.toJSON = function() {
+    return this.toJSONExt();
+  }
+
+  proto.toJSONExt = function(context) {
+    context = context || {};
+    context.entityType = this.fromEntityType;
+    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer : __identity;
+
     var that = this;
+
+    var toJSONExtFn = function(v) {
+      return v ? v.toJSONExt(context) : undefined;
+    };
     return __toJson(this, {
       &quot;from,resourceName&quot;: null,
       &quot;toType,resultEntityType&quot;: function(v) {
         // resultEntityType can be either a string or an entityType
         return v ? ( __isString(v) ? v : v.name) : undefined;
       },
-      &quot;where,wherePredicate&quot;: function(v) {
-        return v ? v.toJSONExt(this.fromEntityType) : undefined;
-      },
-      &quot;orderBy,orderByClause&quot;: null,
-      &quot;select,selectClause&quot;: null,
-      &quot;expand,expandClause&quot;: null,
+      &quot;where,wherePredicate&quot;: toJSONExtFn,
+      &quot;orderBy,orderByClause&quot;: toJSONExtFn,
+      &quot;select,selectClause&quot;: toJSONExtFn,
+      &quot;expand,expandClause&quot;: toJSONExtFn,
       &quot;skip,skipCount&quot;: null,
       &quot;take,takeCount&quot;: null,
       parameters: function(v) {
@@ -1345,9 +1355,9 @@ var OrderByClause = (function () {
     };
   };
 
-  proto.toJSON = function() {
+  proto.toJSONExt = function(context) {
     return this.items.map(function(item) {
-      return item.propertyPath + (item.isDesc ? &quot; desc&quot; : &quot;&quot;);
+      return  context.propertyPathFn(item.propertyPath) + (item.isDesc ? &quot; desc&quot; : &quot;&quot;);
     });
   };
 
@@ -1451,8 +1461,10 @@ var SelectClause = (function () {
     };
   };
 
-  proto.toJSON = function() {
-    return this.propertyPaths;
+  proto.toJSONExt = function(context) {
+    return this.propertyPaths.map(function(pp) {
+      return context.propertyPathFn(pp);
+    })
   };
 
   return ctor;
@@ -1467,14 +1479,16 @@ var ExpandClause = (function () {
   };
   var proto = ctor.prototype;
 
-  proto.toJSON = function() {
-    return this.propertyPaths;
+  proto.toJSONExt = function(context) {
+    return this.propertyPaths.map(function(pp) {
+      return context.propertyPathFn(pp);
+    })
   };
 
   return ctor;
 })();
 
-// also used by Predicate
+// used by EntityQuery and Predicate
 function getPropertyPathValue(obj, propertyPath) {
   var properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(&quot;.&quot;);
   if (properties.length === 1) {
