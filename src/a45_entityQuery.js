@@ -632,8 +632,8 @@
 
   proto.toJSONExt = function(context) {
     context = context || {};
-    context.entityType = this.fromEntityType;
-    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer : __identity;
+    context.entityType = context.entityType || this.fromEntityType;
+    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer.bind(context.entityType) : __identity;
 
     var that = this;
 
@@ -1014,7 +1014,7 @@ var FilterQueryOp = (function () {
    @final
    @static
    **/
-  aEnum.Contains = aEnum.addSymbol({ operator: "substringof"  });
+  aEnum.Contains = aEnum.addSymbol({ operator: "contains"  });
   /**
    @property StartsWith {FilterQueryOp}
    @final

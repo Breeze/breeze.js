@@ -1947,8 +1947,7 @@ var EntityType = (function () {
    @return {DataProperty} Will be null if not found.
    **/
   proto.getDataProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? &quot;nameOnServer&quot; : &quot;name&quot;;
-    return __arrayFirst(this.dataProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.dataProperties, __propEq(&quot;name&quot;, propertyName));
   };
 
   /**
@@ -1962,8 +1961,7 @@ var EntityType = (function () {
    @return {NavigationProperty} Will be null if not found.
    **/
   proto.getNavigationProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? &quot;nameOnServer&quot; : &quot;name&quot;;
-    return __arrayFirst(this.navigationProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.navigationProperties, __propEq(&quot;name&quot;, propertyName));
   };
 
   /**
@@ -1990,19 +1988,17 @@ var EntityType = (function () {
   };
 
   proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
-    var key = this.metadataStore.onServer ? &quot;nameOnServer&quot; : &quot;name&quot;;
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split(&#x27;.&#x27;);
 
     var ok = true;
     var parentType = this;
     var props = propertyNames.map(function (propName) {
-      var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
+      var prop = __arrayFirst(parentType.getProperties(), __propEq(&quot;name&quot;, propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
-        var clientOrServer = parentType.metadataStore.onServer ? &quot; server &quot; : &quot; client &quot;;
-        throw new Error(&quot;unable to locate &quot; +  clientOrServer + &quot; property: &quot; + propName + &quot; on entityType: &quot; + parentType.name);
+        throw new Error(&quot;unable to locate property: &quot; + propName + &quot; on entityType: &quot; + parentType.name);
       } else {
         ok = false;
       }

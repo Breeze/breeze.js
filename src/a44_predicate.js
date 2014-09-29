@@ -801,12 +801,17 @@
 
       binaryPredicate: function (context) {
         var json = {};
+        var expr1Val = this.expr1.toJSONExt(context);
+        var expr2Val = this.expr2.toJSONExt(context);
+        if (this.expr2 instanceof PropExpr) {
+          expr2Val = { value: expr2Val, isProperty: true };
+        }
         if (this.op.key === "eq") {
-          json[this.expr1Source] = this.expr2.toJSONExt(context);
+          json[expr1Val] = expr2Val;
         } else {
           var value = {};
-          json[this.expr1Source] = value;
-          value[this.op.key] = this.expr2.toJSONExt(context);
+          json[expr1Val] = value;
+          value[this.op.key] = expr2Val;
         }
         return json;
       },
@@ -816,13 +821,15 @@
         var jsonValues = this.preds.map(function (pred) {
           return pred.toJSONExt(context);
         });
+        // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
-        if (this.op.key == 'or' || jsonValues.some(__isString)) {
+        if (this.op.key === 'and' && jsonValues.length === 2 && !jsonValues.some(__isString)) {
+          // normalize 'and' clauses - will return null if can't be combined.
+          json = jsonValues.reduce(combine);
+        }
+        if (json == null) {
           json = {};
           json[this.op.key] = jsonValues;
-        } else {
-          // normalize 'and' clauses
-          json = jsonValues.reduce(combine);
         }
         return json;
       },
@@ -830,11 +837,12 @@
       anyAllPredicate: function (context) {
         var json = {};
         var value = {};
-
+        var expr1Val = this.expr.toJSONExt(context);
         var newContext = __extend({}, context);
         newContext.entityType = this.expr.dataType;
         value[this.op.key] = this.pred.toJSONExt(newContext);
-        json[this.exprSource] = value;
+
+        json[expr1Val] = value;
         return json;
       },
 
@@ -847,13 +855,13 @@
       },
 
       propExpr: function (context) {
-        if (context.toServer) {
-          // '/' is the OData path delimiter
-          return context.entityType.clientPropertyPathToServer(this.propertyPath, "/");
+        if (context.onServer) {
+          return context.entityType.clientPropertyPathToServer(this.propertyPath);
         } else {
           return this.propertyPath;
         }
       },
+
       fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
           return expr.toJSONExt(context);
@@ -863,14 +871,21 @@
     };
 
     function combine(j1, j2) {
-      Object.keys(j2).forEach(function (key) {
+      var ok = Object.keys(j2).every(function (key) {
         if (j1.hasOwnProperty(key)) {
-          combine(j1[key], j2[key]);
+          if (typeof(j2[key]) != 'object') {
+            // exit and indicate that we can't combine
+            return false;
+          }
+          if (combine(j1[key], j2[key]) == null) {
+            return false;
+          }
         } else {
           j1[key] = j2[key];
         }
-      })
-      return j1;
+        return true;
+      });
+      return ok ? j1 : null;
     }
 
     return visitor;
@@ -949,7 +964,7 @@
       // TODO: get rid of isAnonymous below when we get the chance.
       if (entityType == null || entityType.isAnonymous) {
         // this fork will only be reached on the LHS of an BinaryPredicate -
-        // a RHS expr cannot get here.
+        // a RHS expr cannot get here with an anon type
         return new PropExpr(value);
       } else {
         var mayBeIdentifier = RX_IDENTIFIER.test(value);
@@ -980,6 +995,7 @@
       // a dataType of Undefined on a context basically means not to try parsing
       // the value if the expr is a literal
       newContext.dataType = DataType.Undefined;
+      newContext.isFnArg = true;
       var exprArgs = args.map(function (a) {
         return parseExpr(a, tokens, newContext);
       });

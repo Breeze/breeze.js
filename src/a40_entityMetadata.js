@@ -1742,8 +1742,7 @@ var EntityType = (function () {
    @return {DataProperty} Will be null if not found.
    **/
   proto.getDataProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? "nameOnServer" : "name";
-    return __arrayFirst(this.dataProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.dataProperties, __propEq("name", propertyName));
   };
 
   /**
@@ -1757,8 +1756,7 @@ var EntityType = (function () {
    @return {NavigationProperty} Will be null if not found.
    **/
   proto.getNavigationProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? "nameOnServer" : "name";
-    return __arrayFirst(this.navigationProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.navigationProperties, __propEq("name", propertyName));
   };
 
   /**
@@ -1785,19 +1783,17 @@ var EntityType = (function () {
   };
 
   proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
-    var key = this.metadataStore.onServer ? "nameOnServer" : "name";
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
     var props = propertyNames.map(function (propName) {
-      var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
+      var prop = __arrayFirst(parentType.getProperties(), __propEq("name", propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
-        var clientOrServer = parentType.metadataStore.onServer ? " server " : " client ";
-        throw new Error("unable to locate " +  clientOrServer + " property: " + propName + " on entityType: " + parentType.name);
+        throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
       } else {
         ok = false;
       }

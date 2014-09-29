@@ -21,8 +21,8 @@
   proto.buildUri = function (entityQuery, metadataStore) {
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
-
-    var json = entityQuery.toJSONExt( { onServer: true});
+    if (!entityType) entityType = new EntityType(metadataStore);
+    var json = entityQuery.toJSONExt( { entityType: entityType, onServer: true});
     json.from = undefined;
     json.queryOptions = undefined;
 

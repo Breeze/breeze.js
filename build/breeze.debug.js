@@ -7916,8 +7916,7 @@ var EntityType = (function () {
    @return {DataProperty} Will be null if not found.
    **/
   proto.getDataProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? "nameOnServer" : "name";
-    return __arrayFirst(this.dataProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.dataProperties, __propEq("name", propertyName));
   };
 
   /**
@@ -7931,8 +7930,7 @@ var EntityType = (function () {
    @return {NavigationProperty} Will be null if not found.
    **/
   proto.getNavigationProperty = function (propertyName) {
-    var propName = this.metadataStore.onServer ? "nameOnServer" : "name";
-    return __arrayFirst(this.navigationProperties, __propEq(propName, propertyName));
+    return __arrayFirst(this.navigationProperties, __propEq("name", propertyName));
   };
 
   /**
@@ -7959,19 +7957,17 @@ var EntityType = (function () {
   };
 
   proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
-    var key = this.metadataStore.onServer ? "nameOnServer" : "name";
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
     var props = propertyNames.map(function (propName) {
-      var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
+      var prop = __arrayFirst(parentType.getProperties(), __propEq("name", propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
-        var clientOrServer = parentType.metadataStore.onServer ? " server " : " client ";
-        throw new Error("unable to locate " +  clientOrServer + " property: " + propName + " on entityType: " + parentType.name);
+        throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
       } else {
         ok = false;
       }
@@ -10446,12 +10442,17 @@ breeze.NamingConvention = NamingConvention;
 
       binaryPredicate: function (context) {
         var json = {};
+        var expr1Val = this.expr1.toJSONExt(context);
+        var expr2Val = this.expr2.toJSONExt(context);
+        if (this.expr2 instanceof PropExpr) {
+          expr2Val = { value: expr2Val, isProperty: true };
+        }
         if (this.op.key === "eq") {
-          json[this.expr1Source] = this.expr2.toJSONExt(context);
+          json[expr1Val] = expr2Val;
         } else {
           var value = {};
-          json[this.expr1Source] = value;
-          value[this.op.key] = this.expr2.toJSONExt(context);
+          json[expr1Val] = value;
+          value[this.op.key] = expr2Val;
         }
         return json;
       },
@@ -10461,13 +10462,15 @@ breeze.NamingConvention = NamingConvention;
         var jsonValues = this.preds.map(function (pred) {
           return pred.toJSONExt(context);
         });
+        // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
-        if (this.op.key == 'or' || jsonValues.some(__isString)) {
+        if (this.op.key === 'and' && jsonValues.length === 2 && !jsonValues.some(__isString)) {
+          // normalize 'and' clauses - will return null if can't be combined.
+          json = jsonValues.reduce(combine);
+        }
+        if (json == null) {
           json = {};
           json[this.op.key] = jsonValues;
-        } else {
-          // normalize 'and' clauses
-          json = jsonValues.reduce(combine);
         }
         return json;
       },
@@ -10475,11 +10478,12 @@ breeze.NamingConvention = NamingConvention;
       anyAllPredicate: function (context) {
         var json = {};
         var value = {};
-
+        var expr1Val = this.expr.toJSONExt(context);
         var newContext = __extend({}, context);
         newContext.entityType = this.expr.dataType;
         value[this.op.key] = this.pred.toJSONExt(newContext);
-        json[this.exprSource] = value;
+
+        json[expr1Val] = value;
         return json;
       },
 
@@ -10492,13 +10496,13 @@ breeze.NamingConvention = NamingConvention;
       },
 
       propExpr: function (context) {
-        if (context.toServer) {
-          // '/' is the OData path delimiter
-          return context.entityType.clientPropertyPathToServer(this.propertyPath, "/");
+        if (context.onServer) {
+          return context.entityType.clientPropertyPathToServer(this.propertyPath);
         } else {
           return this.propertyPath;
         }
       },
+
       fnExpr: function (context) {
         var frags = this.exprArgs.map(function (expr) {
           return expr.toJSONExt(context);
@@ -10508,14 +10512,21 @@ breeze.NamingConvention = NamingConvention;
     };
 
     function combine(j1, j2) {
-      Object.keys(j2).forEach(function (key) {
+      var ok = Object.keys(j2).every(function (key) {
         if (j1.hasOwnProperty(key)) {
-          combine(j1[key], j2[key]);
+          if (typeof(j2[key]) != 'object') {
+            // exit and indicate that we can't combine
+            return false;
+          }
+          if (combine(j1[key], j2[key]) == null) {
+            return false;
+          }
         } else {
           j1[key] = j2[key];
         }
-      })
-      return j1;
+        return true;
+      });
+      return ok ? j1 : null;
     }
 
     return visitor;
@@ -10594,7 +10605,7 @@ breeze.NamingConvention = NamingConvention;
       // TODO: get rid of isAnonymous below when we get the chance.
       if (entityType == null || entityType.isAnonymous) {
         // this fork will only be reached on the LHS of an BinaryPredicate -
-        // a RHS expr cannot get here.
+        // a RHS expr cannot get here with an anon type
         return new PropExpr(value);
       } else {
         var mayBeIdentifier = RX_IDENTIFIER.test(value);
@@ -10625,6 +10636,7 @@ breeze.NamingConvention = NamingConvention;
       // a dataType of Undefined on a context basically means not to try parsing
       // the value if the expr is a literal
       newContext.dataType = DataType.Undefined;
+      newContext.isFnArg = true;
       var exprArgs = args.map(function (a) {
         return parseExpr(a, tokens, newContext);
       });
@@ -11281,8 +11293,8 @@ breeze.Predicate = Predicate;
 
   proto.toJSONExt = function(context) {
     context = context || {};
-    context.entityType = this.fromEntityType;
-    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer : __identity;
+    context.entityType = context.entityType || this.fromEntityType;
+    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer.bind(context.entityType) : __identity;
 
     var that = this;
 
@@ -11663,7 +11675,7 @@ var FilterQueryOp = (function () {
    @final
    @static
    **/
-  aEnum.Contains = aEnum.addSymbol({ operator: "substringof"  });
+  aEnum.Contains = aEnum.addSymbol({ operator: "contains"  });
   /**
    @property StartsWith {FilterQueryOp}
    @final
@@ -16870,8 +16882,8 @@ breeze.SaveOptions = SaveOptions;
   proto.buildUri = function (entityQuery, metadataStore) {
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
-
-    var json = entityQuery.toJSONExt( { onServer: true});
+    if (!entityType) entityType = new EntityType(metadataStore);
+    var json = entityQuery.toJSONExt( { entityType: entityType, onServer: true});
     json.from = undefined;
     json.queryOptions = undefined;
 
