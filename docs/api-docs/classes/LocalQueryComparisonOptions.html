@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -452,17 +454,17 @@ inequality predicates, and not with operations like &#39;startsWith&#39;, &#39;e
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// create a &#39;caseSensitive - non SQL&#39; instance.
+                <pre class="code prettyprint"><code>// create a &#39;caseSensitive - non SQL&#39; instance.
 var lqco = new LocalQueryComparisonOptions({
-         name: &quot;caseSensitive-nonSQL&quot;
-         isCaseSensitive: true;
-         usesSql92CompliantStringComparison: false;
-     });
+        name: &quot;caseSensitive-nonSQL&quot;
+        isCaseSensitive: true;
+        usesSql92CompliantStringComparison: false;
+    });
 // either apply it globally
 lqco.setAsDefault();
 // or to a specific MetadataStore
 var ms = new MetadataStore({ localQueryComparisonOptions: lqco });
-var em = new EntityManager( { metadataStore: ms });</p>
+var em = new EntityManager( { metadataStore: ms });</code></pre>
 
             </div>
         </div>
@@ -529,11 +531,11 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var lqco = new LocalQueryComparisonOptions({
-         isCaseSensitive: false;
-         usesSql92CompliantStringComparison: true;
-     });
-lqco.setAsDefault();</p>
+                <pre class="code prettyprint"><code>var lqco = new LocalQueryComparisonOptions({
+    isCaseSensitive: false;
+    usesSql92CompliantStringComparison: true;
+});</code></pre>
+<p>lqco.setAsDefault();</p>
 
             </div>
         </div>

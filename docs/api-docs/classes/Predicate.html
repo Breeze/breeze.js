@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Event</title>
+    <title>Predicate</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 <!-- commenting out until beta goes live	<link rel="stylesheet" href="http://breezejs.com/sites/all/themes/omega/alpha/css/apha-reset.css"> 
 -->    
@@ -201,7 +201,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Event Class</h1>
+                        <h1>Predicate Class</h1>
 <div class="box meta">
     
 
@@ -209,13 +209,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._.._src_a10_event.js.html#l10"><code>..\..\src\a10_event.js:10</code></a>
+            Defined in: <a href="../files/.._src_a44_predicate.js.html#l4"><code>..\src\a44_predicate.js:4</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/core.html">core</a>
+            Module: <a href="../modules/breeze.html">breeze</a>
         
     
 
@@ -225,7 +225,8 @@
 
 
 <div class="box intro">
-    <p>Class to support basic event publication and subscription semantics.</p>
+    <p>Used to define a &#39;where&#39; predicate for an EntityQuery.  Predicates are immutable, which means that any
+method that would modify a Predicate actually returns a new Predicate.</p>
 
 </div>
 
@@ -254,23 +255,14 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_&lt;ctor&gt; Event">&lt;ctor&gt; Event</a>
+                                <a href="#method_&lt;ctor&gt; Predicate">&lt;ctor&gt; Predicate</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_enable">enable</a>
-
-                                
-                                    <span class="flag static">static</span>
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_isEnabled">isEnabled</a>
+                                <a href="#method_and">and</a>
 
                                 
                                     <span class="flag static">static</span>
@@ -279,28 +271,48 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_publish">publish</a>
+                                <a href="#method_and">and</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_publishAsync">publishAsync</a>
+                                <a href="#method_create">create</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_not">not</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_not">not</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_subscribe">subscribe</a>
+                                <a href="#method_or">or</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_unsubscribe">unsubscribe</a>
+                                <a href="#method_or">or</a>
 
                                 
                                 
@@ -322,8 +334,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_&lt;ctor&gt; Event" class="method item">
-    <h3 class="name"><code>&lt;ctor&gt; Event</code></h3>
+                    <div id="method_&lt;ctor&gt; Predicate" class="method item">
+    <h3 class="name"><code>&lt;ctor&gt; Predicate</code></h3>
 
     
         <div class="args">
@@ -331,19 +343,19 @@
             
                 <li class="arg">
                     
-                        <code>name</code>
+                        <code>property</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>publisher</code>
+                        <code>operator</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code class="optional">[defaultErrorCallback]</code>
+                        <code>value</code>
                     
                 </li>
             
@@ -376,7 +388,7 @@
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l15"><code>..\..\src\a10_event.js:15</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l10"><code>..\src\a44_predicate.js:10</code></a>
         
         </p>
 
@@ -387,7 +399,7 @@
     </div>
 
     <div class="description">
-        <p>Constructor for an Event</p>
+        <p>Predicate constructor</p>
 
     </div>
 
@@ -399,8 +411,24 @@
             
                 <li class="param">
                     
-                        <code class="param-name">name</code>
+                        <code class="param-name">property</code>
                         <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A property name, a nested property name or an expression involving a property name.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">operator</code>
+                        <span class="type"><a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> | String</span>
                     
 
                     
@@ -414,54 +442,24 @@
             
                 <li class="param">
                     
-                        <code class="param-name">publisher</code>
+                        <code class="param-name">value</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The object that will be doing the publication. i.e. the object to which this event is attached.</p>
+                        <ul>
+<li>This will be treated as either a property expression or a literal depending on context.  In general,
+if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.
+In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#39;value&#39;
+property and an &#39;isLiteral&#39; property set to either true or false.  Breeze also tries to infer the dataType of any
+literal based on context, if this fails you can force this inference by making the value argument an object with a
+&#39;value&#39; property and a &#39;dataType&#39;property set to one of the breeze.DataType enumeration instances.</li>
+</ul>
 
                     </div>
 
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[defaultErrorCallback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>If omitted then subscriber notification failures will be ignored.</p>
-<p>errorCallback([e])</p>
-
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[e]</code>
-                                    <span class="type">Error</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Any error encountered during subscription execution.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
                     
                 </li>
             
@@ -476,7 +474,11 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>salaryEvent = new Event(&quot;salaryEvent&quot;, person);</code></pre>
+                <pre class="code prettyprint"><code>var p1 = new Predicate(&quot;CompanyName&quot;, &quot;StartsWith&quot;, &quot;B&quot;);
+var query = new EntityQuery(&quot;Customers&quot;).where(p1); </code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var p2 = new Predicate(&quot;Region&quot;, FilterQueryOp.Equals, null);
+var query = new EntityQuery(&quot;Customers&quot;).where(p2);</code></pre>
 
             </div>
         </div>
@@ -484,8 +486,8 @@
 </div>
 
                 
-                    <div id="method_enable" class="method item">
-    <h3 class="name"><code>enable</code></h3>
+                    <div id="method_and" class="method item">
+    <h3 class="name"><code>and</code></h3>
 
     
         <div class="args">
@@ -493,19 +495,7 @@
             
                 <li class="arg">
                     
-                        <code>eventName</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>target</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>isEnabled</code>
+                        <code>predicates</code>
                     
                 </li>
             
@@ -540,7 +530,7 @@
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l194"><code>..\..\src\a10_event.js:194</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l86"><code>..\src\a44_predicate.js:86</code></a>
         
         </p>
 
@@ -551,7 +541,7 @@
     </div>
 
     <div class="description">
-        <p>Enables or disables the named event for an object and all of its children.</p>
+        <p>Creates a &#39;composite&#39; Predicate by &#39;and&#39;ing a set of specified Predicates together.</p>
 
     </div>
 
@@ -563,47 +553,16 @@
             
                 <li class="param">
                     
-                        <code class="param-name">eventName</code>
-                        <span class="type">String</span>
+                        <code class="param-name">predicates</code>
+                        <span class="type">Multiple Predicates | Array of Predicate</span>
                     
 
                     
-
-                    <div class="param-description">
-                        <p>The name of the event.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">target</code>
-                        <span class="type">Object</span>
-                    
-
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
                     
 
                     <div class="param-description">
-                        <p>The object at which enabling or disabling will occur.  All event notifications that occur to this object or 
-children of this object will be enabled or disabled.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">isEnabled</code>
-                        <span class="type">Boolean | Null | Function</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>A boolean, a null or a function that returns either a boolean or a null.</p>
+                        <p>Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</p>
 
                     </div>
 
@@ -621,20 +580,14 @@ children of this object will be enabled or disabled.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>Event.enable(“propertyChanged”, myEntityManager, false) </code></pre>
-<p>will disable all EntityAspect.propertyChanged events within a EntityManager.</p>
-<pre class="code prettyprint"><code>Event.enable(“propertyChanged”, myEntityManager, true) </code></pre>
-<p>will enable all EntityAspect.propertyChanged events within a EntityManager.</p>
-<pre class="code prettyprint"><code>Event.enable(“propertyChanged”, myEntity.entityAspect, false) </code></pre>
-<p>will disable EntityAspect.propertyChanged events for a specific entity.</p>
-<pre class="code prettyprint"><code>Event.enable(“propertyChanged”, myEntity.entityAspect, null) </code></pre>
-<p>will removes any enabling / disabling at the entity aspect level so now any &#39;Event.enable&#39; calls at the EntityManager level, 
-made either previously or in the future, will control notification.</p>
-<pre class="code prettyprint"><code>Event.enable(“validationErrorsChanged”, myEntityManager, function(em) {     
-   return em.customTag === “blue”;
-})                 </code></pre>
-<p>will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager. 
-Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.</p>
+                <pre class="code prettyprint"><code>var dt = new Date(88, 9, 12);
+var p1 = Predicate.create(&quot;OrderDate&quot;, &quot;ne&quot;, dt);
+var p2 = Predicate.create(&quot;ShipCity&quot;, &quot;startsWith&quot;, &quot;C&quot;);
+var p3 = Predicate.create(&quot;Freight&quot;, &quot;&gt;&quot;, 100);
+var newPred = Predicate.and(p1, p2, p3);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var preds = [p1, p2, p3];
+var newPred = Predicate.and(preds);</code></pre>
 
             </div>
         </div>
@@ -642,8 +595,8 @@ Note that this is dynamic, changing the customTag value will cause events to be 
 </div>
 
                 
-                    <div id="method_isEnabled" class="method item">
-    <h3 class="name"><code>isEnabled</code></h3>
+                    <div id="method_and" class="method item">
+    <h3 class="name"><code>and</code></h3>
 
     
         <div class="args">
@@ -651,13 +604,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
                 <li class="arg">
                     
-                        <code>eventName</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>target</code>
+                        <code>predicates</code>
                     
                 </li>
             
@@ -666,9 +613,133 @@ Note that this is dynamic, changing the customTag value will cause events to be 
     
 
     
-        <span class="returns-inline">
-            <span class="type">Boolean | Null</span>
-        </span>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._src_a44_predicate.js.html#l174"><code>..\src\a44_predicate.js:174</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>&#39;And&#39;s this Predicate with one or more other Predicates and returns a new &#39;composite&#39; Predicate</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">predicates</code>
+                        <span class="type">Multiple Predicates | Array of Predicate</span>
+                    
+
+                    
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
+
+                    <div class="param-description">
+                        <p>Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <pre class="code prettyprint"><code>var dt = new Date(88, 9, 12);
+var p1 = Predicate.create(&quot;OrderDate&quot;, &quot;ne&quot;, dt);
+var p2 = Predicate.create(&quot;ShipCity&quot;, &quot;startsWith&quot;, &quot;C&quot;);
+var p3 = Predicate.create(&quot;Freight&quot;, &quot;&gt;&quot;, 100);
+var newPred = p1.and(p2, p3);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var preds = [p2, p3];
+var newPred = p1.and(preds);</code></pre>
+<p>The &#39;and&#39; method is also used to write &quot;fluent&quot; expressions</p>
+<pre class="code prettyprint"><code>var p4 = Predicate.create(&quot;ShipCity&quot;, &quot;startswith&quot;, &quot;F&quot;)
+  .and(&quot;Size&quot;, &quot;gt&quot;, 2000);</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
+                    <div id="method_create" class="method item">
+    <h3 class="name"><code>create</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>property</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>operator</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>predicates</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
     
 
     
@@ -696,7 +767,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l233"><code>..\..\src\a10_event.js:233</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l64"><code>..\src\a44_predicate.js:64</code></a>
         
         </p>
 
@@ -707,7 +778,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
     </div>
 
     <div class="description">
-        <p>Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set.</p>
+        <p>Same as using the ctor.</p>
 
     </div>
 
@@ -719,14 +790,14 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
                 <li class="param">
                     
-                        <code class="param-name">eventName</code>
+                        <code class="param-name">property</code>
                         <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The name of the event.</p>
+                        <p>A property name, a nested property name or an expression involving a property name.</p>
 
                     </div>
 
@@ -735,14 +806,54 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
                 <li class="param">
                     
-                        <code class="param-name">target</code>
+                        <code class="param-name">operator</code>
+                        <span class="type"><a href="../classes/FilterQueryOp.html" class="crosslink">FilterQueryOp</a> | String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The object for which we want to know if notifications are enabled.</p>
+                        <ul>
+<li>This will be treated as either a property expression or a literal depending on context.  In general,
+if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.
+In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#39;value&#39;
+property and an &#39;isLiteral&#39; property set to either true or false.  Breeze also tries to infer the dataType of any
+literal based on context, if this fails you can force this inference by making the value argument an object with a
+&#39;value&#39; property and a &#39;dataType&#39;property set to one of the breeze.DataType enumeration instances.</li>
+</ul>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">predicates</code>
+                        <span class="type">Multiple Predicates | Array of Predicate</span>
+                    
+
+                    
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
+                    
+
+                    <div class="param-description">
+                        <p>Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</p>
 
                     </div>
 
@@ -754,27 +865,16 @@ Note that this is dynamic, changing the customTag value will cause events to be 
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Boolean | Null</span>:
-                    
-                    <p>A null is returned if this value has not been set.</p>
-
-                
-            </div>
-        </div>
-    
 
     
         <div class="example">
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>Event.isEnabled(“propertyChanged”, myEntityManager) </code></pre>
+                <pre class="code prettyprint"><code>// so 
+var p = Predicate.create(a, b, c);
+// is the same as 
+var p = new Predicate(a, b, c); </code></pre>
 
             </div>
         </div>
@@ -782,8 +882,8 @@ Note that this is dynamic, changing the customTag value will cause events to be 
 </div>
 
                 
-                    <div id="method_publish" class="method item">
-    <h3 class="name"><code>publish</code></h3>
+                    <div id="method_not" class="method item">
+    <h3 class="name"><code>not</code></h3>
 
     
         <div class="args">
@@ -791,19 +891,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
                 <li class="arg">
                     
-                        <code>data</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[publishAsync=false]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[errorCallback]</code>
+                        <code>predicate</code>
                     
                 </li>
             
@@ -812,10 +900,6 @@ Note that this is dynamic, changing the customTag value will cause events to be 
     
 
     
-        <span class="returns-inline">
-            <span class="type">Boolean</span>
-        </span>
-    
 
     
 
@@ -823,6 +907,8 @@ Note that this is dynamic, changing the customTag value will cause events to be 
 
     
 
+    
+        <span class="flag static">static</span>
     
 
     
@@ -840,7 +926,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l42"><code>..\..\src\a10_event.js:42</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l129"><code>..\src\a44_predicate.js:129</code></a>
         
         </p>
 
@@ -851,7 +937,7 @@ Note that this is dynamic, changing the customTag value will cause events to be 
     </div>
 
     <div class="description">
-        <p>Publish data for this event.</p>
+        <p>Creates a &#39;composite&#39; Predicate by &#39;negating&#39; a specified predicate.</p>
 
     </div>
 
@@ -863,72 +949,16 @@ Note that this is dynamic, changing the customTag value will cause events to be 
             
                 <li class="param">
                     
-                        <code class="param-name">data</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">predicate</code>
+                        <span class="type"><a href="../classes/Predicate.html" class="crosslink">Predicate</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>Data to publish</p>
-
+                         
                     </div>
 
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[publishAsync=false]</code>
-                        <span class="type">Boolean</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Whether to publish asynchonously or not.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[errorCallback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Will be called for any errors that occur during publication. If omitted, 
-errors will be eaten.</p>
-<p>errorCallback([e])</p>
-
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[e]</code>
-                                    <span class="type">Error</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Any error encountered during publication execution.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
                     
                 </li>
             
@@ -937,34 +967,18 @@ errors will be eaten.</p>
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Boolean</span>:
-                    
-                    <p>false if event is disabled; true otherwise.</p>
-
-                
-            </div>
-        </div>
-    
 
     
         <div class="example">
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// Assume &#39;salaryEvent&#39; is previously constructed Event
-salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });</code></pre>
-<p>This event can also be published asychronously</p>
-<pre class="code prettyprint"><code>salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true);</code></pre>
-<p>And we can add a handler in case the subscriber &#39;mishandles&#39; the event.</p>
-<pre class="code prettyprint"><code>salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true, function(error) {
-    // do something with the &#39;error&#39; object
-});</code></pre>
+                <pre class="code prettyprint"><code>var p1 = Predicate.create(&quot;Freight&quot;, &quot;gt&quot;, 100);
+var not_p1 = Predicate.not(p1);</code></pre>
+<p>This can also be accomplished using the &#39;instance&#39; version of the &#39;not&#39; method</p>
+<pre class="code prettyprint"><code>var not_p1 = p1.not();</code></pre>
+<p>Both of which would be the same as</p>
+<pre class="code prettyprint"><code>var not_p1 = Predicate.create(&quot;Freight&quot;, &quot;le&quot;, 100);</code></pre>
 
             </div>
         </div>
@@ -972,27 +986,11 @@ salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });</code></
 </div>
 
                 
-                    <div id="method_publishAsync" class="method item">
-    <h3 class="name"><code>publishAsync</code></h3>
+                    <div id="method_not" class="method item">
+    <h3 class="name"><code>not</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>data</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[errorCallback]</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
@@ -1020,7 +1018,7 @@ salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });</code></
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l97"><code>..\..\src\a10_event.js:97</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l222"><code>..\src\a44_predicate.js:222</code></a>
         
         </p>
 
@@ -1031,7 +1029,89 @@ salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });</code></
     </div>
 
     <div class="description">
-        <p>Publish data for this event asynchronously.</p>
+        <p>Returns the &#39;negated&#39; version of this Predicate</p>
+
+    </div>
+
+    
+
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <pre class="code prettyprint"><code>var p1 = Predicate.create(&quot;Freight&quot;, &quot;gt&quot;, 100);
+var not_p1 = p1.not();</code></pre>
+<p>This can also be accomplished using the &#39;static&#39; version of the &#39;not&#39; method</p>
+<pre class="code prettyprint"><code>var p1 = Predicate.create(&quot;Freight&quot;, &quot;gt&quot;, 100);
+var not_p1 = Predicate.not(p1);</code></pre>
+<p>which would be the same as</p>
+<pre class="code prettyprint"><code>var not_p1 = Predicate.create(&quot;Freight&quot;, &quot;le&quot;, 100);</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
+                    <div id="method_or" class="method item">
+    <h3 class="name"><code>or</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>predicates</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._src_a44_predicate.js.html#l108"><code>..\src\a44_predicate.js:108</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Creates a &#39;composite&#39; Predicate by &#39;or&#39;ing a set of specified Predicates together.</p>
 
     </div>
 
@@ -1043,55 +1123,19 @@ salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });</code></
             
                 <li class="param">
                     
-                        <code class="param-name">data</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">predicates</code>
+                        <span class="type">Multiple Predicates | Array of Predicate</span>
                     
 
                     
-
-                    <div class="param-description">
-                        <p>Data to publish</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[errorCallback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
                     
 
                     <div class="param-description">
-                        <p>Will be called for any errors that occur during publication. If omitted, 
-errors will be eaten.</p>
-<p>errorCallback([e])</p>
+                        <p>Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</p>
 
                     </div>
 
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[e]</code>
-                                    <span class="type">Error</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Any error encountered during publication execution.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
                     
                 </li>
             
@@ -1106,12 +1150,14 @@ errors will be eaten.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// Assume &#39;salaryEvent&#39; is previously constructed Event
-salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</code></pre>
-<p>And we can add a handler in case the subscriber &#39;mishandles&#39; the event.</p>
-<pre class="code prettyprint"><code>salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 }, function(error) {
-    // do something with the &#39;error&#39; object
-});</code></pre>
+                <pre class="code prettyprint"><code>var dt = new Date(88, 9, 12);
+var p1 = Predicate.create(&quot;OrderDate&quot;, &quot;ne&quot;, dt);
+var p2 = Predicate.create(&quot;ShipCity&quot;, &quot;startsWith&quot;, &quot;C&quot;);
+var p3 = Predicate.create(&quot;Freight&quot;, &quot;&gt;&quot;, 100);
+var newPred = Predicate.or(p1, p2, p3);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var preds = [p1, p2, p3];
+var newPred = Predicate.or(preds);</code></pre>
 
             </div>
         </div>
@@ -1119,8 +1165,8 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
 </div>
 
                 
-                    <div id="method_subscribe" class="method item">
-    <h3 class="name"><code>subscribe</code></h3>
+                    <div id="method_or" class="method item">
+    <h3 class="name"><code>or</code></h3>
 
     
         <div class="args">
@@ -1128,7 +1174,7 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
             
                 <li class="arg">
                     
-                        <code class="optional">[callback]</code>
+                        <code>predicates</code>
                     
                 </li>
             
@@ -1136,10 +1182,6 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
         </div>
     
 
-    
-        <span class="returns-inline">
-            <span class="type">Number</span>
-        </span>
     
 
     
@@ -1165,7 +1207,7 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
             
         
         
-        <a href="../files/.._.._src_a10_event.js.html#l119"><code>..\..\src\a10_event.js:119</code></a>
+        <a href="../files/.._src_a44_predicate.js.html#l198"><code>..\src\a44_predicate.js:198</code></a>
         
         </p>
 
@@ -1176,7 +1218,7 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
     </div>
 
     <div class="description">
-        <p>Subscribe to this event.</p>
+        <p>&#39;Or&#39;s this Predicate with one or more other Predicates and returns a new &#39;composite&#39; Predicate</p>
 
     </div>
 
@@ -1188,163 +1230,16 @@ salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });</co
             
                 <li class="param">
                     
-                        <code class="param-name optional">[callback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                        <code class="param-name">predicates</code>
+                        <span class="type">Multiple Predicates | Array of Predicate</span>
                     
 
                     
-
-                    <div class="param-description">
-                        <p>Will be called whenever &#39;data&#39; is published for this event. </p>
-<pre><code>callback([data])</code></pre>
-
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[data]</code>
-                                    <span class="type">Object</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Whatever &#39;data&#39; was published.  This should be documented on the specific event.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Number</span>:
-                    
-                    <p>This is a key for &#39;unsubscription&#39;.  It can be passed to the &#39;unsubscribe&#39; method.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-        <div class="example">
-            <h4>Example:</h4>
-
-            <div class="example-content">
-                <pre class="code prettyprint"><code>// Assume &#39;salaryEvent&#39; is previously constructed Event
-salaryEvent.subscribe(function (eventArgs) {
-    if (eventArgs.eventType === &quot;payRaise&quot;) {
-       // do something
-    }
-});</code></pre>
-<p>There are several built in Breeze events, such as EntityAspect.propertyChanged, EntityAspect.validationErrorsChanged as well.</p>
-<pre class="code prettyprint"><code> // Assume order is a preexisting &#39;order&#39; entity
- order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
-     if ( pcEvent.propertyName === &quot;OrderDate&quot;) {
-         // do something
-     }
- });</code></pre>
-
-            </div>
-        </div>
-    
-</div>
-
-                
-                    <div id="method_unsubscribe" class="method item">
-    <h3 class="name"><code>unsubscribe</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>unsubKey</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Boolean</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/.._.._src_a10_event.js.html#l154"><code>..\..\src\a10_event.js:154</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Unsubscribe from this event.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">unsubKey</code>
-                        <span class="type">Number</span>
-                    
-
+                        <span class="flag multiple" title="This argument may occur one or more times.">multiple</span>
                     
 
                     <div class="param-description">
-                        <p>The value returned from the &#39;subscribe&#39; method may be used to unsubscribe here.</p>
+                        <p>Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</p>
 
                     </div>
 
@@ -1356,33 +1251,23 @@ salaryEvent.subscribe(function (eventArgs) {
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Boolean</span>:
-                    
-                    <p>Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
-cannot be found.</p>
-
-                
-            </div>
-        </div>
-    
 
     
         <div class="example">
             <h4>Example:</h4>
 
             <div class="example-content">
-                <pre class="code prettyprint"><code>// Assume order is a preexisting &#39;order&#39; entity
-var token = order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
-        // do something
-});
-// sometime later
-order.entityAspect.propertyChanged.unsubscribe(token);</code></pre>
+                <pre class="code prettyprint"><code>var dt = new Date(88, 9, 12);
+var p1 = Predicate.create(&quot;OrderDate&quot;, &quot;ne&quot;, dt);
+var p2 = Predicate.create(&quot;ShipCity&quot;, &quot;startsWith&quot;, &quot;C&quot;);
+var p3 = Predicate.create(&quot;Freight&quot;, &quot;&gt;&quot;, 100);
+var newPred = p1.or(p2, p3);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var preds = [p2, p3];
+var newPred = p1.or(preds);</code></pre>
+<p>The &#39;or&#39; method is also used to write &quot;fluent&quot; expressions</p>
+<pre class="code prettyprint"><code>var p4 = Predicate.create(&quot;ShipCity&quot;, &quot;startswith&quot;, &quot;F&quot;)
+  .or(&quot;Size&quot;, &quot;gt&quot;, 2000);</code></pre>
 
             </div>
         </div>

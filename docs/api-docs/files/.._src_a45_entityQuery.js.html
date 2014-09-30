@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -205,32 +207,32 @@
     <pre class="code prettyprint linenums">
 ﻿var EntityQuery = (function () {
   /**
-   An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}}.
+  An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}}.
 
-   EntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that
-   EntityQueries can be &#x27;modified&#x27; without affecting any current instances.
+  EntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that
+  EntityQueries can be &#x27;modified&#x27; without affecting any current instances.
 
-   @class EntityQuery
-   **/
+  @class EntityQuery
+  **/
 
   /**
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
 
-   Usually this constructor will be followed by calls to filtering, ordering or selection methods
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .orderBy(&quot;Region&quot;);
+  Usually this constructor will be followed by calls to filtering, ordering or selection methods
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+          .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+          .orderBy(&quot;Region&quot;);
 
-   @method &lt;ctor&gt; EntityQuery
-   @param [resourceName] {String}
-   **/
+  @method &lt;ctor&gt; EntityQuery
+  @param [resourceName] {String}
+  **/
   var ctor = function (resourceName) {
-    if ( resourceName != null &amp;&amp; !__isString(resourceName)) {
+    if (resourceName != null &amp;&amp; !__isString(resourceName)) {
       return fromJSON(this, resourceName);
     }
-
+    
     this.resourceName = resourceName;
     this.fromEntityType = null;
     this.wherePredicate = null;
@@ -250,189 +252,187 @@
   };
   var proto = ctor.prototype;
   proto._$typeName = &quot;EntityQuery&quot;;
+  
+  
+  /**
+  The resource name used by this query.
 
+  __readOnly__
+  @property resourceName {String}
+  **/
 
   /**
-   The resource name used by this query.
+  The entityType that is associated with the &#x27;from&#x27; clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query
+  has been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.
+  This value may be null if the entityType cannot be associated with a resourceName.
 
-   __readOnly__
-   @property resourceName {String}
-   **/
-
-  /**
-   The entityType that is associated with the &#x27;from&#x27; clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query
-   has been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.
-   This value may be null if the entityType cannot be associated with a resourceName.
-
-   __readOnly__
-   @property fromEntityType {EntityType}
-   **/
+  __readOnly__
+  @property fromEntityType {EntityType}
+  **/
 
   /**
-   The entityType that will be returned by this query. This property will only be set if the &#x27;toType&#x27; method was called.
+  The entityType that will be returned by this query. This property will only be set if the &#x27;toType&#x27; method was called.
 
-   __readOnly__
-   @property resultEntityType {EntityType}
-   **/
-
-  /**
-   The &#x27;where&#x27; predicate used by this query.
-
-   __readOnly__
-   @property wherePredicate {Predicate}
-   **/
+  __readOnly__
+  @property resultEntityType {EntityType}
+  **/
 
   /**
-   The {{#crossLink &quot;OrderByClause&quot;}}{{/crossLink}} used by this query.
+  The &#x27;where&#x27; predicate used by this query.
 
-   __readOnly__
-   @property orderByClause {OrderByClause}
-   **/
-
-  /**
-   The number of entities to &#x27;skip&#x27; for this query.
-
-   __readOnly__
-   @property skipCount {Integer}
-   **/
+  __readOnly__
+  @property wherePredicate {Predicate}
+  **/
 
   /**
-   The number of entities to &#x27;take&#x27; for this query.
+  The {{#crossLink &quot;OrderByClause&quot;}}{{/crossLink}} used by this query.
 
-   __readOnly__
-   @property takeCount {Integer}
-   **/
-
-  /**
-   Any additional parameters that were added to the query via the &#x27;withParameters&#x27; method.
-
-   __readOnly__
-   @property parameters {Object}
-   **/
+  __readOnly__
+  @property orderByClause {OrderByClause}
+  **/
 
   /**
-   The {{#crossLink &quot;QueryOptions&quot;}}{{/crossLink}} for this query.
+  The number of entities to &#x27;skip&#x27; for this query.
 
-   __readOnly__
-   @property queryOptions {QueryOptions}
-   **/
-
-  /**
-   The {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}} for this query. This may be null and can be set via the &#x27;using&#x27; method.
-
-   __readOnly__
-   @property entityManager {EntityManager}
-   **/
-
+  __readOnly__
+  @property skipCount {Integer}
+  **/
 
   /**
-   Specifies the resource to query for this EntityQuery.
-   @example
-   var query = new EntityQuery()
-   .from(&quot;Customers&quot;);
-   is the same as
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;);
-   @method from
-   @param resourceName {String} The resource to query.
-   @return {EntityQuery}
-   @chainable
-   **/
+  The number of entities to &#x27;take&#x27; for this query.
+
+  __readOnly__
+  @property takeCount {Integer}
+  **/
+
+  /**
+  Any additional parameters that were added to the query via the &#x27;withParameters&#x27; method.
+
+  __readOnly__
+  @property parameters {Object}
+  **/
+
+  /**
+  The {{#crossLink &quot;QueryOptions&quot;}}{{/crossLink}} for this query.
+
+  __readOnly__
+  @property queryOptions {QueryOptions}
+  **/
+
+  /**
+  The {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}} for this query. This may be null and can be set via the &#x27;using&#x27; method.
+
+  __readOnly__
+  @property entityManager {EntityManager}
+  **/
+
+  /**
+  Specifies the resource to query for this EntityQuery.
+  @example
+      var query = new EntityQuery()
+          .from(&quot;Customers&quot;);
+  is the same as
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;);
+  @method from
+  @param resourceName {String} The resource to query.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.from = function (resourceName) {
     // TODO: think about allowing entityType as well
     assertParam(resourceName, &quot;resourceName&quot;).isString().check();
     return clone(this, &quot;resourceName&quot;, resourceName);
   };
-
+  
   /**
-   This is a static version of the &quot;from&quot; method and it creates a &#x27;base&#x27; entityQuery for the specified resource name.
-   @example
-   var query = EntityQuery.from(&quot;Customers&quot;);
-   is the same as
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;);
-   @method from
-   @static
-   @param resourceName {String} The resource to query.
-   @return {EntityQuery}
-   @chainable
-   **/
+  This is a static version of the &quot;from&quot; method and it creates a &#x27;base&#x27; entityQuery for the specified resource name.
+  @example
+      var query = EntityQuery.from(&quot;Customers&quot;);
+  is the same as
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;);
+  @method from
+  @static
+  @param resourceName {String} The resource to query.
+  @return {EntityQuery}
+  @chainable
+  **/
   ctor.from = function (resourceName) {
     assertParam(resourceName, &quot;resourceName&quot;).isString().check();
     return new EntityQuery(resourceName);
   };
-
+  
   /**
-   Specifies the top level EntityType that this query will return.  Only needed when a query returns a json result that does not include type information.
-   @example
-   var query = new EntityQuery()
-   .from(&quot;MyCustomMethod&quot;)
-   .toType(&quot;Customer&quot;)
+  Specifies the top level EntityType that this query will return.  Only needed when a query returns a json result that does not include type information.
+  @example
+      var query = new EntityQuery()
+        .from(&quot;MyCustomMethod&quot;)
+        .toType(&quot;Customer&quot;)
 
-   @method toType
-   @param entityType {String|EntityType} The top level entityType that this query will return.  This method is only needed when a query returns a json result that
-   does not include type information.  If the json result consists of more than a simple entity or array of entities, consider using a JsonResultsAdapter instead.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @method toType
+  @param entityType {String|EntityType} The top level entityType that this query will return.  This method is only needed when a query returns a json result that
+  does not include type information.  If the json result consists of more than a simple entity or array of entities, consider using a JsonResultsAdapter instead.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.toType = function (entityType) {
     assertParam(entityType, &quot;entityType&quot;).isString().or().isInstanceOf(EntityType).check();
     return clone(this, &quot;resultEntityType&quot;, entityType);
   };
-
-
+  
+  
   /**
-   Returns a new query with an added filter criteria. Can be called multiple times which means to &#x27;and&#x27; with any existing Predicate.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;);
-   This can also be expressed using an explicit {{#crossLink &quot;FilterQueryOp&quot;}}{{/crossLink}} as
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
-   or a preconstructed {{#crossLink &quot;Predicate&quot;}}{{/crossLink}} may be used
-   @example
-   var pred = new Predicate(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(pred);
-   Predicates are often useful when you want to combine multiple conditions in a single filter, such as
-   @example
-   var pred = Predicate.create(&quot;CompanyName&quot;, &quot;startswith&quot;, &quot;C&quot;).and(&quot;Region&quot;, FilterQueryOp.Equals, null);
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(pred);
-   @example
-   More complicated queries can make use of nested property paths
-   @example
-   var query = new EntityQuery(&quot;Products&quot;)
-   .where(&quot;Category.CategoryName&quot;, &quot;startswith&quot;, &quot;S&quot;);
-   or OData functions - A list of valid OData functions can be found within the {{#crossLink &quot;Predicate&quot;}}{{/crossLink}} documentation.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;toLower(CompanyName)&quot;, &quot;startsWith&quot;, &quot;c&quot;);
-   or to be even more baroque
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;toUpper(substring(CompanyName, 1, 2))&quot;, FilterQueryOp.Equals, &quot;OM&quot;);
-   @method where
-   @param predicate {Predicate|property|property path, operator, value} Can be either
+  Returns a new query with an added filter criteria. Can be called multiple times which means to &#x27;and&#x27; with any existing Predicate.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+                .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;);
+  This can also be expressed using an explicit {{#crossLink &quot;FilterQueryOp&quot;}}{{/crossLink}} as
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+          .where(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
+  or a preconstructed {{#crossLink &quot;Predicate&quot;}}{{/crossLink}} may be used
+  @example
+      var pred = new Predicate(&quot;CompanyName&quot;, FilterQueryOp.StartsWith, &quot;C&quot;);
+      var query = new EntityQuery(&quot;Customers&quot;).where(pred);
+  Predicates are often useful when you want to combine multiple conditions in a single filter, such as
+  @example
+      var pred = Predicate.create(&quot;CompanyName&quot;, &quot;startswith&quot;, &quot;C&quot;).and(&quot;Region&quot;, FilterQueryOp.Equals, null);
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(pred);
+  @example
+  More complicated queries can make use of nested property paths
+  @example
+      var query = new EntityQuery(&quot;Products&quot;)
+        .where(&quot;Category.CategoryName&quot;, &quot;startswith&quot;, &quot;S&quot;);
+  or OData functions - A list of valid OData functions can be found within the {{#crossLink &quot;Predicate&quot;}}{{/crossLink}} documentation.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;toLower(CompanyName)&quot;, &quot;startsWith&quot;, &quot;c&quot;);
+  or to be even more baroque
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;toUpper(substring(CompanyName, 1, 2))&quot;, FilterQueryOp.Equals, &quot;OM&quot;);
+  @method where
+  @param predicate {Predicate|property|property path, operator, value} Can be either
 
-   - a single {{#crossLink &quot;Predicate&quot;}}{{/crossLink}}
+    - a single {{#crossLink &quot;Predicate&quot;}}{{/crossLink}}
 
-   - or the parameters to create a &#x27;simple&#x27; Predicate
+    - or the parameters to create a &#x27;simple&#x27; Predicate
 
-   - a property name, a property path with &#x27;.&#x27; as path seperators or a property expression {String}
-   - an operator {FilterQueryOp|String} Either a  {{#crossLink &quot;FilterQueryOp&quot;}}{{/crossLink}} or it&#x27;s string representation. Case is ignored
-   when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.
-   - a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general,
-   if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.
-   In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#x27;value&#x27; property and an &#x27;isLiteral&#x27; property set to either true or false.
-   Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a &#x27;value&#x27; property and a &#x27;dataType&#x27;property set
-   to one of the breeze.DataType enumeration instances.
-   - or a null or undefined ( this causes any existing where clause to be removed)
+    - a property name, a property path with &#x27;.&#x27; as path seperators or a property expression {String}
+    - an operator {FilterQueryOp|String} Either a  {{#crossLink &quot;FilterQueryOp&quot;}}{{/crossLink}} or it&#x27;s string representation. Case is ignored
+    when if a string is provided and any string that matches one of the FilterQueryOp aliases will be accepted.
+    - a value {Object} - This will be treated as either a property expression or a literal depending on context.  In general,
+    if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.
+    In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a &#x27;value&#x27; property and an &#x27;isLiteral&#x27; property set to either true or false.
+    Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a &#x27;value&#x27; property and a &#x27;dataType&#x27;property set
+    to one of the breeze.DataType enumeration instances.
+    - or a null or undefined ( this causes any existing where clause to be removed)
 
-   @return {EntityQuery}
-   @chainable
-   **/
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.where = function (wherePredicate) {
     if (wherePredicate != null) {
       wherePredicate = Predicate.create(__arraySlice(arguments));
@@ -444,288 +444,287 @@
     return clone(this, &quot;wherePredicate&quot;, wherePredicate);
 
   };
-
+  
   /**
-   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderBy(&quot;CompanyName&quot;);
+  Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderBy(&quot;CompanyName&quot;);
 
-   or to sort across multiple properties
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderBy(&quot;Region, CompanyName&quot;);
+  or to sort across multiple properties
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderBy(&quot;Region, CompanyName&quot;);
 
-   Nested property paths are also supported
-   @example
-   var query = new EntityQuery(&quot;Products&quot;)
-   .orderBy(&quot;Category.CategoryName&quot;);
+  Nested property paths are also supported
+  @example
+      var query = new EntityQuery(&quot;Products&quot;)
+        .orderBy(&quot;Category.CategoryName&quot;);
 
-   Sorting in descending order is supported via the addition of &#x27; desc&#x27; to the end of any property path.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderBy(&quot;CompanyName desc&quot;);
+  Sorting in descending order is supported via the addition of &#x27; desc&#x27; to the end of any property path.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderBy(&quot;CompanyName desc&quot;);
 
-   or
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderBy(&quot;Region desc, CompanyName desc&quot;);
-   @method orderBy
-   @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
-   Each property path can optionally end with &quot; desc&quot; to force a descending sort order. If &#x27;propertyPaths&#x27; is either null or omitted then all ordering is removed.
-   @param isDescending {Boolean} - If specified, overrides all of the embedded &#x27;desc&#x27; tags in the previously specified property paths.
-   @return {EntityQuery}
-   @chainable
-   **/
+  or
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderBy(&quot;Region desc, CompanyName desc&quot;);
+  @method orderBy
+  @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
+  Each property path can optionally end with &quot; desc&quot; to force a descending sort order. If &#x27;propertyPaths&#x27; is either null or omitted then all ordering is removed.
+  @param isDescending {Boolean} - If specified, overrides all of the embedded &#x27;desc&#x27; tags in the previously specified property paths.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.orderBy = function (propertyPaths, isDescending) {
     // propertyPaths: can pass in create(&quot;A.X,B&quot;) or create(&quot;A.X desc, B&quot;) or create(&quot;A.X desc,B&quot;, true])
     // isDesc parameter trumps isDesc in propertyName.
     var orderByClause = propertyPaths == null ? null : new OrderByClause(normalizePropertyPaths(propertyPaths), isDescending);
     return clone(this, &quot;orderByClause&quot;, orderByClause);
   }
-
+  
   /**
-   Returns a new query that orders the results of the query by property name in descending order.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderByDesc(&quot;CompanyName&quot;);
+  Returns a new query that orders the results of the query by property name in descending order.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderByDesc(&quot;CompanyName&quot;);
 
-   or to sort across multiple properties
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .orderByDesc(&quot;Region, CompanyName&quot;);
+  or to sort across multiple properties
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .orderByDesc(&quot;Region, CompanyName&quot;);
 
-   Nested property paths are also supported
-   @example
-   var query = new EntityQuery(&quot;Products&quot;)
-   .orderByDesc(&quot;Category.CategoryName&quot;);
+  Nested property paths are also supported
+  @example
+      var query = new EntityQuery(&quot;Products&quot;)
+        .orderByDesc(&quot;Category.CategoryName&quot;);
 
-   @method orderByDesc
-   @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
-   If &#x27;propertyPaths&#x27; is either null or omitted then all ordering is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @method orderByDesc
+  @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
+  If &#x27;propertyPaths&#x27; is either null or omitted then all ordering is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.orderByDesc = function (propertyPaths) {
     return this.orderBy(propertyPaths, true);
   };
-
+  
   /**
-   Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This
-   will be referred to as a projection.
-   If the result of this selection &quot;projection&quot; contains entities, these entities will automatically be added to EntityManager&#x27;s cache and will
-   be made &#x27;observable&#x27;.
-   Any simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made &#x27;observable&#x27;.
+  Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This
+  will be referred to as a projection.
+  If the result of this selection &quot;projection&quot; contains entities, these entities will automatically be added to EntityManager&#x27;s cache and will
+  be made &#x27;observable&#x27;.
+  Any simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made &#x27;observable&#x27;.
 
-   @example
-   Simple data properties can be projected
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .select(&quot;CompanyName&quot;);
-   This will return an array of objects each with a single &quot;CompanyName&quot; property of type string.
-   A similar query could return a navigation property instead
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .select(&quot;Orders&quot;);
-   where the result would be an array of objects each with a single &quot;Orders&quot; property that would itself be an array of &quot;Order&quot; entities.
-   Composite projections are also possible:
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .select(&quot;CompanyName, Orders&quot;);
-   As well as projections involving nested property paths
-   @example
-   var query = EntityQuery(&quot;Orders&quot;)
-   .where(&quot;Customer.CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .select(&quot;Customer.CompanyName, Customer, OrderDate&quot;);
-   @method select
-   @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
-   If &#x27;propertyPaths&#x27; is either null or omitted then any existing projection on the query is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @example
+  Simple data properties can be projected
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .select(&quot;CompanyName&quot;);
+  This will return an array of objects each with a single &quot;CompanyName&quot; property of type string.
+  A similar query could return a navigation property instead
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .select(&quot;Orders&quot;);
+  where the result would be an array of objects each with a single &quot;Orders&quot; property that would itself be an array of &quot;Order&quot; entities.
+  Composite projections are also possible:
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .select(&quot;CompanyName, Orders&quot;);
+  As well as projections involving nested property paths
+  @example
+      var query = EntityQuery(&quot;Orders&quot;)
+        .where(&quot;Customer.CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .select(&quot;Customer.CompanyName, Customer, OrderDate&quot;);
+  @method select
+  @param propertyPaths {String|Array of String} A comma-separated (&#x27;,&#x27;) string of property paths or an array of property paths.
+  If &#x27;propertyPaths&#x27; is either null or omitted then any existing projection on the query is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.select = function (propertyPaths) {
     var selectClause = propertyPaths == null ? null : new SelectClause(normalizePropertyPaths(propertyPaths));
     return clone(this, &quot;selectClause&quot;, selectClause);
   };
-
+  
   /**
-   Returns a new query that skips the specified number of entities when returning results.
-   Any existing &#x27;skip&#x27; can be cleared by calling &#x27;skip&#x27; with no arguments.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .skip(5);
-   @method skip
-   @param count {Number} The number of entities to return. If omitted or null any existing skip count on the query is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Returns a new query that skips the specified number of entities when returning results.
+  Any existing &#x27;skip&#x27; can be cleared by calling &#x27;skip&#x27; with no arguments.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .skip(5);
+  @method skip
+  @param count {Number} The number of entities to return. If omitted or null any existing skip count on the query is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.skip = function (count) {
     assertParam(count, &quot;count&quot;).isOptional().isNumber().check();
     return clone(this, &quot;skipCount&quot;, (count == null) ? null : count);
   };
-
+  
   /**
-   Returns a new query that returns only the specified number of entities when returning results. - Same as &#x27;take&#x27;.
-   Any existing &#x27;top&#x27; can be cleared by calling &#x27;top&#x27; with no arguments.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .top(5);
-   @method top
-   @param count {Number} The number of entities to return.
-   If &#x27;count&#x27; is either null or omitted then any existing &#x27;top&#x27; count on the query is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Returns a new query that returns only the specified number of entities when returning results. - Same as &#x27;take&#x27;.
+  Any existing &#x27;top&#x27; can be cleared by calling &#x27;top&#x27; with no arguments.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .top(5);
+  @method top
+  @param count {Number} The number of entities to return.
+  If &#x27;count&#x27; is either null or omitted then any existing &#x27;top&#x27; count on the query is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.top = function (count) {
     return this.take(count);
   };
-
+  
   /**
-   Returns a new query that returns only the specified number of entities when returning results - Same as &#x27;top&#x27;.
-   Any existing take can be cleared by calling take with no arguments.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .take(5);
-   @method take
-   @param count {Number} The number of entities to return.
-   If &#x27;count&#x27; is either null or omitted then any existing &#x27;take&#x27; count on the query is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Returns a new query that returns only the specified number of entities when returning results - Same as &#x27;top&#x27;.
+  Any existing take can be cleared by calling take with no arguments.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .take(5);
+  @method take
+  @param count {Number} The number of entities to return.
+  If &#x27;count&#x27; is either null or omitted then any existing &#x27;take&#x27; count on the query is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.take = function (count) {
     assertParam(count, &quot;count&quot;).isOptional().isNumber().check();
     return clone(this, &quot;takeCount&quot;, (count == null) ? null : count);
   };
-
+  
   /**
-   Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property
-   names such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are &#x27;expanded&#x27;.
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
-   .expand(&quot;Orders&quot;);
-   will return the filtered customers each with its &quot;Orders&quot; properties fully resolved.
-   Multiple paths may be specified by separating the paths by a &#x27;,&#x27;
-   @example
-   var query = new EntityQuery(&quot;Orders&quot;)
-   .expand(&quot;Customer, Employee&quot;)
-   and nested property paths my be specified as well
-   @example
-   var query = new EntityQuery(&quot;Orders&quot;)
-   .expand(&quot;Customer, OrderDetails, OrderDetails.Product&quot;)
-   @method expand
-   @param propertyPaths {String|Array of String} A comma-separated list of navigation property names or an array of navigation property names. Each Navigation Property name can be followed
-   by a &#x27;.&#x27; and another navigation property name to enable identifying a multi-level relationship.
-   If &#x27;propertyPaths&#x27; is either null or omitted then any existing &#x27;expand&#x27; clause on the query is removed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property
+  names such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are &#x27;expanded&#x27;.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;)
+        .expand(&quot;Orders&quot;);
+  will return the filtered customers each with its &quot;Orders&quot; properties fully resolved.
+  Multiple paths may be specified by separating the paths by a &#x27;,&#x27;
+  @example
+      var query = new EntityQuery(&quot;Orders&quot;)
+        .expand(&quot;Customer, Employee&quot;)
+  and nested property paths my be specified as well
+  @example
+      var query = new EntityQuery(&quot;Orders&quot;)
+        .expand(&quot;Customer, OrderDetails, OrderDetails.Product&quot;)
+  @method expand
+  @param propertyPaths {String|Array of String} A comma-separated list of navigation property names or an array of navigation property names. Each Navigation Property name can be followed
+  by a &#x27;.&#x27; and another navigation property name to enable identifying a multi-level relationship.
+  If &#x27;propertyPaths&#x27; is either null or omitted then any existing &#x27;expand&#x27; clause on the query is removed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.expand = function (propertyPaths) {
     var expandClause = propertyPaths == null ? null : new ExpandClause(normalizePropertyPaths(propertyPaths));
     return clone(this, &quot;expandClause&quot;, expandClause);
   };
-
+  
   /**
-   Returns a new query that includes a collection of parameters to pass to the server.
-   @example
-   var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
-   .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; });
-   will call the &#x27;EmployeesFilteredByCountryAndBirthdate&#x27; method on the server and pass in 2 parameters. This
-   query will be uri encoded as
+  Returns a new query that includes a collection of parameters to pass to the server.
+  @example
+      var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
+        .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; });
+   
+  will call the &#x27;EmployeesFilteredByCountryAndBirthdate&#x27; method on the server and pass in 2 parameters. This
+  query will be uri encoded as
+  @example
+      {serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&amp;country=USA
 
-   {serviceApi}/EmployeesFilteredByCountryAndBirthdate?birthDate=1%2F1%2F1960&amp;country=USA
+  Parameters may also be mixed in with other query criteria.
+  @example
+      var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
+        .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; })
+        .where(&quot;LastName&quot;, &quot;startsWith&quot;, &quot;S&quot;)
+        .orderBy(&quot;BirthDate&quot;);
 
-   Parameters may also be mixed in with other query criteria.
-   @example
-   var query = EntityQuery.from(&quot;EmployeesFilteredByCountryAndBirthdate&quot;)
-   .withParameters({ BirthDate: &quot;1/1/1960&quot;, Country: &quot;USA&quot; })
-   .where(&quot;LastName&quot;, &quot;startsWith&quot;, &quot;S&quot;)
-   .orderBy(&quot;BirthDate&quot;);
-
-   @method withParameters
-   @param parameters {Object} A parameters object where the keys are the parameter names and the values are the parameter values.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @method withParameters
+  @param parameters {Object} A parameters object where the keys are the parameter names and the values are the parameter values.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.withParameters = function (parameters) {
     assertParam(parameters, &quot;parameters&quot;).isObject().check();
     return clone(this, &quot;parameters&quot;, parameters);
   };
-
+  
   /**
-   Returns a query with the &#x27;inlineCount&#x27; capability either enabled or disabled.  With &#x27;inlineCount&#x27; enabled, an additional &#x27;inlineCount&#x27; property
-   will be returned with the query results that will contain the number of entities that would have been returned by this
-   query with only the &#x27;where&#x27;/&#x27;filter&#x27; clauses applied, i.e. without any &#x27;skip&#x27;/&#x27;take&#x27; operators applied. For local queries this clause is ignored.
+  Returns a query with the &#x27;inlineCount&#x27; capability either enabled or disabled.  With &#x27;inlineCount&#x27; enabled, an additional &#x27;inlineCount&#x27; property
+  will be returned with the query results that will contain the number of entities that would have been returned by this
+  query with only the &#x27;where&#x27;/&#x27;filter&#x27; clauses applied, i.e. without any &#x27;skip&#x27;/&#x27;take&#x27; operators applied. For local queries this clause is ignored.
 
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .take(20)
-   .orderBy(&quot;CompanyName&quot;)
-   .inlineCount(true);
-   will return the first 20 customers as well as a count of all of the customers in the remote store.
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .take(20)
+        .orderBy(&quot;CompanyName&quot;)
+        .inlineCount(true);
+  will return the first 20 customers as well as a count of all of the customers in the remote store.
 
-   @method inlineCount
-   @param enabled {Boolean=true} Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @method inlineCount
+  @param enabled {Boolean=true} Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.inlineCount = function (enabled) {
     assertParam(enabled, &quot;enabled&quot;).isBoolean().isOptional().check();
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, &quot;inlineCountEnabled&quot;, enabled);
   };
-
+  
   /**
-   Returns a query with the &#x27;noTracking&#x27; capability either enabled or disabled.  With &#x27;noTracking&#x27; enabled, the results of this query
-   will not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.
+  Returns a query with the &#x27;noTracking&#x27; capability either enabled or disabled.  With &#x27;noTracking&#x27; enabled, the results of this query
+  will not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.
 
-   @example
-   var query = new EntityQuery(&quot;Customers&quot;)
-   .take(20)
-   .orderBy(&quot;CompanyName&quot;)
-   .noTracking(true);
+  @example
+      var query = new EntityQuery(&quot;Customers&quot;)
+        .take(20)
+        .orderBy(&quot;CompanyName&quot;)
+        .noTracking(true);
 
-
-   @method noTracking
-   @param enabled {Boolean=true} Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.
-   @return {EntityQuery}
-   @chainable
-   **/
+  @method noTracking
+  @param enabled {Boolean=true} Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.noTracking = function (enabled) {
     assertParam(enabled, &quot;enabled&quot;).isBoolean().isOptional().check();
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, &quot;noTrackingEnabled&quot;, enabled);
   };
-
+  
   /**
-   Returns a copy of this EntityQuery with the specified {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}}, {{#crossLink &quot;DataService&quot;}}{{/crossLink}},
-   {{#crossLink &quot;JsonResultsAdapter&quot;}}{{/crossLink}}, {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}} or {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}} applied.
-   @example
-   &#x27;using&#x27; can be used to return a new query with a specified EntityManager.
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;)
-   .using(em);
-   or with a specified {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}}
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;)
-   .using(MergeStrategy.PreserveChanges);
-   or with a specified {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;)
-   .using(FetchStrategy.FromLocalCache);
-   @example
-   @method using
-   @param obj {EntityManager|QueryOptions|DataService|MergeStrategy|FetchStrategy|JsonResultsAdapter|config object} The object to update in creating a new EntityQuery from an existing one.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Returns a copy of this EntityQuery with the specified {{#crossLink &quot;EntityManager&quot;}}{{/crossLink}}, {{#crossLink &quot;DataService&quot;}}{{/crossLink}},
+  {{#crossLink &quot;JsonResultsAdapter&quot;}}{{/crossLink}}, {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}} or {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}} applied.
+  @example
+      // &#x27;using&#x27; can be used to return a new query with a specified EntityManager.
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;)
+        .using(em);
+  or with a specified {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}}
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;)
+        .using(MergeStrategy.PreserveChanges);
+  or with a specified {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;)
+        .using(FetchStrategy.FromLocalCache);
+  
+  @method using
+  @param obj {EntityManager|QueryOptions|DataService|MergeStrategy|FetchStrategy|JsonResultsAdapter|config object} The object to update in creating a new EntityQuery from an existing one.
+  @return {EntityQuery}
+  @chainable
+  **/
   proto.using = function (obj) {
     if (!obj) return this;
     var eq = clone(this);
@@ -745,111 +744,109 @@
     }, obj);
     return eq;
   };
-
+  
   /**
-   Executes this query.  This method requires that an EntityManager has been previously specified via the &quot;using&quot; method.
-   @example
-   This method can be called using a &#x27;promises&#x27; syntax ( recommended)
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;).using(em);
-   query.execute()
-   .then( function(data) {
-                ... query results processed here
-            }).fail( function(err) {
-                ... query failure processed here
-            });
-   or with callbacks
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;).using(em);
-   query.execute(
-   function(data) {
-                var orders = data.results;
-                ... query results processed here
-            },
-   function(err) {
-                ... query failure processed here
-            });
-   Either way this method is the same as calling the EntityManager &#x27;execute&#x27; method.
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery(&quot;Orders&quot;);
-   em.executeQuery(query)
-   .then( function(data) {
-                var orders = data.results;
-                ... query results processed here
-            }).fail( function(err) {
-                ... query failure processed here
-            });
+  Executes this query.  This method requires that an EntityManager has been previously specified via the &quot;using&quot; method.
+  @example
+  This method can be called using a &#x27;promises&#x27; syntax ( recommended)
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;).using(em);
+      query.execute().then( function(data) {
+          ... query results processed here
+      }).fail( function(err) {
+          ... query failure processed here
+      });
+  or with callbacks
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;).using(em);
+      query.execute(
+        function(data) {
+                    var orders = data.results;
+                    ... query results processed here
+                },
+        function(err) {
+                    ... query failure processed here
+                });
+  Either way this method is the same as calling the EntityManager &#x27;execute&#x27; method.
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery(&quot;Orders&quot;);
+      em.executeQuery(query).then( function(data) {
+         var orders = data.results;
+          ... query results processed here
+      }).fail( function(err) {
+         ... query failure processed here
+      });
 
-   @method execute
-   @async
+  @method execute
+  @async
 
-   @param callback {Function} Function called on success.
+  @param callback {Function} Function called on success.
 
-   successFunction([data])
-   @param [callback.data] {Object}
-   @param callback.data.results {Array of Entity}
-   @param callback.data.query {EntityQuery} The original query
-   @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
-   @param callback.data.inlineCount {Integer} Only available if &#x27;inlineCount(true)&#x27; was applied to the query.  Returns the count of
-   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-   would have been applied.
+  successFunction([data])
+  @param [callback.data] {Object}
+  @param callback.data.results {Array of Entity}
+  @param callback.data.query {EntityQuery} The original query
+  @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
+  @param callback.data.inlineCount {Integer} Only available if &#x27;inlineCount(true)&#x27; was applied to the query.  Returns the count of
+  items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+  would have been applied.
 
-   @param errorCallback {Function} Function called on failure.
+  @param errorCallback {Function} Function called on failure.
 
-   failureFunction([error])
-   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-   @param [errorCallback.error.query] The query that caused the error.
-   @param [errorCallback.error.httpResponse] {HttpResponse} The raw XMLHttpRequest returned from the server.
+  failureFunction([error])
+  @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+  @param [errorCallback.error.query] The query that caused the error.
+  @param [errorCallback.error.httpResponse] {HttpResponse} The raw XMLHttpRequest returned from the server.
 
-   @return {Promise}
-   **/
+  @return {Promise}
+  **/
   proto.execute = function (callback, errorCallback) {
     if (!this.entityManager) {
       throw new Error(&quot;An EntityQuery must have its EntityManager property set before calling &#x27;execute&#x27;&quot;);
     }
     return this.entityManager.executeQuery(this, callback, errorCallback);
   };
-
+  
   /**
-   Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the &quot;using&quot; method.
-   @example
-   // assume em is an entityManager already filled with order entities;
-   var query = new EntityQuery(&quot;Orders&quot;).using(em);
-   var orders = query.executeLocally();
+  Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the &quot;using&quot; method.
+  @example
+      // assume em is an entityManager already filled with order entities;
+      var query = new EntityQuery(&quot;Orders&quot;).using(em);
+      var orders = query.executeLocally();
 
-   Note that calling this method is the same as calling {{#crossLink &quot;EntityManager/executeQueryLocally&quot;}}{{/crossLink}}.
+  Note that calling this method is the same as calling {{#crossLink &quot;EntityManager/executeQueryLocally&quot;}}{{/crossLink}}.
 
-   @method executeLocally
-   **/
+  @method executeLocally
+  **/
   proto.executeLocally = function () {
     if (!this.entityManager) {
       throw new Error(&quot;An EntityQuery must have its EntityManager property set before calling &#x27;executeLocally&#x27;&quot;);
     }
     return this.entityManager.executeQueryLocally(this);
   };
-
-  proto.toJSON = function() {
+  
+  proto.toJSON = function () {
     return this.toJSONExt();
   }
-
-  proto.toJSONExt = function(context) {
+  
+  proto.toJSONExt = function (context) {
     context = context || {};
     context.entityType = context.entityType || this.fromEntityType;
     context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer.bind(context.entityType) : __identity;
-
+    
     var that = this;
-
-    var toJSONExtFn = function(v) {
+    
+    var toJSONExtFn = function (v) {
       return v ? v.toJSONExt(context) : undefined;
     };
     return __toJson(this, {
       &quot;from,resourceName&quot;: null,
-      &quot;toType,resultEntityType&quot;: function(v) {
+      &quot;toType,resultEntityType&quot;: function (v) {
         // resultEntityType can be either a string or an entityType
-        return v ? ( __isString(v) ? v : v.name) : undefined;
+        return v ? (__isString(v) ? v : v.name) : undefined;
       },
       &quot;where,wherePredicate&quot;: toJSONExtFn,
       &quot;orderBy,orderByClause&quot;: toJSONExtFn,
@@ -857,7 +854,7 @@
       &quot;expand,expandClause&quot;: toJSONExtFn,
       &quot;skip,skipCount&quot;: null,
       &quot;take,takeCount&quot;: null,
-      parameters: function(v) {
+      parameters: function (v) {
         return __isEmpty(v) ? undefined : v;
       },
       &quot;inlineCount,inlineCountEnabled&quot;: false,
@@ -866,60 +863,60 @@
     });
 
   }
-
+  
   function fromJSON(eq, json) {
     __toJson(json, {
       &quot;resourceName,from&quot;: null,
       // just the name comes back and will be resolved later
       &quot;resultEntityType,toType&quot;: null,
-      &quot;wherePredicate,where&quot;: function(v) {
+      &quot;wherePredicate,where&quot;: function (v) {
         return v ? new Predicate(v) : undefined;
       },
-      &quot;orderByClause,orderBy&quot;: function(v) {
+      &quot;orderByClause,orderBy&quot;: function (v) {
         return v ? new OrderByClause(v) : undefined;
       },
-      &quot;selectClause,select&quot;: function(v) {
+      &quot;selectClause,select&quot;: function (v) {
         return v ? new SelectClause(v) : undefined;
       },
-      &quot;expandClause,expand&quot;: function(v) {
+      &quot;expandClause,expand&quot;: function (v) {
         return v ? new ExpandClause(v) : undefined;
       },
       &quot;skipCount,skip&quot;: null,
       &quot;takeCount,take&quot;: null,
-      parameters: function(v) {
+      parameters: function (v) {
         return __isEmpty(v) ? undefined : v;
       },
       &quot;inlineCountEnabled,inlineCount&quot;: false,
       &quot;noTrackingEnabled,noTracking&quot;: false,
-      queryOptions: function(v) {
+      queryOptions: function (v) {
         return v ? QueryOptions.fromJSON(v) : undefined;
       }
     }, eq);
     return eq;
   }
-
+  
   /**
-   Static method tht creates an EntityQuery that will allow &#x27;requerying&#x27; an entity or a collection of entities by primary key. This can be useful
-   to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
-   @example
-   // assuming &#x27;customers&#x27; is an array of &#x27;Customer&#x27; entities retrieved earlier.
-   var customersQuery = EntityQuery.fromEntities(customers);
-   The resulting query can, of course, be extended
-   @example
-   // assuming &#x27;customers&#x27; is an array of &#x27;Customer&#x27; entities retrieved earlier.
-   var customersQuery = EntityQuery.fromEntities(customers)
-   .where(&quot;Region&quot;, FilterQueryOp.NotEquals, null);
-   Single entities can requeried as well.
-   @example
-   // assuming &#x27;customer&#x27; is a &#x27;Customer&#x27; entity retrieved earlier.
-   var customerQuery = EntityQuery.fromEntities(customer);
-   will create a query that will return an array containing a single customer entity.
-   @method fromEntities
-   @static
-   @param entities {Entity|Array of Entity} The entities for which we want to create an EntityQuery.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Static method tht creates an EntityQuery that will allow &#x27;requerying&#x27; an entity or a collection of entities by primary key. This can be useful
+  to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
+  @example
+      // assuming &#x27;customers&#x27; is an array of &#x27;Customer&#x27; entities retrieved earlier.
+      var customersQuery = EntityQuery.fromEntities(customers);
+  The resulting query can, of course, be extended
+  @example
+      // assuming &#x27;customers&#x27; is an array of &#x27;Customer&#x27; entities retrieved earlier.
+      var customersQuery = EntityQuery.fromEntities(customers)
+        .where(&quot;Region&quot;, FilterQueryOp.NotEquals, null);
+  Single entities can requeried as well.
+  @example
+      // assuming &#x27;customer&#x27; is a &#x27;Customer&#x27; entity retrieved earlier.
+      var customerQuery = EntityQuery.fromEntities(customer);
+  will create a query that will return an array containing a single customer entity.
+  @method fromEntities
+  @static
+  @param entities {Entity|Array of Entity} The entities for which we want to create an EntityQuery.
+  @return {EntityQuery}
+  @chainable
+  **/
   ctor.fromEntities = function (entities) {
     assertParam(entities, &quot;entities&quot;).isEntity().or().isNonEmptyArray().isEntity().check();
     if (!Array.isArray(entities)) {
@@ -938,24 +935,24 @@
     }
     return q;
   };
-
+  
   /**
-   Creates an EntityQuery for the specified {{#crossLink &quot;EntityKey&quot;}}{{/crossLink}}.
-   @example
-   var empType = metadataStore.getEntityType(&quot;Employee&quot;);
-   var entityKey = new EntityKey(empType, 1);
-   var query = EntityQuery.fromEntityKey(entityKey);
-   or
-   @example
-   // &#x27;employee&#x27; is a previously queried employee
-   var entityKey = employee.entityAspect.getKey();
-   var query = EntityQuery.fromEntityKey(entityKey);
-   @method fromEntityKey
-   @static
-   @param entityKey {EntityKey} The {{#crossLink &quot;EntityKey&quot;}}{{/crossLink}} for which a query will be created.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Creates an EntityQuery for the specified {{#crossLink &quot;EntityKey&quot;}}{{/crossLink}}.
+  @example
+      var empType = metadataStore.getEntityType(&quot;Employee&quot;);
+      var entityKey = new EntityKey(empType, 1);
+      var query = EntityQuery.fromEntityKey(entityKey);
+  or
+  @example
+      // &#x27;employee&#x27; is a previously queried employee
+      var entityKey = employee.entityAspect.getKey();
+      var query = EntityQuery.fromEntityKey(entityKey);
+  @method fromEntityKey
+  @static
+  @param entityKey {EntityKey} The {{#crossLink &quot;EntityKey&quot;}}{{/crossLink}} for which a query will be created.
+  @return {EntityQuery}
+  @chainable
+  **/
   ctor.fromEntityKey = function (entityKey) {
     assertParam(entityKey, &quot;entityKey&quot;).isInstanceOf(EntityKey).check();
     var q = new EntityQuery(entityKey.entityType.defaultResourceName);
@@ -963,21 +960,21 @@
     q = q.where(pred).toType(entityKey.entityType);
     return q;
   };
-
+  
   /**
-   Creates an EntityQuery for the specified entity and {{#crossLink &quot;NavigationProperty&quot;}}{{/crossLink}}.
-   @example
-   // &#x27;employee&#x27; is a previously queried employee
-   var ordersNavProp = employee.entityType.getProperty(&quot;Orders&quot;);
-   var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);
-   will return a query for the &quot;Orders&quot; of the specified &#x27;employee&#x27;.
-   @method fromEntityNavigation
-   @static
-   @param entity {Entity} The Entity whose navigation property will be queried.
-   @param navigationProperty {NavigationProperty|String} The {{#crossLink &quot;NavigationProperty&quot;}}{{/crossLink}} or name of the NavigationProperty to be queried.
-   @return {EntityQuery}
-   @chainable
-   **/
+  Creates an EntityQuery for the specified entity and {{#crossLink &quot;NavigationProperty&quot;}}{{/crossLink}}.
+  @example
+      // &#x27;employee&#x27; is a previously queried employee
+      var ordersNavProp = employee.entityType.getProperty(&quot;Orders&quot;);
+      var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);
+  will return a query for the &quot;Orders&quot; of the specified &#x27;employee&#x27;.
+  @method fromEntityNavigation
+  @static
+  @param entity {Entity} The Entity whose navigation property will be queried.
+  @param navigationProperty {NavigationProperty|String} The {{#crossLink &quot;NavigationProperty&quot;}}{{/crossLink}} or name of the NavigationProperty to be queried.
+  @return {EntityQuery}
+  @chainable
+  **/
   ctor.fromEntityNavigation = function (entity, navigationProperty) {
     assertParam(entity, &quot;entity&quot;).isEntity().check();
     var navProperty = entity.entityType._checkNavProperty(navigationProperty);
@@ -987,21 +984,21 @@
     var em = entity.entityAspect.entityManager;
     return em ? q.using(em) : q;
   };
-
+  
   // protected methods
-
+  
   proto._getFromEntityType = function (metadataStore, throwErrorIfNotFound) {
     // Uncomment next two lines if we make this method public.
     // assertParam(metadataStore, &quot;metadataStore&quot;).isInstanceOf(MetadataStore).check();
     // assertParam(throwErrorIfNotFound, &quot;throwErrorIfNotFound&quot;).isBoolean().isOptional().check();
     var entityType = this.fromEntityType;
     if (entityType) return entityType;
-
+    
     var resourceName = this.resourceName;
     if (!resourceName) {
       throw new Error(&quot;There is no resourceName for this query&quot;);
     }
-
+    
     if (metadataStore.isEmpty()) {
       if (throwErrorIfNotFound) {
         throw new Error(&quot;There is no metadata available for this query. &quot; +
@@ -1010,29 +1007,29 @@
         return null;
       }
     }
-
+    
     var entityTypeName = metadataStore.getEntityTypeNameForResourceName(resourceName);
     if (entityTypeName) {
       entityType = metadataStore._getEntityType(entityTypeName);
     } else {
       entityType = this._getToEntityType(metadataStore, true);
     }
-
+    
     if (!entityType) {
       if (throwErrorIfNotFound) {
-        throw new Error(__formatString(&quot;Cannot find an entityType for resourceName: &#x27;%1&#x27;. &quot;
-            + &quot; Consider adding an &#x27;EntityQuery.toType&#x27; call to your query or &quot;
+        throw new Error(__formatString(&quot;Cannot find an entityType for resourceName: &#x27;%1&#x27;. &quot; 
+            + &quot; Consider adding an &#x27;EntityQuery.toType&#x27; call to your query or &quot; 
             + &quot;calling the MetadataStore.setEntityTypeForResourceName method to register an entityType for this resourceName.&quot;, resourceName));
       } else {
         return null;
       }
     }
-
+    
     this.fromEntityType = entityType;
     return entityType;
 
   };
-
+  
   proto._getToEntityType = function (metadataStore, skipFromCheck) {
     // skipFromCheck is to avoid recursion if called from _getFromEntityType;
     if (this.resultEntityType instanceof EntityType) {
@@ -1048,15 +1045,15 @@
       return skipFromCheck ? null : (!this.selectClause) &amp;&amp; this._getFromEntityType(metadataStore, false);
     }
   };
-
+  
   // for testing
   proto._toUri = function (em) {
     var ds = DataService.resolve([em.dataService]);
     return ds.uriBuilder.buildUri(this, em.metadataStore);
   }
-
-// private functions
-
+  
+  // private functions
+  
   function clone(that, propName, value) {
     // immutable queries mean that we don&#x27;t need to clone if no change in value.
     if (propName) {
@@ -1085,7 +1082,7 @@
     }
     return copy;
   }
-
+  
   function processUsing(eq, map, value, propertyName) {
     var typeName = value._$typeName || (value.parentEnum &amp;&amp; value.parentEnum.name);
     var key = typeName &amp;&amp; typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
@@ -1107,19 +1104,19 @@
       });
     }
   }
-
+  
   function normalizePropertyPaths(propertyPaths) {
     assertParam(propertyPaths, &quot;propertyPaths&quot;).isOptional().isString().or().isArray().isString().check();
     if (typeof propertyPaths === &#x27;string&#x27;) {
       propertyPaths = propertyPaths.split(&quot;,&quot;);
     }
-
+    
     propertyPaths = propertyPaths.map(function (pp) {
       return pp.trim();
     });
     return propertyPaths;
   }
-
+  
   function buildPredicate(entity) {
     var entityType = entity.entityType;
     var predParts = entityType.keyProperties.map(function (kp) {
@@ -1128,7 +1125,7 @@
     var pred = Predicate.and(predParts);
     return pred;
   }
-
+  
   function buildKeyPredicate(entityKey) {
     var keyProps = entityKey.entityType.keyProperties;
     var preds = __arrayZip(keyProps, entityKey.values, function (kp, v) {
@@ -1137,7 +1134,7 @@
     var pred = Predicate.and(preds);
     return pred;
   }
-
+  
   function buildNavigationPredicate(entity, navigationProperty) {
     if (navigationProperty.isScalar) {
       if (navigationProperty.foreignKeyNames.length === 0) return null;
@@ -1157,7 +1154,7 @@
       return Predicate.and(predParts);
     }
   }
-
+  
   return ctor;
 })();
 
@@ -1219,7 +1216,7 @@ var FilterQueryOp = (function () {
    @final
    @static
    **/
-  aEnum.Contains = aEnum.addSymbol({ operator: &quot;contains&quot;  });
+  aEnum.Contains = aEnum.addSymbol({ operator: &quot;contains&quot; });
   /**
    @property StartsWith {FilterQueryOp}
    @final
@@ -1232,7 +1229,7 @@ var FilterQueryOp = (function () {
    @static
    **/
   aEnum.EndsWith = aEnum.addSymbol({ operator: &quot;endswith&quot; });
-
+  
   /**
    Aliases: &quot;some&quot;
    @property Any {FilterQueryOp}
@@ -1240,7 +1237,7 @@ var FilterQueryOp = (function () {
    @static
    **/
   aEnum.Any = aEnum.addSymbol({ operator: &quot;any&quot; });
-
+  
   /**
    Aliases: &quot;every&quot;
    @property All {FilterQueryOp}
@@ -1248,9 +1245,9 @@ var FilterQueryOp = (function () {
    @static
    **/
   aEnum.All = aEnum.addSymbol({ operator: &quot;all&quot; });
-
+  
   aEnum.IsTypeOf = aEnum.addSymbol({ operator: &quot;isof&quot; });
-
+  
   aEnum.resolveSymbols();
   aEnum._map = function () {
     var map = {};
@@ -1280,7 +1277,7 @@ var BooleanQueryOp = (function () {
   aEnum.And = aEnum.addSymbol({ operator: &quot;and&quot; });
   aEnum.Or = aEnum.addSymbol({ operator: &quot;or&quot; });
   aEnum.Not = aEnum.addSymbol({ operator: &quot;not&quot; });
-
+  
   aEnum.resolveSymbols();
   aEnum._map = (function () {
     var map = {};
@@ -1320,7 +1317,7 @@ var BooleanQueryOp = (function () {
  @class OrderByClause
  */
 var OrderByClause = (function () {
-
+  
   var ctor = function (propertyPaths, isDesc) {
     if (propertyPaths.length &gt; 1) {
       var items = propertyPaths.map(function (pp) {
@@ -1332,14 +1329,14 @@ var OrderByClause = (function () {
     this.items = items;
   };
   var proto = ctor.prototype;
-
+  
   proto.validate = function (entityType) {
     if (entityType == null || entityType.isAnonymous) return;
     this.items.forEach(function (item) {
       item.validate(entityType)
     });
   };
-
+  
   proto.getComparer = function (entityType) {
     var orderByFuncs = this.items.map(function (obc) {
       return obc.getComparer(entityType);
@@ -1354,19 +1351,19 @@ var OrderByClause = (function () {
       return 0;
     };
   };
-
-  proto.toJSONExt = function(context) {
-    return this.items.map(function(item) {
-      return  context.propertyPathFn(item.propertyPath) + (item.isDesc ? &quot; desc&quot; : &quot;&quot;);
+  
+  proto.toJSONExt = function (context) {
+    return this.items.map(function (item) {
+      return context.propertyPathFn(item.propertyPath) + (item.isDesc ? &quot; desc&quot; : &quot;&quot;);
     });
   };
-
+  
   var OrderByItem = function (propertyPath, isDesc) {
     if (!(typeof propertyPath === &#x27;string&#x27;)) {
       throw new Error(&quot;propertyPath is not a string&quot;);
     }
     propertyPath = propertyPath.trim();
-
+    
     var parts = propertyPath.split(&#x27; &#x27;);
     // parts[0] is the propertyPath; [1] would be whether descending or not.
     if (parts.length &gt; 1 &amp;&amp; isDesc !== true &amp;&amp; isDesc !== false) {
@@ -1383,15 +1380,15 @@ var OrderByClause = (function () {
     this.propertyPath = parts[0];
     this.isDesc = isDesc;
   };
-
+  
   var itemProto = OrderByItem.prototype;
-
+  
   itemProto.validate = function (entityType) {
     if (entityType == null || entityType.isAnonymous) return;
     // will throw an exception on bad propertyPath
     this.lastProperty = entityType.getProperty(this.propertyPath, true);
   };
-
+  
   itemProto.getComparer = function (entityType) {
     if (!this.lastProperty) this.validate(entityType);
     if (this.lastProperty) {
@@ -1400,7 +1397,7 @@ var OrderByClause = (function () {
     }
     var propertyPath = this.propertyPath;
     var isDesc = this.isDesc;
-
+    
     return function (entity1, entity2) {
       var value1 = getPropertyPathValue(entity1, propertyPath);
       var value2 = getPropertyPathValue(entity2, propertyPath);
@@ -1427,13 +1424,13 @@ var OrderByClause = (function () {
       }
     };
   };
-
+  
   return ctor;
 })();
 
 // Not exposed
 var SelectClause = (function () {
-
+  
   var ctor = function (propertyPaths) {
     this.propertyPaths = propertyPaths;
     this._pathNames = propertyPaths.map(function (pp) {
@@ -1441,7 +1438,7 @@ var SelectClause = (function () {
     });
   };
   var proto = ctor.prototype;
-
+  
   proto.validate = function (entityType) {
     if (entityType == null || entityType.isAnonymous) return; // can&#x27;t validate yet
     // will throw an exception on bad propertyPath
@@ -1449,7 +1446,7 @@ var SelectClause = (function () {
       entityType.getProperty(path, true);
     });
   };
-
+  
   proto.toFunction = function (/* config */) {
     var that = this;
     return function (entity) {
@@ -1460,31 +1457,31 @@ var SelectClause = (function () {
       return result;
     };
   };
-
-  proto.toJSONExt = function(context) {
-    return this.propertyPaths.map(function(pp) {
+  
+  proto.toJSONExt = function (context) {
+    return this.propertyPaths.map(function (pp) {
       return context.propertyPathFn(pp);
     })
   };
-
+  
   return ctor;
 })();
 
 // Not exposed
 var ExpandClause = (function () {
-
+  
   // propertyPaths is an array of strings.
   var ctor = function (propertyPaths) {
     this.propertyPaths = propertyPaths;
   };
   var proto = ctor.prototype;
-
-  proto.toJSONExt = function(context) {
-    return this.propertyPaths.map(function(pp) {
+  
+  proto.toJSONExt = function (context) {
+    return this.propertyPaths.map(function (pp) {
       return context.propertyPathFn(pp);
     })
   };
-
+  
   return ctor;
 })();
 

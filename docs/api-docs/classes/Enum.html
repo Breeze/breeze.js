@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -226,36 +228,6 @@
     <p>Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
 A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called &#39;symbols&#39;.
 Unlike enums in some other environments, each &#39;symbol&#39; can have both methods and properties.</p>
-<p>See the example below:</p>
-<p>// Example of creating a new Enum
-var prototype = {
-         nextDay: function () {
-             var nextIndex = (this.dayIndex+1) % 7;
-             return DayOfWeek.getSymbols()[nextIndex];
-         }
-     };</p>
-<p>var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
-DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });
-DayOfWeek.Tuesday   = DayOfWeek.addSymbol( { dayIndex: 1 });
-DayOfWeek.Wednesday = DayOfWeek.addSymbol( { dayIndex: 2 });
-DayOfWeek.Thursday  = DayOfWeek.addSymbol( { dayIndex: 3 });
-DayOfWeek.Friday    = DayOfWeek.addSymbol( { dayIndex: 4 });
-DayOfWeek.Saturday  = DayOfWeek.addSymbol( { dayIndex: 5, isWeekend: true });
-DayOfWeek.Sunday    = DayOfWeek.addSymbol( { dayIndex: 6, isWeekend: true });
-DayOfWeek.resolveSymbols();</p>
-<p>// custom methods
-ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
-ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
-// custom properties
-ok(DayOfWeek.Tuesday.isWeekend === undefined);
-ok(DayOfWeek.Saturday.isWeekend == true);
-// Standard enum capabilities
-ok(DayOfWeek instanceof Enum);
-ok(Enum.isSymbol(DayOfWeek.Wednesday));
-ok(DayOfWeek.contains(DayOfWeek.Thursday));
-ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
-ok(DayOfWeek.getSymbols().length === 7);
-ok(DayOfWeek.Friday.toString() === &quot;Friday&quot;);</p>
 
 </div>
 
@@ -405,7 +377,7 @@ ok(DayOfWeek.Friday.toString() === &quot;Friday&quot;);</p>
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l52"><code>..\src\a05_enum.js:52</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l51"><code>..\src\a05_enum.js:51</code></a>
         
         </p>
 
@@ -468,13 +440,14 @@ ok(DayOfWeek.Friday.toString() === &quot;Friday&quot;);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var prototype = {
-         nextDay: function () {
-             var nextIndex = (this.dayIndex+1) % 7;
-             return DayOfWeek.getSymbols()[nextIndex];
-         }
-     };</p>
-<p>var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);</p>
+                <pre class="code prettyprint"><code>var prototype = {
+    nextDay: function () {
+        var nextIndex = (this.dayIndex+1) % 7;
+        return DayOfWeek.getSymbols()[nextIndex];
+    }
+};
+
+var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);</code></pre>
 
             </div>
         </div>
@@ -528,7 +501,7 @@ ok(DayOfWeek.Friday.toString() === &quot;Friday&quot;);</p>
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l108"><code>..\src\a05_enum.js:108</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l107"><code>..\src\a05_enum.js:107</code></a>
         
         </p>
 
@@ -592,8 +565,8 @@ In other words, the &#39;propertiesObj&#39; is any state that should be held by 
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
-DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });</p>
+                <pre class="code prettyprint"><code>var DayOfWeek = new Enum(&quot;DayOfWeek&quot;, prototype);
+DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });</code></pre>
 
             </div>
         </div>
@@ -647,7 +620,7 @@ DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });</p>
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l204"><code>..\src\a05_enum.js:204</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l203"><code>..\src\a05_enum.js:203</code></a>
         
         </p>
 
@@ -709,10 +682,10 @@ DayOfWeek.Monday    = DayOfWeek.addSymbol( { dayIndex: 0 });</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var symbol = DayOfWeek.Friday;
+                <pre class="code prettyprint"><code>var symbol = DayOfWeek.Friday;
 if (DayOfWeek.contains(symbol)) {
-         // do something
-     }</p>
+    // do something
+}</code></pre>
 
             </div>
         </div>
@@ -766,7 +739,7 @@ if (DayOfWeek.contains(symbol)) {
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l95"><code>..\src\a05_enum.js:95</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l94"><code>..\src\a05_enum.js:94</code></a>
         
         </p>
 
@@ -828,8 +801,8 @@ if (DayOfWeek.contains(symbol)) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var dayOfWeek = DayOfWeek.from(&quot;Thursday&quot;);
-// nowdayOfWeek === DayOfWeek.Thursday</p>
+                <pre class="code prettyprint"><code>var dayOfWeek = DayOfWeek.from(&quot;Thursday&quot;);
+// nowdayOfWeek === DayOfWeek.Thursday</code></pre>
 
             </div>
         </div>
@@ -873,7 +846,7 @@ if (DayOfWeek.contains(symbol)) {
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l185"><code>..\src\a05_enum.js:185</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l184"><code>..\src\a05_enum.js:184</code></a>
         
         </p>
 
@@ -911,7 +884,7 @@ if (DayOfWeek.contains(symbol)) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var symbols = DayOfWeek.getNames();</p>
+                <pre class="code prettyprint"><code>var symbols = DayOfWeek.getNames();</code></pre>
 
             </div>
         </div>
@@ -955,7 +928,7 @@ if (DayOfWeek.contains(symbol)) {
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l172"><code>..\src\a05_enum.js:172</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l171"><code>..\src\a05_enum.js:171</code></a>
         
         </p>
 
@@ -993,7 +966,7 @@ if (DayOfWeek.contains(symbol)) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var symbols = DayOfWeek.getSymbols();</p>
+                <pre class="code prettyprint"><code>var symbols = DayOfWeek.getSymbols();</code></pre>
 
             </div>
         </div>
@@ -1039,7 +1012,7 @@ if (DayOfWeek.contains(symbol)) {
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l81"><code>..\src\a05_enum.js:81</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l80"><code>..\src\a05_enum.js:80</code></a>
         
         </p>
 
@@ -1075,9 +1048,9 @@ if (DayOfWeek.contains(symbol)) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>if (Enum.isSymbol(DayOfWeek.Wednesday)) {
-         // do something ...
-      };</p>
+                <pre class="code prettyprint"><code>if (Enum.isSymbol(DayOfWeek.Wednesday)) {
+  // do something ...
+};</code></pre>
 
             </div>
         </div>
@@ -1117,7 +1090,7 @@ if (DayOfWeek.contains(symbol)) {
             
         
         
-        <a href="../files/.._src_a05_enum.js.html#l132"><code>..\src\a05_enum.js:132</code></a>
+        <a href="../files/.._src_a05_enum.js.html#l131"><code>..\src\a05_enum.js:131</code></a>
         
         </p>
 
@@ -1142,7 +1115,7 @@ have already been added to the Enum.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>DayOfWeek.resolveSymbols();</p>
+                <pre class="code prettyprint"><code>DayOfWeek.resolveSymbols();</code></pre>
 
             </div>
         </div>

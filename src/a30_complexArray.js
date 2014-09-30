@@ -19,22 +19,22 @@
    **/
 
   /**
-   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
-   is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-   Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-   collections are collected into a single notification event for each relation array.
-   @example
-   // assume order is an order entity attached to an EntityManager.
-   orders.arrayChanged.subscribe(
-   function (arrayChangedArgs) {
-                var addedEntities = arrayChangedArgs.added;
-                var removedEntities = arrayChanged.removed;
-            });
-   @event arrayChanged
-   @param added {Array of Entity} An array of all of the entities added to this collection.
-   @param removed {Array of Entity} An array of all of the removed from this collection.
-   @readOnly
-   **/
+  An {{#crossLink "Event"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event
+  is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+  Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+  collections are collected into a single notification event for each relation array.
+  @example
+      // assume order is an order entity attached to an EntityManager.
+      orders.arrayChanged.subscribe(
+      function (arrayChangedArgs) {
+          var addedEntities = arrayChangedArgs.added;
+          var removedEntities = arrayChanged.removed;
+      });
+  @event arrayChanged
+  @param added {Array of Entity} An array of all of the entities added to this collection.
+  @param removed {Array of Entity} An array of all of the removed from this collection.
+  @readOnly
+  **/
 
     // virtual impls 
   complexArrayMixin._getGoodAdds = function (adds) {

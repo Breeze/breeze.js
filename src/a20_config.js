@@ -1,6 +1,6 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var __config = (function () {
 
@@ -47,25 +47,25 @@ var __config = (function () {
   };
 
   /**
-   A singleton object that is the repository of all configuration options.
+  A singleton object that is the repository of all configuration options.
+  @example
+      config.initializeAdapterInstance( {
+          modelLibrary: "ko",
+          dataService: "webApi"
+      });
 
-   config.initializeAdapterInstance( {
-            modelLibrary: "ko",
-            dataService: "webApi"
-        });
-
-   @class config
-   **/
+  @class config
+  **/
 
   /**
-   This method is now OBSOLETE.  Use the "initializeAdapterInstances" to accomplish the same result.
-   @method setProperties
-   @deprecated
-   @param config {Object}
-   @param [config.remoteAccessImplementation] { implementation of remoteAccess-interface }
-   @param [config.trackingImplementation] { implementation of entityTracking-interface }
-   @param [config.ajaxImplementation] {implementation of ajax-interface }
-   **/
+  This method is now OBSOLETE.  Use the "initializeAdapterInstances" to accomplish the same result.
+  @method setProperties
+  @deprecated
+  @param config {Object}
+  @param [config.remoteAccessImplementation] { implementation of remoteAccess-interface }
+  @param [config.trackingImplementation] { implementation of entityTracking-interface }
+  @param [config.ajaxImplementation] {implementation of ajax-interface }
+  **/
   __config.setProperties = function (config) {
     assertConfig(config)
         .whereParam("remoteAccessImplementation").isOptional()
@@ -85,12 +85,12 @@ var __config = (function () {
   };
 
   /**
-   Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
-   made as the last step within an adapter implementation.
-   @method registerAdapter
-   @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
-   @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
-   **/
+  Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
+  made as the last step within an adapter implementation.
+  @method registerAdapter
+  @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
+  @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
+  **/
   __config.registerAdapter = function (interfaceName, adapterCtor) {
     assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
     assertParam(adapterCtor, "adapterCtor").isFunction().check();
@@ -106,13 +106,13 @@ var __config = (function () {
   };
 
   /**
-   Returns the ctor function used to implement a specific interface with a specific adapter name.
-   @method getAdapter
-   @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
-   @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
-   this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
-   @return {Function|null} Returns either a ctor function or null.
-   **/
+  Returns the ctor function used to implement a specific interface with a specific adapter name.
+  @method getAdapter
+  @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
+  @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
+  this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
+  @return {Function|null} Returns either a ctor function or null.
+  **/
   __config.getAdapter = function (interfaceName, adapterName) {
     var idef = getInterfaceDef(interfaceName);
     if (adapterName) {
@@ -124,14 +124,14 @@ var __config = (function () {
   };
 
   /**
-   Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
-   @method initializeAdapterInstances
-   @param config {Object}
-   @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
-   @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
-   @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
-   @return [array of instances]
-   **/
+  Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
+  @method initializeAdapterInstances
+  @param config {Object}
+  @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
+  @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
+  @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+  @return [array of instances]
+  **/
   __config.initializeAdapterInstances = function (config) {
     assertConfig(config)
         .whereParam("dataService").isOptional()
@@ -144,15 +144,15 @@ var __config = (function () {
   };
 
   /**
-   Initializes a single adapter implementation. Initialization means either newing a instance of the
-   specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
-   if it already exists.
-   @method initializeAdapterInstance
-   @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
-   @param adapterName {String} - The name of a previously registered adapter to initialize.
-   @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface.
-   @return {an instance of the specified adapter}
-   **/
+  Initializes a single adapter implementation. Initialization means either newing a instance of the
+  specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
+  if it already exists.
+  @method initializeAdapterInstance
+  @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
+  @param adapterName {String} - The name of a previously registered adapter to initialize.
+  @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface.
+  @return {an instance of the specified adapter}
+  **/
   __config.initializeAdapterInstance = function (interfaceName, adapterName, isDefault) {
     isDefault = isDefault === undefined ? true : isDefault;
     assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
@@ -169,14 +169,14 @@ var __config = (function () {
   };
 
   /**
-   Returns the adapter instance corresponding to the specified interface and adapter names.
-   @method getAdapterInstance
-   @param interfaceName {String} The name of the interface.
-   @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
-   omitted then the default implementation of the specified interface is returned. If there is
-   no defaultInstance of this interface, then the first registered instance of this interface is returned.
-   @return {an instance of the specified adapter}
-   **/
+  Returns the adapter instance corresponding to the specified interface and adapter names.
+  @method getAdapterInstance
+  @param interfaceName {String} The name of the interface.
+  @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
+  omitted then the default implementation of the specified interface is returned. If there is
+  no defaultInstance of this interface, then the first registered instance of this interface is returned.
+  @return {an instance of the specified adapter}
+  **/
   __config.getAdapterInstance = function (interfaceName, adapterName) {
     var idef = getInterfaceDef(interfaceName);
     var impl;

@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -207,7 +209,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l1169"><code>..\src\a40_entityMetadata.js:1169</code></a>
+            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l1166"><code>..\src\a40_entityMetadata.js:1166</code></a>
         </div>
     
 
@@ -536,7 +538,7 @@
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1176"><code>..\src\a40_entityMetadata.js:1176</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1173"><code>..\src\a40_entityMetadata.js:1173</code></a>
         
         </p>
 
@@ -729,10 +731,10 @@ client side use and will be given an automatically generated name. Normally, how
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var entityType = new EntityType( {
-         shortName: &quot;person&quot;,
-         namespace: &quot;myAppNamespace&quot;
-         });</p>
+                <pre class="code prettyprint"><code>var entityType = new EntityType( {
+    shortName: &quot;person&quot;,
+    namespace: &quot;myAppNamespace&quot;
+});</code></pre>
 
             </div>
         </div>
@@ -782,7 +784,7 @@ client side use and will be given an automatically generated name. Normally, how
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1438"><code>..\src\a40_entityMetadata.js:1438</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1435"><code>..\src\a40_entityMetadata.js:1435</code></a>
         
         </p>
 
@@ -829,10 +831,10 @@ client side use and will be given an automatically generated name. Normally, how
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume myEntityType is a newly constructed EntityType.
+                <pre class="code prettyprint"><code>// assume myEntityType is a newly constructed EntityType.
 myEntityType.addProperty(dataProperty1);
 myEntityType.addProperty(dataProperty2);
-myEntityType.addProperty(navigationProperty1);</p>
+myEntityType.addProperty(navigationProperty1);</code></pre>
 
             </div>
         </div>
@@ -888,7 +890,7 @@ myEntityType.addProperty(navigationProperty1);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1668"><code>..\src\a40_entityMetadata.js:1668</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1663"><code>..\src\a40_entityMetadata.js:1663</code></a>
         
         </p>
 
@@ -954,22 +956,22 @@ entity level validator and is added to the EntityType&#39;s &#39;validators&#39;
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var countryProp = custType.getProperty(&quot;Country&quot;);
 var valFn = function (v) {
-         if (v == null) return true;
-         return (core.stringStartsWith(v, &quot;US&quot;));
-     };
+        if (v == null) return true;
+        return (core.stringStartsWith(v, &quot;US&quot;));
+    };
 var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn,
 { displayName: &quot;Country&quot;, messageTemplate: &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot; });
-custType.addValidator(countryValidator, countryProp);
-This is the same as adding an entity level validator via the &#39;validators&#39; property of DataProperty or NavigationProperty</p>
-<p>countryProp.validators.push(countryValidator);
-Entity level validators can also be added by omitting the &#39;property&#39; parameter.</p>
-<p>custType.addValidator(someEntityLevelValidator);
-or</p>
-<p>custType.validators.push(someEntityLevelValidator);</p>
+custType.addValidator(countryValidator, countryProp);</code></pre>
+<p>This is the same as adding an entity level validator via the &#39;validators&#39; property of DataProperty or NavigationProperty</p>
+<pre class="code prettyprint"><code>countryProp.validators.push(countryValidator);</code></pre>
+<p>Entity level validators can also be added by omitting the &#39;property&#39; parameter.</p>
+<pre class="code prettyprint"><code>custType.addValidator(someEntityLevelValidator);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>custType.validators.push(someEntityLevelValidator);</code></pre>
 
             </div>
         </div>
@@ -1023,7 +1025,7 @@ or</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1511"><code>..\src\a40_entityMetadata.js:1511</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1506"><code>..\src\a40_entityMetadata.js:1506</code></a>
         
         </p>
 
@@ -1088,10 +1090,10 @@ or</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 var cust1 = custType.createEntity();
-em1.addEntity(cust1);</p>
+em1.addEntity(cust1);</code></pre>
 
             </div>
         </div>
@@ -1135,7 +1137,7 @@ em1.addEntity(cust1);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1601"><code>..\src\a40_entityMetadata.js:1601</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1596"><code>..\src\a40_entityMetadata.js:1596</code></a>
         
         </p>
 
@@ -1218,7 +1220,7 @@ em1.addEntity(cust1);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1734"><code>..\src\a40_entityMetadata.js:1734</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1729"><code>..\src\a40_entityMetadata.js:1729</code></a>
         
         </p>
 
@@ -1279,9 +1281,9 @@ em1.addEntity(cust1);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var customerNameDataProp = custType.getDataProperty(&quot;CustomerName&quot;);</p>
+var customerNameDataProp = custType.getDataProperty(&quot;CustomerName&quot;);</code></pre>
 
             </div>
         </div>
@@ -1335,7 +1337,7 @@ var customerNameDataProp = custType.getDataProperty(&quot;CustomerName&quot;);</
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1748"><code>..\src\a40_entityMetadata.js:1748</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1743"><code>..\src\a40_entityMetadata.js:1743</code></a>
         
         </p>
 
@@ -1396,9 +1398,9 @@ var customerNameDataProp = custType.getDataProperty(&quot;CustomerName&quot;);</
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var customerOrdersNavProp = custType.getDataProperty(&quot;Orders&quot;);</p>
+var customerOrdersNavProp = custType.getDataProperty(&quot;Orders&quot;);</code></pre>
 
             </div>
         </div>
@@ -1442,7 +1444,7 @@ var customerOrdersNavProp = custType.getDataProperty(&quot;Orders&quot;);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1708"><code>..\src\a40_entityMetadata.js:1708</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1703"><code>..\src\a40_entityMetadata.js:1703</code></a>
         
         </p>
 
@@ -1480,9 +1482,9 @@ var customerOrdersNavProp = custType.getDataProperty(&quot;Orders&quot;);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var arrayOfProps = custType.getProperties();</p>
+var arrayOfProps = custType.getProperties();</code></pre>
 
             </div>
         </div>
@@ -1542,7 +1544,7 @@ var arrayOfProps = custType.getProperties();</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1762"><code>..\src\a40_entityMetadata.js:1762</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1757"><code>..\src\a40_entityMetadata.js:1757</code></a>
         
         </p>
 
@@ -1622,12 +1624,12 @@ end of the path.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var companyNameProp = custType.getProperty(&quot;CompanyName&quot;);
-This method can also walk a property path to return a property</p>
-<p>var orderDetailType = em1.metadataStore.getEntityType(&quot;OrderDetail&quot;);
+                <pre class="code prettyprint"><code>var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
+var companyNameProp = custType.getProperty(&quot;CompanyName&quot;);</code></pre>
+<p>This method can also walk a property path to return a property</p>
+<pre class="code prettyprint"><code>var orderDetailType = em1.metadataStore.getEntityType(&quot;OrderDetail&quot;);
 var companyNameProp2 = orderDetailType.getProperty(&quot;Order.Customer.CompanyName&quot;);
-// companyNameProp === companyNameProp2</p>
+// companyNameProp === companyNameProp2</code></pre>
 
             </div>
         </div>
@@ -1671,7 +1673,7 @@ var companyNameProp2 = orderDetailType.getProperty(&quot;Order.Customer.CompanyN
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1721"><code>..\src\a40_entityMetadata.js:1721</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1716"><code>..\src\a40_entityMetadata.js:1716</code></a>
         
         </p>
 
@@ -1707,9 +1709,9 @@ var companyNameProp2 = orderDetailType.getProperty(&quot;Order.Customer.CompanyN
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var arrayOfPropNames = custType.getPropertyNames();</p>
+var arrayOfPropNames = custType.getPropertyNames();</code></pre>
 
             </div>
         </div>
@@ -1749,7 +1751,7 @@ var arrayOfPropNames = custType.getPropertyNames();</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1413"><code>..\src\a40_entityMetadata.js:1413</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1410"><code>..\src\a40_entityMetadata.js:1410</code></a>
         
         </p>
 
@@ -1814,7 +1816,7 @@ var arrayOfPropNames = custType.getPropertyNames();</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1397"><code>..\src\a40_entityMetadata.js:1397</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1394"><code>..\src\a40_entityMetadata.js:1394</code></a>
         
         </p>
 
@@ -1903,7 +1905,7 @@ var arrayOfPropNames = custType.getPropertyNames();</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1369"><code>..\src\a40_entityMetadata.js:1369</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1366"><code>..\src\a40_entityMetadata.js:1366</code></a>
         
         </p>
 
@@ -2012,12 +2014,12 @@ var arrayOfPropNames = custType.getPropertyNames();</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
 custType.setProperties( {
-         autoGeneratedKeyType: AutoGeneratedKeyType.Identity;
-         defaultResourceName: &quot;CustomersAndIncludedOrders&quot;
-     )};</p>
+    autoGeneratedKeyType: AutoGeneratedKeyType.Identity;
+    defaultResourceName: &quot;CustomersAndIncludedOrders&quot;
+)};</code></pre>
 
             </div>
         </div>
@@ -2061,7 +2063,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1886"><code>..\src\a40_entityMetadata.js:1886</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1881"><code>..\src\a40_entityMetadata.js:1881</code></a>
         
         </p>
 
@@ -2127,7 +2129,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1346"><code>..\src\a40_entityMetadata.js:1346</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1343"><code>..\src\a40_entityMetadata.js:1343</code></a>
         
         </p>
 
@@ -2175,7 +2177,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1332"><code>..\src\a40_entityMetadata.js:1332</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1329"><code>..\src\a40_entityMetadata.js:1329</code></a>
         
         </p>
 
@@ -2221,7 +2223,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1266"><code>..\src\a40_entityMetadata.js:1266</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1263"><code>..\src\a40_entityMetadata.js:1263</code></a>
         
         </p>
 
@@ -2267,7 +2269,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1287"><code>..\src\a40_entityMetadata.js:1287</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1284"><code>..\src\a40_entityMetadata.js:1284</code></a>
         
         </p>
 
@@ -2313,7 +2315,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1362"><code>..\src\a40_entityMetadata.js:1362</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1359"><code>..\src\a40_entityMetadata.js:1359</code></a>
         
         </p>
 
@@ -2359,7 +2361,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1252"><code>..\src\a40_entityMetadata.js:1252</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1249"><code>..\src\a40_entityMetadata.js:1249</code></a>
         
         </p>
 
@@ -2405,7 +2407,7 @@ custType.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1302"><code>..\src\a40_entityMetadata.js:1302</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1299"><code>..\src\a40_entityMetadata.js:1299</code></a>
         
         </p>
 
@@ -2453,7 +2455,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1280"><code>..\src\a40_entityMetadata.js:1280</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1277"><code>..\src\a40_entityMetadata.js:1277</code></a>
         
         </p>
 
@@ -2499,7 +2501,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1339"><code>..\src\a40_entityMetadata.js:1339</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1336"><code>..\src\a40_entityMetadata.js:1336</code></a>
         
         </p>
 
@@ -2545,7 +2547,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1273"><code>..\src\a40_entityMetadata.js:1273</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1270"><code>..\src\a40_entityMetadata.js:1270</code></a>
         
         </p>
 
@@ -2591,7 +2593,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1245"><code>..\src\a40_entityMetadata.js:1245</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1242"><code>..\src\a40_entityMetadata.js:1242</code></a>
         
         </p>
 
@@ -2637,7 +2639,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1311"><code>..\src\a40_entityMetadata.js:1311</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1308"><code>..\src\a40_entityMetadata.js:1308</code></a>
         
         </p>
 
@@ -2683,7 +2685,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1325"><code>..\src\a40_entityMetadata.js:1325</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1322"><code>..\src\a40_entityMetadata.js:1322</code></a>
         
         </p>
 
@@ -2729,7 +2731,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1259"><code>..\src\a40_entityMetadata.js:1259</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1256"><code>..\src\a40_entityMetadata.js:1256</code></a>
         
         </p>
 
@@ -2775,7 +2777,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1318"><code>..\src\a40_entityMetadata.js:1318</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1315"><code>..\src\a40_entityMetadata.js:1315</code></a>
         
         </p>
 
@@ -2821,7 +2823,7 @@ or when executing any <a href="../classes/EntityQuery.html" class="crosslink">En
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1294"><code>..\src\a40_entityMetadata.js:1294</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1291"><code>..\src\a40_entityMetadata.js:1291</code></a>
         
         </p>
 
@@ -2868,7 +2870,7 @@ properties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l1354"><code>..\src\a40_entityMetadata.js:1354</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l1351"><code>..\src\a40_entityMetadata.js:1351</code></a>
         
         </p>
 

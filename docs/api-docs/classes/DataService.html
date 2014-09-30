@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -522,18 +524,19 @@ anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or se
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>//
-var dataService = new DataService({
-         serviceName: altServiceName,
-         hasServerMetadata: false
-     });</p>
-<p>var metadataStore = new MetadataStore({
-         namingConvention: NamingConvention.camelCase
-     });</p>
-<p>return new EntityManager({
-         dataService: dataService,
-         metadataStore: metadataStore
-     });</p>
+                <pre class="code prettyprint"><code>var dataService = new DataService({
+    serviceName: altServiceName,
+    hasServerMetadata: false
+});
+
+var metadataStore = new MetadataStore({
+    namingConvention: NamingConvention.camelCase
+});
+
+return new EntityManager({
+    dataService: dataService,
+    metadataStore: metadataStore
+});</code></pre>
 
             </div>
         </div>
@@ -589,7 +592,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l100"><code>..\src\a40_dataService.js:100</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l98"><code>..\src\a40_dataService.js:98</code></a>
         
         </p>
 
@@ -679,7 +682,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l72"><code>..\src\a40_dataService.js:72</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l70"><code>..\src\a40_dataService.js:70</code></a>
         
         </p>
 
@@ -725,7 +728,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l65"><code>..\src\a40_dataService.js:65</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l63"><code>..\src\a40_dataService.js:63</code></a>
         
         </p>
 
@@ -771,7 +774,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l79"><code>..\src\a40_dataService.js:79</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l77"><code>..\src\a40_dataService.js:77</code></a>
         
         </p>
 
@@ -817,7 +820,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l86"><code>..\src\a40_dataService.js:86</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l84"><code>..\src\a40_dataService.js:84</code></a>
         
         </p>
 
@@ -863,7 +866,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l58"><code>..\src\a40_dataService.js:58</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l56"><code>..\src\a40_dataService.js:56</code></a>
         
         </p>
 
@@ -909,7 +912,7 @@ var dataService = new DataService({
             
         
         
-        <a href="../files/.._src_a40_dataService.js.html#l93"><code>..\src\a40_dataService.js:93</code></a>
+        <a href="../files/.._src_a40_dataService.js.html#l91"><code>..\src\a40_dataService.js:91</code></a>
         
         </p>
 

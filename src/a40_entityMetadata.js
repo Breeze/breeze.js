@@ -1,6 +1,6 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 // Get the promises library called Q
 // define a quick failing version if not found.
@@ -36,36 +36,36 @@ breeze.Q = Q; // Todo: consider a "safer" way for apps to get breeze's Q.
 var MetadataStore = (function () {
 
   /**
-   An instance of the MetadataStore contains all of the metadata about a collection of {{#crossLink "EntityType"}}{{/crossLink}}'s.
-   MetadataStores may be shared across {{#crossLink "EntityManager"}}{{/crossLink}}'s.  If an EntityManager is created without an
-   explicit MetadataStore, the MetadataStore from the MetadataStore.defaultInstance property will be used.
-   @class MetadataStore
-   **/
+  An instance of the MetadataStore contains all of the metadata about a collection of {{#crossLink "EntityType"}}{{/crossLink}}'s.
+  MetadataStores may be shared across {{#crossLink "EntityManager"}}{{/crossLink}}'s.  If an EntityManager is created without an
+  explicit MetadataStore, the MetadataStore from the MetadataStore.defaultInstance property will be used.
+  @class MetadataStore
+  **/
 
   var __id = 0;
 
   /**
-   Constructs a new MetadataStore.
-   @example
-   var ms = new MetadataStore();
-   The store can then be associated with an EntityManager
-   @example
-   var entityManager = new EntityManager( {
-            serviceName: "breeze/NorthwindIBModel", 
-            metadataStore: ms 
-        });
-   or for an existing EntityManager
-   @example
-   // Assume em1 is an existing EntityManager
-   em1.setProperties( { metadataStore: ms });
-   @method <ctor> MetadataStore
-   @param [config] {Object} Configuration settings .
-   @param [config.namingConvention=NamingConvention.defaultInstance] {NamingConvention} NamingConvention to be used in mapping property names
-   between client and server. Uses the NamingConvention.defaultInstance if not specified.
-   @param [config.localQueryComparisonOptions=LocalQueryComparisonOptions.defaultInstance] {LocalQueryComparisonOptions} The LocalQueryComparisonOptions to be
-   used when performing "local queries" in order to match the semantics of queries against a remote service.
-   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
-   **/
+  Constructs a new MetadataStore.
+  @example
+      var ms = new MetadataStore();
+  The store can then be associated with an EntityManager
+  @example
+      var entityManager = new EntityManager( {
+          serviceName: "breeze/NorthwindIBModel", 
+          metadataStore: ms 
+      });
+  or for an existing EntityManager
+  @example
+      // Assume em1 is an existing EntityManager
+      em1.setProperties( { metadataStore: ms });
+  @method <ctor> MetadataStore
+  @param [config] {Object} Configuration settings .
+  @param [config.namingConvention=NamingConvention.defaultInstance] {NamingConvention} NamingConvention to be used in mapping property names
+  between client and server. Uses the NamingConvention.defaultInstance if not specified.
+  @param [config.localQueryComparisonOptions=LocalQueryComparisonOptions.defaultInstance] {LocalQueryComparisonOptions} The LocalQueryComparisonOptions to be
+  used when performing "local queries" in order to match the semantics of queries against a remote service.
+  @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
+  **/
   var ctor = function (config) {
     config = config || { };
     assertConfig(config)
@@ -90,38 +90,39 @@ var MetadataStore = (function () {
   ctor.ANONTYPE_PREFIX = "_IB_";
 
   /**
-   An {{#crossLink "Event"}}{{/crossLink}} that fires after a MetadataStore has completed fetching metadata from a remote service.
+  An {{#crossLink "Event"}}{{/crossLink}} that fires after a MetadataStore has completed fetching metadata from a remote service.
 
-   var ms = myEntityManager.metadataStore;
-   ms.metadataFetched.subscribe(function(args) {
-           var metadataStore = args.metadataStore;
-           var dataService = args.dataService;
-       });
-   });
+  @example
+      var ms = myEntityManager.metadataStore;
+      ms.metadataFetched.subscribe(function(args) {
+              var metadataStore = args.metadataStore;
+              var dataService = args.dataService;
+          });
+      });
 
-   @event metadataFetched
-   @param metadataStore {MetadataStore} The MetadataStore into which the metadata was fetched.
-   @param dataService {DataService} The DataService that metadata was fetched from.
-   @param rawMetadata {Object} The raw metadata returned from the service. (It will have already been processed by this point).
-   @readOnly
-   **/
+  @event metadataFetched
+  @param metadataStore {MetadataStore} The MetadataStore into which the metadata was fetched.
+  @param dataService {DataService} The DataService that metadata was fetched from.
+  @param rawMetadata {Object} The raw metadata returned from the service. (It will have already been processed by this point).
+  @readOnly
+  **/
 
   /**
-   General purpose property set method
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
+  General purpose property set method
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
 
-   em1.metadataStore.setProperties( {
-            version: "6.1.3",
-            serializerFn: function(prop, value) {
-            return (prop.isUnmapped) ? undefined : value;
-            }
-        )};
-   @method setProperties
-   @param config [object]
-   @param [config.name] {String} A name for the collection of metadata in this store.
-   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
-   **/
+      em1.metadataStore.setProperties( {
+          version: "6.1.3",
+          serializerFn: function(prop, value) {
+          return (prop.isUnmapped) ? undefined : value;
+          }
+      )};
+  @method setProperties
+  @param config [object]
+  @param [config.name] {String} A name for the collection of metadata in this store.
+  @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
+  **/
   proto.setProperties = function (config) {
     assertConfig(config)
         .whereParam("name").isString().isOptional()
@@ -130,13 +131,12 @@ var MetadataStore = (function () {
   };
 
   /**
-   Adds a DataService to this MetadataStore. If a DataService with the same serviceName is already
-   in the MetadataStore an exception will be thrown.
-   @method addDataService
-   @param dataService {DataService} The DataService to add
-   @param [shouldOverwrite=false] {Boolean} Permit overwrite of existing DataService rather than throw exception
-   **/
-
+  Adds a DataService to this MetadataStore. If a DataService with the same serviceName is already
+  in the MetadataStore an exception will be thrown.
+  @method addDataService
+  @param dataService {DataService} The DataService to add
+  @param [shouldOverwrite=false] {Boolean} Permit overwrite of existing DataService rather than throw exception
+  **/
   proto.addDataService = function (dataService, shouldOverwrite) {
     assertParam(dataService, "dataService").isInstanceOf(DataService).check();
     assertParam(shouldOverwrite, "shouldOverwrite").isBoolean().isOptional().check();
@@ -159,11 +159,11 @@ var MetadataStore = (function () {
   };
 
   /**
-   Adds an EntityType to this MetadataStore.  No additional properties may be added to the EntityType after its has
-   been added to the MetadataStore.
-   @method addEntityType
-   @param structuralType {EntityType|ComplexType} The EntityType or ComplexType to add
-   **/
+  Adds an EntityType to this MetadataStore.  No additional properties may be added to the EntityType after its has
+  been added to the MetadataStore.
+  @method addEntityType
+  @param structuralType {EntityType|ComplexType} The EntityType or ComplexType to add
+  **/
   proto.addEntityType = function (structuralType) {
     if (!(structuralType instanceof EntityType || structuralType instanceof ComplexType)) {
       structuralType = structuralType.isComplexType ? new ComplexType(structuralType) : new EntityType(structuralType);
@@ -215,26 +215,26 @@ var MetadataStore = (function () {
   };
 
   /**
-   The  {{#crossLink "NamingConvention"}}{{/crossLink}} associated with this MetadataStore.
+  The  {{#crossLink "NamingConvention"}}{{/crossLink}} associated with this MetadataStore.
 
-   __readOnly__
-   @property namingConvention {NamingConvention}
-   **/
+  __readOnly__
+  @property namingConvention {NamingConvention}
+  **/
 
   /**
-   Exports this MetadataStore to a serialized string appropriate for local storage.   This operation is also called
-   internally when exporting an EntityManager.
-   @example
-   // assume ms is a previously created MetadataStore
-   var metadataAsString = ms.exportMetadata();
-   window.localStorage.setItem("metadata", metadataAsString);
-   // and later, usually in a different session imported
-   var metadataFromStorage = window.localStorage.getItem("metadata");
-   var newMetadataStore = new MetadataStore();
-   newMetadataStore.importMetadata(metadataFromStorage);
-   @method exportMetadata
-   @return {String} A serialized version of this MetadataStore that may be stored locally and later restored.
-   **/
+  Exports this MetadataStore to a serialized string appropriate for local storage.   This operation is also called
+  internally when exporting an EntityManager.
+  @example
+      // assume ms is a previously created MetadataStore
+      var metadataAsString = ms.exportMetadata();
+      window.localStorage.setItem("metadata", metadataAsString);
+      // and later, usually in a different session imported
+      var metadataFromStorage = window.localStorage.getItem("metadata");
+      var newMetadataStore = new MetadataStore();
+      newMetadataStore.importMetadata(metadataFromStorage);
+  @method exportMetadata
+  @return {String} A serialized version of this MetadataStore that may be stored locally and later restored.
+  **/
   proto.exportMetadata = function () {
     var result = JSON.stringify({
       "metadataVersion": breeze.metadataVersion,
@@ -249,21 +249,21 @@ var MetadataStore = (function () {
   };
 
   /**
-   Imports a previously exported serialized MetadataStore into this MetadataStore.
-   @example
-   // assume ms is a previously created MetadataStore
-   var metadataAsString = ms.exportMetadata();
-   window.localStorage.setItem("metadata", metadataAsString);
-   // and later, usually in a different session
-   var metadataFromStorage = window.localStorage.getItem("metadata");
-   var newMetadataStore = new MetadataStore();
-   newMetadataStore.importMetadata(metadataFromStorage);
-   @method importMetadata
-   @param exportedMetadata {String|JSON Object} A previously exported MetadataStore.
-   @param [allowMerge] {Boolean} Allows custom metadata to be merged into existing metadata types.
-   @return {MetadataStore} This MetadataStore.
-   @chainable
-   **/
+  Imports a previously exported serialized MetadataStore into this MetadataStore.
+  @example
+      // assume ms is a previously created MetadataStore
+      var metadataAsString = ms.exportMetadata();
+      window.localStorage.setItem("metadata", metadataAsString);
+      // and later, usually in a different session
+      var metadataFromStorage = window.localStorage.getItem("metadata");
+      var newMetadataStore = new MetadataStore();
+      newMetadataStore.importMetadata(metadataFromStorage);
+  @method importMetadata
+  @param exportedMetadata {String|JSON Object} A previously exported MetadataStore.
+  @param [allowMerge] {Boolean} Allows custom metadata to be merged into existing metadata types.
+  @return {MetadataStore} This MetadataStore.
+  @chainable
+  **/
   proto.importMetadata = function (exportedMetadata, allowMerge) {
     assertParam(allowMerge, "allowMerge").isOptional().isBoolean().check();
     this._deferredTypes = {};
@@ -312,20 +312,20 @@ var MetadataStore = (function () {
   };
 
   /**
-   Creates a new MetadataStore from a previously exported serialized MetadataStore
-   @example
-   // assume ms is a previously created MetadataStore
-   var metadataAsString = ms.exportMetadata();
-   window.localStorage.setItem("metadata", metadataAsString);
-   // and later, usually in a different session
-   var metadataFromStorage = window.localStorage.getItem("metadata");
-   var newMetadataStore = MetadataStore.importMetadata(metadataFromStorage);
-   @method importMetadata
-   @static
-   @param exportedString {String} A previously exported MetadataStore.
-   @return {MetadataStore} A new MetadataStore.
+  Creates a new MetadataStore from a previously exported serialized MetadataStore
+  @example
+      // assume ms is a previously created MetadataStore
+      var metadataAsString = ms.exportMetadata();
+      window.localStorage.setItem("metadata", metadataAsString);
+      // and later, usually in a different session
+      var metadataFromStorage = window.localStorage.getItem("metadata");
+      var newMetadataStore = MetadataStore.importMetadata(metadataFromStorage);
+  @method importMetadata
+  @static
+  @param exportedString {String} A previously exported MetadataStore.
+  @return {MetadataStore} A new MetadataStore.
 
-   **/
+  **/
   ctor.importMetadata = function (exportedString) {
     var ms = new MetadataStore();
     ms.importMetadata(exportedString);
@@ -333,31 +333,31 @@ var MetadataStore = (function () {
   };
 
   /**
-   Returns whether Metadata has been retrieved for a specified service name.
-   @example
-   // Assume em1 is an existing EntityManager.
-   if (!em1.metadataStore.hasMetadataFor("breeze/NorthwindIBModel"))) {
-            // do something interesting
-        }
-   @method hasMetadataFor
-   @param serviceName {String} The service name.
-   @return {Boolean}
-   **/
+  Returns whether Metadata has been retrieved for a specified service name.
+  @example
+      // Assume em1 is an existing EntityManager.
+      if (!em1.metadataStore.hasMetadataFor("breeze/NorthwindIBModel"))) {
+          // do something interesting
+      }
+  @method hasMetadataFor
+  @param serviceName {String} The service name.
+  @return {Boolean}
+  **/
   proto.hasMetadataFor = function (serviceName) {
     return !!this.getDataService(serviceName);
   };
 
   /**
-   Returns the DataService for a specified service name
-   @example
-   // Assume em1 is an existing EntityManager.
-   var ds = em1.metadataStore.getDataService("breeze/NorthwindIBModel");
-   var adapterName = ds.adapterName; // may be null
+  Returns the DataService for a specified service name
+  @example
+      // Assume em1 is an existing EntityManager.
+      var ds = em1.metadataStore.getDataService("breeze/NorthwindIBModel");
+      var adapterName = ds.adapterName; // may be null
 
-   @method getDataService
-   @param serviceName {String} The service name.
-   @return {DataService}
-   **/
+  @method getDataService
+  @param serviceName {String} The service name.
+  @return {DataService}
+  **/
   proto.getDataService = function (serviceName) {
     assertParam(serviceName, "serviceName").isString().check();
 
@@ -368,39 +368,37 @@ var MetadataStore = (function () {
   };
 
   /**
-   Fetches the metadata for a specified 'service'. This method is automatically called
-   internally by an EntityManager before its first query against a new service.
+  Fetches the metadata for a specified 'service'. This method is automatically called
+  internally by an EntityManager before its first query against a new service.
 
-   @example
-   Usually you will not actually process the results of a fetchMetadata call directly, but will instead
-   ask for the metadata from the EntityManager after the fetchMetadata call returns.
-   @example
-   var ms = new MetadataStore();
-   // or more commonly
-   // var ms = anEntityManager.metadataStore;
-   ms.fetchMetadata("breeze/NorthwindIBModel")
-   .then(function(rawMetadata) {
+  @example
+  Usually you will not actually process the results of a fetchMetadata call directly, but will instead
+  ask for the metadata from the EntityManager after the fetchMetadata call returns.
+  @example
+      var ms = new MetadataStore();
+      // or more commonly
+      // var ms = anEntityManager.metadataStore;
+      ms.fetchMetadata("breeze/NorthwindIBModel").then(function(rawMetadata) {
             // do something with the metadata
-        }
-   .fail(function(exception) {
-            // handle exception here
-        };
-   @method fetchMetadata
-   @async
-   @param dataService {DataService|String}  Either a DataService or just the name of the DataService to fetch metadata for.
+      }).fail(function(exception) {
+          // handle exception here
+      });
+  @method fetchMetadata
+  @async
+  @param dataService {DataService|String}  Either a DataService or just the name of the DataService to fetch metadata for.
 
-   @param [callback] {Function} Function called on success.
+  @param [callback] {Function} Function called on success.
 
-   successFunction([data])
-   @param [callback.data] {rawMetadata}
+  successFunction([data])
+  @param [callback.data] {rawMetadata}
 
-   @param [errorCallback] {Function} Function called on failure.
+  @param [errorCallback] {Function} Function called on failure.
 
-   failureFunction([error])
-   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+  failureFunction([error])
+  @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
 
-   @return {Promise} Promise
-   **/
+  @return {Promise} Promise
+  **/
   proto.fetchMetadata = function (dataService, callback, errorCallback) {
     try {
       assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
@@ -434,13 +432,13 @@ var MetadataStore = (function () {
 
 
   /**
-   Used to register a constructor for an EntityType that is not known via standard Metadata discovery;
-   i.e. an unmapped type.
+  Used to register a constructor for an EntityType that is not known via standard Metadata discovery;
+  i.e. an unmapped type.
 
-   @method trackUnmappedType
-   @param entityCtor {Function} The constructor for the 'unmapped' type.
-   @param [interceptor] {Function} A function
-   **/
+  @method trackUnmappedType
+  @param entityCtor {Function} The constructor for the 'unmapped' type.
+  @param [interceptor] {Function} A function
+  **/
   proto.trackUnmappedType = function (entityCtor, interceptor) {
     assertParam(entityCtor, "entityCtor").isFunction().check();
     assertParam(interceptor, "interceptor").isFunction().isOptional().check();
@@ -450,34 +448,34 @@ var MetadataStore = (function () {
   };
 
   /**
-   Provides a mechanism to register a 'custom' constructor to be used when creating new instances
-   of the specified entity type.  If this call is not made, a default constructor is created for
-   the entity as needed.
-   This call may be made before or after the corresponding EntityType has been discovered via
-   Metadata discovery.
-   @example
-   var Customer = function () {
-            this.miscData = "asdf";
-        };
-   Customer.prototype.doFoo() {
-            ...
-        }
-   // assume em1 is a preexisting EntityManager;
-   em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-   // any queries or EntityType.create calls from this point on will call the Customer constructor
-   // registered above.
-   @method registerEntityTypeCtor
-   @param structuralTypeName {String} The name of the EntityType o0r ComplexType.
-   @param aCtor {Function}  The constructor for this EntityType or ComplexType; may be null if all you want to do is set the next parameter.
-   @param [initFn] {Function} A function or the name of a function on the entity that is to be executed immediately after the entity has been created
-   and populated with any initial values.
-   initFn(entity)
-   @param initFn.entity {Entity} The entity being created or materialized.
-   @param [noTrackingFn} {Function} A function that is executed immediately after a noTracking entity has been created and whose return
-   value will be used in place of the noTracking entity.
-   @param noTrackingFn.entity {Object}
-   @param noTrackingFn.entityType {EntityType} The entityType that the 'entity' parameter would be if we were tracking
-   **/
+  Provides a mechanism to register a 'custom' constructor to be used when creating new instances
+  of the specified entity type.  If this call is not made, a default constructor is created for
+  the entity as needed.
+  This call may be made before or after the corresponding EntityType has been discovered via
+  Metadata discovery.
+  @example
+      var Customer = function () {
+              this.miscData = "asdf";
+          };
+      Customer.prototype.doFoo() {
+              ...
+          }
+      // assume em1 is a preexisting EntityManager;
+      em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
+      // any queries or EntityType.create calls from this point on will call the Customer constructor
+      // registered above.
+  @method registerEntityTypeCtor
+  @param structuralTypeName {String} The name of the EntityType o0r ComplexType.
+  @param aCtor {Function}  The constructor for this EntityType or ComplexType; may be null if all you want to do is set the next parameter.
+  @param [initFn] {Function} A function or the name of a function on the entity that is to be executed immediately after the entity has been created
+  and populated with any initial values.
+  initFn(entity)
+  @param initFn.entity {Entity} The entity being created or materialized.
+  @param [noTrackingFn} {Function} A function that is executed immediately after a noTracking entity has been created and whose return
+  value will be used in place of the noTracking entity.
+  @param noTrackingFn.entity {Object}
+  @param noTrackingFn.entityType {EntityType} The entityType that the 'entity' parameter would be if we were tracking
+  **/
   proto.registerEntityTypeCtor = function (structuralTypeName, aCtor, initFn, noTrackingFn) {
     assertParam(structuralTypeName, "structuralTypeName").isString().check();
     assertParam(aCtor, "aCtor").isFunction().isOptional().check();
@@ -496,34 +494,34 @@ var MetadataStore = (function () {
   };
 
   /**
-   Returns whether this MetadataStore contains any metadata yet.
-   @example
-   // assume em1 is a preexisting EntityManager;
-   if (em1.metadataStore.isEmpty()) {
-            // do something interesting
-        }
-   @method isEmpty
-   @return {Boolean}
-   **/
+  Returns whether this MetadataStore contains any metadata yet.
+  @example
+      // assume em1 is a preexisting EntityManager;
+      if (em1.metadataStore.isEmpty()) {
+          // do something interesting
+      }
+  @method isEmpty
+  @return {Boolean}
+  **/
   proto.isEmpty = function () {
     return __isEmpty(this._structuralTypeMap);
   };
 
   /**
-   Returns an  {{#crossLink "EntityType"}}{{/crossLink}} or a {{#crossLink "ComplexType"}}{{/crossLink}} given its name.
-   @example
-   // assume em1 is a preexisting EntityManager
-   var odType = em1.metadataStore.getEntityType("OrderDetail");
-   or to throw an error if the type is not found
-   @example
-   var badType = em1.metadataStore.getEntityType("Foo", false);
-   // badType will not get set and an exception will be thrown.
-   @method getEntityType
-   @param structuralTypeName {String}  Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
-   that same short name an exception will be thrown.
-   @param [okIfNotFound=false] {Boolean} Whether to throw an error if the specified EntityType is not found.
-   @return {EntityType|ComplexType} The EntityType. ComplexType or 'undefined' if not not found.
-   **/
+  Returns an  {{#crossLink "EntityType"}}{{/crossLink}} or a {{#crossLink "ComplexType"}}{{/crossLink}} given its name.
+  @example
+      // assume em1 is a preexisting EntityManager
+      var odType = em1.metadataStore.getEntityType("OrderDetail");
+  or to throw an error if the type is not found
+  @example
+      var badType = em1.metadataStore.getEntityType("Foo", false);
+      // badType will not get set and an exception will be thrown.
+  @method getEntityType
+  @param structuralTypeName {String}  Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
+  that same short name an exception will be thrown.
+  @param [okIfNotFound=false] {Boolean} Whether to throw an error if the specified EntityType is not found.
+  @return {EntityType|ComplexType} The EntityType. ComplexType or 'undefined' if not not found.
+  **/
   proto.getEntityType = function (structuralTypeName, okIfNotFound) {
     assertParam(structuralTypeName, "structuralTypeName").isString().check();
     assertParam(okIfNotFound, "okIfNotFound").isBoolean().isOptional().check(false);
@@ -547,13 +545,13 @@ var MetadataStore = (function () {
   };
 
   /**
-   Returns an array containing all of the  {{#crossLink "EntityType"}}{{/crossLink}}s or {{#crossLink "ComplexType"}}{{/crossLink}}s in this MetadataStore.
-   @example
-   // assume em1 is a preexisting EntityManager
-   var allTypes = em1.metadataStore.getEntityTypes();
-   @method getEntityTypes
-   @return {Array of EntityType|ComplexType}
-   **/
+  Returns an array containing all of the  {{#crossLink "EntityType"}}{{/crossLink}}s or {{#crossLink "ComplexType"}}{{/crossLink}}s in this MetadataStore.
+  @example
+      // assume em1 is a preexisting EntityManager
+      var allTypes = em1.metadataStore.getEntityTypes();
+  @method getEntityTypes
+  @return {Array of EntityType|ComplexType}
+  **/
   proto.getEntityTypes = function () {
     return getTypesFromMap(this._structuralTypeMap);
   };
@@ -564,29 +562,28 @@ var MetadataStore = (function () {
     });
   };
 
-
   /**
-   Returns a fully qualified entityTypeName for a specified resource name.  The reverse of this operation
-   can be obtained via the  {{#crossLink "EntityType"}}{{/crossLink}} 'defaultResourceName' property
-   @method getEntityTypeNameForResourceName
-   @param resourceName {String}
-   **/
+  Returns a fully qualified entityTypeName for a specified resource name.  The reverse of this operation
+  can be obtained via the  {{#crossLink "EntityType"}}{{/crossLink}} 'defaultResourceName' property
+  @method getEntityTypeNameForResourceName
+  @param resourceName {String}
+  **/
   proto.getEntityTypeNameForResourceName = function (resourceName) {
     assertParam(resourceName, "resourceName").isString().check();
     return this._resourceEntityTypeMap[resourceName];
   };
 
   /**
-   Associates a resourceName with an entityType.
+  Associates a resourceName with an entityType.
 
-   This method is only needed in those cases where multiple resources return the same
-   entityType.  In this case Metadata discovery will only determine a single resource name for
-   each entityType.
-   @method setEntityTypeForResourceName
-   @param resourceName {String}
-   @param entityTypeOrName {EntityType|String} If passing a string either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
-   that same short name an exception will be thrown. If the entityType has not yet been discovered then a fully qualified name must be used.
-   **/
+  This method is only needed in those cases where multiple resources return the same
+  entityType.  In this case Metadata discovery will only determine a single resource name for
+  each entityType.
+  @method setEntityTypeForResourceName
+  @param resourceName {String}
+  @param entityTypeOrName {EntityType|String} If passing a string either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
+  that same short name an exception will be thrown. If the entityType has not yet been discovered then a fully qualified name must be used.
+  **/
   proto.setEntityTypeForResourceName = function (resourceName, entityTypeOrName) {
     assertParam(resourceName, "resourceName").isString().check();
     assertParam(entityTypeOrName, "entityTypeOrName").isInstanceOf(EntityType).or().isString().check();
@@ -1167,33 +1164,33 @@ var CsdlMetadataParser = (function () {
 
 var EntityType = (function () {
   /**
-   Container for all of the metadata about a specific type of Entity.
-   @class EntityType
-   **/
+  Container for all of the metadata about a specific type of Entity.
+  @class EntityType
+  **/
   var __nextAnonIx = 0;
 
 
   /**
-   @example
-   var entityType = new EntityType( {
-            shortName: "person",
-            namespace: "myAppNamespace"
-            });
-   @method <ctor> EntityType
-   @param config {Object|MetadataStore} Configuration settings or a MetadataStore.  If this parameter is just a MetadataStore
-   then what will be created is an 'anonymous' type that will never be communicated to or from the server. It is purely for
-   client side use and will be given an automatically generated name. Normally, however, you will use a configuration object.
-   @param config.shortName {String}
-   @param [config.namespace=""] {String}
-   @param [config.baseTypeName] {String}
-   @param [config.isAbstract=false] {Boolean}
-   @param [config.autoGeneratedKeyType] {AutoGeneratedKeyType}
-   @param [config.defaultResourceName] {String}
-   @param [config.dataProperties] {Array of DataProperties}
-   @param [config.navigationProperties] {Array of NavigationProperties}
-   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
-   @param [config.custom] {Object}
-   **/
+  @example
+      var entityType = new EntityType( {
+          shortName: "person",
+          namespace: "myAppNamespace"
+      });
+  @method <ctor> EntityType
+  @param config {Object|MetadataStore} Configuration settings or a MetadataStore.  If this parameter is just a MetadataStore
+  then what will be created is an 'anonymous' type that will never be communicated to or from the server. It is purely for
+  client side use and will be given an automatically generated name. Normally, however, you will use a configuration object.
+  @param config.shortName {String}
+  @param [config.namespace=""] {String}
+  @param [config.baseTypeName] {String}
+  @param [config.isAbstract=false] {Boolean}
+  @param [config.autoGeneratedKeyType] {AutoGeneratedKeyType}
+  @param [config.defaultResourceName] {String}
+  @param [config.dataProperties] {Array of DataProperties}
+  @param [config.navigationProperties] {Array of NavigationProperties}
+  @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
+  @param [config.custom] {Object}
+  **/
   var ctor = function (config) {
     if (arguments.length > 1) {
       throw new Error("The EntityType ctor has a single argument that is either a 'MetadataStore' or a configuration object.");
@@ -1243,145 +1240,145 @@ var EntityType = (function () {
   ctor.qualifyTypeName = qualifyTypeName;
 
   /**
-   The {{#crossLink "MetadataStore"}}{{/crossLink}} that contains this EntityType
+  The {{#crossLink "MetadataStore"}}{{/crossLink}} that contains this EntityType
 
-   __readOnly__
-   @property metadataStore {MetadataStore}
-   **/
-
-  /**
-   The DataProperties (see {{#crossLink "DataProperty"}}{{/crossLink}}) associated with this EntityType.
-
-   __readOnly__
-   @property dataProperties {Array of DataProperty}
-   **/
+  __readOnly__
+  @property metadataStore {MetadataStore}
+  **/
 
   /**
-   The NavigationProperties  (see {{#crossLink "NavigationProperty"}}{{/crossLink}}) associated with this EntityType.
+  The DataProperties (see {{#crossLink "DataProperty"}}{{/crossLink}}) associated with this EntityType.
 
-   __readOnly__
-   @property navigationProperties {Array of NavigationProperty}
-   **/
-
-  /**
-   The DataProperties for this EntityType that contain instances of a ComplexType (see {{#crossLink "ComplexType"}}{{/crossLink}}).
-
-   __readOnly__
-   @property complexProperties {Array of DataProperty}
-   **/
+  __readOnly__
+  @property dataProperties {Array of DataProperty}
+  **/
 
   /**
-   The DataProperties associated with this EntityType that make up it's {{#crossLink "EntityKey"}}{{/crossLink}}.
+  The NavigationProperties  (see {{#crossLink "NavigationProperty"}}{{/crossLink}}) associated with this EntityType.
 
-   __readOnly__
-   @property keyProperties {Array of DataProperty}
-   **/
-
-  /**
-   The DataProperties associated with this EntityType that are foreign key properties.
-
-   __readOnly__
-   @property foreignKeyProperties {Array of DataProperty}
-   **/
+  __readOnly__
+  @property navigationProperties {Array of NavigationProperty}
+  **/
 
   /**
-   The DataProperties associated with this EntityType that are concurrency properties.
+  The DataProperties for this EntityType that contain instances of a ComplexType (see {{#crossLink "ComplexType"}}{{/crossLink}}).
 
-   __readOnly__
-   @property concurrencyProperties {Array of DataProperty}
-   **/
-
-  /**
-   The DataProperties associated with this EntityType that are not mapped to any backend datastore. These are effectively free standing
-   properties.
-
-   __readOnly__
-   @property unmappedProperties {Array of DataProperty}
-   **/
+  __readOnly__
+  @property complexProperties {Array of DataProperty}
+  **/
 
   /**
-   The default resource name associated with this EntityType.  An EntityType may be queried via a variety of 'resource names' but this one
-   is used as the default when no resource name is provided.  This will occur when calling {{#crossLink "EntityAspect/loadNavigationProperty"}}{{/crossLink}}
-   or when executing any {{#crossLink "EntityQuery"}}{{/crossLink}} that was created via an {{#crossLink "EntityKey"}}{{/crossLink}}.
+  The DataProperties associated with this EntityType that make up it's {{#crossLink "EntityKey"}}{{/crossLink}}.
 
-   __readOnly__
-   @property defaultResourceName {String}
-   **/
+  __readOnly__
+  @property keyProperties {Array of DataProperty}
+  **/
 
   /**
-   The fully qualified name of this EntityType.
+  The DataProperties associated with this EntityType that are foreign key properties.
 
-   __readOnly__
-   @property name {String}
-   **/
-
-  /**
-   The short, unqualified, name for this EntityType.
-
-   __readOnly__
-   @property shortName {String}
-   **/
+  __readOnly__
+  @property foreignKeyProperties {Array of DataProperty}
+  **/
 
   /**
-   The namespace for this EntityType.
+  The DataProperties associated with this EntityType that are concurrency properties.
 
-   __readOnly__
-   @property namespace {String}
-   **/
-
-  /**
-   The base EntityType (if any) for this EntityType.
-
-   __readOnly__
-   @property baseEntityType {EntityType}
-   **/
+  __readOnly__
+  @property concurrencyProperties {Array of DataProperty}
+  **/
 
   /**
-   Whether this EntityType is abstract.
+  The DataProperties associated with this EntityType that are not mapped to any backend datastore. These are effectively free standing
+  properties.
 
-   __readOnly__
-   @property isAbstract {boolean}
-   **/
-
-  /**
-   The {{#crossLink "AutoGeneratedKeyType"}}{{/crossLink}} for this EntityType.
-
-   __readOnly__
-   @property autoGeneratedKeyType {AutoGeneratedKeyType}
-   @default AutoGeneratedKeyType.None
-   **/
+  __readOnly__
+  @property unmappedProperties {Array of DataProperty}
+  **/
 
   /**
-   The entity level validators associated with this EntityType. Validators can be added and
-   removed from this collection.
+  The default resource name associated with this EntityType.  An EntityType may be queried via a variety of 'resource names' but this one
+  is used as the default when no resource name is provided.  This will occur when calling {{#crossLink "EntityAspect/loadNavigationProperty"}}{{/crossLink}}
+  or when executing any {{#crossLink "EntityQuery"}}{{/crossLink}} that was created via an {{#crossLink "EntityKey"}}{{/crossLink}}.
 
-   __readOnly__
-   @property validators {Array of Validator}
-   **/
-
-  /**
-   A free form object that can be used to define any custom metadata for this EntityType.
-
-   __readOnly__
-   @property custom {Object}
-   **/
+  __readOnly__
+  @property defaultResourceName {String}
+  **/
 
   /**
-   General purpose property set method
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   custType.setProperties( {
-            autoGeneratedKeyType: AutoGeneratedKeyType.Identity;
-            defaultResourceName: "CustomersAndIncludedOrders"
-        )};
-   @method setProperties
-   @param config [object]
-   @param [config.autogeneratedKeyType] {AutoGeneratedKeyType}
-   @param [config.defaultResourceName] {String}
-   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
-   @param [config.custom] {Object}
-   **/
+  The fully qualified name of this EntityType.
+
+  __readOnly__
+  @property name {String}
+  **/
+
+  /**
+  The short, unqualified, name for this EntityType.
+
+  __readOnly__
+  @property shortName {String}
+  **/
+
+  /**
+  The namespace for this EntityType.
+
+  __readOnly__
+  @property namespace {String}
+  **/
+
+  /**
+  The base EntityType (if any) for this EntityType.
+
+  __readOnly__
+  @property baseEntityType {EntityType}
+  **/
+
+  /**
+  Whether this EntityType is abstract.
+
+  __readOnly__
+  @property isAbstract {boolean}
+  **/
+
+  /**
+  The {{#crossLink "AutoGeneratedKeyType"}}{{/crossLink}} for this EntityType.
+
+  __readOnly__
+  @property autoGeneratedKeyType {AutoGeneratedKeyType}
+  @default AutoGeneratedKeyType.None
+  **/
+
+  /**
+  The entity level validators associated with this EntityType. Validators can be added and
+  removed from this collection.
+
+  __readOnly__
+  @property validators {Array of Validator}
+  **/
+
+  /**
+  A free form object that can be used to define any custom metadata for this EntityType.
+
+  __readOnly__
+  @property custom {Object}
+  **/
+
+  /**
+  General purpose property set method
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      custType.setProperties( {
+          autoGeneratedKeyType: AutoGeneratedKeyType.Identity;
+          defaultResourceName: "CustomersAndIncludedOrders"
+      )};
+  @method setProperties
+  @param config [object]
+  @param [config.autogeneratedKeyType] {AutoGeneratedKeyType}
+  @param [config.defaultResourceName] {String}
+  @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
+  @param [config.custom] {Object}
+  **/
   proto.setProperties = function (config) {
     assertConfig(config)
         .whereParam("autoGeneratedKeyType").isEnumOf(AutoGeneratedKeyType).isOptional()
@@ -1395,11 +1392,11 @@ var EntityType = (function () {
   };
 
   /**
-   Returns whether this type is a subtype of a specified type.
+  Returns whether this type is a subtype of a specified type.
 
-   @method isSubtypeOf
-   @param entityType [EntityType]
-   **/
+  @method isSubtypeOf
+  @param entityType [EntityType]
+  **/
   proto.isSubtypeOf = function (entityType) {
     assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
     var baseType = this;
@@ -1411,10 +1408,10 @@ var EntityType = (function () {
   };
 
   /**
-   Returns an array containing this type and any/all subtypes of this type down thru the hierarchy.
+  Returns an array containing this type and any/all subtypes of this type down thru the hierarchy.
 
-   @method getSelfAndSubtypes
-   **/
+  @method getSelfAndSubtypes
+  **/
   proto.getSelfAndSubtypes = function () {
     var result = [this];
     this.subtypes.forEach(function (st) {
@@ -1436,23 +1433,21 @@ var EntityType = (function () {
   }
 
   /**
-   Adds a  {{#crossLink "DataProperty"}}{{/crossLink}} or a {{#crossLink "NavigationProperty"}}{{/crossLink}} to this EntityType.
-   @example
-   // assume myEntityType is a newly constructed EntityType.
-   myEntityType.addProperty(dataProperty1);
-   myEntityType.addProperty(dataProperty2);
-   myEntityType.addProperty(navigationProperty1);
-   @method addProperty
-   @param property {DataProperty|NavigationProperty}
-   **/
+  Adds a  {{#crossLink "DataProperty"}}{{/crossLink}} or a {{#crossLink "NavigationProperty"}}{{/crossLink}} to this EntityType.
+  @example
+      // assume myEntityType is a newly constructed EntityType.
+      myEntityType.addProperty(dataProperty1);
+      myEntityType.addProperty(dataProperty2);
+      myEntityType.addProperty(navigationProperty1);
+  @method addProperty
+  @param property {DataProperty|NavigationProperty}
+  **/
   proto.addProperty = function (property) {
     assertParam(property, "property").isInstanceOf(DataProperty).or().isInstanceOf(NavigationProperty).check();
 
     // true is 2nd arg to force resolve of any navigation properties.
     return this._addPropertyCore(property, true);
   };
-
-
 
   proto._updateFromBase = function (baseEntityType) {
     this.baseEntityType = baseEntityType;
@@ -1509,16 +1504,16 @@ var EntityType = (function () {
   };
 
   /**
-   Create a new entity of this type.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var cust1 = custType.createEntity();
-   em1.addEntity(cust1);
-   @method createEntity
-   @param [initialValues] {Config object} - Configuration object of the properties to set immediately after creation.
-   @return {Entity} The new entity.
-   **/
+  Create a new entity of this type.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var cust1 = custType.createEntity();
+      em1.addEntity(cust1);
+  @method createEntity
+  @param [initialValues] {Config object} - Configuration object of the properties to set immediately after creation.
+  @return {Entity} The new entity.
+  **/
   proto.createEntity = function (initialValues) {
     // ignore the _$eref once the entity is attached to an entityManager.
     if (initialValues && initialValues._$eref && !initialValues._$eref.entityAspect.entityManager) return initialValues._$eref;
@@ -1599,10 +1594,10 @@ var EntityType = (function () {
   };
 
   /**
-   Returns the constructor for this EntityType.
-   @method getCtor ( or obsolete getEntityCtor)
-   @return {Function} The constructor for this EntityType.
-   **/
+  Returns the constructor for this EntityType.
+  @method getCtor ( or obsolete getEntityCtor)
+  @return {Function} The constructor for this EntityType.
+  **/
   proto.getCtor = proto.getEntityCtor = function (forceRefresh) {
     if (this._ctor && !forceRefresh) return this._ctor;
 
@@ -1666,32 +1661,32 @@ var EntityType = (function () {
   };
 
   /**
-   Adds either an entity or property level validator to this EntityType.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var countryProp = custType.getProperty("Country");
-   var valFn = function (v) {
-            if (v == null) return true;
-            return (core.stringStartsWith(v, "US"));
-        };
-   var countryValidator = new Validator("countryIsUS", valFn,
-   { displayName: "Country", messageTemplate: "'%displayName%' must start with 'US'" });
-   custType.addValidator(countryValidator, countryProp);
-   This is the same as adding an entity level validator via the 'validators' property of DataProperty or NavigationProperty
-   @example
-   countryProp.validators.push(countryValidator);
-   Entity level validators can also be added by omitting the 'property' parameter.
-   @example
-   custType.addValidator(someEntityLevelValidator);
-   or
-   @example
-   custType.validators.push(someEntityLevelValidator);
-   @method addValidator
-   @param validator {Validator} Validator to add.
-   @param [property] Property to add this validator to.  If omitted, the validator is assumed to be an
-   entity level validator and is added to the EntityType's 'validators'.
-   **/
+  Adds either an entity or property level validator to this EntityType.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var countryProp = custType.getProperty("Country");
+      var valFn = function (v) {
+              if (v == null) return true;
+              return (core.stringStartsWith(v, "US"));
+          };
+      var countryValidator = new Validator("countryIsUS", valFn,
+      { displayName: "Country", messageTemplate: "'%displayName%' must start with 'US'" });
+      custType.addValidator(countryValidator, countryProp);
+  This is the same as adding an entity level validator via the 'validators' property of DataProperty or NavigationProperty
+  @example
+      countryProp.validators.push(countryValidator);
+  Entity level validators can also be added by omitting the 'property' parameter.
+  @example
+      custType.addValidator(someEntityLevelValidator);
+  or
+  @example
+      custType.validators.push(someEntityLevelValidator);
+  @method addValidator
+  @param validator {Validator} Validator to add.
+  @param [property] Property to add this validator to.  If omitted, the validator is assumed to be an
+  entity level validator and is added to the EntityType's 'validators'.
+  **/
   proto.addValidator = function (validator, property) {
     assertParam(validator, "validator").isInstanceOf(Validator).check();
     assertParam(property, "property").isOptional().isString().or().isEntityProperty().check();
@@ -1706,77 +1701,77 @@ var EntityType = (function () {
   };
 
   /**
-   Returns all of the properties ( dataProperties and navigationProperties) for this EntityType.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var arrayOfProps = custType.getProperties();
-   @method getProperties
-   @return {Array of DataProperty|NavigationProperty} Array of Data and Navigation properties.
-   **/
+  Returns all of the properties ( dataProperties and navigationProperties) for this EntityType.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var arrayOfProps = custType.getProperties();
+  @method getProperties
+  @return {Array of DataProperty|NavigationProperty} Array of Data and Navigation properties.
+  **/
   proto.getProperties = function () {
     return this.dataProperties.concat(this.navigationProperties);
   };
 
   /**
-   Returns all of the property names ( for both dataProperties and navigationProperties) for this EntityType.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var arrayOfPropNames = custType.getPropertyNames();
-   @method getPropertyNames
-   @return {Array of String}
-   **/
+  Returns all of the property names ( for both dataProperties and navigationProperties) for this EntityType.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var arrayOfPropNames = custType.getPropertyNames();
+  @method getPropertyNames
+  @return {Array of String}
+  **/
   proto.getPropertyNames = function () {
     return this.getProperties().map(__pluck('name'));
   };
 
   /**
-   Returns a data property with the specified name or null.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var customerNameDataProp = custType.getDataProperty("CustomerName");
-   @method getDataProperty
-   @param propertyName {String}
-   @return {DataProperty} Will be null if not found.
-   **/
+  Returns a data property with the specified name or null.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var customerNameDataProp = custType.getDataProperty("CustomerName");
+  @method getDataProperty
+  @param propertyName {String}
+  @return {DataProperty} Will be null if not found.
+  **/
   proto.getDataProperty = function (propertyName) {
     return __arrayFirst(this.dataProperties, __propEq("name", propertyName));
   };
 
   /**
-   Returns a navigation property with the specified name or null.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var customerOrdersNavProp = custType.getDataProperty("Orders");
-   @method getNavigationProperty
-   @param propertyName {String}
-   @return {NavigationProperty} Will be null if not found.
-   **/
+  Returns a navigation property with the specified name or null.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var customerOrdersNavProp = custType.getDataProperty("Orders");
+  @method getNavigationProperty
+  @param propertyName {String}
+  @return {NavigationProperty} Will be null if not found.
+  **/
   proto.getNavigationProperty = function (propertyName) {
     return __arrayFirst(this.navigationProperties, __propEq("name", propertyName));
   };
 
   /**
-   Returns either a DataProperty or a NavigationProperty with the specified name or null.
+  Returns either a DataProperty or a NavigationProperty with the specified name or null.
 
-   This method also accepts a '.' delimited property path and will return the 'property' at the
-   end of the path.
-   @example
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var companyNameProp = custType.getProperty("CompanyName");
-   This method can also walk a property path to return a property
-   @example
-   var orderDetailType = em1.metadataStore.getEntityType("OrderDetail");
-   var companyNameProp2 = orderDetailType.getProperty("Order.Customer.CompanyName");
-   // companyNameProp === companyNameProp2
-   @method getProperty
-   @param propertyPath {String}
-   @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
-   @return {DataProperty|NavigationProperty} Will be null if not found.
-   **/
+  This method also accepts a '.' delimited property path and will return the 'property' at the
+  end of the path.
+  @example
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var companyNameProp = custType.getProperty("CompanyName");
+  This method can also walk a property path to return a property
+  @example
+      var orderDetailType = em1.metadataStore.getEntityType("OrderDetail");
+      var companyNameProp2 = orderDetailType.getProperty("Order.Customer.CompanyName");
+      // companyNameProp === companyNameProp2
+  @method getProperty
+  @param propertyPath {String}
+  @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
+  @return {DataProperty|NavigationProperty} Will be null if not found.
+  **/
   proto.getProperty = function (propertyPath, throwIfNotFound) {
     var props = this.getPropertiesOnPath(propertyPath, throwIfNotFound);
     return props ? props[props.length - 1] : null;
@@ -1884,10 +1879,10 @@ var EntityType = (function () {
   }
 
   /**
-   Returns a string representation of this EntityType.
-   @method toString
-   @return {String}
-   **/
+  Returns a string representation of this EntityType.
+  @method toString
+  @return {String}
+  **/
   proto.toString = function () {
     return this.name;
   };
@@ -2106,24 +2101,23 @@ var EntityType = (function () {
 
 var ComplexType = (function () {
   /**
-   Container for all of the metadata about a specific type of Complex object.
-   @class ComplexType
-   **/
+  Container for all of the metadata about a specific type of Complex object.
+  @class ComplexType
+  **/
 
   /**
-   @example
-   var complexType = new ComplexType( {
-            shortName: "address",
-            namespace: "myAppNamespace"
-            });
-   @method <ctor> ComplexType
-   @param config {Object} Configuration settings
-   @param config.shortName {String}
-   @param [config.namespace=""] {String}
-   @param [config.dataProperties] {Array of DataProperties}
-   @param [config.custom] {Object}
-   **/
-
+  @example
+      var complexType = new ComplexType( {
+          shortName: "address",
+          namespace: "myAppNamespace"
+      });
+  @method <ctor> ComplexType
+  @param config {Object} Configuration settings
+  @param config.shortName {String}
+  @param [config.namespace=""] {String}
+  @param [config.dataProperties] {Array of DataProperties}
+  @param [config.custom] {Object}
+  **/
   var ctor = function (config) {
     if (arguments.length > 1) {
       throw new Error("The ComplexType ctor has a single argument that is a configuration object.");
@@ -2151,75 +2145,75 @@ var ComplexType = (function () {
   };
   var proto = ctor.prototype;
   /**
-   The DataProperties (see {{#crossLink "DataProperty"}}{{/crossLink}}) associated with this ComplexType.
+  The DataProperties (see {{#crossLink "DataProperty"}}{{/crossLink}}) associated with this ComplexType.
 
-   __readOnly__
-   @property dataProperties {Array of DataProperty}
-   **/
-
-  /**
-   The DataProperties for this ComplexType that contain instances of a ComplexType (see {{#crossLink "ComplexType"}}{{/crossLink}}).
-
-   __readOnly__
-   @property complexProperties {Array of DataProperty}
-   **/
+  __readOnly__
+  @property dataProperties {Array of DataProperty}
+  **/
 
   /**
-   The DataProperties associated with this ComplexType that are not mapped to any backend datastore. These are effectively free standing
-   properties.
+  The DataProperties for this ComplexType that contain instances of a ComplexType (see {{#crossLink "ComplexType"}}{{/crossLink}}).
 
-   __readOnly__
-   @property unmappedProperties {Array of DataProperty}
-   **/
-
-  /**
-   The fully qualifed name of this ComplexType.
-
-   __readOnly__
-   @property name {String}
-   **/
+  __readOnly__
+  @property complexProperties {Array of DataProperty}
+  **/
 
   /**
-   The short, unqualified, name for this ComplexType.
+  The DataProperties associated with this ComplexType that are not mapped to any backend datastore. These are effectively free standing
+  properties.
 
-   __readOnly__
-   @property shortName {String}
-   **/
-
-  /**
-   The namespace for this ComplexType.
-
-   __readOnly__
-   @property namespace {String}
-   **/
+  __readOnly__
+  @property unmappedProperties {Array of DataProperty}
+  **/
 
   /**
-   The entity level validators associated with this ComplexType. Validators can be added and
-   removed from this collection.
+  The fully qualifed name of this ComplexType.
 
-   __readOnly__
-   @property validators {Array of Validator}
-   **/
-
-  /**
-   A free form object that can be used to define any custom metadata for this ComplexType.
-
-   __readOnly__
-   @property custom {Object}
-   **/
+  __readOnly__
+  @property name {String}
+  **/
 
   /**
-   General purpose property set method
-   @example
-   // assume em1 is an EntityManager
-   var addresstType = em1.metadataStore.getEntityType("Address");
-   addressType.setProperties( {
-            custom: { foo: 7, bar: "test" }
-        });
-   @method setProperties
-   @param config [object]
-   @param [config.custom] {Object}
-   **/
+  The short, unqualified, name for this ComplexType.
+
+  __readOnly__
+  @property shortName {String}
+  **/
+
+  /**
+  The namespace for this ComplexType.
+
+  __readOnly__
+  @property namespace {String}
+  **/
+
+  /**
+  The entity level validators associated with this ComplexType. Validators can be added and
+  removed from this collection.
+
+  __readOnly__
+  @property validators {Array of Validator}
+  **/
+
+  /**
+  A free form object that can be used to define any custom metadata for this ComplexType.
+
+  __readOnly__
+  @property custom {Object}
+  **/
+
+  /**
+  General purpose property set method
+  @example
+      // assume em1 is an EntityManager
+      var addresstType = em1.metadataStore.getEntityType("Address");
+      addressType.setProperties( {
+          custom: { foo: 7, bar: "test" }
+      });
+  @method setProperties
+  @param config [object]
+  @param [config.custom] {Object}
+  **/
   proto.setProperties = function (config) {
     assertConfig(config)
         .whereParam("custom").isOptional()
@@ -2232,11 +2226,11 @@ var ComplexType = (function () {
   }
 
   /**
-   Creates a new non-attached instance of this ComplexType.
-   @method createInstance
-   @param initialValues {Object} Configuration object containing initial values for the instance.
-   **/
-    // This method is actually the EntityType.createEntity method renamed 
+  Creates a new non-attached instance of this ComplexType.
+  @method createInstance
+  @param initialValues {Object} Configuration object containing initial values for the instance.
+  **/
+  // This method is actually the EntityType.createEntity method renamed 
   proto._createInstanceCore = function (parent, parentProperty) {
     var aCtor = this.getCtor();
     var instance = new aCtor();
@@ -2256,29 +2250,29 @@ var ComplexType = (function () {
   };
 
   /**
-   See  {{#crossLink "EntityType.addValidator"}}{{/crossLink}}
-   @method addValidator
-   @param validator {Validator} Validator to add.
-   @param [property] Property to add this validator to.  If omitted, the validator is assumed to be an
-   entity level validator and is added to the EntityType's 'validators'.
-   **/
+  See  {{#crossLink "EntityType.addValidator"}}{{/crossLink}}
+  @method addValidator
+  @param validator {Validator} Validator to add.
+  @param [property] Property to add this validator to.  If omitted, the validator is assumed to be an
+  entity level validator and is added to the EntityType's 'validators'.
+  **/
 
   /**
-   See  {{#crossLink "EntityType.getProperty"}}{{/crossLink}}
-   @method getProperty
-   **/
+  See  {{#crossLink "EntityType.getProperty"}}{{/crossLink}}
+  @method getProperty
+  **/
 
   /**
-   See  {{#crossLink "EntityType.getPropertyNames"}}{{/crossLink}}
-   @method getPropertyNames
-   **/
+  See  {{#crossLink "EntityType.getPropertyNames"}}{{/crossLink}}
+  @method getPropertyNames
+  **/
 
   /**
-   See  {{#crossLink "EntityType.getEntityCtor"}}{{/crossLink}}
-   @method getCtor
-   **/
+  See  {{#crossLink "EntityType.getEntityCtor"}}{{/crossLink}}
+  @method getCtor
+  **/
 
-    // copy entityType methods onto complexType
+  // copy entityType methods onto complexType
   proto = __extend(proto, EntityType.prototype, [
     "addValidator",
     "getProperty",
@@ -2318,41 +2312,41 @@ var ComplexType = (function () {
 var DataProperty = (function () {
 
   /**
-   A DataProperty describes the metadata for a single property of an  {{#crossLink "EntityType"}}{{/crossLink}} that contains simple data.
+  A DataProperty describes the metadata for a single property of an  {{#crossLink "EntityType"}}{{/crossLink}} that contains simple data.
 
-   Instances of the DataProperty class are constructed automatically during Metadata retrieval. However it is also possible to construct them
-   directly via the constructor.
-   @class DataProperty
-   **/
+  Instances of the DataProperty class are constructed automatically during Metadata retrieval. However it is also possible to construct them
+  directly via the constructor.
+  @class DataProperty
+  **/
 
   /**
-   @example
-   var lastNameProp = new DataProperty( {
-            name: "lastName",
-            dataType: DataType.String,
-            isNullable: true,
-            maxLength: 20
-        });
-   // assuming personEntityType is a newly constructed EntityType
-   personEntityType.addProperty(lastNameProperty);
-   @method <ctor> DataProperty
-   @param config {configuration Object}
-   @param [config.name] {String}  The name of this property.
-   @param [config.nameOnServer] {String} Same as above but the name is that defined on the server.
-   Either this or the 'name' above must be specified. Whichever one is specified the other will be computed using
-   the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
-   @param [config.dataType=DataType.String] {DataType}
-   @param [config.complexTypeName] {String}
-   @param [config.isNullable=true] {Boolean}
-   @param [config.isScalar=true] {Boolean}
-   @param [config.defaultValue] {Any}
-   @param [config.isPartOfKey=false] {Boolean}
-   @param [config.isUnmapped=false] {Boolean}
-   @param [config.concurrencyMode] {String}
-   @param [config.maxLength] {Integer} Only meaningfull for DataType.String
-   @param [config.validators] {Array of Validator}
-   @param [config.custom] {Object}
-   **/
+  @example
+      var lastNameProp = new DataProperty( {
+          name: "lastName",
+          dataType: DataType.String,
+          isNullable: true,
+          maxLength: 20
+      });
+      // assuming personEntityType is a newly constructed EntityType
+      personEntityType.addProperty(lastNameProperty);
+  @method <ctor> DataProperty
+  @param config {configuration Object}
+  @param [config.name] {String}  The name of this property.
+  @param [config.nameOnServer] {String} Same as above but the name is that defined on the server.
+  Either this or the 'name' above must be specified. Whichever one is specified the other will be computed using
+  the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
+  @param [config.dataType=DataType.String] {DataType}
+  @param [config.complexTypeName] {String}
+  @param [config.isNullable=true] {Boolean}
+  @param [config.isScalar=true] {Boolean}
+  @param [config.defaultValue] {Any}
+  @param [config.isPartOfKey=false] {Boolean}
+  @param [config.isUnmapped=false] {Boolean}
+  @param [config.concurrencyMode] {String}
+  @param [config.maxLength] {Integer} Only meaningfull for DataType.String
+  @param [config.validators] {Array of Validator}
+  @param [config.custom] {Object}
+  **/
   var ctor = function (config) {
     assertConfig(config)
         .whereParam("name").isString().isOptional()
@@ -2439,133 +2433,133 @@ var DataProperty = (function () {
 
 
   /**
-   The name of this property
+  The name of this property
 
-   __readOnly__
-   @property name {String}
-   **/
-
-  /**
-   The parent type that this property belongs to - will be either a {{#crossLink "EntityType"}}{{/crossLink}} or a {{#crossLink "ComplexType"}}{{/crossLink}}.
-
-   __readOnly__
-   @property parentType {EntityType|ComplexType}
-   **/
+  __readOnly__
+  @property name {String}
+  **/
 
   /**
-   The {{#crossLink "DataType"}}{{/crossLink}} of this property.
+  The parent type that this property belongs to - will be either a {{#crossLink "EntityType"}}{{/crossLink}} or a {{#crossLink "ComplexType"}}{{/crossLink}}.
 
-   __readOnly__
-   @property dataType {DataType}
-   **/
-
-  /**
-   The name of the {{#crossLink "ComplexType"}}{{/crossLink}} associated with this property; may be null.
-
-   __readOnly__
-   @property complexTypeName {String}
-   **/
+  __readOnly__
+  @property parentType {EntityType|ComplexType}
+  **/
 
   /**
-   Whether the contents of this property is an instance of a {{#crossLink "ComplexType"}}{{/crossLink}}.
+  The {{#crossLink "DataType"}}{{/crossLink}} of this property.
 
-   __readOnly__
-   @property isComplexProperty {bool}
-   **/
-
-  /**
-   Whether this property is nullable.
-
-   __readOnly__
-   @property isNullable {Boolean}
-   **/
+  __readOnly__
+  @property dataType {DataType}
+  **/
 
   /**
-   Whether this property is scalar (i.e., returns a single value).
+  The name of the {{#crossLink "ComplexType"}}{{/crossLink}} associated with this property; may be null.
 
-   __readOnly__
-   @property isScalar {Boolean}
-   **/
-
-  /**
-   Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
-
-   __readOnly__
-   @property baseProperty {DataProperty}
-   **/
+  __readOnly__
+  @property complexTypeName {String}
+  **/
 
   /**
-   Whether this property is a 'key' property.
+  Whether the contents of this property is an instance of a {{#crossLink "ComplexType"}}{{/crossLink}}.
 
-   __readOnly__
-   @property isPartOfKey {Boolean}
-   **/
-
-  /**
-   Whether this property is an 'unmapped' property.
-
-   __readOnly__
-   @property isUnmapped {Boolean}
-   **/
+  __readOnly__
+  @property isComplexProperty {bool}
+  **/
 
   /**
-   __Describe this__
+  Whether this property is nullable.
 
-   __readOnly__
-   @property concurrencyMode {String}
-   **/
-
-  /**
-   The maximum length for the value of this property.
-
-   __readOnly__
-   @property maxLength {Number}
-   **/
+  __readOnly__
+  @property isNullable {Boolean}
+  **/
 
   /**
-   The {{#crossLink "Validator"}}{{/crossLink}}s that are associated with this property. Validators can be added and
-   removed from this collection.
+  Whether this property is scalar (i.e., returns a single value).
 
-   __readOnly__
-   @property validators {Array of Validator}
-   **/
-
-  /**
-   The default value for this property.
-
-   __readOnly__
-   @property defaultValue {any}
-   **/
+  __readOnly__
+  @property isScalar {Boolean}
+  **/
 
   /**
-   The navigation property related to this property.  Will only be set if this is a foreign key property.
+  Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
 
-   __readOnly__
-   @property relatedNavigationProperty {NavigationProperty}
-   **/
-
-  /**
-   A free form object that can be used to define any custom metadata for this DataProperty.
-
-   __readOnly__
-   @property custom {Object}
-   **/
+  __readOnly__
+  @property baseProperty {DataProperty}
+  **/
 
   /**
-   Is this a DataProperty? - always true here
-   Allows polymorphic treatment of DataProperties and NavigationProperties.
+  Whether this property is a 'key' property.
 
-   __readOnly__
-   @property isDataProperty {Boolean}
-   **/
+  __readOnly__
+  @property isPartOfKey {Boolean}
+  **/
 
   /**
-   Is this a NavigationProperty? - always false here
-   Allows polymorphic treatment of DataProperties and NavigationProperties.
+  Whether this property is an 'unmapped' property.
 
-   __readOnly__
-   @property isNavigationProperty {Boolean}
-   **/
+  __readOnly__
+  @property isUnmapped {Boolean}
+  **/
+
+  /**
+  __Describe this__
+
+  __readOnly__
+  @property concurrencyMode {String}
+  **/
+
+  /**
+  The maximum length for the value of this property.
+
+  __readOnly__
+  @property maxLength {Number}
+  **/
+
+  /**
+  The {{#crossLink "Validator"}}{{/crossLink}}s that are associated with this property. Validators can be added and
+  removed from this collection.
+
+  __readOnly__
+  @property validators {Array of Validator}
+  **/
+
+  /**
+  The default value for this property.
+
+  __readOnly__
+  @property defaultValue {any}
+  **/
+
+  /**
+  The navigation property related to this property.  Will only be set if this is a foreign key property.
+
+  __readOnly__
+  @property relatedNavigationProperty {NavigationProperty}
+  **/
+
+  /**
+  A free form object that can be used to define any custom metadata for this DataProperty.
+
+  __readOnly__
+  @property custom {Object}
+  **/
+
+  /**
+  Is this a DataProperty? - always true here
+  Allows polymorphic treatment of DataProperties and NavigationProperties.
+
+  __readOnly__
+  @property isDataProperty {Boolean}
+  **/
+
+  /**
+  Is this a NavigationProperty? - always false here
+  Allows polymorphic treatment of DataProperties and NavigationProperties.
+
+  __readOnly__
+  @property isNavigationProperty {Boolean}
+  **/
 
   proto.isDataProperty = true;
   proto.isNavigationProperty = false;
@@ -2586,17 +2580,17 @@ var DataProperty = (function () {
 
 
   /**
-   General purpose property set method
-   @example
-   // assume em1 is an EntityManager
-   var prop = myEntityType.getProperty("myProperty");
-   prop.setProperties( {
-            custom: { foo: 7, bar: "test" }
-        });
-   @method setProperties
-   @param config [object]
-   @param [config.custom] {Object}
-   **/
+  General purpose property set method
+  @example
+      // assume em1 is an EntityManager
+      var prop = myEntityType.getProperty("myProperty");
+      prop.setProperties( {
+          custom: { foo: 7, bar: "test" }
+      });
+  @method setProperties
+  @param config [object]
+  @param [config.custom] {Object}
+  **/
   proto.setProperties = function (config) {
     assertConfig(config)
         .whereParam("displayName").isOptional()
@@ -2658,47 +2652,47 @@ var DataProperty = (function () {
 var NavigationProperty = (function () {
 
   /**
-   A NavigationProperty describes the metadata for a single property of an  {{#crossLink "EntityType"}}{{/crossLink}} that return instances of other EntityTypes.
+  A NavigationProperty describes the metadata for a single property of an  {{#crossLink "EntityType"}}{{/crossLink}} that return instances of other EntityTypes.
 
-   Instances of the NavigationProperty class are constructed automatically during Metadata retrieval.   However it is also possible to construct them
-   directly via the constructor.
-   @class NavigationProperty
-   **/
+  Instances of the NavigationProperty class are constructed automatically during Metadata retrieval.   However it is also possible to construct them
+  directly via the constructor.
+  @class NavigationProperty
+  **/
 
   /**
-   @example
-   var homeAddressProp = new NavigationProperty( {
-            name: "homeAddress",
-            entityTypeName: "Address:#myNamespace",
-            isScalar: true,
-            associationName: "address_person",
-            foreignKeyNames: ["homeAddressId"]
-        });
-   var homeAddressIdProp = new DataProperty( {
-            name: "homeAddressId"
-            dataType: DataType.Integer
-        });
-   // assuming personEntityType is a newly constructed EntityType
-   personEntityType.addProperty(homeAddressProp);
-   personEntityType.addProperty(homeAddressIdProp);
-   @method <ctor> NavigationProperty
-   @param config {configuration Object}
-   @param [config.name] {String}  The name of this property.
-   @param [config.nameOnServer] {String} Same as above but the name is that defined on the server.
-   Either this or the 'name' above must be specified. Whichever one is specified the other will be computed using
-   the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
-   @param config.entityTypeName {String} The fully qualified name of the type of entity that this property will return.  This type
-   need not yet have been created, but it will need to get added to the relevant MetadataStore before this EntityType will be 'complete'.
-   The entityType name is constructed as: {shortName} + ":#" + {namespace}
-   @param [config.isScalar=true] {Boolean}
-   @param [config.associationName] {String} A name that will be used to connect the two sides of a navigation. May be omitted for unidirectional navigations.
-   @param [config.foreignKeyNames] {Array of String} An array of foreign key names. The array is needed to support the possibility of multipart foreign keys.
-   Most of the time this will be a single foreignKeyName in an array.
-   @param [config.foreignKeyNamesOnServer] {Array of String} Same as above but the names are those defined on the server. Either this or 'foreignKeyNames' must
-   be specified, if there are foreignKeys. Whichever one is specified the other will be computed using
-   the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
-   @param [config.validators] {Array of Validator}
-   **/
+  @example
+      var homeAddressProp = new NavigationProperty( {
+          name: "homeAddress",
+          entityTypeName: "Address:#myNamespace",
+          isScalar: true,
+          associationName: "address_person",
+          foreignKeyNames: ["homeAddressId"]
+      });
+      var homeAddressIdProp = new DataProperty( {
+          name: "homeAddressId"
+          dataType: DataType.Integer
+      });
+      // assuming personEntityType is a newly constructed EntityType
+      personEntityType.addProperty(homeAddressProp);
+      personEntityType.addProperty(homeAddressIdProp);
+  @method <ctor> NavigationProperty
+  @param config {configuration Object}
+  @param [config.name] {String}  The name of this property.
+  @param [config.nameOnServer] {String} Same as above but the name is that defined on the server.
+  Either this or the 'name' above must be specified. Whichever one is specified the other will be computed using
+  the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
+  @param config.entityTypeName {String} The fully qualified name of the type of entity that this property will return.  This type
+  need not yet have been created, but it will need to get added to the relevant MetadataStore before this EntityType will be 'complete'.
+  The entityType name is constructed as: {shortName} + ":#" + {namespace}
+  @param [config.isScalar=true] {Boolean}
+  @param [config.associationName] {String} A name that will be used to connect the two sides of a navigation. May be omitted for unidirectional navigations.
+  @param [config.foreignKeyNames] {Array of String} An array of foreign key names. The array is needed to support the possibility of multipart foreign keys.
+  Most of the time this will be a single foreignKeyName in an array.
+  @param [config.foreignKeyNamesOnServer] {Array of String} Same as above but the names are those defined on the server. Either this or 'foreignKeyNames' must
+  be specified, if there are foreignKeys. Whichever one is specified the other will be computed using
+  the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
+  @param [config.validators] {Array of Validator}
+  **/
   var ctor = function (config) {
     assertConfig(config)
         .whereParam("name").isString().isOptional()
@@ -2724,107 +2718,107 @@ var NavigationProperty = (function () {
   proto._$typeName = "NavigationProperty";
 
   /**
-   The {{#crossLink "EntityType"}}{{/crossLink}} that this property belongs to. ( same as parentEntityType).
-   __readOnly__
-   @property parentType {EntityType}
-   **/
+  The {{#crossLink "EntityType"}}{{/crossLink}} that this property belongs to. ( same as parentEntityType).
+  __readOnly__
+  @property parentType {EntityType}
+  **/
 
   /**
-   The {{#crossLink "EntityType"}}{{/crossLink}} that this property belongs to.
-   __readOnly__
-   @property parentEntityType {EntityType}
-   **/
+  The {{#crossLink "EntityType"}}{{/crossLink}} that this property belongs to.
+  __readOnly__
+  @property parentEntityType {EntityType}
+  **/
 
   /**
-   The name of this property
+  The name of this property
 
-   __readOnly__
-   @property name {String}
-   **/
-
-  /**
-   The {{#crossLink "EntityType"}}{{/crossLink}} returned by this property.
-
-   __readOnly__
-   @property entityType {EntityType}
-   **/
+  __readOnly__
+  @property name {String}
+  **/
 
   /**
-   Whether this property returns a single entity or an array of entities.
+  The {{#crossLink "EntityType"}}{{/crossLink}} returned by this property.
 
-   __readOnly__
-   @property isScalar {Boolean}
-   **/
-
-  /**
-   Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
-
-   __readOnly__
-   @property baseProperty {NavigationProperty}
-   **/
+  __readOnly__
+  @property entityType {EntityType}
+  **/
 
   /**
-   The name of the association to which that this property belongs.  This associationName will be shared with this
-   properties 'inverse'.
+  Whether this property returns a single entity or an array of entities.
 
-   __readOnly__
-   @property associationName {String}
-   **/
-
-  /**
-   The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
-   with a Navigation property except in the case of entities with multipart keys.
-
-   __readOnly__
-   @property foreignKeyNames {Array of String}
-   **/
+  __readOnly__
+  @property isScalar {Boolean}
+  **/
 
   /**
-   The 'foreign key' DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
-   with a Navigation property except in the case of entities with multipart keys.
+  Property on the base type that this property is inherited from. Will be null if the property is not on the base type.
 
-   __readOnly__
-   @property relatedDataProperties {Array of DataProperty}
-   **/
-
-  /**
-   The inverse of this NavigationProperty.  The NavigationProperty that represents a navigation in the opposite direction
-   to this NavigationProperty.
-
-   __readOnly__
-   @property inverse {NavigationProperty}
-   **/
+  __readOnly__
+  @property baseProperty {NavigationProperty}
+  **/
 
   /**
-   The {{#crossLink "Validator"}}{{/crossLink}}s that are associated with this property. Validators can be added and
-   removed from this collection.
+  The name of the association to which that this property belongs.  This associationName will be shared with this
+  properties 'inverse'.
 
-   __readOnly__
-   @property validators {Array of Validator}
-   **/
-
-  /**
-   A free form object that can be used to define any custom metadata for this NavigationProperty.
-
-   __readOnly__
-   @property custom {Object}
-   **/
+  __readOnly__
+  @property associationName {String}
+  **/
 
   /**
-   Is this a DataProperty? - always false here
-   Allows polymorphic treatment of DataProperties and NavigationProperties.
+  The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
+  with a Navigation property except in the case of entities with multipart keys.
 
-   __readOnly__
-   @property isDataProperty {Boolean}
-   **/
+  __readOnly__
+  @property foreignKeyNames {Array of String}
+  **/
 
   /**
-   Is this a NavigationProperty? - always true here
-   Allows polymorphic treatment of DataProperties and NavigationProperties.
+  The 'foreign key' DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
+  with a Navigation property except in the case of entities with multipart keys.
 
-   __readOnly__
-   @property isNavigationProperty {Boolean}
-   **/
+  __readOnly__
+  @property relatedDataProperties {Array of DataProperty}
+  **/
+
+  /**
+  The inverse of this NavigationProperty.  The NavigationProperty that represents a navigation in the opposite direction
+  to this NavigationProperty.
+
+  __readOnly__
+  @property inverse {NavigationProperty}
+  **/
+
+  /**
+  The {{#crossLink "Validator"}}{{/crossLink}}s that are associated with this property. Validators can be added and
+  removed from this collection.
+
+  __readOnly__
+  @property validators {Array of Validator}
+  **/
+
+  /**
+  A free form object that can be used to define any custom metadata for this NavigationProperty.
+
+  __readOnly__
+  @property custom {Object}
+  **/
+
+  /**
+  Is this a DataProperty? - always false here
+  Allows polymorphic treatment of DataProperties and NavigationProperties.
+
+  __readOnly__
+  @property isDataProperty {Boolean}
+  **/
+
+  /**
+  Is this a NavigationProperty? - always true here
+  Allows polymorphic treatment of DataProperties and NavigationProperties.
+
+  __readOnly__
+  @property isNavigationProperty {Boolean}
+  **/
 
   proto.isDataProperty = false;
   proto.isNavigationProperty = true;
@@ -2834,18 +2828,18 @@ var NavigationProperty = (function () {
   ]);
 
   /**
-   General purpose property set method
-   @example
-   // assume myEntityType is an EntityType
-   var prop = myEntityType.getProperty("myProperty");
-   prop.setProperties( {
-            custom: { foo: 7, bar: "test" }
-        });
-   @method setProperties
-   @param config [object]
-   @param [config.inverse] {String}
-   @param [config.custom] {Object}
-   **/
+  General purpose property set method
+  @example
+      // assume myEntityType is an EntityType
+      var prop = myEntityType.getProperty("myProperty");
+      prop.setProperties( {
+          custom: { foo: 7, bar: "test" }
+      });
+  @method setProperties
+  @param config [object]
+  @param [config.inverse] {String}
+  @param [config.custom] {Object}
+  **/
   proto.setProperties = function (config) {
     if (!this.parentType) {
       throw new Error("Cannot call NavigationProperty.setProperties until the parent EntityType of the NavigationProperty has been set.");
@@ -3009,37 +3003,37 @@ var NavigationProperty = (function () {
 
 var AutoGeneratedKeyType = (function () {
   /**
-   AutoGeneratedKeyType is an 'Enum' containing all of the valid states for an automatically generated key.
-   @class AutoGeneratedKeyType
-   @static
-   @final
-   **/
+  AutoGeneratedKeyType is an 'Enum' containing all of the valid states for an automatically generated key.
+  @class AutoGeneratedKeyType
+  @static
+  @final
+  **/
   var ctor = new Enum("AutoGeneratedKeyType");
   /**
-   This entity does not have an autogenerated key.
-   The client must set the key before adding the entity to the EntityManager
-   @property None {AutoGeneratedKeyType}
-   @final
-   @static
-   **/
+  This entity does not have an autogenerated key.
+  The client must set the key before adding the entity to the EntityManager
+  @property None {AutoGeneratedKeyType}
+  @final
+  @static
+  **/
   ctor.None = ctor.addSymbol();
   /**
-   This entity's key is an Identity column and is set by the backend database.
-   Keys for new entities will be temporary until the entities are saved at which point the keys will
-   be converted to their 'real' versions.
-   @property Identity {AutoGeneratedKeyType}
-   @final
-   @static
-   **/
+  This entity's key is an Identity column and is set by the backend database.
+  Keys for new entities will be temporary until the entities are saved at which point the keys will
+  be converted to their 'real' versions.
+  @property Identity {AutoGeneratedKeyType}
+  @final
+  @static
+  **/
   ctor.Identity = ctor.addSymbol();
   /**
-   This entity's key is generated by a KeyGenerator and is set by the backend database.
-   Keys for new entities will be temporary until the entities are saved at which point the keys will
-   be converted to their 'real' versions.
-   @property KeyGenerator {AutoGeneratedKeyType}
-   @final
-   @static
-   **/
+  This entity's key is generated by a KeyGenerator and is set by the backend database.
+  Keys for new entities will be temporary until the entities are saved at which point the keys will
+  be converted to their 'real' versions.
+  @property KeyGenerator {AutoGeneratedKeyType}
+  @final
+  @static
+  **/
   ctor.KeyGenerator = ctor.addSymbol();
   ctor.resolveSymbols();
 

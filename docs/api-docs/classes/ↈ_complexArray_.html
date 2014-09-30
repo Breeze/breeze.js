@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -371,12 +373,12 @@ collections are collected into a single notification event for each relation arr
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 orders.arrayChanged.subscribe(
 function (arrayChangedArgs) {
-             var addedEntities = arrayChangedArgs.added;
-             var removedEntities = arrayChanged.removed;
-         });</p>
+    var addedEntities = arrayChangedArgs.added;
+    var removedEntities = arrayChanged.removed;
+});</code></pre>
 
             </div>
         </div>

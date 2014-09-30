@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -204,59 +206,59 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var MergeStrategy = (function () {
   /**
-   MergeStrategy is an &#x27;Enum&#x27; that determines how entities are merged into an EntityManager.
+  MergeStrategy is an &#x27;Enum&#x27; that determines how entities are merged into an EntityManager.
 
-   @class MergeStrategy
-   @static
-   **/
+  @class MergeStrategy
+  @static
+  **/
   var MergeStrategy = new Enum(&quot;MergeStrategy&quot;);
   /**
-   MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed
-   state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
-   remain {{#crossLink &quot;EntityState/Unchanged&quot;}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will
-   be that of the imported entities.
+  MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed
+  state (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will
+  remain {{#crossLink &quot;EntityState/Unchanged&quot;}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will
+  be that of the imported entities.
 
-   @property PreserveChanges {MergeStrategy}
-   @final
-   @static
-   **/
+  @property PreserveChanges {MergeStrategy}
+  @final
+  @static
+  **/
   MergeStrategy.PreserveChanges = MergeStrategy.addSymbol();
   /**
-   MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
-   a changed state (added, modified, deleted). After the merge, the pending changes are lost.
-   The new EntityState will be  {{#crossLink &quot;EntityState/Unchanged&quot;}}{{/crossLink}} unless you’re importing entities
-   in which case the new EntityState will be that of the imported entities.
+  MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in
+  a changed state (added, modified, deleted). After the merge, the pending changes are lost.
+  The new EntityState will be  {{#crossLink &quot;EntityState/Unchanged&quot;}}{{/crossLink}} unless you’re importing entities
+  in which case the new EntityState will be that of the imported entities.
 
-   @property OverwriteChanges {MergeStrategy}
-   @final
-   @static
-   **/
+  @property OverwriteChanges {MergeStrategy}
+  @final
+  @static
+  **/
   MergeStrategy.OverwriteChanges = MergeStrategy.addSymbol();
 
   /**
-   SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key.
-   This is the fastest merge strategy but your existing cached data will remain “stale”.
+  SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key.
+  This is the fastest merge strategy but your existing cached data will remain “stale”.
 
-   @property SkipMerge {MergeStrategy}
-   @final
-   @static
-   **/
+  @property SkipMerge {MergeStrategy}
+  @final
+  @static
+  **/
   MergeStrategy.SkipMerge = MergeStrategy.addSymbol();
 
   /**
-   Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.
-   Use this strategy when you want to be sure that the incoming entity is not already in cache.
-   This is the default strategy for EntityManager.attachEntity.
+  Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.
+  Use this strategy when you want to be sure that the incoming entity is not already in cache.
+  This is the default strategy for EntityManager.attachEntity.
 
-   @property Disallowed {MergeStrategy}
-   @final
-   @static
-   **/
+  @property Disallowed {MergeStrategy}
+  @final
+  @static
+  **/
   MergeStrategy.Disallowed = MergeStrategy.addSymbol();
   MergeStrategy.resolveSymbols();
   return MergeStrategy;
@@ -264,25 +266,25 @@ var MergeStrategy = (function () {
 
 var FetchStrategy = (function () {
   /**
-   FetchStrategy is an &#x27;Enum&#x27; that determines how and where entities are retrieved from as a result of a query.
+  FetchStrategy is an &#x27;Enum&#x27; that determines how and where entities are retrieved from as a result of a query.
 
-   @class FetchStrategy
-   @static
-   **/
+  @class FetchStrategy
+  @static
+  **/
   var FetchStrategy = new Enum(&quot;FetchStrategy&quot;);
   /**
-   FromServer is used to tell the query to execute the query against a remote data source on the server.
-   @property FromServer {MergeStrategy}
-   @final
-   @static
-   **/
+  FromServer is used to tell the query to execute the query against a remote data source on the server.
+  @property FromServer {MergeStrategy}
+  @final
+  @static
+  **/
   FetchStrategy.FromServer = FetchStrategy.addSymbol();
   /**
-   FromLocalCache is used to tell the query to execute the query against a local EntityManager instead of going to a remote server.
-   @property FromLocalCache {MergeStrategy}
-   @final
-   @static
-   **/
+  FromLocalCache is used to tell the query to execute the query against a local EntityManager instead of going to a remote server.
+  @property FromLocalCache {MergeStrategy}
+  @final
+  @static
+  **/
   FetchStrategy.FromLocalCache = FetchStrategy.addSymbol();
   FetchStrategy.resolveSymbols();
   return FetchStrategy;
@@ -290,29 +292,29 @@ var FetchStrategy = (function () {
 
 var QueryOptions = (function () {
   /**
-   A QueryOptions instance is used to specify the &#x27;options&#x27; under which a query will occur.
+  A QueryOptions instance is used to specify the &#x27;options&#x27; under which a query will occur.
 
-   @class QueryOptions
-   **/
+  @class QueryOptions
+  **/
 
   /**
-   QueryOptions constructor
-   @example
-   var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-   // assume em1 is a preexisting EntityManager
-   em1.setProperties( { queryOptions: newQo });
+  QueryOptions constructor
+  @example
+      var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+      // assume em1 is a preexisting EntityManager
+      em1.setProperties( { queryOptions: newQo });
 
-   Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e.
-   -  from query.queryOptions
-   -  to   entityManager.queryOptions
-   -  to   QueryOptions.defaultInstance;
+  Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e.
+  -  from query.queryOptions
+  -  to   entityManager.queryOptions
+  -  to   QueryOptions.defaultInstance;
 
-   @method &lt;ctor&gt; QueryOptions
-   @param [config] {Object}
-   @param [config.fetchStrategy] {FetchStrategy}
-   @param [config.mergeStrategy] {MergeStrategy}
-   @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default)
-   **/
+  @method &lt;ctor&gt; QueryOptions
+  @param [config] {Object}
+  @param [config.fetchStrategy] {FetchStrategy}
+  @param [config.mergeStrategy] {MergeStrategy}
+  @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default)
+  **/
   var ctor = function (config) {
     updateWithConfig(this, config);
   };
@@ -320,33 +322,33 @@ var QueryOptions = (function () {
   proto._$typeName = &quot;QueryOptions&quot;;
 
   /**
-   A {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}
-   __readOnly__
-   @property fetchStrategy {FetchStrategy}
-   **/
+  A {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}
+  __readOnly__
+  @property fetchStrategy {FetchStrategy}
+  **/
 
   /**
-   A {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}}
-   __readOnly__
-   @property mergeStrategy {MergeStrategy}
-   **/
+  A {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}}
+  __readOnly__
+  @property mergeStrategy {MergeStrategy}
+  **/
 
   /**
-   Whether to include cached deleted entities in a query result (false by default).
+  Whether to include cached deleted entities in a query result (false by default).
 
-   __readOnly__
-   @property includeDeleted {Boolean}
-   **/
+  __readOnly__
+  @property includeDeleted {Boolean}
+  **/
 
   ctor.resolve = function (queryOptionsArray) {
     return new QueryOptions(__resolveProperties(queryOptionsArray, [&quot;fetchStrategy&quot;, &quot;mergeStrategy&quot;, &quot;includeDeleted&quot;]));
   };
 
   /**
-   The default value whenever QueryOptions are not specified.
-   @property defaultInstance {QueryOptions}
-   @static
-   **/
+  The default value whenever QueryOptions are not specified.
+  @property defaultInstance {QueryOptions}
+  @static
+  **/
   ctor.defaultInstance = new ctor({
     fetchStrategy: FetchStrategy.FromServer,
     mergeStrategy: MergeStrategy.PreserveChanges,
@@ -354,28 +356,28 @@ var QueryOptions = (function () {
   });
 
   /**
-   Returns a copy of this QueryOptions with the specified {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}},
-   {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}, or &#x27;includeDeleted&#x27; option applied.
-   @example
-   // Given an EntityManager instance, em
-   var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
-   or
-   @example
-   var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
-   or
-   @example
-   var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
-   or
-   @example
-   var queryOptions = em.queryOptions.using({
-                includeDeleted: true,
-                fetchStrategy:  FetchStrategy.FromLocalCache 
-            });
-   @method using
-   @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
-   @return {QueryOptions}
-   @chainable
-   **/
+  Returns a copy of this QueryOptions with the specified {{#crossLink &quot;MergeStrategy&quot;}}{{/crossLink}},
+  {{#crossLink &quot;FetchStrategy&quot;}}{{/crossLink}}, or &#x27;includeDeleted&#x27; option applied.
+  @example
+      // Given an EntityManager instance, em
+      var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
+  or
+  @example
+      var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
+  or
+  @example
+      var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+  or
+  @example
+      var queryOptions = em.queryOptions.using({
+          includeDeleted: true,
+          fetchStrategy:  FetchStrategy.FromLocalCache 
+      });
+  @method using
+  @param config {Configuration Object|MergeStrategy|FetchStrategy} The object to apply to create a new QueryOptions.
+  @return {QueryOptions}
+  @chainable
+  **/
   proto.using = function (config) {
     if (!config) return this;
     var result = new QueryOptions(this);
@@ -388,14 +390,14 @@ var QueryOptions = (function () {
   };
 
   /**
-   Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance.
-   The current instance is returned unchanged.
-   @method setAsDefault
-   @example
-   var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-   newQo.setAsDefault();
-   @chainable
-   **/
+  Sets the &#x27;defaultInstance&#x27; by creating a copy of the current &#x27;defaultInstance&#x27; and then applying all of the properties of the current instance.
+  The current instance is returned unchanged.
+  @method setAsDefault
+  @example
+      var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+      newQo.setAsDefault();
+  @chainable
+  **/
   proto.setAsDefault = function () {
     return __setAsDefault(this, ctor);
   };

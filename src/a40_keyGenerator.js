@@ -1,12 +1,12 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var KeyGenerator = (function () {
 
   /*
-   @class KeyGenerator
-   */
+  @class KeyGenerator
+  */
   var ctor = function () {
     // key is dataProperty.name + || + entityType.name, value is propEntry
     // propEntry = { entityType, propertyName, keyMap }
@@ -16,31 +16,30 @@ var KeyGenerator = (function () {
   var proto = ctor.prototype;
 
   /*
-   Returns a unique 'temporary' id for the specified {{#crossLink "EntityType"}}{{/crossLink}}.
-   Uniqueness is defined for this purpose as being unique within each instance of a KeyGenerator. This is sufficient
-   because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
-   the EntityManager with temporary keys will have them regenerated and remapped on import.
+  Returns a unique 'temporary' id for the specified {{#crossLink "EntityType"}}{{/crossLink}}.
+  Uniqueness is defined for this purpose as being unique within each instance of a KeyGenerator. This is sufficient
+  because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
+  the EntityManager with temporary keys will have them regenerated and remapped on import.
 
-   The return value of this method must be of the correct type as determined by the keyProperties of the
-   specified EntityType
-   @example
-   // Assume em1 is a preexisting EntityManager
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var cust1 = custType.createEntity();
-   // next line both sets cust1's 'CustomerId' property but also returns the value
-   var cid1 = em1.generateTempKeyValue(cust1);
-   em1.saveChanges()
-   .then( function( data) {
-   var sameCust1 = data.results[0];
-   // cust1 === sameCust1;
-   // but cust1.getProperty("CustomerId") != cid1
-   // because the server will have generated a new id
-   // and the client will have been updated with this
-   // new id.
-   })
-   @method generateTempKeyValue
-   @param entityType {EntityType}
-   */
+  The return value of this method must be of the correct type as determined by the keyProperties of the
+  specified EntityType
+  @example
+      // Assume em1 is a preexisting EntityManager
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var cust1 = custType.createEntity();
+      // next line both sets cust1's 'CustomerId' property but also returns the value
+      var cid1 = em1.generateTempKeyValue(cust1);
+      em1.saveChanges().then( function( data) {
+        var sameCust1 = data.results[0];
+        // cust1 === sameCust1;
+        // but cust1.getProperty("CustomerId") != cid1
+        // because the server will have generated a new id
+        // and the client will have been updated with this
+        // new id.
+      });
+  @method generateTempKeyValue
+  @param entityType {EntityType}
+  */
   proto.generateTempKeyValue = function (entityType, valueIfAvail) {
     var keyProps = entityType.keyProperties;
     if (keyProps.length > 1) {

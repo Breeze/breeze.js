@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -204,8 +206,8 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 ﻿/**
- @module core
- **/
+@module core
+**/
 
 var Event = (function () {
 
@@ -213,22 +215,22 @@ var Event = (function () {
   var __nextUnsubKey = 1;
 
   /**
-   Class to support basic event publication and subscription semantics.
-   @class Event
-   **/
+  Class to support basic event publication and subscription semantics.
+  @class Event
+  **/
 
   /**
-   Constructor for an Event
-   @example
-   salaryEvent = new Event(&quot;salaryEvent&quot;, person);
-   @method &lt;ctor&gt; Event
-   @param name {String}
-   @param publisher {Object} The object that will be doing the publication. i.e. the object to which this event is attached.
-   @param [defaultErrorCallback] {Function} If omitted then subscriber notification failures will be ignored.
+  Constructor for an Event
+  @example
+      salaryEvent = new Event(&quot;salaryEvent&quot;, person);
+  @method &lt;ctor&gt; Event
+  @param name {String}
+  @param publisher {Object} The object that will be doing the publication. i.e. the object to which this event is attached.
+  @param [defaultErrorCallback] {Function} If omitted then subscriber notification failures will be ignored.
 
-   errorCallback([e])
-   @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
-   **/
+  errorCallback([e])
+  @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
+  **/
 
   var ctor = function (name, publisher, defaultErrorCallback) {
     assertParam(name, &quot;eventName&quot;).isNonEmptyString().check();
@@ -245,28 +247,28 @@ var Event = (function () {
   var proto = ctor.prototype;
 
   /**
-   Publish data for this event.
-   @example
-   // Assume &#x27;salaryEvent&#x27; is previously constructed Event
-   salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });
-   This event can also be published asychronously
-   @example
-   salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true);
-   And we can add a handler in case the subscriber &#x27;mishandles&#x27; the event.
-   @example
-   salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true, function(error) {
-            // do something with the &#x27;error&#x27; object
-        });
-   @method publish
-   @param data {Object} Data to publish
-   @param [publishAsync=false] {Boolean} Whether to publish asynchonously or not.
-   @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
-   errors will be eaten.
+  Publish data for this event.
+  @example
+      // Assume &#x27;salaryEvent&#x27; is previously constructed Event
+      salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 });
+  This event can also be published asychronously
+  @example
+      salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true);
+  And we can add a handler in case the subscriber &#x27;mishandles&#x27; the event.
+  @example
+      salaryEvent.publish( { eventType: &quot;payRaise&quot;, amount: 100 }, true, function(error) {
+          // do something with the &#x27;error&#x27; object
+      });
+  @method publish
+  @param data {Object} Data to publish
+  @param [publishAsync=false] {Boolean} Whether to publish asynchonously or not.
+  @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
+  errors will be eaten.
 
-   errorCallback([e])
-   @param [errorCallback.e] {Error} Any error encountered during publication execution.
-   @return {Boolean} false if event is disabled; true otherwise.
-   **/
+  errorCallback([e])
+  @param [errorCallback.e] {Error} Any error encountered during publication execution.
+  @return {Boolean} false if event is disabled; true otherwise.
+  **/
   proto.publish = function (data, publishAsync, errorCallback) {
 
     if (!ctor._isEnabled(this.name, this.publisher)) return false;
@@ -300,51 +302,51 @@ var Event = (function () {
   }
 
   /**
-   Publish data for this event asynchronously.
-   @example
-   // Assume &#x27;salaryEvent&#x27; is previously constructed Event
-   salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });
-   And we can add a handler in case the subscriber &#x27;mishandles&#x27; the event.
-   @example
-   salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 }, function(error) {
-           // do something with the &#x27;error&#x27; object
-       });
-   @method publishAsync
-   @param data {Object} Data to publish
-   @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
-   errors will be eaten.
+  Publish data for this event asynchronously.
+  @example
+      // Assume &#x27;salaryEvent&#x27; is previously constructed Event
+      salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 });
+  And we can add a handler in case the subscriber &#x27;mishandles&#x27; the event.
+  @example
+      salaryEvent.publishAsync( { eventType: &quot;payRaise&quot;, amount: 100 }, function(error) {
+          // do something with the &#x27;error&#x27; object
+      });
+  @method publishAsync
+  @param data {Object} Data to publish
+  @param [errorCallback] {Function} Will be called for any errors that occur during publication. If omitted,
+  errors will be eaten.
 
-   errorCallback([e])
-   @param [errorCallback.e] {Error} Any error encountered during publication execution.
-   **/
+  errorCallback([e])
+  @param [errorCallback.e] {Error} Any error encountered during publication execution.
+  **/
   proto.publishAsync = function (data, errorCallback) {
     this.publish(data, true, errorCallback);
   };
 
   /**
-   Subscribe to this event.
-   @example
-   // Assume &#x27;salaryEvent&#x27; is previously constructed Event
-   salaryEvent.subscribe(function (eventArgs) {
-            if (eventArgs.eventType === &quot;payRaise&quot;) {
-               // do something
-            }
-        });
-   There are several built in Breeze events, such as EntityAspect.propertyChanged, EntityAspect.validationErrorsChanged as well.
-   @example
-   // Assume order is a preexisting &#x27;order&#x27; entity
-   order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
-             if ( pcEvent.propertyName === &quot;OrderDate&quot;) {
-                 // do something
-             }
-         });
-   @method subscribe
-   @param [callback] {Function} Will be called whenever &#x27;data&#x27; is published for this event.
+  Subscribe to this event.
+  @example
+      // Assume &#x27;salaryEvent&#x27; is previously constructed Event
+      salaryEvent.subscribe(function (eventArgs) {
+          if (eventArgs.eventType === &quot;payRaise&quot;) {
+              // do something
+          }
+      });
+  There are several built in Breeze events, such as EntityAspect.propertyChanged, EntityAspect.validationErrorsChanged as well.
+  @example
+      // Assume order is a preexisting &#x27;order&#x27; entity
+      order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
+          if ( pcEvent.propertyName === &quot;OrderDate&quot;) {
+              // do something
+          }
+      });
+  @method subscribe
+  @param [callback] {Function} Will be called whenever &#x27;data&#x27; is published for this event.
 
-   callback([data])
-   @param [callback.data] {Object} Whatever &#x27;data&#x27; was published.  This should be documented on the specific event.
-   @return {Number} This is a key for &#x27;unsubscription&#x27;.  It can be passed to the &#x27;unsubscribe&#x27; method.
-   **/
+  callback([data])
+  @param [callback.data] {Object} Whatever &#x27;data&#x27; was published.  This should be documented on the specific event.
+  @return {Number} This is a key for &#x27;unsubscription&#x27;.  It can be passed to the &#x27;unsubscribe&#x27; method.
+  **/
   proto.subscribe = function (callback) {
     if (!this._subscribers) {
       this._subscribers = [];
@@ -357,19 +359,19 @@ var Event = (function () {
   };
 
   /**
-   Unsubscribe from this event.
-   @example
-   // Assume order is a preexisting &#x27;order&#x27; entity
-   var token = order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
-                // do something
-        });
-   // sometime later
-   order.entityAspect.propertyChanged.unsubscribe(token);
-   @method unsubscribe
-   @param unsubKey {Number} The value returned from the &#x27;subscribe&#x27; method may be used to unsubscribe here.
-   @return {Boolean} Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
-   cannot be found.
-   **/
+  Unsubscribe from this event.
+  @example
+      // Assume order is a preexisting &#x27;order&#x27; entity
+      var token = order.entityAspect.propertyChanged.subscribe(function (pcEvent) {
+              // do something
+      });
+      // sometime later
+      order.entityAspect.propertyChanged.unsubscribe(token);
+  @method unsubscribe
+  @param unsubKey {Number} The value returned from the &#x27;subscribe&#x27; method may be used to unsubscribe here.
+  @return {Boolean} Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
+  cannot be found.
+  **/
   proto.unsubscribe = function (unsubKey) {
     if (!this._subscribers) return false;
     var subs = this._subscribers;
@@ -397,33 +399,33 @@ var Event = (function () {
   };
 
   /**
-   Enables or disables the named event for an object and all of its children.
-   @example
-   Event.enable(“propertyChanged”, myEntityManager, false)
-   will disable all EntityAspect.propertyChanged events within a EntityManager.
-   @example
-   Event.enable(“propertyChanged”, myEntityManager, true)
-   will enable all EntityAspect.propertyChanged events within a EntityManager.
-   @example
-   Event.enable(“propertyChanged”, myEntity.entityAspect, false)
-   will disable EntityAspect.propertyChanged events for a specific entity.
-   @example
-   Event.enable(“propertyChanged”, myEntity.entityAspect, null)
-   will removes any enabling / disabling at the entity aspect level so now any &#x27;Event.enable&#x27; calls at the EntityManager level,
-   made either previously or in the future, will control notification.
-   @example
-   Event.enable(“validationErrorsChanged”, myEntityManager, function(em) {
-           return em.customTag === “blue”;
-        })
-   will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager.
-   Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.
-   @method enable
-   @static
-   @param eventName {String} The name of the event.
-   @param target {Object} The object at which enabling or disabling will occur.  All event notifications that occur to this object or
-   children of this object will be enabled or disabled.
-   @param isEnabled {Boolean|null|Function} A boolean, a null or a function that returns either a boolean or a null.
-   **/
+  Enables or disables the named event for an object and all of its children.
+  @example
+      Event.enable(“propertyChanged”, myEntityManager, false)
+  will disable all EntityAspect.propertyChanged events within a EntityManager.
+  @example
+      Event.enable(“propertyChanged”, myEntityManager, true)
+  will enable all EntityAspect.propertyChanged events within a EntityManager.
+  @example
+      Event.enable(“propertyChanged”, myEntity.entityAspect, false)
+  will disable EntityAspect.propertyChanged events for a specific entity.
+  @example
+      Event.enable(“propertyChanged”, myEntity.entityAspect, null)
+  will removes any enabling / disabling at the entity aspect level so now any &#x27;Event.enable&#x27; calls at the EntityManager level,
+  made either previously or in the future, will control notification.
+  @example
+      Event.enable(“validationErrorsChanged”, myEntityManager, function(em) {
+          return em.customTag === “blue”;
+      })
+  will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager.
+  Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.
+  @method enable
+  @static
+  @param eventName {String} The name of the event.
+  @param target {Object} The object at which enabling or disabling will occur.  All event notifications that occur to this object or
+  children of this object will be enabled or disabled.
+  @param isEnabled {Boolean|null|Function} A boolean, a null or a function that returns either a boolean or a null.
+  **/
   ctor.enable = function (eventName, obj, isEnabled) {
     assertParam(eventName, &quot;eventName&quot;).isNonEmptyString().check();
     assertParam(obj, &quot;obj&quot;).isObject().check();
@@ -436,16 +438,16 @@ var Event = (function () {
 
 
   /**
-   Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set.
-   @example
-   Event.isEnabled(“propertyChanged”, myEntityManager)
+  Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set.
+  @example
+      Event.isEnabled(“propertyChanged”, myEntityManager)
 
-   @method isEnabled
-   @static
-   @param eventName {String} The name of the event.
-   @param target {Object} The object for which we want to know if notifications are enabled.
-   @return {Boolean|null} A null is returned if this value has not been set.
-   **/
+  @method isEnabled
+  @static
+  @param eventName {String} The name of the event.
+  @param target {Object} The object for which we want to know if notifications are enabled.
+  @return {Boolean|null} A null is returned if this value has not been set.
+  **/
   ctor.isEnabled = function (eventName, obj) {
     assertParam(eventName, &quot;eventName&quot;).isNonEmptyString().check();
     assertParam(obj, &quot;obj&quot;).isObject().check();

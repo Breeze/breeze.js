@@ -1,6 +1,6 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var Validator = (function () {
 
@@ -25,140 +25,140 @@ var Validator = (function () {
   };
 
   /**
-   Instances of the Validator class provide the logic to validate another object and provide a description of any errors
-   encountered during the validation process.  They are typically associated with a 'validators' property on the following types: {{#crossLink "EntityType"}}{{/crossLink}},
-   {{#crossLink "DataProperty"}}{{/crossLink}} or {{#crossLink "NavigationProperty"}}{{/crossLink}}.
+  Instances of the Validator class provide the logic to validate another object and provide a description of any errors
+  encountered during the validation process.  They are typically associated with a 'validators' property on the following types: {{#crossLink "EntityType"}}{{/crossLink}},
+  {{#crossLink "DataProperty"}}{{/crossLink}} or {{#crossLink "NavigationProperty"}}{{/crossLink}}.
 
-   A number of property level validators are registered automatically, i.e added to each DataProperty.validators property
-   based on {{#crossLink "DataProperty"}}{{/crossLink}} metadata.  For example,
+  A number of property level validators are registered automatically, i.e added to each DataProperty.validators property
+  based on {{#crossLink "DataProperty"}}{{/crossLink}} metadata.  For example,
 
-   - DataProperty.dataType -> one of the 'dataType' validator methods such as Validator.int64, Validator.date, Validator.bool etc.
-   - DataProperty.maxLength -> Validator.maxLength
-   - DataProperty.isNullable -> Validator.required (if not nullable)
+  - DataProperty.dataType -> one of the 'dataType' validator methods such as Validator.int64, Validator.date, Validator.bool etc.
+  - DataProperty.maxLength -> Validator.maxLength
+  - DataProperty.isNullable -> Validator.required (if not nullable)
 
-   @class Validator
-   **/
+  @class Validator
+  **/
 
   /**
-   Validator constructor - This method is used to create create custom validations.  Several
-   basic "Validator" construction methods are also provided as static methods to this class. These methods
-   provide a simpler syntax for creating basic validations.
+  Validator constructor - This method is used to create create custom validations.  Several
+  basic "Validator" construction methods are also provided as static methods to this class. These methods
+  provide a simpler syntax for creating basic validations.
 
-   Many of these stock validators are inspired by and implemented to conform to the validators defined at
-   http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx
+  Many of these stock validators are inspired by and implemented to conform to the validators defined at
+  http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx
 
-   Sometimes a custom validator will be required.
-   @example
-   Most validators will be 'property' level validators, like this.
-   @example
-   // v is this function is the value to be validated, in this case a "country" string.
-   var valFn = function (v) {
-            if (v == null) return true;
-            return (core.stringStartsWith(v, "US"));
-        };
-   var countryValidator = new Validator("countryIsUS", valFn, {
-            displayName: "Country", 
-            messageTemplate: "'%displayName%' must start with 'US'" 
-        });
+  Sometimes a custom validator will be required.
+  @example
+  Most validators will be 'property' level validators, like this.
+  @example
+      // v is this function is the value to be validated, in this case a "country" string.
+      var valFn = function (v) {
+          if (v == null) return true;
+          return (core.stringStartsWith(v, "US"));
+      };
+      var countryValidator = new Validator("countryIsUS", valFn, {
+          displayName: "Country", 
+          messageTemplate: "'%displayName%' must start with 'US'" 
+      });
 
-   // Now plug it into Breeze.
-   // Assume em1 is a preexisting EntityManager.
-   var custType = metadataStore.getEntityType("Customer");
-   var countryProp = custType.getProperty("Country");
-   // Note that validator is added to a 'DataProperty' validators collection.
-   prop.validators.push(countryValidator);
-   Entity level validators are also possible
-   @example
-   function isValidZipCode(value) {
-            var re = /^\d{5}([\-]\d{4})?$/;
-            return (re.test(value));
-        }
+      // Now plug it into Breeze.
+      // Assume em1 is a preexisting EntityManager.
+      var custType = metadataStore.getEntityType("Customer");
+      var countryProp = custType.getProperty("Country");
+      // Note that validator is added to a 'DataProperty' validators collection.
+      prop.validators.push(countryValidator);
+  Entity level validators are also possible
+  @example
+      function isValidZipCode(value) {
+          var re = /^\d{5}([\-]\d{4})?$/;
+          return (re.test(value));
+      }
 
-   // v in this case will be a Customer entity
-   var valFn = function (v) {
-            // This validator only validates US Zip Codes.
-            if ( v.getProperty("Country") === "USA") {
-                var postalCode = v.getProperty("PostalCode");
-                return isValidZipCode(postalCode);
-            }
-            return true;
-        };
-   var zipCodeValidator = new Validator("zipCodeValidator", valFn,
-   { messageTemplate: "For the US, this is not a valid PostalCode" });
+      // v in this case will be a Customer entity
+      var valFn = function (v) {
+          // This validator only validates US Zip Codes.
+          if ( v.getProperty("Country") === "USA") {
+              var postalCode = v.getProperty("PostalCode");
+              return isValidZipCode(postalCode);
+          }
+          return true;
+      };
+      var zipCodeValidator = new Validator("zipCodeValidator", valFn,
+          { messageTemplate: "For the US, this is not a valid PostalCode" });
 
-   // Now plug it into Breeze.
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   // Note that validator is added to an 'EntityType' validators collection.
-   custType.validators.push(zipCodeValidator);
-   What is commonly needed is a way of creating a parameterized function that will itself
-   return a new Validator.  This requires the use of a 'context' object.
-   @example
-   // create a function that will take in a config object
-   // and will return a validator
-   var numericRangeValidator = function(context) {
-            var valFn = function(v, ctx) {
-                if (v == null) return true;
-                if (typeof(v) !== "number") return false;
-                if (ctx.min != null && v < ctx.min) return false;
-                if (ctx.max != null && v > ctx.max) return false;
-                return true;
-            };
-            // The last parameter below is the 'context' object that will be passed into the 'ctx' parameter above
-            // when this validator executes. Several other properties, such as displayName will get added to this object as well.
-            return new Validator("numericRange", valFn, {
-                messageTemplate: "'%displayName%' must be a number between the values of %min% and %max%",
-                min: context.min,
-                max: context.max
-            });
-        };
-   // Assume that freightProperty is a DataEntityProperty that describes numeric values.
-   // register the validator
-   freightProperty.validators.push(numericRangeValidator({ min: 100, max: 500 }));
+      // Now plug it into Breeze.
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      // Note that validator is added to an 'EntityType' validators collection.
+      custType.validators.push(zipCodeValidator);
+  What is commonly needed is a way of creating a parameterized function that will itself
+  return a new Validator.  This requires the use of a 'context' object.
+  @example
+      // create a function that will take in a config object
+      // and will return a validator
+      var numericRangeValidator = function(context) {
+          var valFn = function(v, ctx) {
+              if (v == null) return true;
+              if (typeof(v) !== "number") return false;
+              if (ctx.min != null && v < ctx.min) return false;
+              if (ctx.max != null && v > ctx.max) return false;
+              return true;
+          };
+          // The last parameter below is the 'context' object that will be passed into the 'ctx' parameter above
+          // when this validator executes. Several other properties, such as displayName will get added to this object as well.
+          return new Validator("numericRange", valFn, {
+              messageTemplate: "'%displayName%' must be a number between the values of %min% and %max%",
+              min: context.min,
+              max: context.max
+          });
+      };
+      // Assume that freightProperty is a DataEntityProperty that describes numeric values.
+      // register the validator
+      freightProperty.validators.push(numericRangeValidator({ min: 100, max: 500 }));
 
-   Breeze substitutes context values and functions for the tokens in the messageTemplate when preparing the runtime error message;
-   'displayName' is a pre-defined context function that is always available.
+  Breeze substitutes context values and functions for the tokens in the messageTemplate when preparing the runtime error message;
+  'displayName' is a pre-defined context function that is always available.
 
-   Please note that Breeze substitutes the empty string for falsey parameters. That usually works in your favor.
-   Sometimes it doesn't as when the 'min' value is zero in which case the message text would have a hole
-   where the 'min' value goes, saying: "... an integer between the values of and ...". That is not what you want.
+  Please note that Breeze substitutes the empty string for falsey parameters. That usually works in your favor.
+  Sometimes it doesn't as when the 'min' value is zero in which case the message text would have a hole
+  where the 'min' value goes, saying: "... an integer between the values of and ...". That is not what you want.
 
-   To avoid this effect, you may can bake certain of the context values into the 'messageTemplate' itself
-   as shown in this revision to the pertinent part of the previous example:
-   @example
-   // ... as before
-   // ... but bake the min/max values into the message template.
-   var template = breeze.core.formatString(
-   "'%displayName%' must be a number between the values of %1 and %2",
-   context.min, context.max);
-   return new Validator("numericRange", valFn, {
-            messageTemplate: template,
-            min: context.min,
-            max: context.max
-        });
+  To avoid this effect, you may can bake certain of the context values into the 'messageTemplate' itself
+  as shown in this revision to the pertinent part of the previous example:
+  @example
+      // ... as before
+      // ... but bake the min/max values into the message template.
+      var template = breeze.core.formatString(
+          "'%displayName%' must be a number between the values of %1 and %2",
+          context.min, context.max);
+      return new Validator("numericRange", valFn, {
+          messageTemplate: template,
+          min: context.min,
+          max: context.max
+      });
 
-   @method <ctor> Validator
-   @param name {String} The name of this validator.
-   @param validatorFn {Function} A function to perform validation.
+  @method <ctor> Validator
+  @param name {String} The name of this validator.
+  @param validatorFn {Function} A function to perform validation.
 
-   validatorFn(value, context)
-   @param validatorFn.value {Object} Value to be validated
-   @param validatorFn.context {Object} The same context object passed into the constructor with the following additional properties if not
-   otherwise specified.
-   @param validatorFn.context.value {Object} The value being validated.
-   @param validatorFn.context.name {String} The name of the validator being executed.
-   @param validatorFn.context.displayName {String} This will be either the value of the property's 'displayName' property or
-   the value of its 'name' property or the string 'Value'
-   @param validatorFn.context.messageTemplate {String} This will either be the value of Validator.messageTemplates[ {this validators name}] or null. Validator.messageTemplates
-   is an object that is keyed by validator name and that can be added to in order to 'register' your own message for a given validator.
-   The following property can also be specified for any validator to force a specific errorMessage string
-   @param [validatorFn.context.message] {String} If this property is set it will be used instead of the 'messageTemplate' property when an
-   error message is generated.
+  validatorFn(value, context)
+  @param validatorFn.value {Object} Value to be validated
+  @param validatorFn.context {Object} The same context object passed into the constructor with the following additional properties if not
+  otherwise specified.
+  @param validatorFn.context.value {Object} The value being validated.
+  @param validatorFn.context.name {String} The name of the validator being executed.
+  @param validatorFn.context.displayName {String} This will be either the value of the property's 'displayName' property or
+  the value of its 'name' property or the string 'Value'
+  @param validatorFn.context.messageTemplate {String} This will either be the value of Validator.messageTemplates[ {this validators name}] or null. Validator.messageTemplates
+  is an object that is keyed by validator name and that can be added to in order to 'register' your own message for a given validator.
+  The following property can also be specified for any validator to force a specific errorMessage string
+  @param [validatorFn.context.message] {String} If this property is set it will be used instead of the 'messageTemplate' property when an
+  error message is generated.
 
-   @param [context] {Object} A free form object whose properties will made available during the validation and error message creation process.
-   This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
-   of additional properties that will be automatically added to this object if not otherwise specified.
-   **/
+  @param [context] {Object} A free form object whose properties will made available during the validation and error message creation process.
+  This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
+  of additional properties that will be automatically added to this object if not otherwise specified.
+  **/
   var ctor = function (name, valFn, context) {
     // _baseContext is what will get serialized
     this._baseContext = context || {};
@@ -173,45 +173,45 @@ var Validator = (function () {
   proto._$typeName = "Validator";
 
   /**
-   The name of this validator.
+  The name of this validator.
 
-   __readOnly__
-   @property name {String}
-   **/
-
-  /**
-   The context for this validator.
-
-   This object will typically contain at a minimum the following properties. "name", "displayName", and "message" or "messageTemplate".
-   __readOnly__
-   @property context {Object}
-   **/
-
+  __readOnly__
+  @property name {String}
+  **/
 
   /**
-   Run this validator against the specified value.  This method will usually be called internally either
-   automatically by an property change, entity attach, query or save operation, or manually as a result of
-   a validateEntity call on the EntityAspect. The resulting ValidationResults are available via the
-   EntityAspect.getValidationErrors method.
+  The context for this validator.
 
-   However, you can also call a validator directly either for testing purposes or some other reason if needed.
-   @example
-   // using one of the predefined validators
-   var validator = Validator.maxLength({ maxLength: 5, displayName: "City" });
-   // should be ok because "asdf".length < 5
-   var result = validator.validate("asdf");
-   ok(result === null);
-   result = validator.validate("adasdfasdf");
-   // extract all of the properties of the 'result'
-   var errMsg = result.errorMessage;
-   var context = result.context;
-   var sameValidator = result.validator;
-   @method validate
-   @param value {Object} Value to validate
-   @param additionalContext {Object} Any additional contextual information that the Validator
-   can make use of.
-   @return {ValidationError|null} A ValidationError if validation fails, null otherwise
-   **/
+  This object will typically contain at a minimum the following properties. "name", "displayName", and "message" or "messageTemplate".
+  __readOnly__
+  @property context {Object}
+  **/
+
+
+  /**
+  Run this validator against the specified value.  This method will usually be called internally either
+  automatically by an property change, entity attach, query or save operation, or manually as a result of
+  a validateEntity call on the EntityAspect. The resulting ValidationResults are available via the
+  EntityAspect.getValidationErrors method.
+
+  However, you can also call a validator directly either for testing purposes or some other reason if needed.
+  @example
+      // using one of the predefined validators
+      var validator = Validator.maxLength({ maxLength: 5, displayName: "City" });
+      // should be ok because "asdf".length < 5
+      var result = validator.validate("asdf");
+      ok(result === null);
+      result = validator.validate("adasdfasdf");
+      // extract all of the properties of the 'result'
+      var errMsg = result.errorMessage;
+      var context = result.context;
+      var sameValidator = result.validator;
+  @method validate
+  @param value {Object} Value to validate
+  @param additionalContext {Object} Any additional contextual information that the Validator
+  can make use of.
+  @return {ValidationError|null} A ValidationError if validation fails, null otherwise
+  **/
   proto.validate = function (value, additionalContext) {
     var currentContext;
     if (additionalContext) {
@@ -237,14 +237,14 @@ var Validator = (function () {
   // context.value is not avail unless validate was called first.
 
   /**
-   Returns the message generated by the most recent execution of this Validator.
-   @example
-   var v0 = Validator.maxLength({ maxLength: 5, displayName: "City" });
-   v0.validate("adasdfasdf");
-   var errMessage = v0.getMessage());
-   @method getMessage
-   @return {String}
-   **/
+  Returns the message generated by the most recent execution of this Validator.
+  @example
+      var v0 = Validator.maxLength({ maxLength: 5, displayName: "City" });
+      v0.validate("adasdfasdf");
+      var errMessage = v0.getMessage());
+  @method getMessage
+  @return {String}
+  **/
   proto.getMessage = function () {
     try {
       var context = this.currentContext;
@@ -270,11 +270,11 @@ var Validator = (function () {
   };
 
   /**
-   Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
-   @method fromJSON
-   @static
-   @param json {Object} JSON object that represents the serialized version of a validator.
-   **/
+  Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.
+  @method fromJSON
+  @static
+  @param json {Object} JSON object that represents the serialized version of a validator.
+  **/
   ctor.fromJSON = function (json) {
     if (Array.isArray(json)) {
       return json.map(function (js) {
@@ -291,11 +291,11 @@ var Validator = (function () {
   };
 
   /**
-   Register a validator instance so that any deserialized metadata can reference it.
-   @method register
-   @static
-   @param validator {Validator} Validator to register.
-   **/
+  Register a validator instance so that any deserialized metadata can reference it.
+  @method register
+  @static
+  @param validator {Validator} Validator to register.
+  **/
   ctor.register = function (validator) {
     __config.registerFunction(function () {
       return validator;
@@ -303,35 +303,35 @@ var Validator = (function () {
   };
 
   /**
-   Register a validator factory so that any deserialized metadata can reference it.
-   @method registerFactory
-   @static
-   @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
-   @param name {String} The name of the validator.
-   **/
+  Register a validator factory so that any deserialized metadata can reference it.
+  @method registerFactory
+  @static
+  @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
+  @param name {String} The name of the validator.
+  **/
   ctor.registerFactory = function (validatorFn, name) {
     __config.registerFunction(validatorFn, "Validator." + name);
   };
 
   /**
-   Map of standard error message templates keyed by validator name.
-   You can add to or modify this object to customize the template used for any validation error message.
-   @example
-   // v is this function is the value to be validated, in this case a "country" string.
-   var valFn = function (v) {
-            if (v == null) return true;
-            return (core.stringStartsWith(v, "US"));
-        };
-   var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" });
-   Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
-   This will have a similar effect to this
-   var countryValidator = new Validator("countryIsUS", valFn, {
-            displayName: "Country", 
-            messageTemplate: "'%displayName%' must start with 'US'" 
-        });
-   @property messageTemplates {Object}
-   @static
-   **/
+  Map of standard error message templates keyed by validator name.
+  You can add to or modify this object to customize the template used for any validation error message.
+  @example
+      // v is this function is the value to be validated, in this case a "country" string.
+      var valFn = function (v) {
+          if (v == null) return true;
+          return (core.stringStartsWith(v, "US"));
+      };
+      var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" });
+      Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
+      This will have a similar effect to this
+      var countryValidator = new Validator("countryIsUS", valFn, {
+          displayName: "Country", 
+          messageTemplate: "'%displayName%' must start with 'US'" 
+      });
+  @property messageTemplates {Object}
+  @static
+  **/
   ctor.messageTemplates = {
     bool: "'%displayName%' must be a 'true' or 'false' value",
     creditCard: "The %displayName% is not a valid credit card number",
@@ -352,21 +352,21 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard 'required value' Validator
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var regionProperty - custType.getProperty("Region");
-   // Makes "Region" on Customer a required property.
-   regionProperty.validators.push(Validator.required());
-   // or to allow empty strings
-   regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
-   @method required
-   @static
-   @param context {Object}
-   @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
-   @return {Validator} A new Validator
-   **/
+  Returns a standard 'required value' Validator
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var regionProperty - custType.getProperty("Region");
+      // Makes "Region" on Customer a required property.
+      regionProperty.validators.push(Validator.required());
+      // or to allow empty strings
+      regionProperty.validators.push(Validator.required({ allowEmptyStrings: true }););
+  @method required
+  @static
+  @param context {Object}
+  @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
+  @return {Validator} A new Validator
+  **/
   ctor.required = function (context) {
     var valFn = function (v, ctx) {
       if (typeof v === "string") {
@@ -380,19 +380,19 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard maximum string length Validator; the maximum length must be specified
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var regionProperty - custType.getProperty("Region");
-   // Validates that the value of the Region property on Customer will be less than or equal to 5 characters.
-   regionProperty.validators.push(Validator.maxLength( {maxLength: 5}));
-   @method maxLength
-   @static
-   @param context {Object}
-   @param context.maxLength {Integer}
-   @return {Validator} A new Validator
-   **/
+  Returns a standard maximum string length Validator; the maximum length must be specified
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var regionProperty - custType.getProperty("Region");
+      // Validates that the value of the Region property on Customer will be less than or equal to 5 characters.
+      regionProperty.validators.push(Validator.maxLength( {maxLength: 5}));
+  @method maxLength
+  @static
+  @param context {Object}
+  @param context.maxLength {Integer}
+  @return {Validator} A new Validator
+  **/
   ctor.maxLength = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
@@ -403,21 +403,21 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard string length Validator; both minimum and maximum lengths must be specified.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var regionProperty - custType.getProperty("Region");
-   // Validates that the value of the Region property on Customer will be
-   // between 2 and 5 characters
-   regionProperty.validators.push(Validator.stringLength( {minLength: 2, maxLength: 5});
-   @method stringLength
-   @static
-   @param context {Object}
-   @param context.maxLength {Integer}
-   @param context.minLength {Integer}
-   @return {Validator} A new Validator
-   **/
+  Returns a standard string length Validator; both minimum and maximum lengths must be specified.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var regionProperty - custType.getProperty("Region");
+      // Validates that the value of the Region property on Customer will be
+      // between 2 and 5 characters
+      regionProperty.validators.push(Validator.stringLength( {minLength: 2, maxLength: 5});
+  @method stringLength
+  @static
+  @param context {Object}
+  @param context.maxLength {Integer}
+  @param context.minLength {Integer}
+  @return {Validator} A new Validator
+  **/
   ctor.stringLength = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
@@ -430,17 +430,17 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard string dataType Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var regionProperty - custType.getProperty("Region");
-   // Validates that the value of the Region property on Customer is a string.
-   regionProperty.validators.push(Validator.string());
-   @method string
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard string dataType Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var regionProperty - custType.getProperty("Region");
+      // Validates that the value of the Region property on Customer is a string.
+      regionProperty.validators.push(Validator.string());
+  @method string
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.string = function () {
     var valFn = function (v) {
       if (v == null) return true;
@@ -450,17 +450,17 @@ var Validator = (function () {
   };
 
   /**
-   Returns a Guid data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var customerIdProperty - custType.getProperty("CustomerID");
-   // Validates that the value of the CustomerID property on Customer is a Guid.
-   customerIdProperty.validators.push(Validator.guid());
-   @method guid
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a Guid data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var customerIdProperty - custType.getProperty("CustomerID");
+      // Validates that the value of the CustomerID property on Customer is a Guid.
+      customerIdProperty.validators.push(Validator.guid());
+  @method guid
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.guid = function () {
     var valFn = function (v) {
       if (v == null) return true;
@@ -470,17 +470,17 @@ var Validator = (function () {
   };
 
   /**
-   Returns a ISO 8601 duration string  Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var eventType = em1.metadataStore.getEntityType("Event");
-   var elapsedTimeProperty - eventType.getProperty("ElapsedTime");
-   // Validates that the value of the ElapsedTime property on Customer is a duration.
-   elapsedTimeProperty.validators.push(Validator.duration());
-   @method duration
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a ISO 8601 duration string  Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var eventType = em1.metadataStore.getEntityType("Event");
+      var elapsedTimeProperty - eventType.getProperty("ElapsedTime");
+      // Validates that the value of the ElapsedTime property on Customer is a duration.
+      elapsedTimeProperty.validators.push(Validator.duration());
+  @method duration
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.duration = function () {
     var valFn = function (v) {
       if (v == null) return true;
@@ -490,17 +490,17 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard numeric data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var freightProperty - orderType.getProperty("Freight");
-   // Validates that the value of the Freight property on Order is a number.
-   freightProperty.validators.push(Validator.number());
-   @method number
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard numeric data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var freightProperty - orderType.getProperty("Freight");
+      // Validates that the value of the Freight property on Order is a number.
+      freightProperty.validators.push(Validator.number());
+  @method number
+  @static
+  @return {Validator} A new Validator
+  **/
 
     // TODO: may need to have seperate logic for single.
   ctor.number = ctor.double = ctor.single = function (context) {
@@ -515,17 +515,17 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard large integer data type - 64 bit - Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var freightProperty - orderType.getProperty("Freight");
-   // Validates that the value of the Freight property on Order is within the range of a 64 bit integer.
-   freightProperty.validators.push(Validator.int64());
-   @method int64
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard large integer data type - 64 bit - Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var freightProperty - orderType.getProperty("Freight");
+      // Validates that the value of the Freight property on Order is within the range of a 64 bit integer.
+      freightProperty.validators.push(Validator.int64());
+  @method int64
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.integer = ctor.int64 = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
@@ -538,65 +538,65 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard 32 bit integer data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var freightProperty - orderType.getProperty("Freight");
-   freightProperty.validators.push(Validator.int32());
-   @method int32
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard 32 bit integer data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var freightProperty - orderType.getProperty("Freight");
+      freightProperty.validators.push(Validator.int32());
+  @method int32
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.int32 = function (context) {
     return intRangeValidatorCtor("int32", INT32_MIN, INT32_MAX, context)();
   };
 
   /**
-   Returns a standard 16 bit integer data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var freightProperty - orderType.getProperty("Freight");
-   // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
-   freightProperty.validators.push(Validator.int16());
-   @method int16
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard 16 bit integer data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var freightProperty - orderType.getProperty("Freight");
+      // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
+      freightProperty.validators.push(Validator.int16());
+  @method int16
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.int16 = function (context) {
     return intRangeValidatorCtor("int16", INT16_MIN, INT16_MAX, context)();
   };
 
   /**
-   Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var freightProperty - orderType.getProperty("Freight");
-   // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
-   // Probably not a very good validation to place on the Freight property.
-   regionProperty.validators.push(Validator.byte());
-   @method byte
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var freightProperty - orderType.getProperty("Freight");
+      // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.
+      // Probably not a very good validation to place on the Freight property.
+      regionProperty.validators.push(Validator.byte());
+  @method byte
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.byte = function (context) {
     return intRangeValidatorCtor("byte", BYTE_MIN, BYTE_MAX, context)();
   };
 
   /**
-   Returns a standard boolean data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var productType = em1.metadataStore.getEntityType("Product");
-   var discontinuedProperty - productType.getProperty("Discontinued");
-   // Validates that the value of the Discontinued property on Product is a boolean
-   discontinuedProperty.validators.push(Validator.bool());
-   @method bool
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard boolean data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var productType = em1.metadataStore.getEntityType("Product");
+      var discontinuedProperty - productType.getProperty("Discontinued");
+      // Validates that the value of the Discontinued property on Product is a boolean
+      discontinuedProperty.validators.push(Validator.bool());
+  @method bool
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.bool = function () {
     var valFn = function (v) {
       if (v == null) return true;
@@ -613,18 +613,18 @@ var Validator = (function () {
   };
 
   /**
-   Returns a standard date data type Validator.
-   @example
-   // Assume em1 is a preexisting EntityManager.
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var orderDateProperty - orderType.getProperty("OrderDate");
-   // Validates that the value of the OrderDate property on Order is a date
-   // Probably not a very good validation to place on the Freight property.
-   orderDateProperty.validators.push(Validator.date());
-   @method date
-   @static
-   @return {Validator} A new Validator
-   **/
+  Returns a standard date data type Validator.
+  @example
+      // Assume em1 is a preexisting EntityManager.
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var orderDateProperty - orderType.getProperty("OrderDate");
+      // Validates that the value of the OrderDate property on Order is a date
+      // Probably not a very good validation to place on the Freight property.
+      orderDateProperty.validators.push(Validator.date());
+  @method date
+  @static
+  @return {Validator} A new Validator
+  **/
   ctor.date = function () {
     var valFn = function (v) {
       if (v == null) return true;
@@ -644,20 +644,20 @@ var Validator = (function () {
   };
 
   /**
-   Returns a credit card number validator
-   Performs a luhn algorithm checksum test for plausability
-   catches simple mistakes; only service knows for sure
-   @example
-   // Assume em is a preexisting EntityManager.
-   var personType = em.metadataStore.getEntityType("Person");
-   var creditCardProperty = personType.getProperty("creditCard");
-   // Validates that the value of the Person.creditCard property is credit card.
-   creditCardProperty.validators.push(Validator.creditCard());
-   @method creditCard
-   @static
-   @param [context] {Object} optional parameters to pass through to validation constructor
-   @return {Validator} A new Validator
-   **/
+  Returns a credit card number validator
+  Performs a luhn algorithm checksum test for plausability
+  catches simple mistakes; only service knows for sure
+  @example
+      // Assume em is a preexisting EntityManager.
+      var personType = em.metadataStore.getEntityType("Person");
+      var creditCardProperty = personType.getProperty("creditCard");
+      // Validates that the value of the Person.creditCard property is credit card.
+      creditCardProperty.validators.push(Validator.creditCard());
+  @method creditCard
+  @static
+  @param [context] {Object} optional parameters to pass through to validation constructor
+  @return {Validator} A new Validator
+  **/
   ctor.creditCard = function (context) {
     function valFn(v) {
       if (v == null || v === '') return true;
@@ -677,19 +677,19 @@ var Validator = (function () {
   };
 
   /**
-   Returns a regular expression validator; the expression must be specified
-   @example
-   // Add validator to a property. Assume em is a preexisting EntityManager.
-   var customerType = em.metadataStore.getEntityType("Customer");
-   var regionProperty = customerType.getProperty("Region");
-   // Validates that the value of Customer.Region is 2 char uppercase alpha.
-   regionProperty.validators.push(Validator.regularExpression( {expression: '^[A-Z]{2}$'} );
-   @method regularExpression
-   @static
-   @param context {Object}
-   @param context.expression {String} String form of the regular expression to apply
-   @return {Validator} A new Validator
-   **/
+  Returns a regular expression validator; the expression must be specified
+  @example
+      // Add validator to a property. Assume em is a preexisting EntityManager.
+      var customerType = em.metadataStore.getEntityType("Customer");
+      var regionProperty = customerType.getProperty("Region");
+      // Validates that the value of Customer.Region is 2 char uppercase alpha.
+      regionProperty.validators.push(Validator.regularExpression( {expression: '^[A-Z]{2}$'} );
+  @method regularExpression
+  @static
+  @param context {Object}
+  @param context.expression {String} String form of the regular expression to apply
+  @return {Validator} A new Validator
+  **/
   ctor.regularExpression = function (context) {
     function valFn(v, ctx) {
       // do not invalidate if empty; use a separate required test
@@ -706,18 +706,18 @@ var Validator = (function () {
   };
 
   /**
-   Returns the email address validator
-   @example
-   // Assume em is a preexisting EntityManager.
-   var personType = em.metadataStore.getEntityType("Person");
-   var emailProperty = personType.getProperty("email");
-   // Validates that the value of the Person.email property is an email address.
-   emailProperty.validators.push(Validator.emailAddress());
-   @method emailAddress
-   @static
-   @param [context] {Object} optional parameters to pass through to validation constructor
-   @return {Validator} A new Validator
-   **/
+  Returns the email address validator
+  @example
+      // Assume em is a preexisting EntityManager.
+      var personType = em.metadataStore.getEntityType("Person");
+      var emailProperty = personType.getProperty("email");
+      // Validates that the value of the Person.email property is an email address.
+      emailProperty.validators.push(Validator.emailAddress());
+  @method emailAddress
+  @static
+  @param [context] {Object} optional parameters to pass through to validation constructor
+  @return {Validator} A new Validator
+  **/
   ctor.emailAddress = function (context) {
     // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/EmailAttribute.cs
     var reEmailAddress = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
@@ -725,28 +725,28 @@ var Validator = (function () {
   };
 
   /**
-   Returns the phone validator
-   Provides basic assertions on the format and will help to eliminate most nonsense input
-   Matches:
-   International dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])
-   > ((\+)|(0(\d+)?[-/.\s]))
-   Country code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])
-   > [1-9]\d{,2}[-/.\s]?
-   Area code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])
-   > ((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?
-   Local: {0, ...}+ (with or without a trailing break character: [-/. ])
-   > (\d+[-/.\s]?)+\d+
-   @example
-   // Assume em is a preexisting EntityManager.
-   var customerType = em.metadataStore.getEntityType("Customer");
-   var phoneProperty = customerType.getProperty("phone");
-   // Validates that the value of the Customer.phone property is phone.
-   phoneProperty.validators.push(Validator.phone());
-   @method phone
-   @static
-   @param [context] {Object} optional parameters to pass through to validation constructor
-   @return {Validator} A new Validator
-   **/
+  Returns the phone validator
+  Provides basic assertions on the format and will help to eliminate most nonsense input
+  Matches:
+  International dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])
+  > ((\+)|(0(\d+)?[-/.\s]))
+  Country code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])
+  > [1-9]\d{,2}[-/.\s]?
+  Area code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])
+  > ((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?
+  Local: {0, ...}+ (with or without a trailing break character: [-/. ])
+  > (\d+[-/.\s]?)+\d+
+  @example
+      // Assume em is a preexisting EntityManager.
+      var customerType = em.metadataStore.getEntityType("Customer");
+      var phoneProperty = customerType.getProperty("phone");
+      // Validates that the value of the Customer.phone property is phone.
+      phoneProperty.validators.push(Validator.phone());
+  @method phone
+  @static
+  @param [context] {Object} optional parameters to pass through to validation constructor
+  @return {Validator} A new Validator
+  **/
   ctor.phone = function (context) {
     // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/Expressions.cs
     var rePhone = /^((\+|(0(\d+)?[-/.\s]?))[1-9]\d{0,2}[-/.\s]?)?((\(\d{1,6}\)|\d{1,6})[-/.\s]?)?(\d+[-/.\s]?)+\d+$/;
@@ -754,18 +754,18 @@ var Validator = (function () {
   };
 
   /**
-   Returns the URL (protocol required) validator
-   @example
-   // Assume em is a preexisting EntityManager.
-   var personType = em.metadataStore.getEntityType("Person");
-   var websiteProperty = personType.getProperty("website");
-   // Validates that the value of the Person.website property is a URL.
-   websiteProperty.validators.push(Validator.url());
-   @method url
-   @static
-   @param [context] {Object} optional parameters to pass through to validation constructor
-   @return {Validator} A new Validator
-   **/
+  Returns the URL (protocol required) validator
+  @example
+      // Assume em is a preexisting EntityManager.
+      var personType = em.metadataStore.getEntityType("Person");
+      var websiteProperty = personType.getProperty("website");
+      // Validates that the value of the Person.website property is a URL.
+      websiteProperty.validators.push(Validator.url());
+  @method url
+  @static
+  @param [context] {Object} optional parameters to pass through to validation constructor
+  @return {Validator} A new Validator
+  **/
   ctor.url = function (context) {
     //See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/UrlAttribute.cs
     var reUrlProtocolRequired = /^(https?|ftp):\/\/(((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|([a-zA-Z][\-a-zA-Z0-9]*)|((([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-zA-Z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-zA-Z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-fA-F]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/;
@@ -773,31 +773,31 @@ var Validator = (function () {
   };
 
   /**
-   Creates a regular expression validator with a fixed expression.
-   Many of the stock validators are built with this factory method.
-   Their expressions are often derived from
-   https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions
-   You can try many of them at http://dataannotationsextensions.org/
-   @example
-   // Make a zipcode validator
-   function zipValidator = Validator.makeRegExpValidator(
-   "zipVal,
-   /^\d{5}([\-]\d{4})?$/,
-   "The %displayName% '%value%' is not a valid U.S. zipcode");
-   // Register it.
-   Validator.register(zipValidator);
-   // Add it to a data property. Assume em is a preexisting EntityManager.
-   var custType = em.metadataStore.getEntityType("Customer");
-   var zipProperty = custType.getProperty("PostalCode");
-   zipProperty.validators.push(zipValidator);
-   @method makeRegExpValidator
-   @static
-   @param validatorName {String} name of this validator
-   @param expression {String | RegExp} regular expression to apply
-   @param [defaultMessage] {String} default message for failed validations
-   @param [context] {Object} optional parameters to pass through to validation constructor
-   @return {Validator} A new Validator
-   **/
+  Creates a regular expression validator with a fixed expression.
+  Many of the stock validators are built with this factory method.
+  Their expressions are often derived from
+  https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions
+  You can try many of them at http://dataannotationsextensions.org/
+  @example
+      // Make a zipcode validator
+      function zipValidator = Validator.makeRegExpValidator(
+      "zipVal,
+      /^\d{5}([\-]\d{4})?$/,
+      "The %displayName% '%value%' is not a valid U.S. zipcode");
+      // Register it.
+      Validator.register(zipValidator);
+      // Add it to a data property. Assume em is a preexisting EntityManager.
+      var custType = em.metadataStore.getEntityType("Customer");
+      var zipProperty = custType.getProperty("PostalCode");
+      zipProperty.validators.push(zipValidator);
+  @method makeRegExpValidator
+  @static
+  @param validatorName {String} name of this validator
+  @param expression {String | RegExp} regular expression to apply
+  @param [defaultMessage] {String} default message for failed validations
+  @param [context] {Object} optional parameters to pass through to validation constructor
+  @return {Validator} A new Validator
+  **/
   ctor.makeRegExpValidator = makeRegExpValidator;
 
   function makeRegExpValidator(validatorName, expression, defaultMessage, context) {
@@ -885,20 +885,20 @@ var Validator = (function () {
 
 var ValidationError = (function () {
   /**
-   A ValidationError is used to describe a failed validation.
+  A ValidationError is used to describe a failed validation.
 
-   @class ValidationError
-   **/
+  @class ValidationError
+  **/
 
   /**
-   Constructs a new ValidationError
-   @method <ctor> ValidationError
+  Constructs a new ValidationError
+  @method <ctor> ValidationError
 
-   @param validator {Validator || null} The Validator used to create this error, if any.
-   @param context { ContextObject || null} The Context object used in conjunction with the Validator to create this error.
-   @param errorMessage { String} The actual error message
-   @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here.
-   **/
+  @param validator {Validator || null} The Validator used to create this error, if any.
+  @param context { ContextObject || null} The Context object used in conjunction with the Validator to create this error.
+  @param errorMessage { String} The actual error message
+  @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here.
+  **/
   var ctor = function (validator, context, errorMessage, key) {
     assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
     assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
@@ -921,63 +921,63 @@ var ValidationError = (function () {
 
 
   /**
-   The Validator associated with this ValidationError.
+  The Validator associated with this ValidationError.
 
-   __readOnly__
-   @property validator {Validator}
-   **/
-
-  /**
-   A 'context' object associated with this ValidationError.
-
-   __readOnly__
-   @property context {Object}
-   **/
+  __readOnly__
+  @property validator {Validator}
+  **/
 
   /**
-   The DataProperty or NavigationProperty associated with this ValidationError.
+  A 'context' object associated with this ValidationError.
 
-   __readOnly__
-   @property property {DataProperty|NavigationProperty}
-   **/
-
-  /**
-   The property name associated with this ValidationError. This will be a "property path" for any properties of a complex object.
-
-   __readOnly__
-   @property propertyName {String}
-   **/
+  __readOnly__
+  @property context {Object}
+  **/
 
   /**
-   The error message associated with the ValidationError.
+  The DataProperty or NavigationProperty associated with this ValidationError.
 
-   __readOnly__
-   @property errorMessage {string}
-   **/
-
-  /**
-   The key by which this validation error may be removed from a collection of ValidationErrors.
-
-   __readOnly__
-   @property key {string}
-   **/
+  __readOnly__
+  @property property {DataProperty|NavigationProperty}
+  **/
 
   /**
-   Whether this is a server error.
+  The property name associated with this ValidationError. This will be a "property path" for any properties of a complex object.
 
-   __readOnly__
-   @property isServerError {bool}
-   **/
+  __readOnly__
+  @property propertyName {String}
+  **/
+
+  /**
+  The error message associated with the ValidationError.
+
+  __readOnly__
+  @property errorMessage {string}
+  **/
+
+  /**
+  The key by which this validation error may be removed from a collection of ValidationErrors.
+
+  __readOnly__
+  @property key {string}
+  **/
+
+  /**
+  Whether this is a server error.
+
+  __readOnly__
+  @property isServerError {bool}
+  **/
 
 
   /**
-   Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName
-   @method getKey
-   @static
-   @param validator {ValidatorOrErrorKey} A Validator or an "error name" if no validator is available.
-   @param [propertyName] A property name
-   @return {String} A ValidationError 'key'
-   **/
+  Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName
+  @method getKey
+  @static
+  @param validator {ValidatorOrErrorKey} A Validator or an "error name" if no validator is available.
+  @param [propertyName] A property name
+  @return {String} A ValidationError 'key'
+  **/
   ctor.getKey = function (validatorOrErrorName, propertyName) {
     return (validatorOrErrorName.name || validatorOrErrorName) + (propertyName ? ":" + propertyName : "");
   };

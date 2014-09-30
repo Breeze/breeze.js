@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -455,17 +457,18 @@ will translate property names between the server and the javascript client.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// A naming convention that converts the first character of every property name to uppercase on the server
+                <pre class="code prettyprint"><code>// A naming convention that converts the first character of every property name to uppercase on the server
 // and lowercase on the client.
 var namingConv = new NamingConvention({
-         serverPropertyNameToClient: function(serverPropertyName) {
-             return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-         },
-         clientPropertyNameToServer: function(clientPropertyName) {
-             return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-         }<br>     });
+    serverPropertyNameToClient: function(serverPropertyName) {
+        return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+    },
+    clientPropertyNameToServer: function(clientPropertyName) {
+        return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+    }            
+});
 var ms = new MetadataStore({ namingConvention: namingConv });
-var em = new EntityManager( { metadataStore: ms });</p>
+var em = new EntityManager( { metadataStore: ms });</code></pre>
 
             </div>
         </div>
@@ -790,14 +793,15 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var namingConv = new NamingConvention({
-         serverPropertyNameToClient: function(serverPropertyName) {
-             return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-         },
-         clientPropertyNameToServer: function(clientPropertyName) {
-             return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-         }<br>     });
-namingConv.setAsDefault();</p>
+                <pre class="code prettyprint"><code>var namingConv = new NamingConvention({
+    serverPropertyNameToClient: function(serverPropertyName) {
+        return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+    },
+    clientPropertyNameToServer: function(clientPropertyName) {
+        return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+    }            
+});
+namingConv.setAsDefault();</code></pre>
 
             </div>
         </div>

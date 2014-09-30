@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -229,9 +231,6 @@ that provide a variety of services including validation and change tracking.</p>
 <p>An EntityAspect will almost never need to be constructed directly. You will usually get an EntityAspect by accessing
 an entities &#39;entityAspect&#39; property.  This property will be automatically attached when an entity is created via either
 a query, import or EntityManager.createEntity call.</p>
-<p>// assume order is an order entity attached to an EntityManager.
-var aspect = order.entityAspect;
-var currentState = aspect.entityState;</p>
 
 </div>
 
@@ -534,9 +533,9 @@ had &#39;acceptChanges&#39; called on it.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.acceptChanges();
-// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes committed.</p>
+// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes committed.</code></pre>
 
             </div>
         </div>
@@ -586,7 +585,7 @@ order.entityAspect.acceptChanges();
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l615"><code>..\src\a30_entityAspect.js:615</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l614"><code>..\src\a30_entityAspect.js:614</code></a>
         
         </p>
 
@@ -664,7 +663,7 @@ order.entityAspect.acceptChanges();
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l641"><code>..\src\a30_entityAspect.js:641</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l640"><code>..\src\a30_entityAspect.js:640</code></a>
         
         </p>
 
@@ -796,8 +795,8 @@ order.entityAspect.acceptChanges();
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
-var entityKey = order.entityAspect.getKey();</p>
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+var entityKey = order.entityAspect.getKey();</code></pre>
 
             </div>
         </div>
@@ -851,7 +850,7 @@ var entityKey = order.entityAspect.getKey();</p>
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l582"><code>..\src\a30_entityAspect.js:582</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l581"><code>..\src\a30_entityAspect.js:581</code></a>
         
         </p>
 
@@ -914,15 +913,15 @@ If omitted, all of the validation errors for this entity will be returned.</p>
 
             <div class="example-content">
                 <p>This method can return all of the errors for an Entity</p>
-<p>// assume order is an order entity attached to an EntityManager.
-var valErrors = order.entityAspect.getValidationErrors();
-as well as those for just a specific property.</p>
-<p>// assume order is an order entity attached to an EntityManager.
-var orderDateErrors = order.entityAspect.getValidationErrors(&quot;OrderDate&quot;);
-which can also be expressed as</p>
-<p>// assume order is an order entity attached to an EntityManager.
+<pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+var valErrors = order.entityAspect.getValidationErrors();</code></pre>
+<p>as well as those for just a specific property.</p>
+<pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+var orderDateErrors = order.entityAspect.getValidationErrors(&quot;OrderDate&quot;);</code></pre>
+<p>which can also be expressed as</p>
+<pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 var orderDateProperty = order.entityType.getProperty(&quot;OrderDate&quot;);
-var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);</p>
+var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);</code></pre>
 
             </div>
         </div>
@@ -972,7 +971,7 @@ var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l451"><code>..\src\a30_entityAspect.js:451</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l450"><code>..\src\a30_entityAspect.js:450</code></a>
         
         </p>
 
@@ -1020,13 +1019,14 @@ var orderDateErrors = order.entityAspect.getValidationErrors(orderDateProperty);
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>A navigation property is considered loaded when any of the following three conditions applies:</p>
-<p>1) It was fetched from the backend server.
+                <pre class="code prettyprint"><code>A navigation property is considered loaded when any of the following three conditions applies:
+
+1) It was fetched from the backend server.
 a) This can be the result of an expand query or a call to the EntityAspect.loadNavigationProperty method.
 b) Note that even if the fetch returns nothing the property is still marked as loaded in this case.
 2) The property is scalar and has been set to a nonnull value.
-3) The EntityAspect.markNavigationPropertyAsLoaded was called.</p>
-<p>var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded(&quot;Orders&quot;);</p>
+3) The EntityAspect.markNavigationPropertyAsLoaded was called.</code></pre>
+<pre class="code prettyprint"><code>var wasLoaded = emp.entityAspect.isNavigationPropertyLoaded(&quot;Orders&quot;);</code></pre>
 
             </div>
         </div>
@@ -1178,9 +1178,14 @@ b) Note that even if the fetch returns nothing the property is still marked as l
                     
                         <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
                     
-                    <p>promiseData.results {Array of Entity}
-promiseData.query {EntityQuery} The original query
-promiseData.httpResponse {httpResponse} The HttpResponse returned from the server.</p>
+                    <ul>
+<li>properties of success promise<ul>
+<li>results {Array of Entity}</li>
+<li>query {EntityQuery} The original query</li>
+<li>httpResponse {httpResponse} The HttpResponse returned from the server.</li>
+</ul>
+</li>
+</ul>
 
                 
             </div>
@@ -1192,12 +1197,11 @@ promiseData.httpResponse {httpResponse} The HttpResponse returned from the serve
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>emp.entityAspect.loadNavigationProperty(&quot;Orders&quot;)
-.then(function (data) {
-             var orders = data.results;
-         }).fail(function (exception) {
-             // handle exception here;
-         });</p>
+                <pre class="code prettyprint"><code>emp.entityAspect.loadNavigationProperty(&quot;Orders&quot;).then(function (data) {
+    var orders = data.results;
+}).fail(function (exception) {
+    // handle exception here;
+});</code></pre>
 
             </div>
         </div>
@@ -1249,7 +1253,7 @@ promiseData.httpResponse {httpResponse} The HttpResponse returned from the serve
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l437"><code>..\src\a30_entityAspect.js:437</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l436"><code>..\src\a30_entityAspect.js:436</code></a>
         
         </p>
 
@@ -1297,7 +1301,7 @@ promiseData.httpResponse {httpResponse} The HttpResponse returned from the serve
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>emp.entityAspect.markNavigationPropertyAsLoaded(&quot;Orders&quot;);</p>
+                <pre class="code prettyprint"><code>emp.entityAspect.markNavigationPropertyAsLoaded(&quot;Orders&quot;);</code></pre>
 
             </div>
         </div>
@@ -1362,9 +1366,9 @@ had &#39;rejectChanges&#39; called on it.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.rejectChanges();
-// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes rejected.</p>
+// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes rejected.</code></pre>
 
             </div>
         </div>
@@ -1414,7 +1418,7 @@ order.entityAspect.rejectChanges();
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l627"><code>..\src\a30_entityAspect.js:627</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l626"><code>..\src\a30_entityAspect.js:626</code></a>
         
         </p>
 
@@ -1520,9 +1524,9 @@ The same operation can be performed by calling  <a href="../classes/EntityAspect
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setAdded();
-// The &#39;order&#39; entity will now be in an &#39;Added&#39; state.</p>
+// The &#39;order&#39; entity will now be in an &#39;Added&#39; state.</code></pre>
 
             </div>
         </div>
@@ -1588,9 +1592,9 @@ The same operation can be performed by calling  <a href="../classes/EntityAspect
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setDeleted();
-// The &#39;order&#39; entity will now be in a &#39;Deleted&#39; state and it will no longer have any &#39;related&#39; entities.</p>
+// The &#39;order&#39; entity will now be in a &#39;Deleted&#39; state and it will no longer have any &#39;related&#39; entities.</code></pre>
 
             </div>
         </div>
@@ -1655,9 +1659,9 @@ The same operation can be performed by calling  <a href="../classes/EntityAspect
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setDetached();
-// The &#39;order&#39; entity will now be in a &#39;Detached&#39; state and it will no longer have any &#39;related&#39; entities.</p>
+// The &#39;order&#39; entity will now be in a &#39;Detached&#39; state and it will no longer have any &#39;related&#39; entities.</code></pre>
 
             </div>
         </div>
@@ -1721,9 +1725,9 @@ order.entityAspect.setDetached();
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setEntityState(EntityState.Unchanged);
-// The &#39;order&#39; entity will now be in a &#39;Unchanged&#39; state.</p>
+// The &#39;order&#39; entity will now be in a &#39;Unchanged&#39; state.</code></pre>
 
             </div>
         </div>
@@ -1788,9 +1792,9 @@ The same operation can be performed by calling  <a href="../classes/EntityAspect
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setModified();
-// The &#39;order&#39; entity will now be in a &#39;Modified&#39; state.</p>
+// The &#39;order&#39; entity will now be in a &#39;Modified&#39; state.</code></pre>
 
             </div>
         </div>
@@ -1855,9 +1859,9 @@ The same operation can be performed by calling  <a href="../classes/EntityAspect
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.setUnchanged();
-// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes committed.</p>
+// The &#39;order&#39; entity will now be in an &#39;Unchanged&#39; state with any changes committed.</code></pre>
 
             </div>
         </div>
@@ -1901,7 +1905,7 @@ order.entityAspect.setUnchanged();
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l483"><code>..\src\a30_entityAspect.js:483</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l482"><code>..\src\a30_entityAspect.js:482</code></a>
         
         </p>
 
@@ -1941,12 +1945,12 @@ all of the validators on both the entity itself as well as those on each of its 
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 var isOk = order.entityAspect.validateEntity();
 // isOk will be &#39;true&#39; if there are no errors on the entity.
 if (!isOk) {
-         var errors = order.entityAspect.getValidationErrors();
-     }</p>
+    var errors = order.entityAspect.getValidationErrors();
+}</code></pre>
 
             </div>
         </div>
@@ -2006,7 +2010,7 @@ if (!isOk) {
             
         
         
-        <a href="../files/.._src_a30_entityAspect.js.html#l545"><code>..\src\a30_entityAspect.js:545</code></a>
+        <a href="../files/.._src_a30_entityAspect.js.html#l544"><code>..\src\a30_entityAspect.js:544</code></a>
         
         </p>
 
@@ -2090,11 +2094,11 @@ the path to a property of a complex object.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
-var isOk = order.entityAspect.validateProperty(&quot;Order&quot;);
-or</p>
-<p>var orderDateProperty = order.entityType.getProperty(&quot;OrderDate&quot;);
-var isOk = order.entityAspect.validateProperty(OrderDateProperty);</p>
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
+var isOk = order.entityAspect.validateProperty(&quot;Order&quot;);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var orderDateProperty = order.entityType.getProperty(&quot;OrderDate&quot;);
+var isOk = order.entityAspect.validateProperty(OrderDateProperty);</code></pre>
 
             </div>
         </div>
@@ -2548,15 +2552,15 @@ for any properties of a complex type.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.propertyChanged.subscribe(
 function (propertyChangedArgs) {
-             // this code will be executed anytime a property value changes on the &#39;order&#39; entity.
-             var entity = propertyChangedArgs.entity; // Note: entity === order
-             var propertyNameChanged = propertyChangedArgs.propertyName;
-             var oldValue = propertyChangedArgs.oldValue;
-             var newValue = propertyChangedArgs.newValue;
-         });</p>
+    // this code will be executed anytime a property value changes on the &#39;order&#39; entity.
+    var entity = propertyChangedArgs.entity; // Note: entity === order
+    var propertyNameChanged = propertyChangedArgs.propertyName;
+    var oldValue = propertyChangedArgs.oldValue;
+    var newValue = propertyChangedArgs.newValue;
+});</code></pre>
 
             </div>
         </div>
@@ -2667,14 +2671,14 @@ errors that have been &#39;fixed&#39;</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume order is an order entity attached to an EntityManager.
+                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
 order.entityAspect.validationErrorsChanged.subscribe(
 function (validationChangeArgs) {
-             // this code will be executed anytime a property value changes on the &#39;order&#39; entity.
-             var entity == validationChangeArgs.entity; // Note: entity === order
-             var errorsAdded = validationChangeArgs.added;
-             var errorsCleared = validationChangeArgs.removed;
-         });</p>
+    // this code will be executed anytime a property value changes on the &#39;order&#39; entity.
+    var entity == validationChangeArgs.entity; // Note: entity === order
+    var errorsAdded = validationChangeArgs.added;
+    var errorsCleared = validationChangeArgs.removed;
+});</code></pre>
 
             </div>
         </div>

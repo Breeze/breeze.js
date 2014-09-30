@@ -1,25 +1,25 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var DataType = (function () {
 
   /**
-   DataType is an 'Enum' containing all of the supported data types.
+  DataType is an 'Enum' containing all of the supported data types.
 
-   @class DataType
-   @static
-   **/
-
-  /**
-   The default value of this DataType.
-   @property defaultValue {any}
-   **/
+  @class DataType
+  @static
+  **/
 
   /**
-   Whether this is a 'numeric' DataType.
-   @property isNumeric {Boolean}
-   **/
+  The default value of this DataType.
+  @property defaultValue {any}
+  **/
+
+  /**
+  Whether this is a 'numeric' DataType.
+  @property isNumeric {Boolean}
+  **/
 
   var dataTypeMethods = {
     // default
@@ -189,145 +189,145 @@ var DataType = (function () {
 
 
   /**
-   @property String {DataType}
-   @final
-   @static
-   **/
+  @property String {DataType}
+  @final
+  @static
+  **/
   DataType.String = DataType.addSymbol({
-    defaultValue: "",
-    parse: coerceToString,
-    fmtOData: fmtString,
-    getNext: getNextString
+  defaultValue: "",
+  parse: coerceToString,
+  fmtOData: fmtString,
+  getNext: getNextString
   });
   /**
-   @property Int64 {DataType}
-   @final
-   @static
-   **/
+  @property Int64 {DataType}
+  @final
+  @static
+  **/
   DataType.Int64 = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, isInteger: true, quoteJsonOData: true,
-    parse: coerceToInt,
-    fmtOData: makeFloatFmt("L"),
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, isInteger: true, quoteJsonOData: true,
+  parse: coerceToInt,
+  fmtOData: makeFloatFmt("L"),
+  getNext: getNextNumber
   });
   /**
-   @property Int32 {DataType}
-   @final
-   @static
-   **/
+  @property Int32 {DataType}
+  @final
+  @static
+  **/
   DataType.Int32 = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, isInteger: true,
-    parse: coerceToInt,
-    fmtOData: fmtInt,
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, isInteger: true,
+  parse: coerceToInt,
+  fmtOData: fmtInt,
+  getNext: getNextNumber
   });
   /**
-   @property Int16 {DataType}
-   @final
-   @static
-   **/
+  @property Int16 {DataType}
+  @final
+  @static
+  **/
   DataType.Int16 = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, isInteger: true,
-    parse: coerceToInt,
-    fmtOData: fmtInt,
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, isInteger: true,
+  parse: coerceToInt,
+  fmtOData: fmtInt,
+  getNext: getNextNumber
   });
   /**
-   @property Byte {DataType}
-   @final
-   @static
-   **/
+  @property Byte {DataType}
+  @final
+  @static
+  **/
   DataType.Byte = DataType.addSymbol({ defaultValue: 0, isNumeric: true, isInteger: true, parse: coerceToInt, fmtOData: fmtInt });
   /**
-   @property Decimal {DataType}
-   @final
-   @static
-   **/
+  @property Decimal {DataType}
+  @final
+  @static
+  **/
   DataType.Decimal = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, quoteJsonOData: true, isFloat: true,
-    parse: coerceToFloat,
-    fmtOData: makeFloatFmt("m"),
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, quoteJsonOData: true, isFloat: true,
+  parse: coerceToFloat,
+  fmtOData: makeFloatFmt("m"),
+  getNext: getNextNumber
   });
   /**
-   @property Double {DataType}
-   @final
-   @static
-   **/
+  @property Double {DataType}
+  @final
+  @static
+  **/
   DataType.Double = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, isFloat: true,
-    parse: coerceToFloat,
-    fmtOData: makeFloatFmt("d"),
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, isFloat: true,
+  parse: coerceToFloat,
+  fmtOData: makeFloatFmt("d"),
+  getNext: getNextNumber
   });
   /**
-   @property Single {DataType}
-   @final
-   @static
-   **/
+  @property Single {DataType}
+  @final
+  @static
+  **/
   DataType.Single = DataType.addSymbol({
-    defaultValue: 0, isNumeric: true, isFloat: true,
-    parse: coerceToFloat,
-    fmtOData: makeFloatFmt("f"),
-    getNext: getNextNumber
+  defaultValue: 0, isNumeric: true, isFloat: true,
+  parse: coerceToFloat,
+  fmtOData: makeFloatFmt("f"),
+  getNext: getNextNumber
   });
   /**
-   @property DateTime {DataType}
-   @final
-   @static
-   **/
+  @property DateTime {DataType}
+  @final
+  @static
+  **/
   DataType.DateTime = DataType.addSymbol({
-    defaultValue: new Date(1900, 0, 1), isDate: true,
-    parse: coerceToDate,
-    fmtOData: fmtDateTime,
-    getNext: getNextDateTime
+  defaultValue: new Date(1900, 0, 1), isDate: true,
+  parse: coerceToDate,
+  fmtOData: fmtDateTime,
+  getNext: getNextDateTime
   });
 
   /**
-   @property DateTimeOffset {DataType}
-   @final
-   @static
-   **/
+  @property DateTimeOffset {DataType}
+  @final
+  @static
+  **/
   DataType.DateTimeOffset = DataType.addSymbol({
-    defaultValue: new Date(1900, 0, 1), isDate: true,
-    parse: coerceToDate,
-    fmtOData: fmtDateTimeOffset,
-    getNext: getNextDateTime
+  defaultValue: new Date(1900, 0, 1), isDate: true,
+  parse: coerceToDate,
+  fmtOData: fmtDateTimeOffset,
+  getNext: getNextDateTime
   });
   /**
-   @property Time {DataType}
-   @final
-   @static
-   **/
+  @property Time {DataType}
+  @final
+  @static
+  **/
   DataType.Time = DataType.addSymbol({ defaultValue: "PT0S", fmtOData: fmtTime });
   /**
-   @property Boolean {DataType}
-   @final
-   @static
-   **/
+  @property Boolean {DataType}
+  @final
+  @static
+  **/
   DataType.Boolean = DataType.addSymbol({ defaultValue: false, parse: coerceToBool, fmtOData: fmtBoolean });
   /**
-   @property Guid {DataType}
-   @final
-   @static
-   **/
+  @property Guid {DataType}
+  @final
+  @static
+  **/
   DataType.Guid = DataType.addSymbol({
-    defaultValue: "00000000-0000-0000-0000-000000000000",
-    fmtOData: fmtGuid,
-    getNext: getNextGuid
+  defaultValue: "00000000-0000-0000-0000-000000000000",
+  fmtOData: fmtGuid,
+  getNext: getNextGuid
   });
 
   /**
-   @property Binary {DataType}
-   @final
-   @static
-   **/
+  @property Binary {DataType}
+  @final
+  @static
+  **/
   DataType.Binary = DataType.addSymbol({ defaultValue: null, fmtOData: fmtBinary });
   /**
-   @property Undefined {DataType}
-   @final
-   @static
-   **/
+  @property Undefined {DataType}
+  @final
+  @static
+  **/
   DataType.Undefined = DataType.addSymbol({ defaultValue: undefined, fmtOData: fmtUndefined});
   DataType.resolveSymbols();
 
@@ -351,12 +351,12 @@ var DataType = (function () {
   };
 
   /**
-   Returns the DataType for a specified EDM type name.
-   @method fromEdmDataType
-   @static
-   @param typeName {String}
-   @return {DataType} A DataType.
-   **/
+  Returns the DataType for a specified EDM type name.
+  @method fromEdmDataType
+  @static
+  @param typeName {String}
+  @return {DataType} A DataType.
+  **/
   DataType.fromEdmDataType = function (typeName) {
     var dt = null;
     var parts = typeName.split(".");

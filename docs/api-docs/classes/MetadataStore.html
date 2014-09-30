@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -573,15 +575,15 @@ used when performing &quot;local queries&quot; in order to match the semantics o
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var ms = new MetadataStore();
-The store can then be associated with an EntityManager</p>
-<p>var entityManager = new EntityManager( {
-         serviceName: &quot;breeze/NorthwindIBModel&quot;, 
-         metadataStore: ms 
-     });
-or for an existing EntityManager</p>
-<p>// Assume em1 is an existing EntityManager
-em1.setProperties( { metadataStore: ms });</p>
+                <pre class="code prettyprint"><code>var ms = new MetadataStore();</code></pre>
+<p>The store can then be associated with an EntityManager</p>
+<pre class="code prettyprint"><code>var entityManager = new EntityManager( {
+    serviceName: &quot;breeze/NorthwindIBModel&quot;, 
+    metadataStore: ms 
+});</code></pre>
+<p>or for an existing EntityManager</p>
+<pre class="code prettyprint"><code>// Assume em1 is an existing EntityManager
+em1.setProperties( { metadataStore: ms });</code></pre>
 
             </div>
         </div>
@@ -637,7 +639,7 @@ em1.setProperties( { metadataStore: ms });</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l132"><code>..\src\a40_entityMetadata.js:132</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l133"><code>..\src\a40_entityMetadata.js:133</code></a>
         
         </p>
 
@@ -867,13 +869,13 @@ internally when exporting an EntityManager.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume ms is a previously created MetadataStore
+                <pre class="code prettyprint"><code>// assume ms is a previously created MetadataStore
 var metadataAsString = ms.exportMetadata();
 window.localStorage.setItem(&quot;metadata&quot;, metadataAsString);
 // and later, usually in a different session imported
 var metadataFromStorage = window.localStorage.getItem(&quot;metadata&quot;);
 var newMetadataStore = new MetadataStore();
-newMetadataStore.importMetadata(metadataFromStorage);</p>
+newMetadataStore.importMetadata(metadataFromStorage);</code></pre>
 
             </div>
         </div>
@@ -1079,16 +1081,14 @@ internally by an EntityManager before its first query against a new service.</p>
             <div class="example-content">
                 <p>Usually you will not actually process the results of a fetchMetadata call directly, but will instead
 ask for the metadata from the EntityManager after the fetchMetadata call returns.</p>
-<p>var ms = new MetadataStore();
+<pre class="code prettyprint"><code>var ms = new MetadataStore();
 // or more commonly
 // var ms = anEntityManager.metadataStore;
-ms.fetchMetadata(&quot;breeze/NorthwindIBModel&quot;)
-.then(function(rawMetadata) {
-         // do something with the metadata
-     }
-.fail(function(exception) {
-         // handle exception here
-     };</p>
+ms.fetchMetadata(&quot;breeze/NorthwindIBModel&quot;).then(function(rawMetadata) {
+      // do something with the metadata
+}).fail(function(exception) {
+    // handle exception here
+});</code></pre>
 
             </div>
         </div>
@@ -1202,9 +1202,9 @@ ms.fetchMetadata(&quot;breeze/NorthwindIBModel&quot;)
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// Assume em1 is an existing EntityManager.
+                <pre class="code prettyprint"><code>// Assume em1 is an existing EntityManager.
 var ds = em1.metadataStore.getDataService(&quot;breeze/NorthwindIBModel&quot;);
-var adapterName = ds.adapterName; // may be null</p>
+var adapterName = ds.adapterName; // may be null</code></pre>
 
             </div>
         </div>
@@ -1264,7 +1264,7 @@ var adapterName = ds.adapterName; // may be null</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l512"><code>..\src\a40_entityMetadata.js:512</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l510"><code>..\src\a40_entityMetadata.js:510</code></a>
         
         </p>
 
@@ -1344,11 +1344,11 @@ that same short name an exception will be thrown.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is a preexisting EntityManager
-var odType = em1.metadataStore.getEntityType(&quot;OrderDetail&quot;);
-or to throw an error if the type is not found</p>
-<p>var badType = em1.metadataStore.getEntityType(&quot;Foo&quot;, false);
-// badType will not get set and an exception will be thrown.</p>
+                <pre class="code prettyprint"><code>// assume em1 is a preexisting EntityManager
+var odType = em1.metadataStore.getEntityType(&quot;OrderDetail&quot;);</code></pre>
+<p>or to throw an error if the type is not found</p>
+<pre class="code prettyprint"><code>var badType = em1.metadataStore.getEntityType(&quot;Foo&quot;, false);
+// badType will not get set and an exception will be thrown.</code></pre>
 
             </div>
         </div>
@@ -1398,7 +1398,7 @@ or to throw an error if the type is not found</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l568"><code>..\src\a40_entityMetadata.js:568</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l565"><code>..\src\a40_entityMetadata.js:565</code></a>
         
         </p>
 
@@ -1481,7 +1481,7 @@ can be obtained via the  <a href="../classes/EntityType.html" class="crosslink">
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l549"><code>..\src\a40_entityMetadata.js:549</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l547"><code>..\src\a40_entityMetadata.js:547</code></a>
         
         </p>
 
@@ -1517,8 +1517,8 @@ can be obtained via the  <a href="../classes/EntityType.html" class="crosslink">
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is a preexisting EntityManager
-var allTypes = em1.metadataStore.getEntityTypes();</p>
+                <pre class="code prettyprint"><code>// assume em1 is a preexisting EntityManager
+var allTypes = em1.metadataStore.getEntityTypes();</code></pre>
 
             </div>
         </div>
@@ -1632,10 +1632,10 @@ var allTypes = em1.metadataStore.getEntityTypes();</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// Assume em1 is an existing EntityManager.
+                <pre class="code prettyprint"><code>// Assume em1 is an existing EntityManager.
 if (!em1.metadataStore.hasMetadataFor(&quot;breeze/NorthwindIBModel&quot;))) {
-         // do something interesting
-     }</p>
+    // do something interesting
+}</code></pre>
 
             </div>
         </div>
@@ -1753,12 +1753,12 @@ if (!em1.metadataStore.hasMetadataFor(&quot;breeze/NorthwindIBModel&quot;))) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume ms is a previously created MetadataStore
+                <pre class="code prettyprint"><code>// assume ms is a previously created MetadataStore
 var metadataAsString = ms.exportMetadata();
 window.localStorage.setItem(&quot;metadata&quot;, metadataAsString);
 // and later, usually in a different session
 var metadataFromStorage = window.localStorage.getItem(&quot;metadata&quot;);
-var newMetadataStore = MetadataStore.importMetadata(metadataFromStorage);</p>
+var newMetadataStore = MetadataStore.importMetadata(metadataFromStorage);</code></pre>
 
             </div>
         </div>
@@ -1899,13 +1899,13 @@ var newMetadataStore = MetadataStore.importMetadata(metadataFromStorage);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume ms is a previously created MetadataStore
+                <pre class="code prettyprint"><code>// assume ms is a previously created MetadataStore
 var metadataAsString = ms.exportMetadata();
 window.localStorage.setItem(&quot;metadata&quot;, metadataAsString);
 // and later, usually in a different session
 var metadataFromStorage = window.localStorage.getItem(&quot;metadata&quot;);
 var newMetadataStore = new MetadataStore();
-newMetadataStore.importMetadata(metadataFromStorage);</p>
+newMetadataStore.importMetadata(metadataFromStorage);</code></pre>
 
             </div>
         </div>
@@ -1949,7 +1949,7 @@ newMetadataStore.importMetadata(metadataFromStorage);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l498"><code>..\src\a40_entityMetadata.js:498</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l496"><code>..\src\a40_entityMetadata.js:496</code></a>
         
         </p>
 
@@ -1985,10 +1985,10 @@ newMetadataStore.importMetadata(metadataFromStorage);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is a preexisting EntityManager;
+                <pre class="code prettyprint"><code>// assume em1 is a preexisting EntityManager;
 if (em1.metadataStore.isEmpty()) {
-         // do something interesting
-     }</p>
+    // do something interesting
+}</code></pre>
 
             </div>
         </div>
@@ -2068,7 +2068,7 @@ if (em1.metadataStore.isEmpty()) {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l452"><code>..\src\a40_entityMetadata.js:452</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l450"><code>..\src\a40_entityMetadata.js:450</code></a>
         
         </p>
 
@@ -2221,16 +2221,16 @@ value will be used in place of the noTracking entity.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var Customer = function () {
-         this.miscData = &quot;asdf&quot;;
-     };
+                <pre class="code prettyprint"><code>var Customer = function () {
+        this.miscData = &quot;asdf&quot;;
+    };
 Customer.prototype.doFoo() {
-         ...
-     }
+        ...
+    }
 // assume em1 is a preexisting EntityManager;
 em1.metadataStore.registerEntityTypeCtor(&quot;Customer&quot;, Customer);
 // any queries or EntityType.create calls from this point on will call the Customer constructor
-// registered above.</p>
+// registered above.</code></pre>
 
             </div>
         </div>
@@ -2286,7 +2286,7 @@ em1.metadataStore.registerEntityTypeCtor(&quot;Customer&quot;, Customer);
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l579"><code>..\src\a40_entityMetadata.js:579</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l576"><code>..\src\a40_entityMetadata.js:576</code></a>
         
         </p>
 
@@ -2394,7 +2394,7 @@ that same short name an exception will be thrown. If the entityType has not yet 
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l109"><code>..\src\a40_entityMetadata.js:109</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l110"><code>..\src\a40_entityMetadata.js:110</code></a>
         
         </p>
 
@@ -2476,13 +2476,14 @@ that same short name an exception will be thrown. If the entityType has not yet 
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.</p>
-<p>em1.metadataStore.setProperties( {
-         version: &quot;6.1.3&quot;,
-         serializerFn: function(prop, value) {
-         return (prop.isUnmapped) ? undefined : value;
-         }
-     )};</p>
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+
+em1.metadataStore.setProperties( {
+    version: &quot;6.1.3&quot;,
+    serializerFn: function(prop, value) {
+    return (prop.isUnmapped) ? undefined : value;
+    }
+)};</code></pre>
 
             </div>
         </div>
@@ -2678,7 +2679,7 @@ that same short name an exception will be thrown. If the entityType has not yet 
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l436"><code>..\src\a40_entityMetadata.js:436</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l434"><code>..\src\a40_entityMetadata.js:434</code></a>
         
         </p>
 
@@ -2841,12 +2842,6 @@ i.e. an unmapped type.</p>
 
     <div class="description">
         <p>An <a href="../classes/Event.html" class="crosslink">Event</a> that fires after a MetadataStore has completed fetching metadata from a remote service.</p>
-<p>var ms = myEntityManager.metadataStore;
-ms.metadataFetched.subscribe(function(args) {
-        var metadataStore = args.metadataStore;
-        var dataService = args.dataService;
-    });
-});</p>
 
     </div>
 
@@ -2909,6 +2904,20 @@ ms.metadataFetched.subscribe(function(args) {
     
 
 
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <pre class="code prettyprint"><code>var ms = myEntityManager.metadataStore;
+ms.metadataFetched.subscribe(function(args) {
+        var metadataStore = args.metadataStore;
+        var dataService = args.dataService;
+    });
+});</code></pre>
+
+            </div>
+        </div>
     
 </div>
 

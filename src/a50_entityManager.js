@@ -1,58 +1,57 @@
 ﻿/**
- @module breeze
- **/
+@module breeze
+**/
 
 var EntityManager = (function () {
   /**
-   Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client.
-   @class EntityManager
-   **/
+  Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client.
+  @class EntityManager
+  **/
 
   /**
-   @example
-   At its most basic an EntityManager can be constructed with just a service name
-   @example
-   var entityManager = new EntityManager( "breeze/NorthwindIBModel");
-   This is the same as calling it with the following configuration object
-   @example
-   var entityManager = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-   Usually however, configuration objects will contain more than just the 'serviceName';
-   @example
-   var metadataStore = new MetadataStore();
-   var entityManager = new EntityManager( {
-            serviceName: "breeze/NorthwindIBModel", 
-            metadataStore: metadataStore 
-        });
-   or
-   @example
-   return new QueryOptions({
-            mergeStrategy: obj, 
-            fetchStrategy: this.fetchStrategy 
-        });u
-   var queryOptions = new QueryOptions({
-            mergeStrategy: MergeStrategy.OverwriteChanges, 
-            fetchStrategy: FetchStrategy.FromServer 
-        });
-   var validationOptions = new ValidationOptions({
-            validateOnAttach: true, 
-            validateOnSave: true, 
-            validateOnQuery: false
-        });
-   var entityManager = new EntityManager({
-            serviceName: "breeze/NorthwindIBModel", 
-            queryOptions: queryOptions, 
-            validationOptions: validationOptions 
-        });
-   @method <ctor> EntityManager
-   @param [config] {Object|String} Configuration settings or a service name.
-   @param [config.serviceName] {String}
-   @param [config.dataService] {DataService} An entire DataService (instead of just the serviceName above).
-   @param [config.metadataStore=MetadataStore.defaultInstance] {MetadataStore}
-   @param [config.queryOptions] {QueryOptions}
-   @param [config.saveOptions] {SaveOptions}
-   @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
-   @param [config.keyGeneratorCtor] {Function}
-   **/
+  At its most basic an EntityManager can be constructed with just a service name
+  @example
+      var entityManager = new EntityManager( "breeze/NorthwindIBModel");
+  This is the same as calling it with the following configuration object
+  @example
+      var entityManager = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+  Usually however, configuration objects will contain more than just the 'serviceName';
+  @example
+      var metadataStore = new MetadataStore();
+      var entityManager = new EntityManager( {
+          serviceName: "breeze/NorthwindIBModel", 
+          metadataStore: metadataStore 
+      });
+  or
+  @example
+      return new QueryOptions({
+          mergeStrategy: obj, 
+          fetchStrategy: this.fetchStrategy 
+      });
+      var queryOptions = new QueryOptions({
+          mergeStrategy: MergeStrategy.OverwriteChanges, 
+          fetchStrategy: FetchStrategy.FromServer 
+      });
+      var validationOptions = new ValidationOptions({
+          validateOnAttach: true, 
+          validateOnSave: true, 
+          validateOnQuery: false
+      });
+      var entityManager = new EntityManager({
+          serviceName: "breeze/NorthwindIBModel", 
+          queryOptions: queryOptions, 
+          validationOptions: validationOptions 
+      });
+  @method <ctor> EntityManager
+  @param [config] {Object|String} Configuration settings or a service name.
+  @param [config.serviceName] {String}
+  @param [config.dataService] {DataService} An entire DataService (instead of just the serviceName above).
+  @param [config.metadataStore=MetadataStore.defaultInstance] {MetadataStore}
+  @param [config.queryOptions] {QueryOptions}
+  @param [config.saveOptions] {SaveOptions}
+  @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
+  @param [config.keyGeneratorCtor] {Function}
+  **/
   var ctor = function (config) {
 
     if (arguments.length > 1) {
@@ -79,23 +78,23 @@ var EntityManager = (function () {
   Event.bubbleEvent(proto, null);
 
   /**
-   General purpose property set method.  Any of the properties documented below
-   may be set.
-   @example
-   // assume em1 is a previously created EntityManager
-   // where we want to change some of its settings.
-   em1.setProperties( {
-                serviceName: "breeze/foo"
-            });
-   @method setProperties
-   @param config {Object}
-   @param [config.serviceName] {String}
-   @param [config.dataService] {DataService}
-   @param [config.queryOptions] {QueryOptions}
-   @param [config.saveOptions] {SaveOptions}
-   @param [config.validationOptions] {ValidationOptions}
-   @param [config.keyGeneratorCtor] {Function}
-   **/
+  General purpose property set method.  Any of the properties documented below
+  may be set.
+  @example
+      // assume em1 is a previously created EntityManager
+      // where we want to change some of its settings.
+      em1.setProperties( {
+          serviceName: "breeze/foo"
+      });
+  @method setProperties
+  @param config {Object}
+  @param [config.serviceName] {String}
+  @param [config.dataService] {DataService}
+  @param [config.queryOptions] {QueryOptions}
+  @param [config.saveOptions] {SaveOptions}
+  @param [config.validationOptions] {ValidationOptions}
+  @param [config.keyGeneratorCtor] {Function}
+  **/
   proto.setProperties = function (config) {
     updateWithConfig(this, config, false);
   };
@@ -138,121 +137,121 @@ var EntityManager = (function () {
   }
 
   /**
-   The service name associated with this EntityManager.
+  The service name associated with this EntityManager.
 
-   __readOnly__
-   @property serviceName {String}
-   **/
-
-  /**
-   The DataService name associated with this EntityManager.
-
-   __readOnly__
-   @property dataService {DataService}
-   **/
+  __readOnly__
+  @property serviceName {String}
+  **/
 
   /**
-   The {{#crossLink "MetadataStore"}}{{/crossLink}} associated with this EntityManager.
+  The DataService name associated with this EntityManager.
 
-   __readOnly__
-   @property metadataStore {MetadataStore}
-   **/
-
-  /**
-   The {{#crossLink "QueryOptions"}}{{/crossLink}} associated with this EntityManager.
-
-   __readOnly__
-   @property queryOptions {QueryOptions}
-   **/
+  __readOnly__
+  @property dataService {DataService}
+  **/
 
   /**
-   The {{#crossLink "SaveOptions"}}{{/crossLink}} associated with this EntityManager.
+  The {{#crossLink "MetadataStore"}}{{/crossLink}} associated with this EntityManager.
 
-   __readOnly__
-   @property saveOptions {SaveOptions}
-   **/
-
-  /**
-   The {{#crossLink "ValidationOptions"}}{{/crossLink}} associated with this EntityManager.
-
-   __readOnly__
-   @property validationOptions {ValidationOptions}
-   **/
+  __readOnly__
+  @property metadataStore {MetadataStore}
+  **/
 
   /**
-   The {{#crossLink "KeyGenerator"}}{{/crossLink}} constructor associated with this EntityManager.
+  The {{#crossLink "QueryOptions"}}{{/crossLink}} associated with this EntityManager.
 
-   __readOnly__
-   @property keyGeneratorCtor {KeyGenerator constructor}
-   **/
+  __readOnly__
+  @property queryOptions {QueryOptions}
+  **/
+
+  /**
+  The {{#crossLink "SaveOptions"}}{{/crossLink}} associated with this EntityManager.
+
+  __readOnly__
+  @property saveOptions {SaveOptions}
+  **/
+
+  /**
+  The {{#crossLink "ValidationOptions"}}{{/crossLink}} associated with this EntityManager.
+
+  __readOnly__
+  @property validationOptions {ValidationOptions}
+  **/
+
+  /**
+  The {{#crossLink "KeyGenerator"}}{{/crossLink}} constructor associated with this EntityManager.
+
+  __readOnly__
+  @property keyGeneratorCtor {KeyGenerator constructor}
+  **/
 
 
   // events
   /**
-   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a change to any entity in this EntityManager occurs.
-   @example
-   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-   em.entityChanged.subscribe(function(changeArgs) {
-            // This code will be executed any time any entity within the entityManager is added, modified, deleted or detached for any reason. 
-            var action = changeArgs.entityAction;
-            var entity = changeArgs.entity;
-            // .. do something to this entity when it is changed.
-        });
-   });
+  An {{#crossLink "Event"}}{{/crossLink}} that fires whenever a change to any entity in this EntityManager occurs.
+  @example
+      var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+      em.entityChanged.subscribe(function(changeArgs) {
+          // This code will be executed any time any entity within the entityManager is added, modified, deleted or detached for any reason. 
+          var action = changeArgs.entityAction;
+          var entity = changeArgs.entity;
+          // .. do something to this entity when it is changed.
+      });
+  });
 
-   @event entityChanged
-   @param entityAction {EntityAction} The {{#crossLink "EntityAction"}}{{/crossLink}} that occured.
-   @param entity {Object} The entity that changed.  If this is null, then all entities in the entityManager were affected.
-   @param args {Object} Additional information about this event. This will differ based on the entityAction.
-   @readOnly
-   **/
+  @event entityChanged
+  @param entityAction {EntityAction} The {{#crossLink "EntityAction"}}{{/crossLink}} that occured.
+  @param entity {Object} The entity that changed.  If this is null, then all entities in the entityManager were affected.
+  @param args {Object} Additional information about this event. This will differ based on the entityAction.
+  @readOnly
+  **/
 
   /**
-   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever validationErrors change for any entity in this EntityManager.
-   @example
-   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-   em.validationErrorsChanged.subscribe(function(changeArgs) {
-            // This code will be executed any time any entity within the entityManager experiences a change to its validationErrors collection. 
-            function (validationChangeArgs) {
-                var entity == validationChangeArgs.entity; 
-                var errorsAdded = validationChangeArgs.added;
-                var errorsCleared = validationChangeArgs.removed;
-                // ... do something interesting with the order.
-            });
-        });
-   });
-   @event validationErrorsChanged
-   @param entity {Entity} The entity on which the validation errors have been added or removed.
-   @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
-   @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
-   errors that have been 'fixed'
-   @readOnly
-   **/
+  An {{#crossLink "Event"}}{{/crossLink}} that fires whenever validationErrors change for any entity in this EntityManager.
+  @example
+      var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+      em.validationErrorsChanged.subscribe(function(changeArgs) {
+              // This code will be executed any time any entity within the entityManager experiences a change to its validationErrors collection. 
+              function (validationChangeArgs) {
+                  var entity == validationChangeArgs.entity; 
+                  var errorsAdded = validationChangeArgs.added;
+                  var errorsCleared = validationChangeArgs.removed;
+                  // ... do something interesting with the order.
+              });
+          });
+      });
+  @event validationErrorsChanged
+  @param entity {Entity} The entity on which the validation errors have been added or removed.
+  @param added {Array of ValidationError} An array containing any newly added {{#crossLink "ValidationError"}}{{/crossLink}}s
+  @param removed {Array of ValidationError} An array containing any newly removed {{#crossLink "ValidationError"}}{{/crossLink}}s. This is those
+  errors that have been 'fixed'
+  @readOnly
+  **/
 
   // class methods
 
   /**
-   Creates a new entity of a specified type and optionally initializes it. By default the new entity is created with an EntityState of Added
-   but you can also optionally specify an EntityState.  An EntityState of 'Detached' will insure that the entity is created but not yet added
-   to the EntityManager.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   // create and add an entity;
-   var emp1 = em1.createEntity("Employee");
-   // create and add an initialized entity;
-   var emp2 = em1.createEntity("Employee", { lastName: Smith", firstName: "John" });
-   // create and attach (not add) an initialized entity
-   var emp3 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Unchanged);
-   // create but don't attach an entity;
-   var emp4 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Detached);
+  Creates a new entity of a specified type and optionally initializes it. By default the new entity is created with an EntityState of Added
+  but you can also optionally specify an EntityState.  An EntityState of 'Detached' will insure that the entity is created but not yet added
+  to the EntityManager.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      // create and add an entity;
+      var emp1 = em1.createEntity("Employee");
+      // create and add an initialized entity;
+      var emp2 = em1.createEntity("Employee", { lastName: Smith", firstName: "John" });
+      // create and attach (not add) an initialized entity
+      var emp3 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Unchanged);
+      // create but don't attach an entity;
+      var emp4 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Detached);
 
-   @method createEntity
-   @param entityType {String|EntityType} The EntityType or the name of the type for which an instance should be created.
-   @param [initialValues=null] {Config object} - Configuration object of the properties to set immediately after creation.
-   @param [entityState=EntityState.Added] {EntityState} - The EntityState of the entity after being created and added to this EntityManager.
-   @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} - How to handle conflicts if an entity with the same key already exists within this EntityManager.
-   @return {Entity} A new Entity of the specified type.
-   **/
+  @method createEntity
+  @param entityType {String|EntityType} The EntityType or the name of the type for which an instance should be created.
+  @param [initialValues=null] {Config object} - Configuration object of the properties to set immediately after creation.
+  @param [entityState=EntityState.Added] {EntityState} - The EntityState of the entity after being created and added to this EntityManager.
+  @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} - How to handle conflicts if an entity with the same key already exists within this EntityManager.
+  @return {Entity} A new Entity of the specified type.
+  **/
   proto.createEntity = function (entityType, initialValues, entityState, mergeStrategy) {
     assertParam(entityType, "entityType").isString().or().isInstanceOf(EntityType).check();
     assertParam(entityState, "entityState").isEnumOf(EntityState).isOptional().check();
@@ -273,29 +272,29 @@ var EntityManager = (function () {
 
 
   /**
-   Creates a new EntityManager and imports a previously exported result into it.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var bundle = em1.exportEntities();
-   // can be stored via the web storage api
-   window.localStorage.setItem("myEntityManager", bundle);
-   // assume the code below occurs in a different session.
-   var bundleFromStorage = window.localStorage.getItem("myEntityManager");
-   // and imported
-   var em2 = EntityManager.importEntities(bundleFromStorage);
-   // em2 will now have a complete copy of what was in em1
-   @method importEntities
-   @static
-   @param exportedString {String} The result of a previous 'exportEntities' call.
-   @param [config] {Object} A configuration object.
-   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
-   merging into an existing EntityManager.
-   @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
-   and may be used to perform version checking.
-   @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that
-   provided by the same named method on an EntityManager instance. Use that method if you need additional information
-   regarding the imported entities.
-   **/
+  Creates a new EntityManager and imports a previously exported result into it.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var bundle = em1.exportEntities();
+      // can be stored via the web storage api
+      window.localStorage.setItem("myEntityManager", bundle);
+      // assume the code below occurs in a different session.
+      var bundleFromStorage = window.localStorage.getItem("myEntityManager");
+      // and imported
+      var em2 = EntityManager.importEntities(bundleFromStorage);
+      // em2 will now have a complete copy of what was in em1
+  @method importEntities
+  @static
+  @param exportedString {String} The result of a previous 'exportEntities' call.
+  @param [config] {Object} A configuration object.
+  @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
+  merging into an existing EntityManager.
+  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  and may be used to perform version checking.
+  @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that
+  provided by the same named method on an EntityManager instance. Use that method if you need additional information
+  regarding the imported entities.
+  **/
   ctor.importEntities = function (exportedString, config) {
     var em = new EntityManager();
     em.importEntities(exportedString, config);
@@ -305,9 +304,9 @@ var EntityManager = (function () {
   // instance methods
 
   /**
-   Calls EntityAspect.acceptChanges on every changed entity in this EntityManager.
-   @method acceptChanges
-   **/
+  Calls EntityAspect.acceptChanges on every changed entity in this EntityManager.
+  @method acceptChanges
+  **/
   proto.acceptChanges = function () {
     this.getChanges().forEach(function (entity) {
       entity.entityAspect.acceptChanges();
@@ -315,35 +314,34 @@ var EntityManager = (function () {
   }
 
   /**
-   Exports an entire EntityManager or just selected entities into a serialized string for external storage.
-   @example
-   This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
-   memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var bundle = em1.exportEntities();
-   // can be stored via the web storage api
-   window.localStorage.setItem("myEntityManager", bundle);
-   // assume the code below occurs in a different session.
-   var bundleFromStorage = window.localStorage.getItem("myEntityManager");
-   var em2 = new EntityManager({
-            serviceName: em1.serviceName, 
-            metadataStore: em1.metadataStore 
-        });
-   em2.importEntities(bundleFromStorage);
-   // em2 will now have a complete copy of what was in em1
-   You can also control exactly which entities are exported.
-   @example
-   // assume entitiesToExport is an array of entities to export.
-   var bundle = em1.exportEntities(entitiesToExport);
-   // assume em2 is another entityManager containing some of the same entities possibly with modifications.
-   em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-   @method exportEntities
-   @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
-   @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
-
-   @return {String} A serialized version of the exported data.
-   **/
+  Exports an entire EntityManager or just selected entities into a serialized string for external storage.
+  @example
+  This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
+  memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var bundle = em1.exportEntities();
+      // can be stored via the web storage api
+      window.localStorage.setItem("myEntityManager", bundle);
+      // assume the code below occurs in a different session.
+      var bundleFromStorage = window.localStorage.getItem("myEntityManager");
+      var em2 = new EntityManager({
+              serviceName: em1.serviceName, 
+              metadataStore: em1.metadataStore 
+          });
+      em2.importEntities(bundleFromStorage);
+      // em2 will now have a complete copy of what was in em1
+  You can also control exactly which entities are exported.
+  @example
+      // assume entitiesToExport is an array of entities to export.
+      var bundle = em1.exportEntities(entitiesToExport);
+      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+      em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+  @method exportEntities
+  @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
+  @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
+  @return {String} A serialized version of the exported data.
+  **/
   proto.exportEntities = function (entities, includeMetadata) {
     assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
     includeMetadata = (includeMetadata == null) ? true : includeMetadata;
@@ -364,41 +362,41 @@ var EntityManager = (function () {
   };
 
   /**
-   Imports a previously exported result into this EntityManager.
-   @example
-   This method can be used to make a complete copy of any previously created entityManager, even if created
-   in a previous session and stored in localStorage. The static version of this method performs a
-   very similar process.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var bundle = em1.exportEntities();
-   // bundle can be stored in window.localStorage or just held in memory.
-   var em2 = new EntityManager({
-            serviceName: em1.serviceName, 
-            metadataStore: em1.metadataStore 
-        });
-   em2.importEntities(bundle);
-   // em2 will now have a complete copy of what was in em1
-   It can also be used to merge the contents of a previously created EntityManager with an
-   existing EntityManager with control over how the two are merged.
-   @example
-   var bundle = em1.exportEntities();
-   // assume em2 is another entityManager containing some of the same entities possibly with modifications.
-   em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-   // em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously
-   // made modifications will not have been touched, but all other entities from em1 will have been imported.
-   @method importEntities
-   @param exportedString {String|Json} The result of a previous 'export' call.
-   @param [config] {Object} A configuration object.
-   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
-   merging into an existing EntityManager.
-   @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
-   and may be used to perform version checking.
-   @return result {Object}
+  Imports a previously exported result into this EntityManager.
+  @example
+  This method can be used to make a complete copy of any previously created entityManager, even if created
+  in a previous session and stored in localStorage. The static version of this method performs a
+  very similar process.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var bundle = em1.exportEntities();
+      // bundle can be stored in window.localStorage or just held in memory.
+      var em2 = new EntityManager({
+          serviceName: em1.serviceName, 
+          metadataStore: em1.metadataStore 
+      });
+      em2.importEntities(bundle);
+      // em2 will now have a complete copy of what was in em1
+  It can also be used to merge the contents of a previously created EntityManager with an
+  existing EntityManager with control over how the two are merged.
+  @example
+      var bundle = em1.exportEntities();
+      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+      em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+      // em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously
+      // made modifications will not have been touched, but all other entities from em1 will have been imported.
+  @method importEntities
+  @param exportedString {String|Json} The result of a previous 'export' call.
+  @param [config] {Object} A configuration object.
+  @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
+  merging into an existing EntityManager.
+  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  and may be used to perform version checking.
+  @return result {Object}
 
-   result.entities {Array of Entities} The entities that were imported.
-   result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager.
-   **/
+  result.entities {Array of Entities} The entities that were imported.
+  result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager.
+  **/
   proto.importEntities = function (exportedString, config) {
     config = config || {};
     assertConfig(config)
@@ -458,15 +456,15 @@ var EntityManager = (function () {
 
 
   /**
-   Clears this EntityManager's cache but keeps all other settings. Note that this
-   method is not as fast as creating a new EntityManager via 'new EntityManager'.
-   This is because clear actually detaches all of the entities from the EntityManager.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   em1.clear();
-   // em1 is will now contain no entities, but all other setting will be maintained.
-   @method clear
-   **/
+  Clears this EntityManager's cache but keeps all other settings. Note that this
+  method is not as fast as creating a new EntityManager via 'new EntityManager'.
+  This is because clear actually detaches all of the entities from the EntityManager.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      em1.clear();
+      // em1 is will now contain no entities, but all other setting will be maintained.
+  @method clear
+  **/
   proto.clear = function () {
     __objectForEach(this._entityGroupMap, function (key, entityGroup) {
       // remove en
@@ -482,15 +480,15 @@ var EntityManager = (function () {
 
 
   /**
-   Creates an empty copy of this EntityManager
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var em2 = em1.createEmptyCopy();
-   // em2 is a new EntityManager with all of em1's settings
-   // but no entities.
-   @method createEmptyCopy
-   @return {EntityManager} A new EntityManager.
-   **/
+  Creates an empty copy of this EntityManager
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var em2 = em1.createEmptyCopy();
+      // em2 is a new EntityManager with all of em1's settings
+      // but no entities.
+  @method createEmptyCopy
+  @return {EntityManager} A new EntityManager.
+  **/
   proto.createEmptyCopy = function () {
     var copy = new ctor(__extend({}, this,
         ["dataService", "metadataStore", "queryOptions", "saveOptions", "validationOptions", "keyGeneratorCtor"]));
@@ -498,39 +496,39 @@ var EntityManager = (function () {
   };
 
   /**
-   Attaches an entity to this EntityManager with an  {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var cust1 = custType.createEntity();
-   em1.addEntity(cust1);
-   Note that this is the same as using 'attachEntity' with an {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var cust1 = custType.createEntity();
-   em1.attachEntity(cust1, EntityState.Added);
-   @method addEntity
-   @param entity {Entity} The entity to add.
-   @return {Entity} The added entity.
-   **/
+  Attaches an entity to this EntityManager with an  {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var cust1 = custType.createEntity();
+      em1.addEntity(cust1);
+  Note that this is the same as using 'attachEntity' with an {{#crossLink "EntityState"}}{{/crossLink}} of 'Added'.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var cust1 = custType.createEntity();
+      em1.attachEntity(cust1, EntityState.Added);
+  @method addEntity
+  @param entity {Entity} The entity to add.
+  @return {Entity} The added entity.
+  **/
   proto.addEntity = function (entity) {
     return this.attachEntity(entity, EntityState.Added);
   };
 
   /**
-   Attaches an entity to this EntityManager with a specified {{#crossLink "EntityState"}}{{/crossLink}}.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var cust1 = custType.createEntity();
-   em1.attachEntity(cust1, EntityState.Added);
-   @method attachEntity
-   @param entity {Entity} The entity to add.
-   @param [entityState=EntityState.Unchanged] {EntityState} The EntityState of the newly attached entity. If omitted this defaults to EntityState.Unchanged.
-   @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} How the specified entity should be merged into the EntityManager if this EntityManager already contains an entity with the same key.
-   @return {Entity} The attached entity.
-   **/
+  Attaches an entity to this EntityManager with a specified {{#crossLink "EntityState"}}{{/crossLink}}.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var cust1 = custType.createEntity();
+      em1.attachEntity(cust1, EntityState.Added);
+  @method attachEntity
+  @param entity {Entity} The entity to add.
+  @param [entityState=EntityState.Unchanged] {EntityState} The EntityState of the newly attached entity. If omitted this defaults to EntityState.Unchanged.
+  @param [mergeStrategy=MergeStrategy.Disallowed] {MergeStrategy} How the specified entity should be merged into the EntityManager if this EntityManager already contains an entity with the same key.
+  @return {Entity} The attached entity.
+  **/
   proto.attachEntity = function (entity, entityState, mergeStrategy) {
     assertParam(entity, "entity").isRequired().check();
     this.metadataStore._checkEntityType(entity);
@@ -588,17 +586,17 @@ var EntityManager = (function () {
 
 
   /**
-   Detaches an entity from this EntityManager.
-   @example
-   // assume em1 is an EntityManager containing a number of existing entities.
-   // assume cust1 is a customer Entity previously attached to em1
-   em1.detachEntity(cust1);
-   // em1 will now no longer contain cust1 and cust1 will have an
-   // entityAspect.entityState of EntityState.Detached
-   @method detachEntity
-   @param entity {Entity} The entity to detach.
-   @return {Boolean} Whether the entity could be detached. This will return false if the entity is already detached or was never attached.
-   **/
+  Detaches an entity from this EntityManager.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      // assume cust1 is a customer Entity previously attached to em1
+      em1.detachEntity(cust1);
+      // em1 will now no longer contain cust1 and cust1 will have an
+      // entityAspect.entityState of EntityState.Detached
+  @method detachEntity
+  @param entity {Entity} The entity to detach.
+  @return {Boolean} Whether the entity could be detached. This will return false if the entity is already detached or was never attached.
+  **/
   proto.detachEntity = function (entity) {
     assertParam(entity, "entity").isEntity().check();
     var aspect = entity.entityAspect;
@@ -614,38 +612,37 @@ var EntityManager = (function () {
   };
 
   /**
-   Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call
-   occurs internally before the first query to any service if the metadata hasn't already been
-   loaded.
-   @example
-   Usually you will not actually process the results of a fetchMetadata call directly, but will instead
-   ask for the metadata from the EntityManager after the fetchMetadata call returns.
-   @example
-   var em1 = new EntityManager( "breeze/NorthwindIBModel");
-   em1.fetchMetadata()
-   .then(function() {
-                var metadataStore = em1.metadataStore;
-                // do something with the metadata
-            }
-   .fail(function(exception) {
-                // handle exception here
-            };
-   @method fetchMetadata
-   @async
-   @param [callback] {Function} Function called on success.
+  Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call
+  occurs internally before the first query to any service if the metadata hasn't already been
+  loaded.
+  @example
+  Usually you will not actually process the results of a fetchMetadata call directly, but will instead
+  ask for the metadata from the EntityManager after the fetchMetadata call returns.
+  @example
+      var em1 = new EntityManager( "breeze/NorthwindIBModel");
+      em1.fetchMetadata()
+        .then(function() {
+            var metadataStore = em1.metadataStore;
+            // do something with the metadata
+        }).fail(function(exception) {
+            // handle exception here
+        });
+  @method fetchMetadata
+  @async
+  @param [callback] {Function} Function called on success.
 
-   successFunction([schema])
-   @param [callback.schema] {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
-   it is usually better to access metadata via the 'metadataStore' property of the EntityManager after this method's Promise or callback completes.
-   @param [errorCallback] {Function} Function called on failure.
+  successFunction([schema])
+  @param [callback.schema] {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
+  it is usually better to access metadata via the 'metadataStore' property of the EntityManager after this method's Promise or callback completes.
+  @param [errorCallback] {Function} Function called on failure.
 
-   failureFunction([error])
-   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-   @return {Promise} Promise
-
-   promiseData.schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
-   it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.
-   **/
+  failureFunction([error])
+  @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+  @return {Promise} 
+    - Properties on the promise success result
+      - schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
+        it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.
+  **/
   proto.fetchMetadata = function (dataService, callback, errorCallback) {
     if (typeof (dataService) === "function") {
       // legacy support for when dataService was not an arg. i.e. first arg was callback
@@ -663,77 +660,75 @@ var EntityManager = (function () {
   };
 
   /**
-   Executes the specified query.
-   @example
-   This method can be called using a 'promises' syntax ( recommended)
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery("Orders");
-   em.executeQuery(query)
-   .then( function(data) {
-                var orders = data.results;
-                ... query results processed here
-            }).fail( function(err) {
-                ... query failure processed here
-            });
-   or with callbacks
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery("Orders");
-   em.executeQuery(query,
-   function(data) {
-                var orders = data.results;
-                ... query results processed here
-            },
-   function(err) {
-                ... query failure processed here
-            });
-   Either way this method is the same as calling the The {{#crossLink "EntityQuery"}}{{/crossLink}} 'execute' method.
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery("Orders").using(em);
-   query.execute()
-   .then( function(data) {
-                var orders = data.results;
-                ... query results processed here
-            }).fail( function(err) {
-                ... query failure processed here
-            });
+  Executes the specified query.
+  @example
+  This method can be called using a 'promises' syntax ( recommended)
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery("Orders");
+      em.executeQuery(query).then( function(data) {
+          var orders = data.results;
+          ... query results processed here
+      }).fail( function(err) {
+          ... query failure processed here
+      });
+  or with callbacks
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery("Orders");
+      em.executeQuery(query, 
+          function(data) {
+              var orders = data.results;
+              ... query results processed here
+          },
+          function(err) {
+              ... query failure processed here
+          });
+  Either way this method is the same as calling the The {{#crossLink "EntityQuery"}}{{/crossLink}} 'execute' method.
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery("Orders").using(em);
+      query.execute().then( function(data) {
+          var orders = data.results;
+          ... query results processed here
+      }).fail( function(err) {
+          ... query failure processed here
+      });
 
-   @method executeQuery
-   @async
-   @param query {EntityQuery|String}  The {{#crossLink "EntityQuery"}}{{/crossLink}} or OData query string to execute.
-   @param [callback] {Function} Function called on success.
+  @method executeQuery
+  @async
+  @param query {EntityQuery|String}  The {{#crossLink "EntityQuery"}}{{/crossLink}} or OData query string to execute.
+  @param [callback] {Function} Function called on success.
 
-   successFunction([data])
-   @param callback.data {Object}
-   @param callback.data.results {Array of Entity}
-   @param callback.data.query {EntityQuery} The original query
-   @param callback.data.entityManager {EntityManager} The EntityManager.
-   @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
-   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
-   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-   would have been applied.
+  successFunction([data])
+  @param callback.data {Object}
+  @param callback.data.results {Array of Entity}
+  @param callback.data.query {EntityQuery} The original query
+  @param callback.data.entityManager {EntityManager} The EntityManager.
+  @param callback.data.httpResponse {HttpResponse} The HttpResponse returned from the server.
+  @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
+  items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+  would have been applied.
 
-   @param [errorCallback] {Function} Function called on failure.
+  @param [errorCallback] {Function} Function called on failure.
 
-   failureFunction([error])
-   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-   @param [errorCallback.error.query] The query that caused the error.
-   @param [errorCallback.error.entityManager] The query that caused the error.
-   @param [errorCallback.error.httpResponse] {HttpResponse} The HttpResponse returned from the server.
+  failureFunction([error])
+  @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+  @param [errorCallback.error.query] The query that caused the error.
+  @param [errorCallback.error.entityManager] The query that caused the error.
+  @param [errorCallback.error.httpResponse] {HttpResponse} The HttpResponse returned from the server.
 
 
-   @return {Promise} Promise
-
-   promiseData.results {Array of Entity}
-   promiseData.query {EntityQuery} The original query
-   promiseData.entityManager {EntityManager} The EntityManager.
-   promiseData.httpResponse {HttpResponse} The  HttpResponse returned from the server.
-   promiseData.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
-   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
-   would have been applied.
-   **/
+  @return {Promise} 
+    - Properties on the promise success result
+      - results {Array of Entity}
+      - query {EntityQuery} The original query
+      - entityManager {EntityManager} The EntityManager.
+      - httpResponse {HttpResponse} The  HttpResponse returned from the server.
+      - [inlineCount] {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
+    items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
+    would have been applied.
+  **/
   proto.executeQuery = function (query, callback, errorCallback) {
     assertParam(query, "query").isInstanceOf(EntityQuery).or().isString().check();
     assertParam(callback, "callback").isFunction().isOptional().check();
@@ -758,30 +753,30 @@ var EntityManager = (function () {
   };
 
   /**
-   Executes the specified query against this EntityManager's local cache.
+  Executes the specified query against this EntityManager's local cache.
 
-   @example
-   Because this method is executed immediately there is no need for a promise or a callback
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery("Orders");
-   var orders = em.executeQueryLocally(query);
-   Note that this can also be accomplished using the 'executeQuery' method with
-   a FetchStrategy of FromLocalCache and making use of the Promise or callback
-   @example
-   var em = new EntityManager(serviceName);
-   var query = new EntityQuery("Orders").using(FetchStrategy.FromLocalCache);
-   em.executeQuery(query)
-   .then( function(data) {
-                var orders = data.results;
-                ... query results processed here
-            }).fail( function(err) {
-                ... query failure processed here
-            });
-   @method executeQueryLocally
-   @param query {EntityQuery}  The {{#crossLink "EntityQuery"}}{{/crossLink}} to execute.
-   @return  {Array of Entity}  Array of entities from cache that satisfy the query
-   **/
+  @example
+  Because this method is executed immediately there is no need for a promise or a callback
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery("Orders");
+      var orders = em.executeQueryLocally(query);
+   
+  Note that this can also be accomplished using the 'executeQuery' method with
+  a FetchStrategy of FromLocalCache and making use of the Promise or callback
+  @example
+      var em = new EntityManager(serviceName);
+      var query = new EntityQuery("Orders").using(FetchStrategy.FromLocalCache);
+      em.executeQuery(query).then( function(data) {
+          var orders = data.results;
+          ... query results processed here
+      }).fail( function(err) {
+          ... query failure processed here
+      });
+  @method executeQueryLocally
+  @param query {EntityQuery}  The {{#crossLink "EntityQuery"}}{{/crossLink}} to execute.
+  @return  {Array of Entity}  Array of entities from cache that satisfy the query
+  **/
   proto.executeQueryLocally = function (query) {
     assertParam(query, "query").isInstanceOf(EntityQuery).check();
 
@@ -827,72 +822,72 @@ var EntityManager = (function () {
   };
 
   /**
-   Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities
-   specified then there will be no server side call made but a valid 'empty' saveResult will still be returned.
-   @example
-   Often we will be saving all of the entities within an EntityManager that are either added, modified or deleted
-   and we will let the 'saveChanges' call determine which entities these are.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   // This could include added, modified and deleted entities.
-   em.saveChanges().then(function(saveResult) {
-            var savedEntities = saveResult.entities;
-            var keyMappings = saveResult.keyMappings;
-        }).fail(function (e) {
-            // e is any exception that was thrown.
-        });
-   But we can also control exactly which entities to save and can specify specific SaveOptions
-   @example
-   // assume entitiesToSave is an array of entities to save.
-   var saveOptions = new SaveOptions({ allowConcurrentSaves: true });
-   em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
-            var savedEntities = saveResult.entities;
-            var keyMappings = saveResult.keyMappings;
-        }).fail(function (e) {
-            // e is any exception that was thrown.
-        });
-   Callback methods can also be used
-   @example
-   em.saveChanges(entitiesToSave, null,
-   function(saveResult) {
-                var savedEntities = saveResult.entities;
-                var keyMappings = saveResult.keyMappings;
-            }, function (e) {
-                // e is any exception that was thrown.
-            }
-   );
-   @method saveChanges
-   @async
-   @param [entities] {Array of Entity} The list of entities to save.
-   Every entity in that list will be sent to the server, whether changed or unchanged,
-   as long as it is attached to this EntityManager.
-   If this parameter is omitted, null or empty (the usual case),
-   every entity with pending changes in this EntityManager will be saved.
-   @param [saveOptions] {SaveOptions} {{#crossLink "SaveOptions"}}{{/crossLink}} for the save - will default to
-   {{#crossLink "EntityManager/saveOptions"}}{{/crossLink}} if null.
-   @param [callback] {Function} Function called on success.
+  Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities
+  specified then there will be no server side call made but a valid 'empty' saveResult will still be returned.
+  @example
+  Often we will be saving all of the entities within an EntityManager that are either added, modified or deleted
+  and we will let the 'saveChanges' call determine which entities these are.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      // This could include added, modified and deleted entities.
+      em.saveChanges().then(function(saveResult) {
+          var savedEntities = saveResult.entities;
+          var keyMappings = saveResult.keyMappings;
+      }).fail(function (e) {
+          // e is any exception that was thrown.
+      });
+  But we can also control exactly which entities to save and can specify specific SaveOptions
+  @example
+      // assume entitiesToSave is an array of entities to save.
+      var saveOptions = new SaveOptions({ allowConcurrentSaves: true });
+      em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
+          var savedEntities = saveResult.entities;
+          var keyMappings = saveResult.keyMappings;
+      }).fail(function (e) {
+          // e is any exception that was thrown.
+      });
+  Callback methods can also be used
+  @example
+      em.saveChanges(entitiesToSave, null,
+      function(saveResult) {
+                  var savedEntities = saveResult.entities;
+                  var keyMappings = saveResult.keyMappings;
+              }, function (e) {
+                  // e is any exception that was thrown.
+              }
+      );
+  @method saveChanges
+  @async
+  @param [entities] {Array of Entity} The list of entities to save.
+  Every entity in that list will be sent to the server, whether changed or unchanged,
+  as long as it is attached to this EntityManager.
+  If this parameter is omitted, null or empty (the usual case),
+  every entity with pending changes in this EntityManager will be saved.
+  @param [saveOptions] {SaveOptions} {{#crossLink "SaveOptions"}}{{/crossLink}} for the save - will default to
+  {{#crossLink "EntityManager/saveOptions"}}{{/crossLink}} if null.
+  @param [callback] {Function} Function called on success.
 
-   successFunction([saveResult])
-   @param [callback.saveResult] {Object}
-   @param [callback.saveResult.entities] {Array of Entity} The saved entities - with any temporary keys converted into 'real' keys.
-   These entities are actually references to entities in the EntityManager cache that have been updated as a result of the
-   save.
-   @param [callback.saveResult.keyMappings] {Array of keyMappings} Each keyMapping has the following properties: 'entityTypeName', 'tempValue' and 'realValue'
-   @param [callback.saveResult.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
+  successFunction([saveResult])
+  @param [callback.saveResult] {Object}
+  @param [callback.saveResult.entities] {Array of Entity} The saved entities - with any temporary keys converted into 'real' keys.
+  These entities are actually references to entities in the EntityManager cache that have been updated as a result of the
+  save.
+  @param [callback.saveResult.keyMappings] {Array of keyMappings} Each keyMapping has the following properties: 'entityTypeName', 'tempValue' and 'realValue'
+  @param [callback.saveResult.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
 
-   @param [errorCallback] {Function} Function called on failure.
+  @param [errorCallback] {Function} Function called on failure.
 
-   failureFunction([error])
-   @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
-   @param [errorCallback.error.entityErrors] { Array of server side errors }  These are typically validation errors but are generally any error that can be easily isolated to a single entity.
-   @param [errorCallback.error.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
-   @param [errorCallback.error.saveResult] {Object} Some dataservice adapters return a 'saveResult' object
-   when the failing save operation is non-transactional meaning some entities could be saved while others were not.
-   The 'saveResult' object identifies both that entities that were saved (with their keyMapping)
-   and that entities that were not saved (with their errors).
+  failureFunction([error])
+  @param [errorCallback.error] {Error} Any error that occured wrapped into an Error object.
+  @param [errorCallback.error.entityErrors] { Array of server side errors }  These are typically validation errors but are generally any error that can be easily isolated to a single entity.
+  @param [errorCallback.error.httpResponse] {HttpResponse} The raw HttpResponse returned from the server.
+  @param [errorCallback.error.saveResult] {Object} Some dataservice adapters return a 'saveResult' object
+  when the failing save operation is non-transactional meaning some entities could be saved while others were not.
+  The 'saveResult' object identifies both that entities that were saved (with their keyMapping)
+  and that entities that were not saved (with their errors).
 
-   @return {Promise} Promise
-   **/
+  @return {Promise} Promise
+  **/
   proto.saveChanges = function (entities, saveOptions, callback, errorCallback) {
     assertParam(entities, "entities").isOptional().isArray().isEntity().check();
     assertParam(saveOptions, "saveOptions").isInstanceOf(SaveOptions).isOptional().check();
@@ -1094,29 +1089,29 @@ var EntityManager = (function () {
 
 
   /**
-   Attempts to locate an entity within this EntityManager by its key.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var employee = em1.getEntityByKey("Employee", 1);
-   // employee will either be an entity or null.
-   @method getEntityByKey
-   @param typeName {EntityType | String} The EntityType or EntityType name for this key.
-   @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
-   @return {Entity} An Entity or null;
-   **/
+  Attempts to locate an entity within this EntityManager by its key.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var employee = em1.getEntityByKey("Employee", 1);
+      // employee will either be an entity or null.
+  @method getEntityByKey
+  @param typeName {EntityType | String} The EntityType or EntityType name for this key.
+  @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
+  @return {Entity} An Entity or null;
+  **/
 
   /**
-   Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var employeeType = em1.metadataStore.getEntityType("Employee");
-   var employeeKey = new EntityKey(employeeType, 1);
-   var employee = em1.getEntityByKey(employeeKey);
-   // employee will either be an entity or null.
-   @method getEntityByKey - overload
-   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-   @return {Entity} An Entity or null;
-   **/
+  Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var employeeType = em1.metadataStore.getEntityType("Employee");
+      var employeeKey = new EntityKey(employeeType, 1);
+      var employee = em1.getEntityByKey(employeeKey);
+      // employee will either be an entity or null.
+  @method getEntityByKey - overload
+  @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+  @return {Entity} An Entity or null;
+  **/
   proto.getEntityByKey = function () {
     var entityKey = createEntityKey(this, arguments).entityKey;
     var entityTypes = entityKey._subtypes || [entityKey.entityType];
@@ -1132,50 +1127,51 @@ var EntityManager = (function () {
   };
 
   /**
-   Attempts to fetch an entity from the server by its key with
-   an option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy
-   will be used to merge any server side entity returned by this method.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   em1.fetchEntityByKey("Employee", 1).then(function(result) {
-            var employee = result.entity;
-            var entityKey = result.entityKey;
-            var fromCache = result.fromCache;
-        });
-   @method fetchEntityByKey
-   @async
-   @param typeName {EntityType | String} The EntityType or EntityType name for this key.
-   @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
-   @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
-   @return {Promise}
-
-   promiseData.entity {Object} The entity returned or null
-   promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-   promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
-   **/
+  Attempts to fetch an entity from the server by its key with
+  an option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy
+  will be used to merge any server side entity returned by this method.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      em1.fetchEntityByKey("Employee", 1).then(function(result) {
+          var employee = result.entity;
+          var entityKey = result.entityKey;
+          var fromCache = result.fromCache;
+      });
+  @method fetchEntityByKey
+  @async
+  @param typeName {EntityType | String} The EntityType or EntityType name for this key.
+  @param keyValues {Object|Array of Object} The values for this key - will usually just be a single value; an array is only needed for multipart keys.
+  @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
+  @return {Promise} 
+    - Properties on the promise success result
+      - entity {Object} The entity returned or null
+      - entityKey {EntityKey} The entityKey of the entity to fetch.
+      - fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
+   
+  **/
 
   /**
-   Attempts to fetch an entity from the server by its {{#crossLink "EntityKey"}}{{/crossLink}} with
-   an option to check the local cache first.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var employeeType = em1.metadataStore.getEntityType("Employee");
-   var employeeKey = new EntityKey(employeeType, 1);
-   em1.fetchEntityByKey(employeeKey).then(function(result) {
-            var employee = result.entity;
-            var entityKey = result.entityKey;
-            var fromCache = result.fromCache;
-        });
-   @method fetchEntityByKey - overload
-   @async
-   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-   @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
-   @return {Promise}
-
-   promiseData.entity {Object} The entity returned or null
-   promiseData.entityKey {EntityKey} The entityKey of the entity to fetch.
-   promiseData.fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
-   **/
+  Attempts to fetch an entity from the server by its {{#crossLink "EntityKey"}}{{/crossLink}} with
+  an option to check the local cache first.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var employeeType = em1.metadataStore.getEntityType("Employee");
+      var employeeKey = new EntityKey(employeeType, 1);
+      em1.fetchEntityByKey(employeeKey).then(function(result) {
+          var employee = result.entity;
+          var entityKey = result.entityKey;
+          var fromCache = result.fromCache;
+      });
+  @method fetchEntityByKey - overload
+  @async
+  @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+  @param checkLocalCacheFirst {Boolean=false} Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.
+  @return {Promise} 
+    - Properties on the promise success result
+      - entity {Object} The entity returned or null
+      - entityKey {EntityKey} The entityKey of the entity to fetch.
+      - fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
+  **/
   proto.fetchEntityByKey = function () {
     var dataService = DataService.resolve([this.dataService]);
     if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
@@ -1218,52 +1214,51 @@ var EntityManager = (function () {
   };
 
   /**
-   Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var employeeType = em1.metadataStore.getEntityType("Employee");
-   var employeeKey = new EntityKey(employeeType, 1);
-   var employee = em1.findEntityByKey(employeeKey);
-   // employee will either be an entity or null.
-   @method findEntityByKey
-   @deprecated - use getEntityByKey instead
-   @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
-   @return {Entity} An Entity or null;
-   **/
+  [Deprecated] - Attempts to locate an entity within this EntityManager by its  {{#crossLink "EntityKey"}}{{/crossLink}}.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var employeeType = em1.metadataStore.getEntityType("Employee");
+      var employeeKey = new EntityKey(employeeType, 1);
+      var employee = em1.findEntityByKey(employeeKey);
+      // employee will either be an entity or null.
+  @method findEntityByKey
+  @deprecated - use getEntityByKey instead
+  @param entityKey {EntityKey} The  {{#crossLink "EntityKey"}}{{/crossLink}} of the Entity to be located.
+  @return {Entity} An Entity or null;
+  **/
   proto.findEntityByKey = function (entityKey) {
     return this.getEntityByKey(entityKey);
   };
 
   /**
-   Generates a temporary key for the specified entity.  This is used to insure that newly
-   created entities have unique keys and to register that these keys are temporary and
-   need to be automatically replaced with 'real' key values once these entities are saved.
+  Generates a temporary key for the specified entity.  This is used to insure that newly
+  created entities have unique keys and to register that these keys are temporary and
+  need to be automatically replaced with 'real' key values once these entities are saved.
 
-   The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
-   the keys - See the  {{#crossLink "~keyGenerator-interface"}}{{/crossLink}} interface description to see
-   how a custom key generator can be plugged in.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var custumer = custType.createEntity();
-   var customerId = em.generateTempKeyValue(custumer);
-   // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value
-   // This property will change again after a successful save of the 'customer' entity.
+  The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
+  the keys - See the  {{#crossLink "~keyGenerator-interface"}}{{/crossLink}} interface description to see
+  how a custom key generator can be plugged in.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var custumer = custType.createEntity();
+      var customerId = em.generateTempKeyValue(custumer);
+      // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value
+      // This property will change again after a successful save of the 'customer' entity.
 
-   em1.saveChanges()
-   .then( function( data) {
-                var sameCust1 = data.results[0];
-                // cust1 === sameCust1;
-                // but cust1.getProperty("CustomerId") != customerId
-                // because the server will have generated a new id 
-                // and the client will have been updated with this 
-                // new id.
-            })
+      em1.saveChanges().then( function( data) {
+          var sameCust1 = data.results[0];
+          // cust1 === sameCust1;
+          // but cust1.getProperty("CustomerId") != customerId
+          // because the server will have generated a new id 
+          // and the client will have been updated with this 
+          // new id.
+      })
 
-   @method generateTempKeyValue
-   @param entity {Entity} The Entity to generate a key for.
-   @return {Object} The new key value
-   **/
+  @method generateTempKeyValue
+  @param entity {Entity} The Entity to generate a key for.
+  @return {Object} The new key value
+  **/
   proto.generateTempKeyValue = function (entity) {
     // TODO - check if this entity is attached to this EntityManager.
     assertParam(entity, "entity").isEntity().check();
@@ -1276,35 +1271,35 @@ var EntityManager = (function () {
   };
 
   /**
-   Returns whether there are any changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
-   has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
-   @example
-   This method can be used to determine if an EntityManager has any changes
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   if ( em1.hasChanges() {
-            // do something interesting
-        }
-   or if it has any changes on to a specific {{#crossLink "EntityType"}}{{/crossLink}}
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   if ( em1.hasChanges(custType) {
-            // do something interesting
-        }
-   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var orderType = em1.metadataStore.getEntityType("Order");
-   if ( em1.hasChanges( [custType, orderType]) {
-            // do something interesting
-        }
-   @method hasChanges
-   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
-   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
-   @return {Boolean} Whether there were any changed entities.
-   **/
+  Returns whether there are any changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
+  has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
+  @example
+  This method can be used to determine if an EntityManager has any changes
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      if ( em1.hasChanges() {
+          // do something interesting
+      }
+  or if it has any changes on to a specific {{#crossLink "EntityType"}}{{/crossLink}}
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      if ( em1.hasChanges(custType) {
+          // do something interesting
+      }
+  or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var orderType = em1.metadataStore.getEntityType("Order");
+      if ( em1.hasChanges( [custType, orderType]) {
+          // do something interesting
+      }
+  @method hasChanges
+  @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
+  If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+  @return {Boolean} Whether there were any changed entities.
+  **/
   proto.hasChanges = function (entityTypes) {
     if (!this._hasChanges) return false;
     if (entityTypes === undefined) return this._hasChanges;
@@ -1312,23 +1307,23 @@ var EntityManager = (function () {
   };
 
   /**
-   An {{#crossLink "Event"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.
-   @example
-   var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
-   em.hasChangesChanged.subscribe(function(args) {
-            var hasChangesChanged = args.hasChanges;
-            var entityManager = args.entityManager;
-        });
-   });
+  An {{#crossLink "Event"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.
+  @example
+      var em = new EntityManager( {serviceName: "breeze/NorthwindIBModel" });
+      em.hasChangesChanged.subscribe(function(args) {
+              var hasChangesChanged = args.hasChanges;
+              var entityManager = args.entityManager;
+          });
+      });
 
-   @event hasChangesChanged
-   @param entityManager {EntityManager} The EntityManager whose 'hasChanges' status has changed.
-   @param hasChanges {Boolean} Whether or not this EntityManager has changes.
-   @readOnly
-   **/
+  @event hasChangesChanged
+  @param entityManager {EntityManager} The EntityManager whose 'hasChanges' status has changed.
+  @param hasChanges {Boolean} Whether or not this EntityManager has changes.
+  @readOnly
+  **/
 
 
-    // backdoor the "really" check for changes.
+  // backdoor to "really" check for changes.
   proto._hasChangesCore = function (entityTypes) {
     entityTypes = checkEntityTypes(this, entityTypes);
     var entityGroups = getEntityGroups(this, entityTypes);
@@ -1338,29 +1333,29 @@ var EntityManager = (function () {
   };
 
   /**
-   Returns a array of all changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
-   has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
-   @example
-   This method can be used to get all of the changed entities within an EntityManager
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var changedEntities = em1.getChanges();
-   or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var changedCustomers = em1.getChanges(custType);
-   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var changedCustomersAndOrders = em1.getChanges([custType, orderType]);
-   @method getChanges
-   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
-   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
-   @return {Array of Entity} Array of Entities
-   **/
+  Returns a array of all changed entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s. A 'changed' Entity has
+  has an {{#crossLink "EntityState"}}{{/crossLink}} of either Added, Modified or Deleted.
+  @example
+  This method can be used to get all of the changed entities within an EntityManager
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var changedEntities = em1.getChanges();
+  or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var changedCustomers = em1.getChanges(custType);
+  or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var changedCustomersAndOrders = em1.getChanges([custType, orderType]);
+  @method getChanges
+  @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which 'changed' entities will be found.
+  If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+  @return {Array of Entity} Array of Entities
+  **/
   proto.getChanges = function (entityTypes) {
     entityTypes = checkEntityTypes(this, entityTypes);
     var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
@@ -1368,16 +1363,16 @@ var EntityManager = (function () {
   };
 
   /**
-   Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.
-   Calls EntityAspect.rejectChanges on every changed entity in this EntityManager.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var entities = em1.rejectChanges();
+  Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.
+  Calls EntityAspect.rejectChanges on every changed entity in this EntityManager.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var entities = em1.rejectChanges();
 
-   @method rejectChanges
-   @return {Array of Entity} The entities whose changes were rejected. These entities will all have EntityStates of
-   either 'Unchanged' or 'Detached'
-   **/
+  @method rejectChanges
+  @return {Array of Entity} The entities whose changes were rejected. These entities will all have EntityStates of
+  either 'Unchanged' or 'Detached'
+  **/
   proto.rejectChanges = function () {
     if (!this._hasChanges) return [];
     var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
@@ -1392,36 +1387,36 @@ var EntityManager = (function () {
   };
 
   /**
-   Returns a array of all entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s with the specified {{#crossLink "EntityState"}}{{/crossLink}}s.
-   @example
-   This method can be used to get all of the entities within an EntityManager
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var entities = em1.getEntities();
-   or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var customers = em1.getEntities(custType);
-   or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var customersAndOrders = em1.getChanges([custType, orderType]);
-   You can also ask for entities with a particular {{#crossLink "EntityState"}}{{/crossLink}} or EntityStates.
-   @example
-   // assume em1 is an EntityManager containing a number of preexisting entities.
-   var custType = em1.metadataStore.getEntityType("Customer");
-   var orderType = em1.metadataStore.getEntityType("Order");
-   var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState.Added);
-   @method getEntities
-   @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which entities will be found.
-   If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
-   @param [entityState] {EntityState|Array of EntityState} The {{#crossLink "EntityState"}}{{/crossLink}}s for which entities will be found.
-   If this parameter is omitted, entities of all EntityStates are returned.
-   @return {Array of Entity} Array of Entities
-   **/
+  Returns a array of all entities of the specified {{#crossLink "EntityType"}}{{/crossLink}}s with the specified {{#crossLink "EntityState"}}{{/crossLink}}s.
+  @example
+  This method can be used to get all of the entities within an EntityManager
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var entities = em1.getEntities();
+  or you can specify that you only want the changes on a specific {{#crossLink "EntityType"}}{{/crossLink}}
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var customers = em1.getEntities(custType);
+  or to a collection of {{#crossLink "EntityType"}}{{/crossLink}}s
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var customersAndOrders = em1.getChanges([custType, orderType]);
+  You can also ask for entities with a particular {{#crossLink "EntityState"}}{{/crossLink}} or EntityStates.
+  @example
+      // assume em1 is an EntityManager containing a number of preexisting entities.
+      var custType = em1.metadataStore.getEntityType("Customer");
+      var orderType = em1.metadataStore.getEntityType("Order");
+      var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState.Added);
+  @method getEntities
+  @param [entityTypes] {String|Array of String|EntityType|Array of EntityType} The {{#crossLink "EntityType"}}{{/crossLink}}s for which entities will be found.
+  If this parameter is omitted, all EntityTypes are searched. String parameters are treated as EntityType names.
+  @param [entityState] {EntityState|Array of EntityState} The {{#crossLink "EntityState"}}{{/crossLink}}s for which entities will be found.
+  If this parameter is omitted, entities of all EntityStates are returned.
+  @return {Array of Entity} Array of Entities
+  **/
   proto.getEntities = function (entityTypes, entityStates) {
     entityTypes = checkEntityTypes(this, entityTypes);
     assertParam(entityStates, "entityStates").isOptional().isEnumOf(EntityState).or().isNonEmptyArray().isEnumOf(EntityState).check();

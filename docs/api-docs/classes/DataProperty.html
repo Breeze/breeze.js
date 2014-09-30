@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -207,7 +209,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l2320"><code>..\src\a40_entityMetadata.js:2320</code></a>
+            Defined in: <a href="../files/.._src_a40_entityMetadata.js.html#l2314"><code>..\src\a40_entityMetadata.js:2314</code></a>
         </div>
     
 
@@ -461,7 +463,7 @@ directly via the constructor.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2328"><code>..\src\a40_entityMetadata.js:2328</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2322"><code>..\src\a40_entityMetadata.js:2322</code></a>
         
         </p>
 
@@ -698,14 +700,14 @@ the NamingConvention on the MetadataStore associated with the EntityType to whic
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var lastNameProp = new DataProperty( {
-         name: &quot;lastName&quot;,
-         dataType: DataType.String,
-         isNullable: true,
-         maxLength: 20
-     });
+                <pre class="code prettyprint"><code>var lastNameProp = new DataProperty( {
+    name: &quot;lastName&quot;,
+    dataType: DataType.String,
+    isNullable: true,
+    maxLength: 20
+});
 // assuming personEntityType is a newly constructed EntityType
-personEntityType.addProperty(lastNameProperty);</p>
+personEntityType.addProperty(lastNameProperty);</code></pre>
 
             </div>
         </div>
@@ -755,7 +757,7 @@ personEntityType.addProperty(lastNameProperty);</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2588"><code>..\src\a40_entityMetadata.js:2588</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2582"><code>..\src\a40_entityMetadata.js:2582</code></a>
         
         </p>
 
@@ -821,11 +823,11 @@ personEntityType.addProperty(lastNameProperty);</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager
 var prop = myEntityType.getProperty(&quot;myProperty&quot;);
 prop.setProperties( {
-         custom: { foo: 7, bar: &quot;test&quot; }
-     });</p>
+    custom: { foo: 7, bar: &quot;test&quot; }
+});</code></pre>
 
             </div>
         </div>
@@ -864,7 +866,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2490"><code>..\src\a40_entityMetadata.js:2490</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2484"><code>..\src\a40_entityMetadata.js:2484</code></a>
         
         </p>
 
@@ -910,7 +912,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2462"><code>..\src\a40_entityMetadata.js:2462</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2456"><code>..\src\a40_entityMetadata.js:2456</code></a>
         
         </p>
 
@@ -956,7 +958,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2511"><code>..\src\a40_entityMetadata.js:2511</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2505"><code>..\src\a40_entityMetadata.js:2505</code></a>
         
         </p>
 
@@ -1002,7 +1004,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2547"><code>..\src\a40_entityMetadata.js:2547</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2541"><code>..\src\a40_entityMetadata.js:2541</code></a>
         
         </p>
 
@@ -1048,7 +1050,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2455"><code>..\src\a40_entityMetadata.js:2455</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2449"><code>..\src\a40_entityMetadata.js:2449</code></a>
         
         </p>
 
@@ -1094,7 +1096,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2533"><code>..\src\a40_entityMetadata.js:2533</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2527"><code>..\src\a40_entityMetadata.js:2527</code></a>
         
         </p>
 
@@ -1140,7 +1142,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2469"><code>..\src\a40_entityMetadata.js:2469</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2463"><code>..\src\a40_entityMetadata.js:2463</code></a>
         
         </p>
 
@@ -1186,7 +1188,7 @@ prop.setProperties( {
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2554"><code>..\src\a40_entityMetadata.js:2554</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2548"><code>..\src\a40_entityMetadata.js:2548</code></a>
         
         </p>
 
@@ -1233,7 +1235,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2562"><code>..\src\a40_entityMetadata.js:2562</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2556"><code>..\src\a40_entityMetadata.js:2556</code></a>
         
         </p>
 
@@ -1280,7 +1282,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2476"><code>..\src\a40_entityMetadata.js:2476</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2470"><code>..\src\a40_entityMetadata.js:2470</code></a>
         
         </p>
 
@@ -1326,7 +1328,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2497"><code>..\src\a40_entityMetadata.js:2497</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2491"><code>..\src\a40_entityMetadata.js:2491</code></a>
         
         </p>
 
@@ -1372,7 +1374,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2483"><code>..\src\a40_entityMetadata.js:2483</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2477"><code>..\src\a40_entityMetadata.js:2477</code></a>
         
         </p>
 
@@ -1418,7 +1420,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2504"><code>..\src\a40_entityMetadata.js:2504</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2498"><code>..\src\a40_entityMetadata.js:2498</code></a>
         
         </p>
 
@@ -1464,7 +1466,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2518"><code>..\src\a40_entityMetadata.js:2518</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2512"><code>..\src\a40_entityMetadata.js:2512</code></a>
         
         </p>
 
@@ -1510,7 +1512,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2441"><code>..\src\a40_entityMetadata.js:2441</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2435"><code>..\src\a40_entityMetadata.js:2435</code></a>
         
         </p>
 
@@ -1556,7 +1558,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2448"><code>..\src\a40_entityMetadata.js:2448</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2442"><code>..\src\a40_entityMetadata.js:2442</code></a>
         
         </p>
 
@@ -1602,7 +1604,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2540"><code>..\src\a40_entityMetadata.js:2540</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2534"><code>..\src\a40_entityMetadata.js:2534</code></a>
         
         </p>
 
@@ -1648,7 +1650,7 @@ Allows polymorphic treatment of DataProperties and NavigationProperties.</p>
             
         
         
-        <a href="../files/.._src_a40_entityMetadata.js.html#l2525"><code>..\src\a40_entityMetadata.js:2525</code></a>
+        <a href="../files/.._src_a40_entityMetadata.js.html#l2519"><code>..\src\a40_entityMetadata.js:2519</code></a>
         
         </p>
 

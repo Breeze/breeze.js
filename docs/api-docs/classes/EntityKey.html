@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -426,17 +428,17 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
-var entityKey = new EntityKey(empType, 1);
-EntityKey&#39;s may also be found by calling EntityAspect.getKey()</p>
-<p>// assume employee1 is an existing Employee entity
-var empKey = employee1.entityAspect.getKey();
-Multipart keys are created by passing an array as the &#39;keyValues&#39; parameter</p>
-<p>var empTerrType = em1.metadataStore.getEntityType(&quot;EmployeeTerritory&quot;);
+var entityKey = new EntityKey(empType, 1);</code></pre>
+<p>EntityKey&#39;s may also be found by calling EntityAspect.getKey()</p>
+<pre class="code prettyprint"><code>// assume employee1 is an existing Employee entity
+var empKey = employee1.entityAspect.getKey();</code></pre>
+<p>Multipart keys are created by passing an array as the &#39;keyValues&#39; parameter</p>
+<pre class="code prettyprint"><code>var empTerrType = em1.metadataStore.getEntityType(&quot;EmployeeTerritory&quot;);
 var empTerrKey = new EntityKey(empTerrType, [ 1, 77]);
 // The order of the properties in the &#39;keyValues&#39; array must be the same as that
-// returned by empTerrType.keyProperties</p>
+// returned by empTerrType.keyProperties</code></pre>
 
             </div>
         </div>
@@ -534,14 +536,14 @@ There is also an static version of &#39;equals&#39; with the same functionality.
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
 var empKey1 = new EntityKey(empType, 1);
 // assume employee1 is an existing Employee entity
 var empKey2 = employee1.entityAspect.getKey();
 if (empKey1.equals(empKey2)) {
-         // do something  ...
-     }</p>
+    // do something  ...
+}</code></pre>
 
             </div>
         </div>
@@ -662,14 +664,14 @@ There is also an instance version of &#39;equals&#39; with the same functionalit
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// assume em1 is an EntityManager containing a number of existing entities.
+                <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
 var empType = em1.metadataStore.getEntityType(&quot;Employee&quot;);
 var empKey1 = new EntityKey(empType, 1);
 // assume employee1 is an existing Employee entity
 var empKey2 = employee1.entityAspect.getKey();
 if (EntityKey.equals(empKey1, empKey2)) {
-         // do something  ...
-     }</p>
+    // do something  ...
+}</code></pre>
 
             </div>
         </div>

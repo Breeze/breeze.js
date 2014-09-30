@@ -134,6 +134,8 @@
             
                 <li><a href="../classes/NavigationProperty.html">NavigationProperty</a></li>
             
+                <li><a href="../classes/Predicate.html">Predicate</a></li>
+            
                 <li><a href="../classes/Promise.html">Promise</a></li>
             
                 <li><a href="../classes/QueryOptions.html">QueryOptions</a></li>
@@ -465,9 +467,9 @@
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+                <pre class="code prettyprint"><code>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
 // assume em1 is a preexisting EntityManager
-em1.setProperties( { queryOptions: newQo });</p>
+em1.setProperties( { queryOptions: newQo });</code></pre>
 <p>Any QueryOptions property that is not defined will be defaulted from any QueryOptions defined at a higher level in the breeze hierarchy, i.e.</p>
 <ul>
 <li>from query.queryOptions</li>
@@ -540,8 +542,8 @@ The current instance is returned unchanged.</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
-newQo.setAsDefault();</p>
+                <pre class="code prettyprint"><code>var newQo = new QueryOptions( { mergeStrategy: MergeStrategy.OverwriteChanges });
+newQo.setAsDefault();</code></pre>
 
             </div>
         </div>
@@ -658,17 +660,17 @@ newQo.setAsDefault();</p>
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>// Given an EntityManager instance, em
-var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);
-or</p>
-<p>var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);
-or</p>
-<p>var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
-or</p>
-<p>var queryOptions = em.queryOptions.using({
-             includeDeleted: true,
-             fetchStrategy:  FetchStrategy.FromLocalCache 
-         });</p>
+                <pre class="code prettyprint"><code>// Given an EntityManager instance, em
+var queryOptions = em.queryOptions.using(MergeStrategy.PreserveChanges);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using(FetchStrategy.FromLocalCache);</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({ mergeStrategy: MergeStrategy.OverwriteChanges });</code></pre>
+<p>or</p>
+<pre class="code prettyprint"><code>var queryOptions = em.queryOptions.using({
+    includeDeleted: true,
+    fetchStrategy:  FetchStrategy.FromLocalCache 
+});</code></pre>
 
             </div>
         </div>
