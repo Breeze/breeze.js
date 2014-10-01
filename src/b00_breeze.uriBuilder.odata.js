@@ -54,7 +54,7 @@
     function toWhereODataFragment(wherePredicate) {
       if (!wherePredicate) return;
       // validation occurs inside of the toODataFragment call here.
-      return wherePredicate.toODataFragment({ entityType: entityType});
+      return wherePredicate.visit(toODataFragmentVisitor, { entityType: entityType});
     }
 
     function toOrderByODataFragment(orderByClause) {
@@ -109,65 +109,62 @@
     }
   };
 
-
-
+  breeze.Predicate.prototype.toODataFragment = function(config) {
+    return this.visit(toODataFragmentVisitor, config);
+  }
 
   // toODataFragment visitor
-  breeze.Predicate.attachVisitor(function () {
+  var toODataFragmentVisitor = (function () {
     var visitor = {
-      config: { fnName: "toODataFragment"   },
 
       passthruPredicate: function () {
         return this.value;
       },
 
-      unaryPredicate: function (context) {
-        return odataOpFrom(this) + " " + "(" + this.pred.toODataFragment(context) + ")";
+      unaryPredicate: function (context, predVal) {
+        return odataOpFrom(this) + " " + "(" + predVal + ")";
       },
 
-      binaryPredicate: function (context) {
-        var v1Expr = this.expr1.toODataFragment(context);
+      binaryPredicate: function (context, expr1Val, expr2Val) {
         var prefix = context.prefix;
         if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
+          expr1Val = prefix + "/" + expr1Val
         }
-
-        var v2Expr = this.expr2.toODataFragment(context);
 
         var odataOp = odataOpFrom(this);
 
         if (this.op.isFunction) {
           if (odataOp == "substringof") {
-            return odataOp + "(" + v2Expr + "," + v1Expr + ") eq true";
+            return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
           } else {
-            return odataOp + "(" + v1Expr + "," + v2Expr + ") eq true";
+            return odataOp + "(" + expr1Val + "," + expr2Val + ") eq true";
           }
         } else {
-          return v1Expr + " " + odataOp + " " + v2Expr;
+          return expr1Val + " " + odataOp + " " + expr2Val;
         }
       },
 
-      andOrPredicate: function (context) {
-        var result = this.preds.map(function (pred) {
-          return "(" + pred.toODataFragment(context) + ")";
+      andOrPredicate: function (context, predVals) {
+        var result = predVals.map(function (predVal) {
+          return "(" + predVal + ")";
         }).join(" " + odataOpFrom(this) + " ");
         return result;
       },
 
-      anyAllPredicate: function (context) {
-        var v1Expr = this.expr.toODataFragment(context);
-
+      anyAllPredicate: function (context, exprVal, predVal) {
         var prefix = context.prefix;
         if (prefix) {
-          v1Expr = prefix + "/" + v1Expr;
+          exprVal = prefix + "/" + exprVal;
           prefix = "x" + (parseInt(prefix.substring(1)) + 1);
         } else {
           prefix = "x1";
         }
-        var newConfig = breeze.core.extend({}, context);
-        newConfig.entityType = this.expr.dataType;
-        newConfig.prefix = prefix;
-        return v1Expr + "/" + odataOpFrom(this) + "(" + prefix + ": " + this.pred.toODataFragment(newConfig) + ")";
+        // can't use predVal because of prefix logic below.
+        var newContext = breeze.core.extend({}, context);
+        newContext.entityType = this.expr.dataType;
+        newContext.prefix = prefix;
+        var newPredVal = this.pred.visit(context.visitor, newContext)
+        return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
       },
 
       litExpr: function () {
@@ -180,11 +177,8 @@
         return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
       },
 
-      fnExpr: function (context) {
-        var frags = this.exprArgs.map(function (expr) {
-          return expr.toODataFragment(context);
-        });
-        return this.fnName + "(" + frags.join(",") + ")";
+      fnExpr: function (context, exprVals) {
+        return this.fnName + "(" + exprVals.join(",") + ")";
       }
     };
 

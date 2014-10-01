@@ -144,33 +144,18 @@
     ctor.not = function (pred) {
       return pred.not();
     };
-    
-    ctor.attachVisitor = function (visitor) {
-      var fnName = visitor.config.fnName;
-      Object.keys(visitor).forEach(function (key) {
-        var lcKey = key.toLowerCase();
-        if (lcKey == "config") return;
-        var proto = _nodeMap[lcKey];
-        if (proto == null) {
-          throw new Error("Unable to locate a visitor node for: " + key + " on visitor: " + fnName);
-        }
-        // add function to the Predicate or Expr node.
-        var fn = wrapValidation(visitor[key]);
-        proto[fnName] = fn;
-      });
-    };
-    
-    var _nodeMap = {};
-    
-    ctor._registerProto = function (typeName, proto, validateFn) {
-      _nodeMap[typeName.toLowerCase()] = proto;
-      proto.typeName = typeName;
-      // perf improvement so that we don't keep revalidating
-      proto.validate = validateFn ? cacheValidation(validateFn) : __noop;
-    };
-    
+
     var proto = ctor.prototype;
     
+    ctor._registerProto = function (methodName, proto, validateFn) {
+
+      proto.visitorMethodName = methodName;
+      proto.validate = validateFn || __noop;
+      // give expressions the Predicate prototype method
+      // needed since they don't inherit from Predicate
+      proto.visit = proto.visit || ctor.prototype.visit;
+    };
+
     /**
     'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
     @example
@@ -241,25 +226,58 @@
     proto.toJSON = function () {
       // toJSON ( part of js standard - takes a single parameter
       // that is either "" or the name of the property being serialized.
-      // whereas toJSONExt ( custom impl) takes a context object
-      // this._entityType may be null
       return this.toJSONExt({ entityType: this._entityType });
     }
-    
+
+    proto.toJSONExt = function(context) {
+      return this.visit(toJSONVisitor, context);
+    }
+
+    proto.toFunction = function(context) {
+      return this.visit(toFunctionVisitor, context);
+    }
+
     proto.toString = function () {
       return JSON.stringify(this);
     };
-    
+
+    proto.visit = function(visitor, context) {
+      var fn = visitor[this.visitorMethodName];
+      if (fn == null) {
+        throw new Error("Unable to locate method: " + this.visitorMethodName + " on visitor");
+      }
+      if (__isEmpty(context)) {
+        context = { entityType: null };
+      } else if (context instanceof EntityType) {
+        context = { entityType: context };
+      } else if (!__hasOwnProperty(context, "entityType")) {
+        throw new Error("All visitor methods must be called with a context object containing at least an 'entityType' property");
+      }
+
+      var entityType = context.entityType;
+      // don't both validating if already done so
+      if (entityType == null || this._entityType !== entityType) {
+        // don't need to capture return value because validation fn doesn't have one.
+        this.validate(entityType);
+        this._entityType = entityType;
+      }
+
+      // args = context, arg1, args2, ...
+      var args = Array.prototype.slice.call(arguments, 1);
+      if (!context.visitor) context.visitor = visitor;
+      return this._visit(fn, visitor, context);
+    }
+
     proto._initialize = function (typeName, validateFn, map) {
       ctor._registerProto(typeName, this, validateFn);
       var aliasMap = {};
       for (var key in (map || {})) {
         var value = map[key];
-        
+
         var aliasKey = key.toLowerCase();
         value.key = aliasKey;
         aliasMap[aliasKey] = value;
-        
+
         value.aliases && value.aliases.forEach(function (alias) {
           aliasMap[alias.toLowerCase()] = value;
         });
@@ -357,34 +375,7 @@
       
       return (preds.length === 1) ? preds[0] : new AndOrPredicate("and", preds);
     }
-    
-    // all visitor calls are wrapped with this.
-    function wrapValidation(fn) {
-      return function (context) {
-        if (__isEmpty(context)) {
-          context = { entityType: null };
-        } else if (context instanceof EntityType) {
-          context = { entityType: context };
-        } else if (!__hasOwnProperty(context, "entityType")) {
-          throw new Error("All visitor methods must be called with a config object containing at least an 'entityType' property");
-        }
-        // don't need to capture return value because validation fn doesn't have one.
-        this.validate(context.entityType);
-        return fn.call(this, context);
-      }
-    }
-    
-    function cacheValidation(fn) {
-      return function (entityType) {
-        // don't both rerunning the validation if its already been run for this entityType
-        // but always run it for a null or undefined type
-        if (entityType && this._entityType === entityType) return;
-        // don't need to capture return value because validation fn doesn't have one.
-        fn.call(this, entityType);
-        this._entityType = entityType;
-      }
-    }
-    
+
     return ctor;
   })();
   
@@ -393,7 +384,10 @@
       this.value = value;
     };
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('PassthruPredicate');
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context)
+    };
+    proto._initialize('passthruPredicate');
     
     return ctor;
   })();
@@ -405,13 +399,17 @@
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('UnaryPredicate', validate, {
+    proto._initialize('unaryPredicate', validate, {
       'not': { aliases: [ '!', '~' ] }
     });
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context, this.pred.visit(visitor, context));
+    };
     
     function validate(entityType) {
       this.pred.validate(entityType);
-    }    ;
+    };
     
     return ctor;
   })();
@@ -427,7 +425,7 @@
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('BinaryPredicate', validate, {
+    proto._initialize('binaryPredicate', validate, {
       'eq': {
         aliases: ["=="]
       },
@@ -457,6 +455,10 @@
         isFunction: true
       }
     });
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context, this.expr1.visit(visitor, context), this.expr2.visit(visitor, context));
+    };
     
     function validate(entityType) {
       this.expr1 = createExpr(this.expr1Source, { entityType: entityType });
@@ -503,10 +505,16 @@
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize("AndOrPredicate", validate, {
+    proto._initialize("andOrPredicate", validate, {
       'and': { aliases: [ '&&' ] },
       'or': { aliases: [ '||' ] }
     });
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context, this.preds.map(function(pred) {
+        return pred.visit(visitor, context);
+      }));
+    };
     
     function validate(entityType) {
       this.preds.every(function (pred) {
@@ -528,10 +536,16 @@
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize("AnyAllPredicate", validate, {
+    proto._initialize("anyAllPredicate", validate, {
       'any': { aliases: ['some'] },
       'all': { aliases: ["every"] }
     });
+
+    proto._visit = function(fn, visitor, context) {
+      var predContext = __extend({}, context);
+      predContext.entityType = this.expr.dataType;
+      return fn.call(this, context, this.expr.visit(visitor, context), this.pred.visit(visitor, predContext));
+    };
     
     function validate(entityType) {
       this.expr = createExpr(this.exprSource, { entityType: entityType });
@@ -540,9 +554,8 @@
         this.expr.dataType = null;
       }
       this.pred.validate(this.expr.dataType);
-
     }
-    
+
     return ctor;
   })();
   
@@ -566,7 +579,11 @@
 
     };
     var proto = ctor.prototype;
-    Predicate._registerProto('LitExpr', proto);
+    Predicate._registerProto('litExpr', proto);
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context);
+    };
     
     function resolveDataType(dataType) {
       if (dataType == null) return dataType;
@@ -593,7 +610,11 @@
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype;
-    Predicate._registerProto('PropExpr', proto, validate);
+    Predicate._registerProto('propExpr', proto, validate);
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context);
+    };
     
     function validate(entityType) {
       if (entityType == null || entityType.isAnonymous) return;
@@ -626,7 +647,13 @@
       this.dataType = qf.dataType;
     };
     var proto = ctor.prototype;
-    Predicate._registerProto('FnExpr', proto, validate);
+    Predicate._registerProto('fnExpr', proto, validate);
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context, this.exprArgs.map(function(expr) {
+        return expr.visit(visitor, context);
+      }));
+    };
     
     function validate(entityType) {
       this.exprArgs.forEach(function (expr) {
@@ -735,53 +762,158 @@
     
     return ctor;
   })();
-  
-  // toFunction visitor
-  Predicate.attachVisitor(function () {
+
+  var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
+  // comma delimited expressions ignoring commas inside of both single and double quotes.
+  var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
+  var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
+  var DELIM = String.fromCharCode(191);
+
+  function createExpr(source, context) {
+    var entityType = context.entityType;
+
+    if (!__isString(source)) {
+      if (source != null && __isObject(source) && (!__isDate(source))) {
+        if (source.value === undefined) {
+          throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + entityType.name);
+        }
+        if (source.isProperty) {
+          return new PropExpr(source.value);
+        } else {
+          // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
+          // because we want to insure that if we roundtrip thru toJSON that we don't
+          // accidently reinterpret this node as a PropExpr.
+          // return new LitExpr(source.value, source.dataType || context.dataType, !!source.dataType);
+          return new LitExpr(source.value, source.dataType || context.dataType, true);
+        }
+      } else {
+        return new LitExpr(source, context.dataType);
+      }
+    }
+
+    // if entityType is unknown then assume that the rhs is a literal
+    if (context.isRHS && (entityType == null || entityType.isAnonymous)) {
+      return new LitExpr(source, context.dataType);
+    }
+
+    var regex = /\([^()]*\)/;
+    var m;
+    var tokens = [];
+    var i = 0;
+    while (m = regex.exec(source)) {
+      var token = m[0];
+      tokens.push(token);
+      var repl = DELIM + i++;
+      source = source.replace(token, repl);
+    }
+
+    var expr = parseExpr(source, tokens, context);
+    expr.validate(entityType);
+    return expr;
+  }
+
+  function parseExpr(source, tokens, context) {
+    var parts = source.split(DELIM);
+    if (parts.length === 1) {
+      return parseLitOrPropExpr(parts[0], context);
+    } else {
+      return parseFnExpr(source, parts, tokens, context);
+    }
+  }
+
+  function parseLitOrPropExpr(value, context) {
+    value = value.trim();
+    // value is either a string, a quoted string, a number, a bool value, or a date
+    // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
+    var firstChar = value.substr(0, 1);
+    var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
+    if (isQuoted) {
+      var unquotedValue = value.substr(1, value.length - 2);
+      return new LitExpr(unquotedValue, context.dataType || DataType.String);
+    } else {
+      var entityType = context.entityType;
+      // TODO: get rid of isAnonymous below when we get the chance.
+      if (entityType == null || entityType.isAnonymous) {
+        // this fork will only be reached on the LHS of an BinaryPredicate -
+        // a RHS expr cannot get here with an anon type
+        return new PropExpr(value);
+      } else {
+        var mayBeIdentifier = RX_IDENTIFIER.test(value);
+        if (mayBeIdentifier) {
+          if (entityType.getProperty(value, false) != null) {
+            return new PropExpr(value);
+          }
+        }
+      }
+      // we don't really know the datatype here because even though it comes in as a string
+      // its usually a string BUT it might be a number  i.e. the "1" or the "2" from an expr
+      // like "toUpper(substring(companyName, 1, 2))"
+      return new LitExpr(value, context.dataType);
+    }
+  }
+
+  function parseFnExpr(source, parts, tokens, context) {
+    try {
+      var fnName = parts[0].trim().toLowerCase();
+
+      var argSource = tokens[parts[1]].trim();
+      if (argSource.substr(0, 1) === "(") {
+        argSource = argSource.substr(1, argSource.length - 2);
+      }
+      var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
+      var args = argSource.match(commaMatchStr);
+      var newContext = __extend({}, context);
+      // a dataType of Undefined on a context basically means not to try parsing
+      // the value if the expr is a literal
+      newContext.dataType = DataType.Undefined;
+      newContext.isFnArg = true;
+      var exprArgs = args.map(function (a) {
+        return parseExpr(a, tokens, newContext);
+      });
+      return new FnExpr(fnName, exprArgs);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  var toFunctionVisitor =  (function () {
     var visitor = {
-      config: { fnName: "toFunction" },
-      
+
       passthruPredicate: function () {
         throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
       
-      unaryPredicate: function (context) {
+      unaryPredicate: function (context, predVal) {
         switch (this.op.key) {
           case "not":
-            var func = this.pred.toFunction(context);
             return function (entity) {
-              return !func(entity);
+              return !predVal(entity);
             };
           default:
             throw new Error("Invalid unary operator:" + this.op.key);
         }
       },
       
-      binaryPredicate: function (context) {
+      binaryPredicate: function (context, expr1Fn, expr2Fn) {
         var dataType = this.expr1.dataType || this.expr2.dataType;
         var predFn = getBinaryPredicateFn(context.entityType, this.op, dataType);
-        var v1Fn = this.expr1.toFunction(context);
-        var v2Fn = this.expr2.toFunction(context);
         return function (entity) {
-          return predFn(v1Fn(entity), v2Fn(entity));
+          return predFn(expr1Fn(entity), expr2Fn(entity));
         };
       },
       
-      andOrPredicate: function (context) {
-        var funcs = this.preds.map(function (pred) {
-          return pred.toFunction(context);
-        });
+      andOrPredicate: function (context, predFns) {
         switch (this.op.key) {
           case "and":
             return function (entity) {
-              var result = funcs.reduce(function (prev, cur) {
+              var result = predFns.reduce(function (prev, cur) {
                 return prev && cur(entity);
               }, true);
               return result;
             };
           case "or":
             return function (entity) {
-              var result = funcs.reduce(function (prev, cur) {
+              var result = predFns.reduce(function (prev, cur) {
                 return prev || cur(entity);
               }, false);
               return result;
@@ -791,17 +923,10 @@
         }
       },
       
-      anyAllPredicate: function (context) {
-        var v1Fn = this.expr.toFunction(context);
-        
+      anyAllPredicate: function (context, exprFn, subPredFn) {
         var predFn = getAnyAllPredicateFn(this.op);
-        
-        var newConfig = __extend({}, context);
-        newConfig.entityType = this.expr.dataType;
-        var fn2 = this.pred.toFunction(newConfig);
-        
         return function (entity) {
-          return predFn(v1Fn(entity), fn2);
+          return predFn(exprFn(entity), subPredFn);
         };
       },
       
@@ -826,11 +951,11 @@
         }
       },
       
-      fnExpr: function (context) {
+      fnExpr: function (context, exprFns) {
         var that = this;
         return function (entity) {
-          var values = that.exprArgs.map(function (expr) {
-            var value = expr.toFunction(context)(entity);
+          var values = exprFns.map(function (exprFn) {
+            var value = exprFn(entity);
             return value;
           });
           var result = that.localFn.apply(null, values);
@@ -966,27 +1091,22 @@
     
     return visitor;
   }());
-  
-  
-  // toJSON visitor
-  Predicate.attachVisitor(function () {
+
+  var toJSONVisitor = (function () {
     var visitor = {
-      config: { fnName: "toJSONExt" },
-      
+
       passthruPredicate: function () {
         return this.value;
       },
       
-      unaryPredicate: function (context) {
+      unaryPredicate: function (context, predVal) {
         var json = {};
-        json[this.op.key] = this.pred.toJSONExt(context);
+        json[this.op.key] = predVal;
         return json;
       },
       
-      binaryPredicate: function (context) {
+      binaryPredicate: function (context, expr1Val, expr2Val) {
         var json = {};
-        var expr1Val = this.expr1.toJSONExt(context);
-        var expr2Val = this.expr2.toJSONExt(context);
         if (this.expr2 instanceof PropExpr) {
           expr2Val = { value: expr2Val, isProperty: true };
         }
@@ -1000,32 +1120,25 @@
         return json;
       },
       
-      andOrPredicate: function (context) {
+      andOrPredicate: function (context, predVals) {
         var json;
-        var jsonValues = this.preds.map(function (pred) {
-          return pred.toJSONExt(context);
-        });
         // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
-        if (this.op.key === 'and' && jsonValues.length === 2 && !jsonValues.some(__isString)) {
+        if (this.op.key === 'and' && predVals.length === 2 && !predVals.some(__isString)) {
           // normalize 'and' clauses - will return null if can't be combined.
-          json = jsonValues.reduce(combine);
+          json = predVals.reduce(combine);
         }
         if (json == null) {
           json = {};
-          json[this.op.key] = jsonValues;
+          json[this.op.key] = predVals;
         }
         return json;
       },
       
-      anyAllPredicate: function (context) {
+      anyAllPredicate: function (context, expr1Val, predVal) {
         var json = {};
         var value = {};
-        var expr1Val = this.expr.toJSONExt(context);
-        var newContext = __extend({}, context);
-        newContext.entityType = this.expr.dataType;
-        value[this.op.key] = this.pred.toJSONExt(newContext);
-        
+        value[this.op.key] = predVal;
         json[expr1Val] = value;
         return json;
       },
@@ -1046,11 +1159,8 @@
         }
       },
       
-      fnExpr: function (context) {
-        var frags = this.exprArgs.map(function (expr) {
-          return expr.toJSONExt(context);
-        });
-        return this.fnName + "(" + frags.join(",") + ")";
+      fnExpr: function (context, exprVals) {
+        return this.fnName + "(" + exprVals.join(",") + ")";
       }
     };
     
@@ -1074,127 +1184,7 @@
     
     return visitor;
   }());
-  
-  
-  var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
-  // comma delimited expressions ignoring commas inside of both single and double quotes.
-  var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
-  var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
-  var DELIM = String.fromCharCode(191);
-  
-  function createExpr(source, context) {
-    var entityType = context.entityType;
-    
-    if (!__isString(source)) {
-      if (source != null && __isObject(source) && (!__isDate(source))) {
-        if (source.value === undefined) {
-          throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + entityType.name);
-        }
-        if (source.isProperty) {
-          return new PropExpr(source.value);
-        } else {
-          // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
-          // because we want to insure that if we roundtrip thru toJSON that we don't
-          // accidently reinterpret this node as a PropExpr.
-          // return new LitExpr(source.value, source.dataType || context.dataType, !!source.dataType);
-          return new LitExpr(source.value, source.dataType || context.dataType, true);
-        }
-      } else {
-        return new LitExpr(source, context.dataType);
-      }
-    }
-    
-    // if entityType is unknown then assume that the rhs is a literal
-    if (context.isRHS && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source, context.dataType);
-    }
-    
-    var regex = /\([^()]*\)/;
-    var m;
-    var tokens = [];
-    var i = 0;
-    while (m = regex.exec(source)) {
-      var token = m[0];
-      tokens.push(token);
-      var repl = DELIM + i++;
-      source = source.replace(token, repl);
-    }
-    
-    var expr = parseExpr(source, tokens, context);
-    expr.validate(entityType);
-    return expr;
-  }
-  
-  function parseExpr(source, tokens, context) {
-    var parts = source.split(DELIM);
-    if (parts.length === 1) {
-      return parseLitOrPropExpr(parts[0], context);
-    } else {
-      return parseFnExpr(source, parts, tokens, context);
-    }
-  }
-  
-  function parseLitOrPropExpr(value, context) {
-    value = value.trim();
-    // value is either a string, a quoted string, a number, a bool value, or a date
-    // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
-    var firstChar = value.substr(0, 1);
-    var isQuoted = (firstChar === "'" || firstChar === '"') && value.length > 1 && value.substr(value.length - 1) === firstChar;
-    if (isQuoted) {
-      var unquotedValue = value.substr(1, value.length - 2);
-      return new LitExpr(unquotedValue, context.dataType || DataType.String);
-    } else {
-      var entityType = context.entityType;
-      // TODO: get rid of isAnonymous below when we get the chance.
-      if (entityType == null || entityType.isAnonymous) {
-        // this fork will only be reached on the LHS of an BinaryPredicate -
-        // a RHS expr cannot get here with an anon type
-        return new PropExpr(value);
-      } else {
-        var mayBeIdentifier = RX_IDENTIFIER.test(value);
-        if (mayBeIdentifier) {
-          if (entityType.getProperty(value, false) != null) {
-            return new PropExpr(value);
-          }
-        }
-      }
-      // we don't really know the datatype here because even though it comes in as a string
-      // its usually a string BUT it might be a number  i.e. the "1" or the "2" from an expr
-      // like "toUpper(substring(companyName, 1, 2))"
-      return new LitExpr(value, context.dataType);
-    }
-  }
-  
-  function parseFnExpr(source, parts, tokens, context) {
-    try {
-      var fnName = parts[0].trim().toLowerCase();
-      
-      var argSource = tokens[parts[1]].trim();
-      if (argSource.substr(0, 1) === "(") {
-        argSource = argSource.substr(1, argSource.length - 2);
-      }
-      var commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
-      var args = argSource.match(commaMatchStr);
-      var newContext = __extend({}, context);
-      // a dataType of Undefined on a context basically means not to try parsing
-      // the value if the expr is a literal
-      newContext.dataType = DataType.Undefined;
-      newContext.isFnArg = true;
-      var exprArgs = args.map(function (a) {
-        return parseExpr(a, tokens, newContext);
-      });
-      return new FnExpr(fnName, exprArgs);
-    } catch (e) {
-      return null;
-    }
-  }
-  
-  function coerceEntityTypeConfig(fn) {
-    return function (arg) {
-      arg = (arg instanceof EntityType) ? { entityType: arg } : arguments;
-      fn(newArgs);
-    }
-  }
+
   
   return Predicate;
 

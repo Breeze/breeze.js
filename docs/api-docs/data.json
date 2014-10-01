@@ -6056,7 +6056,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 174,
+            "line": 159,
             "description": "'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.and(p2, p3);\nor",
@@ -6078,7 +6078,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 198,
+            "line": 183,
             "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.or(p2, p3);\nor",
@@ -6100,7 +6100,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 222,
+            "line": 207,
             "description": "Returns the 'negated' version of this Predicate",
             "example": [
                 "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = p1.not();\nThis can also be accomplished using the 'static' version of the 'not' method",
@@ -8335,7 +8335,7 @@
             "line": 69,
             "description": "Returns a copy of this SaveOptions with the specified config options applied.",
             "example": [
-                "\nvar saveOptions = em1.saveOptions.using( {resourceName: \"anotherResource\" });"
+                "\n    var saveOptions = em1.saveOptions.using( {resourceName: \"anotherResource\" });"
             ],
             "itemtype": "method",
             "name": "using",
