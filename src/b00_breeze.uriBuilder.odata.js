@@ -113,7 +113,6 @@
     return this.visit(toODataFragmentVisitor, config);
   }
 
-  // toODataFragment visitor
   var toODataFragmentVisitor = (function () {
     var visitor = {
 
@@ -184,12 +183,7 @@
 
     var _operatorMap = {
       'contains': 'substringof'
-      // ops where op.key === odataOperator
-      // not
-      // eq, ne, gt, ge, lt, le,
-      // any, all, and, or
-      // startswith, endswith
-    }
+    };
 
     function odataOpFrom(node) {
       var op = node.op.key;

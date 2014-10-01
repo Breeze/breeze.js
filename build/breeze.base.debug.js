@@ -9689,6 +9689,7 @@ breeze.NamingConvention = NamingConvention;
         return createPredicateFromArray(Array.prototype.slice.call(arguments, 0));
       }
     };
+    var proto = ctor.prototype;
     
     /**
     Same as using the ctor.
@@ -9772,17 +9773,6 @@ breeze.NamingConvention = NamingConvention;
     **/
     ctor.not = function (pred) {
       return pred.not();
-    };
-
-    var proto = ctor.prototype;
-    
-    ctor._registerProto = function (methodName, proto, validateFn) {
-
-      proto.visitorMethodName = methodName;
-      proto.validate = validateFn || __noop;
-      // give expressions the Predicate prototype method
-      // needed since they don't inherit from Predicate
-      proto.visit = proto.visit || ctor.prototype.visit;
     };
 
     /**
@@ -9884,10 +9874,10 @@ breeze.NamingConvention = NamingConvention;
       }
 
       var entityType = context.entityType;
-      // don't both validating if already done so
-      if (entityType == null || this._entityType !== entityType) {
+      // don't both validating if already done so ( or if no _validate method
+      if (this._validate && entityType == null || this._entityType !== entityType) {
         // don't need to capture return value because validation fn doesn't have one.
-        this.validate(entityType);
+        this._validate(entityType);
         this._entityType = entityType;
       }
 
@@ -9897,11 +9887,11 @@ breeze.NamingConvention = NamingConvention;
       return this._visit(fn, visitor, context);
     }
 
-    proto._initialize = function (typeName, validateFn, map) {
-      ctor._registerProto(typeName, this, validateFn);
+    proto._initialize = function (visitorMethodName,  opMap) {
+      this.visitorMethodName = visitorMethodName;
       var aliasMap = {};
-      for (var key in (map || {})) {
-        var value = map[key];
+      for (var key in (opMap || {})) {
+        var value = opMap[key];
 
         var aliasKey = key.toLowerCase();
         value.key = aliasKey;
@@ -9941,7 +9931,7 @@ breeze.NamingConvention = NamingConvention;
         value[op] = createPredicateFromArray(arr.splice(2));
       }
       return createPredicateFromObject(json);
-    }    ;
+    };
     
     function createPredicateFromObject(obj) {
       if (obj instanceof Predicate) return obj;
@@ -9966,8 +9956,7 @@ breeze.NamingConvention = NamingConvention;
       if (UnaryPredicate.prototype._resolveOp(key, true)) {
         return new UnaryPredicate(key, value);
       }
-      
-      
+
       if ((typeof value !== 'object') || value == null || __isDate(value)) {
         // { foo: bar } key='foo', value = bar ( where bar is a literal i.e. a string, a number, a boolean or a date.
         return new BinaryPredicate("eq", key, value);
@@ -10013,10 +10002,13 @@ breeze.NamingConvention = NamingConvention;
       this.value = value;
     };
     var proto = ctor.prototype = new Predicate();
+    proto._initialize('passthruPredicate');
+
+    proto._validate = __noop;
+
     proto._visit = function(fn, visitor, context) {
       return fn.call(this, context)
     };
-    proto._initialize('passthruPredicate');
     
     return ctor;
   })();
@@ -10028,18 +10020,18 @@ breeze.NamingConvention = NamingConvention;
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('unaryPredicate', validate, {
+    proto._initialize('unaryPredicate', {
       'not': { aliases: [ '!', '~' ] }
     });
+
+    proto._validate = function(entityType) {
+      this.pred._validate(entityType);
+    };
 
     proto._visit = function(fn, visitor, context) {
       return fn.call(this, context, this.pred.visit(visitor, context));
     };
-    
-    function validate(entityType) {
-      this.pred.validate(entityType);
-    };
-    
+
     return ctor;
   })();
   
@@ -10054,7 +10046,7 @@ breeze.NamingConvention = NamingConvention;
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize('binaryPredicate', validate, {
+    proto._initialize('binaryPredicate', {
       'eq': {
         aliases: ["=="]
       },
@@ -10085,11 +10077,7 @@ breeze.NamingConvention = NamingConvention;
       }
     });
 
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context, this.expr1.visit(visitor, context), this.expr2.visit(visitor, context));
-    };
-    
-    function validate(entityType) {
+    proto._validate = function(entityType) {
       this.expr1 = createExpr(this.expr1Source, { entityType: entityType });
       if (this.expr1 == null) {
         throw new Error("Unable to validate 1st expression: " + this.expr1Source);
@@ -10098,17 +10086,21 @@ breeze.NamingConvention = NamingConvention;
         // lhs must be either a property or a function.
         throw new Error("The left hand side of a binary predicate cannot be a literal expression, it must be a valid property or functional predicate expression: " + this.expr1Source);
       }
-      
+
       this.expr2 = createExpr(this.expr2Source, { entityType: entityType, isRHS: true, dataType: this.expr1.dataType });
       if (this.expr2 == null) {
         throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
       }
-      
+
       if (this.expr1.dataType == null) {
         this.expr1.dataType = this.expr2.dataType;
       }
     }
-    
+
+    proto._visit = function(fn, visitor, context) {
+      return fn.call(this, context, this.expr1.visit(visitor, context), this.expr2.visit(visitor, context));
+    };
+
     return ctor;
   })();
   
@@ -10134,23 +10126,23 @@ breeze.NamingConvention = NamingConvention;
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize("andOrPredicate", validate, {
+    proto._initialize("andOrPredicate", {
       'and': { aliases: [ '&&' ] },
       'or': { aliases: [ '||' ] }
     });
+
+    proto._validate = function(entityType) {
+      this.preds.every(function (pred) {
+        pred._validate(entityType);
+      });
+    }
 
     proto._visit = function(fn, visitor, context) {
       return fn.call(this, context, this.preds.map(function(pred) {
         return pred.visit(visitor, context);
       }));
     };
-    
-    function validate(entityType) {
-      this.preds.every(function (pred) {
-        pred.validate(entityType);
-      });
-    }
-    
+
     
     return ctor;
   })();
@@ -10165,29 +10157,40 @@ breeze.NamingConvention = NamingConvention;
     };
     
     var proto = ctor.prototype = new Predicate();
-    proto._initialize("anyAllPredicate", validate, {
+    proto._initialize("anyAllPredicate", {
       'any': { aliases: ['some'] },
       'all': { aliases: ["every"] }
     });
+
+    proto._validate = function(entityType) {
+      this.expr = createExpr(this.exprSource, { entityType: entityType });
+      // can't really know the predicateEntityType unless the original entity type was known.
+      if (entityType == null || entityType.isAnonymous) {
+        this.expr.dataType = null;
+      }
+      this.pred._validate(this.expr.dataType);
+    }
 
     proto._visit = function(fn, visitor, context) {
       var predContext = __extend({}, context);
       predContext.entityType = this.expr.dataType;
       return fn.call(this, context, this.expr.visit(visitor, context), this.pred.visit(visitor, predContext));
     };
-    
-    function validate(entityType) {
-      this.expr = createExpr(this.exprSource, { entityType: entityType });
-      // can't really know the predicateEntityType unless the original entity type was known.
-      if (entityType == null || entityType.isAnonymous) {
-        this.expr.dataType = null;
-      }
-      this.pred.validate(this.expr.dataType);
-    }
 
     return ctor;
   })();
-  
+
+  var PredicateExpression = function (visitorMethodName) {
+    this.visitorMethodName = visitorMethodName;
+    // give expressions the Predicate prototype method
+    this.visit = Predicate.prototype.visit;
+    // default impls - may be overridden
+    this._validate = __noop;
+    this._visit = function(fn, visitor, context) {
+      return fn.call(this, context);
+    };
+  }
+
   var LitExpr = (function () {
     // 2 public props: value, dataType
     var ctor = function (value, dataType, hasExplicitDataType) {
@@ -10204,16 +10207,9 @@ breeze.NamingConvention = NamingConvention;
       }
       this.dataType = dataType;
       this.hasExplicitDataType = hasExplicitDataType;
-
-
     };
-    var proto = ctor.prototype;
-    Predicate._registerProto('litExpr', proto);
+    var proto = ctor.prototype = new PredicateExpression('litExpr');
 
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context);
-    };
-    
     function resolveDataType(dataType) {
       if (dataType == null) return dataType;
       if (DataType.contains(dataType)) {
@@ -10238,14 +10234,9 @@ breeze.NamingConvention = NamingConvention;
       //this.dataType = DataType.Undefined;
       // this.dataType resolved after validate ( if not on an anon type }
     };
-    var proto = ctor.prototype;
-    Predicate._registerProto('propExpr', proto, validate);
+    var proto = ctor.prototype = new PredicateExpression('propExpr');
 
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context);
-    };
-    
-    function validate(entityType) {
+    proto._validate = function(entityType) {
       if (entityType == null || entityType.isAnonymous) return;
       var prop = entityType.getProperty(this.propertyPath, true);
       if (!prop) {
@@ -10258,7 +10249,7 @@ breeze.NamingConvention = NamingConvention;
         this.dataType = prop.entityType;
       }
     }
-    
+
     return ctor;
   })();
   
@@ -10275,21 +10266,20 @@ breeze.NamingConvention = NamingConvention;
       this.localFn = qf.fn;
       this.dataType = qf.dataType;
     };
-    var proto = ctor.prototype;
-    Predicate._registerProto('fnExpr', proto, validate);
+    var proto = ctor.prototype = new PredicateExpression('fnExpr');
+
+    proto._validate = function(entityType) {
+      this.exprArgs.forEach(function (expr) {
+        expr._validate(entityType);
+      });
+    }
 
     proto._visit = function(fn, visitor, context) {
       return fn.call(this, context, this.exprArgs.map(function(expr) {
         return expr.visit(visitor, context);
       }));
     };
-    
-    function validate(entityType) {
-      this.exprArgs.forEach(function (expr) {
-        expr.validate(entityType);
-      });
-    }
-    
+
     // TODO: add dataTypes for the args next - will help to infer other dataTypes.
     var _funcMap = ctor.funcMap = {
       toupper: {
@@ -10437,7 +10427,7 @@ breeze.NamingConvention = NamingConvention;
     }
 
     var expr = parseExpr(source, tokens, context);
-    expr.validate(entityType);
+    expr._validate(entityType);
     return expr;
   }
 
@@ -10512,11 +10502,11 @@ breeze.NamingConvention = NamingConvention;
         throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
       
-      unaryPredicate: function (context, predVal) {
+      unaryPredicate: function (context, predFn) {
         switch (this.op.key) {
           case "not":
             return function (entity) {
-              return !predVal(entity);
+              return !predFn(entity);
             };
           default:
             throw new Error("Invalid unary operator:" + this.op.key);
@@ -10552,10 +10542,10 @@ breeze.NamingConvention = NamingConvention;
         }
       },
       
-      anyAllPredicate: function (context, exprFn, subPredFn) {
-        var predFn = getAnyAllPredicateFn(this.op);
+      anyAllPredicate: function (context, exprFn, predFn) {
+        var anyAllPredFn = getAnyAllPredicateFn(this.op);
         return function (entity) {
-          return predFn(exprFn(entity), subPredFn);
+          return anyAllPredFn(exprFn(entity), predFn);
         };
       },
       
