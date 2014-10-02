@@ -7942,18 +7942,19 @@ var EntityType = (function () {
   @return {DataProperty|NavigationProperty} Will be null if not found.
   **/
   proto.getProperty = function (propertyPath, throwIfNotFound) {
-    var props = this.getPropertiesOnPath(propertyPath, throwIfNotFound);
+    var props = this.getPropertiesOnPath(propertyPath, false, throwIfNotFound);
     return props ? props[props.length - 1] : null;
   };
 
-  proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
+  proto.getPropertiesOnPath = function(propertyPath, onServer, throwIfNotFound) {
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
+    var key = onServer ? "nameOnServer" : "name";
     var props = propertyNames.map(function (propName) {
-      var prop = __arrayFirst(parentType.getProperties(), __propEq("name", propName));
+      var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
@@ -7975,7 +7976,7 @@ var EntityType = (function () {
         return fn(propName);
       });
     } else {
-      propNames = this.getPropertiesOnPath(propertyPath, true).map(function(prop) {
+      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop) {
         return prop.nameOnServer;
       });
     }
@@ -9775,6 +9776,27 @@ breeze.NamingConvention = NamingConvention;
       return pred.not();
     };
 
+    ctor.extendBinaryPredicateFn = function(opMap, visitorFn ) {
+      var baseVisitorFn = toFunctionVisitor.binaryPredicate;
+      for (var op in (opMap || {})) {
+        var config = opMap[op];
+        config.visitorFn = visitorFn;
+        updateAliasMap(BinaryPredicate.prototype.aliasMap, op, opMap[op])
+      }
+      if (!toFunctionVisitor.isExtended) {
+        toFunctionVisitor.binaryPredicate = function (context, expr1Val, expr2Val) {
+          var visitorFn = this.aliasMap[this.op.key].visitorFn;
+          if (visitorFn) {
+            return visitorFn(context, expr1Val, expr2Val);
+          } else {
+            return baseVisitorFn(context, expr1Val, expr2Val);
+          }
+        }
+        toFunctionVisitor.isExtended = true;
+      }
+    };
+
+
     /**
     'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
     @example
@@ -9889,20 +9911,21 @@ breeze.NamingConvention = NamingConvention;
 
     proto._initialize = function (visitorMethodName,  opMap) {
       this.visitorMethodName = visitorMethodName;
-      var aliasMap = {};
-      for (var key in (opMap || {})) {
-        var value = opMap[key];
-
-        var aliasKey = key.toLowerCase();
-        value.key = aliasKey;
-        aliasMap[aliasKey] = value;
-
-        value.aliases && value.aliases.forEach(function (alias) {
-          aliasMap[alias.toLowerCase()] = value;
-        });
+      var aliasMap = this.aliasMap = {};
+      for (var op in (opMap || {})) {
+        updateAliasMap(aliasMap, op, opMap[op])
       }
-      this.aliasMap = aliasMap;
     };
+
+    function updateAliasMap(aliasMap, op, config) {
+      var key = op.toLowerCase();
+      config.key = key;
+      aliasMap[key] = config;
+
+      config.aliases && config.aliases.forEach(function (alias) {
+        aliasMap[alias.toLowerCase()] = config;
+      });
+    }
     
     proto._resolveOp = function (op, okIfNotFound) {
       op = op.operator || op;
@@ -10076,6 +10099,7 @@ breeze.NamingConvention = NamingConvention;
         isFunction: true
       }
     });
+
 
     proto._validate = function(entityType) {
       this.expr1 = createExpr(this.expr1Source, { entityType: entityType });
@@ -10515,7 +10539,11 @@ breeze.NamingConvention = NamingConvention;
       
       binaryPredicate: function (context, expr1Fn, expr2Fn) {
         var dataType = this.expr1.dataType || this.expr2.dataType;
-        var predFn = getBinaryPredicateFn(context.entityType, this.op, dataType);
+        var lqco = context.entityType.metadataStore.localQueryComparisonOptions;
+        var predFn = getBinaryPredicateFn(this, dataType, lqco);
+        if (predFn == null) {
+          throw new Error("Invalid binaryPredicate operator:" + this.op.key);
+        }
         return function (entity) {
           return predFn(expr1Fn(entity), expr2Fn(entity));
         };
@@ -10581,8 +10609,9 @@ breeze.NamingConvention = NamingConvention;
           return result;
         }
       }
+
     };
-    
+
     function getAnyAllPredicateFn(op) {
       switch (op.key) {
         case "any":
@@ -10601,9 +10630,9 @@ breeze.NamingConvention = NamingConvention;
           throw new Error("Unknown operator: " + op.key);
       }
     }
-    
-    function getBinaryPredicateFn(entityType, op, dataType) {
-      var lqco = entityType.metadataStore.localQueryComparisonOptions;
+
+    function getBinaryPredicateFn(binaryPredicate, dataType, lqco) {
+      var op = binaryPredicate.op;
       var mc = DataType.getComparableFn(dataType);
       var predFn;
       switch (op.key) {
@@ -10661,13 +10690,11 @@ breeze.NamingConvention = NamingConvention;
           };
           break;
         default:
-          throw new Error("Unknown operator: " + op.key);
-
+          return null;
       }
       return predFn;
     }
-    
-    
+
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
       if (typeof b !== 'string') {

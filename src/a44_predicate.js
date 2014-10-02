@@ -146,6 +146,27 @@
       return pred.not();
     };
 
+    ctor.extendBinaryPredicateFn = function(opMap, visitorFn ) {
+      var baseVisitorFn = toFunctionVisitor.binaryPredicate;
+      for (var op in (opMap || {})) {
+        var config = opMap[op];
+        config.visitorFn = visitorFn;
+        updateAliasMap(BinaryPredicate.prototype.aliasMap, op, opMap[op])
+      }
+      if (!toFunctionVisitor.isExtended) {
+        toFunctionVisitor.binaryPredicate = function (context, expr1Val, expr2Val) {
+          var visitorFn = this.aliasMap[this.op.key].visitorFn;
+          if (visitorFn) {
+            return visitorFn(context, expr1Val, expr2Val);
+          } else {
+            return baseVisitorFn(context, expr1Val, expr2Val);
+          }
+        }
+        toFunctionVisitor.isExtended = true;
+      }
+    };
+
+
     /**
     'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
     @example
@@ -260,20 +281,21 @@
 
     proto._initialize = function (visitorMethodName,  opMap) {
       this.visitorMethodName = visitorMethodName;
-      var aliasMap = {};
-      for (var key in (opMap || {})) {
-        var value = opMap[key];
-
-        var aliasKey = key.toLowerCase();
-        value.key = aliasKey;
-        aliasMap[aliasKey] = value;
-
-        value.aliases && value.aliases.forEach(function (alias) {
-          aliasMap[alias.toLowerCase()] = value;
-        });
+      var aliasMap = this.aliasMap = {};
+      for (var op in (opMap || {})) {
+        updateAliasMap(aliasMap, op, opMap[op])
       }
-      this.aliasMap = aliasMap;
     };
+
+    function updateAliasMap(aliasMap, op, config) {
+      var key = op.toLowerCase();
+      config.key = key;
+      aliasMap[key] = config;
+
+      config.aliases && config.aliases.forEach(function (alias) {
+        aliasMap[alias.toLowerCase()] = config;
+      });
+    }
     
     proto._resolveOp = function (op, okIfNotFound) {
       op = op.operator || op;
@@ -447,6 +469,7 @@
         isFunction: true
       }
     });
+
 
     proto._validate = function(entityType) {
       this.expr1 = createExpr(this.expr1Source, { entityType: entityType });
@@ -886,7 +909,11 @@
       
       binaryPredicate: function (context, expr1Fn, expr2Fn) {
         var dataType = this.expr1.dataType || this.expr2.dataType;
-        var predFn = getBinaryPredicateFn(context.entityType, this.op, dataType);
+        var lqco = context.entityType.metadataStore.localQueryComparisonOptions;
+        var predFn = getBinaryPredicateFn(this, dataType, lqco);
+        if (predFn == null) {
+          throw new Error("Invalid binaryPredicate operator:" + this.op.key);
+        }
         return function (entity) {
           return predFn(expr1Fn(entity), expr2Fn(entity));
         };
@@ -952,8 +979,9 @@
           return result;
         }
       }
+
     };
-    
+
     function getAnyAllPredicateFn(op) {
       switch (op.key) {
         case "any":
@@ -972,9 +1000,9 @@
           throw new Error("Unknown operator: " + op.key);
       }
     }
-    
-    function getBinaryPredicateFn(entityType, op, dataType) {
-      var lqco = entityType.metadataStore.localQueryComparisonOptions;
+
+    function getBinaryPredicateFn(binaryPredicate, dataType, lqco) {
+      var op = binaryPredicate.op;
       var mc = DataType.getComparableFn(dataType);
       var predFn;
       switch (op.key) {
@@ -1032,13 +1060,11 @@
           };
           break;
         default:
-          throw new Error("Unknown operator: " + op.key);
-
+          return null;
       }
       return predFn;
     }
-    
-    
+
     function stringEquals(a, b, lqco) {
       if (b == null) return false;
       if (typeof b !== 'string') {

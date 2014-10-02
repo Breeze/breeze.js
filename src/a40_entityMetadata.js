@@ -1773,18 +1773,19 @@ var EntityType = (function () {
   @return {DataProperty|NavigationProperty} Will be null if not found.
   **/
   proto.getProperty = function (propertyPath, throwIfNotFound) {
-    var props = this.getPropertiesOnPath(propertyPath, throwIfNotFound);
+    var props = this.getPropertiesOnPath(propertyPath, false, throwIfNotFound);
     return props ? props[props.length - 1] : null;
   };
 
-  proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
+  proto.getPropertiesOnPath = function(propertyPath, onServer, throwIfNotFound) {
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
+    var key = onServer ? "nameOnServer" : "name";
     var props = propertyNames.map(function (propName) {
-      var prop = __arrayFirst(parentType.getProperties(), __propEq("name", propName));
+      var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
@@ -1806,7 +1807,7 @@ var EntityType = (function () {
         return fn(propName);
       });
     } else {
-      propNames = this.getPropertiesOnPath(propertyPath, true).map(function(prop) {
+      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop) {
         return prop.nameOnServer;
       });
     }
