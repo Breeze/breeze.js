@@ -9,6 +9,7 @@ var rename  = require('gulp-rename');
 var rimraf  = require('gulp-rimraf');
 var shell   = require('gulp-shell');
 var newer   = require('gulp-newer');
+var through = require('through');
  
 var srcDir = '../src/';
 var destDir = './';
@@ -39,7 +40,16 @@ gulp.task('yuidoc-clean', function() {
 gulp.task('yuidoc', function() {
   return gulp.src( mapPath(srcDir, fileNames))
       .pipe(newer(yuidocDestDir + 'data.json'))
-      .pipe(concat('foo'))  // just needed a method that would get n -> 1 would like something smaller.
+      .pipe(concat('foo')) // eat the stream but yield one to trigger yuidoc to run once
+      
+      /* Clever alternative
+      .pipe(through(function(file) {
+        // pass first file through (don't care what it is; it's just a trigger)
+        this.queue(file);
+        // then end this stream by passing null to queue, ignoring all additional files
+        this.queue(null);
+      }))  
+      */
       .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));
 });
 
