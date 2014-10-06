@@ -7906,7 +7906,8 @@ var EntityType = (function () {
   @return {DataProperty} Will be null if not found.
   **/
   proto.getDataProperty = function (propertyName) {
-    return __arrayFirst(this.dataProperties, __propEq("name", propertyName));
+    var key = this._name();
+    return __arrayFirst(this.dataProperties, __propEq(key, propertyName));
   };
 
   /**
@@ -7920,7 +7921,8 @@ var EntityType = (function () {
   @return {NavigationProperty} Will be null if not found.
   **/
   proto.getNavigationProperty = function (propertyName) {
-    return __arrayFirst(this.navigationProperties, __propEq("name", propertyName));
+    var key = this._name();
+    return __arrayFirst(this.navigationProperties, __propEq(key, propertyName));
   };
 
   /**
@@ -7946,13 +7948,13 @@ var EntityType = (function () {
     return props ? props[props.length - 1] : null;
   };
 
-  proto.getPropertiesOnPath = function(propertyPath, onServer, throwIfNotFound) {
+  proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
-    var key = onServer ? "nameOnServer" : "name";
+    var key = this._name();
     var props = propertyNames.map(function (propName) {
       var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
       if (prop) {
@@ -8070,6 +8072,10 @@ var EntityType = (function () {
       validators: null,
       custom: null
     });
+  };
+
+  proto._name = function() {
+    return this.metadataStore.onServer ? "nameOnServer" : "name";
   };
 
   function localPropsOnly(props) {
