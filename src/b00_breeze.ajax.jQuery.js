@@ -47,7 +47,8 @@
       var compositeConfig = core.extend({}, this.defaultSettings);
       jqConfig = core.extend(compositeConfig, jqConfig);
       // extend is shallow; extend headers separately
-      jqConfig.headers = core.extend(this.defaultSettings.headers, jqConfig.headers);
+      var headers =core.extend({}, this.defaultSettings.headers); // copy default headers 1st
+      ngConfig.headers = core.extend(headers, ngConfig.headers);
     }
 
     var requestInfo = {
