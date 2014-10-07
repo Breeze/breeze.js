@@ -7944,7 +7944,7 @@ var EntityType = (function () {
   @return {DataProperty|NavigationProperty} Will be null if not found.
   **/
   proto.getProperty = function (propertyPath, throwIfNotFound) {
-    var props = this.getPropertiesOnPath(propertyPath, false, throwIfNotFound);
+    var props = this.getPropertiesOnPath(propertyPath, throwIfNotFound);
     return props ? props[props.length - 1] : null;
   };
 
@@ -7978,7 +7978,7 @@ var EntityType = (function () {
         return fn(propName);
       });
     } else {
-      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop) {
+      propNames = this.getPropertiesOnPath(propertyPath, true).map(function(prop) {
         return prop.nameOnServer;
       });
     }
@@ -15774,7 +15774,8 @@ breeze.SaveOptions = SaveOptions;
       var compositeConfig = core.extend({}, this.defaultSettings);
       ngConfig = core.extend(compositeConfig, ngConfig);
       // extend is shallow; extend headers separately
-      ngConfig.headers = core.extend(this.defaultSettings.headers, ngConfig.headers);
+      var headers =core.extend({}, this.defaultSettings.headers); // copy default headers 1st
+      ngConfig.headers = core.extend(headers, ngConfig.headers);
     }
 
     var requestInfo = {
@@ -15916,7 +15917,8 @@ breeze.SaveOptions = SaveOptions;
       var compositeConfig = core.extend({}, this.defaultSettings);
       jqConfig = core.extend(compositeConfig, jqConfig);
       // extend is shallow; extend headers separately
-      jqConfig.headers = core.extend(this.defaultSettings.headers, jqConfig.headers);
+      var headers =core.extend({}, this.defaultSettings.headers); // copy default headers 1st
+      ngConfig.headers = core.extend(headers, ngConfig.headers);
     }
 
     var requestInfo = {
