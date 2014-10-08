@@ -15,13 +15,12 @@
   "use strict";
   var core = breeze.core;
 
-  var httpService;
-  var rootScope;
-
   var ctor = function () {
     this.name = "angular";
     this.defaultSettings = { };
     this.requestInterceptor = null;
+    this.$http;
+    this.$rootScope;
   };
   var proto = ctor.prototype;
 
@@ -30,21 +29,25 @@
     var ng = core.requireLib("angular");
     if (ng) {
       var $injector = ng.injector(['ng']);
-      $injector.invoke(['$http', '$rootScope', function (xHttp, xRootScope) {
-        httpService = xHttp;
-        rootScope = xRootScope;
+      var http, rootScope;
+      $injector.invoke(['$http', '$rootScope', function ($http, $rootScope) {
+        http = $http;
+        rootScope = $rootScope;
       }]);
+      this.$http = http;
+      this.$rootScope = rootScope;     
     }
 
   };
 
   proto.setHttp = function (http) {
-    httpService = http;
-    rootScope = null; // to suppress rootScope.digest
+    this.$http = http;
+    this.$rootScope = null; // to suppress $rootScope.digest
   };
 
+
   proto.ajax = function (config) {
-    if (!httpService) {
+    if (!this.$http) {
       throw new Error("Unable to locate angular for ajax adapter");
     }
     var ngConfig = {
@@ -91,11 +94,11 @@
       }
     }
 
-    if (requestInfo.config) {
-      httpService(requestInfo.config)
+    if (requestInfo.config) { // exists unless requestInterceptor killed it.
+      this.$http(requestInfo.config)
           .success(requestInfo.success)
           .error(requestInfo.error);
-      rootScope && rootScope.$digest();
+      this.$rootScope && this.$rootScope.$digest();
     }
 
     function successFn(data, status, headers, xconfig, statusText) {

@@ -48,7 +48,7 @@
       jqConfig = core.extend(compositeConfig, jqConfig);
       // extend is shallow; extend headers separately
       var headers =core.extend({}, this.defaultSettings.headers); // copy default headers 1st
-      ngConfig.headers = core.extend(headers, ngConfig.headers);
+      jqConfig.headers = core.extend(headers, jqConfig.headers);
     }
 
     var requestInfo = {
@@ -66,7 +66,7 @@
       }
     }
 
-    if (requestInfo.config) {
+    if (requestInfo.config) { // exists unless requestInterceptor killed it.
       requestInfo.jqXHR = jQuery.ajax(requestInfo.config)
           .done(requestInfo.success)
           .fail(requestInfo.error);

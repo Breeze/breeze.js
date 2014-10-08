@@ -1,6 +1,7 @@
 // ajaxAdapterTests
 (function (testFns) {
     var breeze = testFns.breeze;
+    var core = breeze.core;
     var originalAjaxAdapter;
 
     module("ajaxAdapter", {
@@ -49,6 +50,98 @@
             start();
         }
     });
+
+    /*********************************************************
+      * jQuery ajax adapter default settings are inherited
+      *********************************************************/
+    asyncTest("jQuery ajax adapter default settings are inherited", 2, function() {
+
+        // get jQuery ajax adapter and ensure it is the default adapter for this test
+        var adapter = breeze.config.getAdapterInstance('ajax', 'jQuery');
+        breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
+
+        var ajaxSpy = sinon.spy(jQuery, "ajax");
+
+        // copy the original default settings so can restore at end of test
+        var defSettings = adapter.defaultSettings;
+        var originalDefaultSettings = core.extend({}, defSettings);
+        // add a default header to the settings that will be used.
+        var fooHeader = 'foo header';
+        defSettings.headers = {foo_header: fooHeader};
+
+        new breeze.EntityManager('/bad/address/')
+            .fetchMetadata() // triggers a call to the server
+            .then(stubWtf, expectedFailure).finally(fin);
+
+        // should fail; we're only interested in how ajax was called
+        function expectedFailure(err) {
+            if (err.status !== 404) {
+                ok(false, "server call failed with unexpected error: " + err.message);
+                expect(1);
+                return;
+            }
+            var ajaxSettings = ajaxSpy.args[0][0]; // 1st arg of 1st call
+            ok(ajaxSettings != null, 'ajax was called with a settings object');
+            var expectedHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
+            equal(expectedHeader, fooHeader,
+            "received expected default 'foo_header' with value: " + fooHeader);
+        }
+
+        function fin(){
+            // restore
+            adapter.defaultSettings = originalDefaultSettings;
+            start();
+        }
+
+    });
+    /*********************************************************
+      * Angular ajax adapter default settings are inherited
+      *********************************************************/
+    asyncTest("Angular ajax adapter default settings are inherited", 2, function () {
+
+        // get Angular ajax adapter and ensure it is the default adapter for this test
+        var adapter = breeze.config.getAdapterInstance('ajax', 'angular');
+        breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
+
+        var ajaxSpy = sinon.spy(adapter, "$http");
+
+        // copy the original default settings so can restore at end of test
+        var defSettings = adapter.defaultSettings;
+        var originalDefaultSettings = core.extend({}, defSettings);
+        // add a default header to the settings that will be used.
+        var fooHeader = 'foo header';
+        defSettings.headers = { foo_header: fooHeader };
+
+        new breeze.EntityManager('/bad/address/')
+            .fetchMetadata() // triggers a call to the server
+            .then(stubWtf, expectedFailure).finally(fin);
+
+        // should fail; we're only interested in how ajax was called
+        function expectedFailure(err) {
+            if (err.status !== 404) {
+                ok(false, "server call failed with unexpected error: " + err.message);
+                expect(1);
+                return;
+            }
+
+            var ajaxSettings = ajaxSpy.args[0][0]; // 1st arg of 1st call
+            ok(ajaxSettings != null, 'ajax was called with a settings object');
+            var expectedHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
+            equal(expectedHeader, fooHeader,
+            "received expected default 'foo_header' with value: " + fooHeader);
+        }
+
+        function fin() {
+            // restore
+            adapter.defaultSettings = originalDefaultSettings;
+            start();
+        }
+
+    });
+    /////
+    function stubWtf() {
+        ok(false, "server request succeeded when it shouldn't; Disaster!");
+    }
 
 
 })(breezeTestFns);
