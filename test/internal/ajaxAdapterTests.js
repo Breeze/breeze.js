@@ -10,11 +10,6 @@
             originalAjaxAdapter = breeze.config.getAdapterInstance('ajax');
         },
         teardown: function () {
-            try {
-                originalAjaxAdapter.ajax.restore(); // restore if spied or stubbed
-            } catch (e) {
-                /* assume it wasn't a spy or stub; ignore error*/
-            }
             // restore pre-test default adapter instance in case we changed it in a test
             breeze.config.initializeAdapterInstance('ajax', originalAjaxAdapter.name, true);
         }
@@ -34,19 +29,21 @@
         // if you leave this line and bug #2590 is not fixed, the test will fail
         // Regardless, if you comment this out, then the "bad url" will be caught properly
         // and passed to the catch and the test passes
-        sinon.stub(originalAjaxAdapter, "ajax").throws(err);
+        var ajaxStub = sinon.stub(originalAjaxAdapter, "ajax").throws(err);
         try {
             breeze.EntityQuery.from("Todos").using(em).execute()
                 .catch(function () { wasCaught = true;})
                 .finally(fin);
         } catch (e) {
             ok(false, "the attempt to query with bad adapter threw sync exception");
+            ajaxStub.restore();
             start();
         }
 
         function fin() {
             ok(originalAjaxAdapter.ajax.threw(err), "ajax adapter threw expected error");
             ok(wasCaught, "the exceptions was passed to the promise's catch");
+            ajaxStub.restore();
             start();
         }
     });
@@ -90,6 +87,7 @@
         function fin(){
             // restore
             adapter.defaultSettings = originalDefaultSettings;
+            ajaxSpy.restore();
             start();
         }
 
@@ -134,14 +132,15 @@
         function fin() {
             // restore
             adapter.defaultSettings = originalDefaultSettings;
+            ajaxSpy.restore();
             start();
         }
 
     });
+
     /////
     function stubWtf() {
         ok(false, "server request succeeded when it shouldn't; Disaster!");
     }
-
 
 })(breezeTestFns);
