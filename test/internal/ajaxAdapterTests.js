@@ -62,7 +62,7 @@
         // copy the original default settings so can restore at end of test
         var defSettings = adapter.defaultSettings;
         var originalDefaultSettings = core.extend({}, defSettings);
-        // add a default header to the settings that will be used.
+        // add a default header to the default settings that will be used.
         var fooHeader = 'foo header';
         defSettings.headers = {foo_header: fooHeader};
 
@@ -79,8 +79,8 @@
             }
             var ajaxSettings = ajaxSpy.args[0][0]; // 1st arg of 1st call
             ok(ajaxSettings != null, 'ajax was called with a settings object');
-            var expectedHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
-            equal(expectedHeader, fooHeader,
+            var actualHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
+            equal(actualHeader, fooHeader,
             "received expected default 'foo_header' with value: " + fooHeader);
         }
 
@@ -106,7 +106,7 @@
         // copy the original default settings so can restore at end of test
         var defSettings = adapter.defaultSettings;
         var originalDefaultSettings = core.extend({}, defSettings);
-        // add a default header to the settings that will be used.
+        // add a default header to the default settings that will be used.
         var fooHeader = 'foo header';
         defSettings.headers = { foo_header: fooHeader };
 
@@ -124,8 +124,8 @@
 
             var ajaxSettings = ajaxSpy.args[0][0]; // 1st arg of 1st call
             ok(ajaxSettings != null, 'ajax was called with a settings object');
-            var expectedHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
-            equal(expectedHeader, fooHeader,
+            var actualHeader = ajaxSettings.headers && ajaxSettings.headers['foo_header'];
+            equal(actualHeader, fooHeader,
             "received expected default 'foo_header' with value: " + fooHeader);
         }
 
