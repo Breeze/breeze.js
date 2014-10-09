@@ -1737,8 +1737,7 @@ var EntityType = (function () {
   @return {DataProperty} Will be null if not found.
   **/
   proto.getDataProperty = function (propertyName) {
-    var key = this._name();
-    return __arrayFirst(this.dataProperties, __propEq(key, propertyName));
+    return __arrayFirst(this.dataProperties, __propEq('name', propertyName));
   };
 
   /**
@@ -1752,8 +1751,7 @@ var EntityType = (function () {
   @return {NavigationProperty} Will be null if not found.
   **/
   proto.getNavigationProperty = function (propertyName) {
-    var key = this._name();
-    return __arrayFirst(this.navigationProperties, __propEq(key, propertyName));
+    return __arrayFirst(this.navigationProperties, __propEq('name', propertyName));
   };
 
   /**
@@ -1775,17 +1773,17 @@ var EntityType = (function () {
   @return {DataProperty|NavigationProperty} Will be null if not found.
   **/
   proto.getProperty = function (propertyPath, throwIfNotFound) {
-    var props = this.getPropertiesOnPath(propertyPath, throwIfNotFound);
+    var props = this.getPropertiesOnPath(propertyPath, false, throwIfNotFound);
     return props ? props[props.length - 1] : null;
   };
 
-  proto.getPropertiesOnPath = function(propertyPath, throwIfNotFound) {
+  proto.getPropertiesOnPath = function(propertyPath, useServerName, throwIfNotFound) {
     throwIfNotFound = throwIfNotFound || false;
     var propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     var ok = true;
     var parentType = this;
-    var key = this._name();
+    var key = useServerName ? "nameOnServer" : "name";
     var props = propertyNames.map(function (propName) {
       var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
       if (prop) {
@@ -1809,7 +1807,7 @@ var EntityType = (function () {
         return fn(propName);
       });
     } else {
-      propNames = this.getPropertiesOnPath(propertyPath, true).map(function(prop) {
+      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop) {
         return prop.nameOnServer;
       });
     }
@@ -1903,10 +1901,6 @@ var EntityType = (function () {
       validators: null,
       custom: null
     });
-  };
-
-  proto._name = function() {
-    return this.metadataStore.onServer ? "nameOnServer" : "name";
   };
 
   function localPropsOnly(props) {

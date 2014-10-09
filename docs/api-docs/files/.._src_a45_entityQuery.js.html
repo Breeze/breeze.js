@@ -835,7 +835,7 @@
   proto.toJSONExt = function (context) {
     context = context || {};
     context.entityType = context.entityType || this.fromEntityType;
-    context.propertyPathFn = context.onServer ? context.entityType.clientPropertyPathToServer.bind(context.entityType) : __identity;
+    context.propertyPathFn = context.toNameOnServer ? context.entityType.clientPropertyPathToServer.bind(context.entityType) : __identity;
     
     var that = this;
     

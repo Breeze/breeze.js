@@ -19,9 +19,20 @@ var yuidocThemeDir = '../docs/api-docs-theme/';
 var baseFileNames = [ '_head.jsfrag', 'a??_*.js', '_tail.jsfrag'];
 var fileNames     = [ '_head.jsfrag', 'a??_*.js', 'b??_*.js', '_tail.jsfrag'];
 
-
 buildMinify('', fileNames);
 buildMinify('.base', baseFileNames);
+
+gulp.task('copyBreezeExtns', function() {
+	gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
+      // .pipe(newer(destDir))
+      .pipe(gulp.dest(destDir))
+});
+
+gulp.task('copyForTests', function() {
+	testDir = '../test/breeze'
+	gulp.src( mapPath(destDir, [ 'breeze.*']))
+      .pipe(gulp.dest(testDir))
+});
 
 gulp.task('yuidoc-full', ['yuidoc-clean'], function() {
   return gulp.src( mapPath(srcDir, fileNames))
@@ -53,7 +64,9 @@ gulp.task('yuidoc', function() {
       .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));
 });
 
-gulp.task('default', ['minify', 'minify.base', 'yuidoc'], function() {
+
+
+gulp.task('default', ['minify', 'minify.base', 'copyBreezeExtns', 'copyForTests', 'yuidoc'], function() {
 
 });
 

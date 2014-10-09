@@ -22,7 +22,7 @@
     // force entityType validation;
     var entityType = entityQuery._getFromEntityType(metadataStore, false);
     if (!entityType) entityType = new EntityType(metadataStore);
-    var json = entityQuery.toJSONExt( { entityType: entityType, onServer: true});
+    var json = entityQuery.toJSONExt( { entityType: entityType, toNameOnServer: true});
     json.from = undefined;
     json.queryOptions = undefined;
 
