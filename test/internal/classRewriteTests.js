@@ -1,208 +1,210 @@
 (function (testFns) {
-    var breeze = testFns.breeze;
-    var core = breeze.core;
-    var EntityAspect = breeze.EntityAspect;
-    var MetadataStore = breeze.MetadataStore;
-    
-    module("classRewrite", {
-        setup: function () {
-            this.interceptor = function (property, newValue, accessorFn) {
-                var prevValues = this.prevValues;
-                if (!prevValues) {
-                    prevValues = [];
-                    this.prevValues = prevValues;
-                }
-                var oldValue = accessorFn();
-                if (oldValue != null) {
-                    prevValues.push(oldValue);
-                }
-                accessorFn(newValue);
-            };
+  var breeze = testFns.breeze;
+  var core = breeze.core;
+  var EntityAspect = breeze.EntityAspect;
+  var MetadataStore = breeze.MetadataStore;
 
-
-        },
-        teardown: function () {
-
+  module("classRewrite", {
+    setup: function () {
+      this.interceptor = function (property, newValue, accessorFn) {
+        var prevValues = this.prevValues;
+        if (!prevValues) {
+          prevValues = [];
+          this.prevValues = prevValues;
         }
-    });
+        var oldValue = accessorFn();
+        if (oldValue != null) {
+          prevValues.push(oldValue);
+        }
+        accessorFn(newValue);
+      };
 
-    function nottest() {
+
+    },
+    teardown: function () {
 
     }
+  });
 
-    // Uncomment the next two tests when working on inheritance.
+  function nottest() {
 
-    //test("class watcher - inherited - backbone", function() {
-    //    if (testFns.modelLibrary !== 'backbone') {
-    //        ok(true, "Skipped test - Backbone specific");
-    //        return;
-    //    }
-    //    var metadataStore = new MetadataStore();
-    //    var Entity = Backbone.Model.extend({ });
+  }
 
-    //    var Person = Entity.extend({
-    //        defaults: {
-    //            firstName: null,
-    //            lastName: null
-    //        }
-    //    });
+  // Uncomment the next two tests when working on inheritance.
 
-    //    metadataStore.trackUnmappedType(Person, this.interceptor);
+  //test("class watcher - inherited - backbone", function() {
+  //    if (testFns.modelLibrary !== 'backbone') {
+  //        ok(true, "Skipped test - Backbone specific");
+  //        return;
+  //    }
+  //    var metadataStore = new MetadataStore();
+  //    var Entity = Backbone.Model.extend({ });
 
-    //    var per1 = new Person({
-    //        firstName: "Jane",
-    //        lastName: "Doe"
-    //    });
-    //    var per2 = new Person({
-    //        firstName: "a",
-    //        lastName: "b"
-    //    });
+  //    var Person = Entity.extend({
+  //        defaults: {
+  //            firstName: null,
+  //            lastName: null
+  //        }
+  //    });
 
-    //    var Employee = Person.extend({
-    //        defaults: {
-    //            job: null
-    //        }
-    //    });
+  //    metadataStore.trackUnmappedType(Person, this.interceptor);
 
-    //    metadataStore.trackUnmappedType(Employee, this.interceptor);
+  //    var per1 = new Person({
+  //        firstName: "Jane",
+  //        lastName: "Doe"
+  //    });
+  //    var per2 = new Person({
+  //        firstName: "a",
+  //        lastName: "b"
+  //    });
 
-    //    var emp1 = new Employee({
-    //        firstName: "John",
-    //        lastName: "Smith",
-    //        job: "CTO"
-    //    });
-    //    var aspect = new EntityAspect(emp1);
-    //    var emp2 = new Employee({
-    //        firstName: "Fred",
-    //        lastName: "Jones",
-    //        job: "Eng"
-    //    });
-    //    new EntityAspect(emp2)
-    //    emp2.setProperty("firstName", "Bill");
-    //    ok(emp2.getProperty("firstName") === "Bill", "firstName should be Bill");
-    //    ok(emp2.getProperty("lastName") === "Jones", "lastName should be Jones");
-    //    ok(emp2.prevValues.length === 1, "prevValues should have length of 1");
+  //    var Employee = Person.extend({
+  //        defaults: {
+  //            job: null
+  //        }
+  //    });
 
-    //    equal(emp1.getProperty("firstName"), "John", "first name should be John");
-    //    equal(emp1.getProperty("lastName"), "Smith", "lastName should be Smith");
-    //    equal(emp1.getProperty("job"), "CTO", "job should be CTO");
+  //    metadataStore.trackUnmappedType(Employee, this.interceptor);
 
-    //    emp1.setProperty("firstName", "John L.");
-    //    emp1.setProperty("lastName", "Smythe");
-    //    ok(emp1.getProperty("firstName") === "John L.", "firstName should be 'John L'");
-    //    ok(emp1.getProperty("lastName") === "Smythe", "lastName should be Smythe");
+  //    var emp1 = new Employee({
+  //        firstName: "John",
+  //        lastName: "Smith",
+  //        job: "CTO"
+  //    });
+  //    var aspect = new EntityAspect(emp1);
+  //    var emp2 = new Employee({
+  //        firstName: "Fred",
+  //        lastName: "Jones",
+  //        job: "Eng"
+  //    });
+  //    new EntityAspect(emp2)
+  //    emp2.setProperty("firstName", "Bill");
+  //    ok(emp2.getProperty("firstName") === "Bill", "firstName should be Bill");
+  //    ok(emp2.getProperty("lastName") === "Jones", "lastName should be Jones");
+  //    ok(emp2.prevValues.length === 1, "prevValues should have length of 1");
 
-    //    ok(emp1.prevValues.length === 2);
-    //    // next line is needed for chrome.
-    //    new EntityAspect(per1);
-    //    per1.setProperty("firstName", "Jen");
-    //    ok(per1.getProperty("firstName") === "Jen");
-    //    ok(per1.prevValues.length === 1, "getPrevValues() length should be 1");
+  //    equal(emp1.getProperty("firstName"), "John", "first name should be John");
+  //    equal(emp1.getProperty("lastName"), "Smith", "lastName should be Smith");
+  //    equal(emp1.getProperty("job"), "CTO", "job should be CTO");
 
-    //});
+  //    emp1.setProperty("firstName", "John L.");
+  //    emp1.setProperty("lastName", "Smythe");
+  //    ok(emp1.getProperty("firstName") === "John L.", "firstName should be 'John L'");
+  //    ok(emp1.getProperty("lastName") === "Smythe", "lastName should be Smythe");
 
-    //test("class watcher - inherited - not backbone", function () {
-    //    if (testFns.modelLibrary === 'backbone') {
-    //        ok(true, "Skipped - NOT APPLICABLE");
-    //        return;
-    //    }
-    //    var metadataStore = new MetadataStore();
-    //    var Entity = function () {
+  //    ok(emp1.prevValues.length === 2);
+  //    // next line is needed for chrome.
+  //    new EntityAspect(per1);
+  //    per1.setProperty("firstName", "Jen");
+  //    ok(per1.getProperty("firstName") === "Jen");
+  //    ok(per1.prevValues.length === 1, "getPrevValues() length should be 1");
 
-    //    };
+  //});
 
-    //    var Person = function (firstName, lastName) {
-    //        this.firstName = firstName;
-    //        this.lastName = lastName;
-    //    };
-    //    Person.prototype = new Entity;
+  //test("class watcher - inherited - not backbone", function () {
+  //    if (testFns.modelLibrary === 'backbone') {
+  //        ok(true, "Skipped - NOT APPLICABLE");
+  //        return;
+  //    }
+  //    var metadataStore = new MetadataStore();
+  //    var Entity = function () {
 
-    //    metadataStore.trackUnmappedType(Person, this.interceptor);
+  //    };
 
-    //    var per1 = new Person("Jane", "Doe");
-    //    var per2 = new Person("a", "b");
+  //    var Person = function (firstName, lastName) {
+  //        this.firstName = firstName;
+  //        this.lastName = lastName;
+  //    };
+  //    Person.prototype = new Entity;
 
-    //    var Employee = function (firstName, lastName, job) {
-    //        Person.call(this, firstName, lastName);
-    //        this.job = job;
-    //    };
-    //    Employee.prototype = new Person;
+  //    metadataStore.trackUnmappedType(Person, this.interceptor);
 
-    //    metadataStore.trackUnmappedType(Employee, this.interceptor);
+  //    var per1 = new Person("Jane", "Doe");
+  //    var per2 = new Person("a", "b");
 
-    //    var emp1 = new Employee("John", "Smith", "CTO");
-    //    var aspect = new EntityAspect(emp1);
-    //    var emp2 = new Employee("Fred", "Jones", "Eng");
-    //    new EntityAspect(emp2)
-    //    emp2.setProperty("firstName", "Bill");
-    //    ok(emp2.getProperty("firstName") === "Bill", "firstName should be Bill");
-    //    ok(emp2.getProperty("lastName") === "Jones", "lastName should be Jones");
-    //    ok(emp2.prevValues.length === 1, "prevValues should have length of 1");
+  //    var Employee = function (firstName, lastName, job) {
+  //        Person.call(this, firstName, lastName);
+  //        this.job = job;
+  //    };
+  //    Employee.prototype = new Person;
 
-    //    equal(emp1.getProperty("firstName"), "John", "first name should be John");
-    //    equal(emp1.getProperty("lastName"), "Smith", "lastName should be Smith");
-    //    equal(emp1.getProperty("job"), "CTO", "job should be CTO");
+  //    metadataStore.trackUnmappedType(Employee, this.interceptor);
 
-    //    emp1.setProperty("firstName", "John L.");
-    //    emp1.setProperty("lastName", "Smythe");
-    //    ok(emp1.getProperty("firstName") === "John L.", "firstName should be 'John L'");
-    //    ok(emp1.getProperty("lastName") === "Smythe", "lastName should be Smythe");
+  //    var emp1 = new Employee("John", "Smith", "CTO");
+  //    var aspect = new EntityAspect(emp1);
+  //    var emp2 = new Employee("Fred", "Jones", "Eng");
+  //    new EntityAspect(emp2)
+  //    emp2.setProperty("firstName", "Bill");
+  //    ok(emp2.getProperty("firstName") === "Bill", "firstName should be Bill");
+  //    ok(emp2.getProperty("lastName") === "Jones", "lastName should be Jones");
+  //    ok(emp2.prevValues.length === 1, "prevValues should have length of 1");
 
-    //    ok(emp1.prevValues.length === 2);
-    //    // next line is needed for chrome.
-    //    new EntityAspect(per1);
-    //    per1.setProperty("firstName", "Jen");
-    //    ok(per1.getProperty("firstName") === "Jen");
-    //    ok(per1.prevValues.length === 1, "getPrevValues() length should be 1");
+  //    equal(emp1.getProperty("firstName"), "John", "first name should be John");
+  //    equal(emp1.getProperty("lastName"), "Smith", "lastName should be Smith");
+  //    equal(emp1.getProperty("job"), "CTO", "job should be CTO");
 
-    //});
+  //    emp1.setProperty("firstName", "John L.");
+  //    emp1.setProperty("lastName", "Smythe");
+  //    ok(emp1.getProperty("firstName") === "John L.", "firstName should be 'John L'");
+  //    ok(emp1.getProperty("lastName") === "Smythe", "lastName should be Smythe");
 
-    test("class watcher - 2", function () {
+  //    ok(emp1.prevValues.length === 2);
+  //    // next line is needed for chrome.
+  //    new EntityAspect(per1);
+  //    per1.setProperty("firstName", "Jen");
+  //    ok(per1.getProperty("firstName") === "Jen");
+  //    ok(per1.prevValues.length === 1, "getPrevValues() length should be 1");
 
-        var Customer = testFns.makeEntityCtor(function() {
-            this.companyName = null;
-        });
+  //});
 
-        var metadataStore = new MetadataStore();
-        metadataStore.trackUnmappedType(Customer, this.interceptor);
+  test("class watcher - 2", function () {
 
-        var cust1 = new Customer();
-        // next line is needed by chrome.
-        new EntityAspect(cust1);
-        cust1.setProperty("companyName", "foo");
-        cust1.setProperty("companyName", "bar");
-        ok(cust1.getProperty("companyName") === "bar");
-        ok(cust1.prevValues.length === 1);
-
-
+    var Customer = testFns.makeEntityCtor(function () {
+      this.companyName = null;
     });
 
-    test("class watcher - 3", function () {
+    var metadataStore = new MetadataStore();
+    metadataStore.trackUnmappedType(Customer, this.interceptor);
 
-        var Customer = testFns.makeEntityCtor(function() {
-            this.companyName = null;
-        });
+    var cust1 = new Customer();
+    // next line is needed by chrome.
+    new EntityAspect(cust1);
+    cust1.setProperty("companyName", "foo");
+    cust1.setProperty("companyName", "bar");
+    ok(cust1.getProperty("companyName") === "bar");
+    ok(cust1.prevValues.length === 1);
 
-        var metadataStore = new MetadataStore();
-        metadataStore.trackUnmappedType(Customer, this.interceptor);
 
-        var cust1 = new Customer();
-        // next line is needed by Chrome.
-        new EntityAspect(cust1);
-        cust1.setProperty("companyName", "foo");
-        cust1.setProperty("companyName", "foox");
-        ok(cust1.prevValues.length === 1);
-        var oldInterceptor = Customer.prototype._$interceptor;
-        Customer.prototype._$interceptor = function (p, v, a) { a(v); };
-        cust1.setProperty("companyName", "bar");
-        ok(cust1.getProperty("companyName") === "bar");
-        ok(cust1.prevValues.length === 1);
-        Customer.prototype._$interceptor = oldInterceptor;
-        cust1.setProperty("companyName", "foo2");
-        ok(cust1.getProperty("companyName") == "foo2");
-        ok(cust1.prevValues.length === 2);
+  });
 
+  test("class watcher - 3", function () {
+
+    var Customer = testFns.makeEntityCtor(function () {
+      this.companyName = null;
     });
+
+    var metadataStore = new MetadataStore();
+    metadataStore.trackUnmappedType(Customer, this.interceptor);
+
+    var cust1 = new Customer();
+    // next line is needed by Chrome.
+    new EntityAspect(cust1);
+    cust1.setProperty("companyName", "foo");
+    cust1.setProperty("companyName", "foox");
+    ok(cust1.prevValues.length === 1);
+    var oldInterceptor = Customer.prototype._$interceptor;
+    Customer.prototype._$interceptor = function (p, v, a) {
+      a(v);
+    };
+    cust1.setProperty("companyName", "bar");
+    ok(cust1.getProperty("companyName") === "bar");
+    ok(cust1.prevValues.length === 1);
+    Customer.prototype._$interceptor = oldInterceptor;
+    cust1.setProperty("companyName", "foo2");
+    ok(cust1.getProperty("companyName") == "foo2");
+    ok(cust1.prevValues.length === 2);
+
+  });
 
 
 })(breezeTestFns);

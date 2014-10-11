@@ -116,8 +116,8 @@
   test("one to one", function () {
     var manager = newEm();
     var query = new breeze.EntityQuery()
-       .from("Orders")
-       .where("internationalOrder", "==", null);
+        .from("Orders")
+        .where("internationalOrder", "==", null);
     stop();
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
@@ -130,8 +130,8 @@
   test("query with bad criteria", function () {
     var manager = newEm();
     var query = new breeze.EntityQuery()
-       .from("Employees")
-       .where("badPropName", "==", "7");
+        .from("Employees")
+        .where("badPropName", "==", "7");
     stop();
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
@@ -144,8 +144,8 @@
   test("query with bad criteria - 2", function () {
     var manager = newEm();
     var query = new breeze.EntityQuery()
-       .from("AltCustomers")
-       .where("xxxx", "<", 7);
+        .from("AltCustomers")
+        .where("xxxx", "<", 7);
     stop();
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
@@ -329,7 +329,7 @@
 
   });
 
-  test("OData predicate - date(year) function", function () {
+  test("query function expr - date(year) function", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "Mongo does not yet support the 'year' OData predicate");
       return;
@@ -348,7 +348,7 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("OData predicate - date(month) function", function () {
+  test("query function expr - date(month) function", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "Mongo does not yet support the 'year' OData predicate");
       return;
@@ -369,8 +369,8 @@
   });
 
   test("OData predicate - add ", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Mongo does not yet support the 'add' OData predicate");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Neither Mongo nor Sequelize supports the 'add' OData predicate");
       return;
     }
     var manager = newEm();
@@ -390,8 +390,8 @@
   });
 
   test("OData predicate - add combined with regular predicate", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Mongo does not yet support the 'add' OData predicate");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Neither Mongo nor Sequelize supports the 'add' OData predicate");
       return;
     }
     var manager = newEm();
@@ -525,8 +525,8 @@
     // var pred = new Predicate("employeeID", ">", 1).and("employeeID", "<", 6);
     var pred = new Predicate("shipCity", "startsWith", "A");
     var query = new breeze.EntityQuery.from("Orders")
-    .where(pred)
-    .orderBy("customerID");
+        .where(pred)
+        .orderBy("customerID");
     // .orderBy("customer.companyName")
     stop();
     var totalCount;
@@ -546,9 +546,9 @@
     // var pred = new Predicate("employeeID", ">", 1).and("employeeID", "<", 6);
     var pred = new Predicate("shipCity", "startsWith", "A");
     var query = new breeze.EntityQuery.from("Orders")
-    .where(pred)
-    // .orderBy("customerID");
-    .orderBy("customer.companyName")
+        .where(pred)
+      // .orderBy("customerID");
+        .orderBy("customer.companyName")
     stop();
     var totalCount;
     em.executeQuery(query).then(function (data) {
@@ -568,7 +568,7 @@
     stop();
     em.executeQuery(q).then(function (data) {
       var alfred = data.results[0];
-      var alfredsID = alfred.getProperty(testFns.customerKeyName);
+      var alfredsID = alfred.getProperty(testFns.customerKeyName).toLowerCase();
       ok(alfredsID === wellKnownData.alfredsID);
     }).fail(testFns.handleFail).fin(start);
   });
@@ -585,13 +585,20 @@
         ok(error.message.indexOf("Unable to locate") >= 0, "Bad error message");
       } else if (testFns.DEBUG_ODATA) {
         ok(error.message.indexOf("Not Found") >= 0, "Bad error message");
+      } else if (testFns.DEBUG_SEQUELIZE) {
+        ok(error.message.indexOf("Cannot find an entityType" > 0, "Bad error message"));
       } else {
         ok(error.message.indexOf("No HTTP resource was found") >= 0, "Bad error message");
       }
     }).fin(start);
   });
 
-  test("raw query string", function () {
+  test("raw OData query string", function () {
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Breeze-Sequelize does not support OData syntax");
+      return;
+    }
+
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - needs a toType for MONGO");
       return;
@@ -812,7 +819,6 @@
 
     }).fail(testFns.handleFail).fin(start);
   });
-
 
 
   test("query using jsonResultsAdapter", function () {
@@ -1161,24 +1167,24 @@
   test("query with two fields & contains", function () {
     var em = newEm();
     var q = EntityQuery.from("Employees")
-        .where("lastName", "startsWith", "firstName")
+        .where("notes", "contains", "firstName")
         .take(20);
     stop();
     em.executeQuery(q).then(function (data) {
       var r = data.results;
-      ok(r.length > 0, "should be at least one record where lastName startsWith firstName");
+      ok(r.length > 0, "should be at least one record where notes contains firstName");
       r.forEach(function (r) {
-        var lastNm = r.getProperty("lastName").toLowerCase();
+        var notes = r.getProperty("notes").toLowerCase();
         var firstNm = r.getProperty("firstName").toLowerCase();
-        ok(lastNm.indexOf(firstNm) >= 0, "lastName should start with firstName - check the database first this may be a test data bug");
+        ok(notes.indexOf(firstNm) >= 0, "notes should contain firstName");
       });
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query with two fields & contains literal", function () {
+  test("query with two fields & startsWith literal", function () {
     var em = newEm();
     var q = EntityQuery.from("Employees")
-        // .where("lastName", "startsWith", "Dav")
+      // .where("lastName", "startsWith", "Dav")
         .where({ lastName: { "startsWith": "Dav" } })
         .take(20);
     stop();
@@ -1192,11 +1198,11 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query with two fields & contains literal forced", function () {
+  test("query with two fields & startsWith literal forced", function () {
     var em = newEm();
     var q = EntityQuery.from("Employees")
         .where("lastName", "startsWith", { value: "firstName", isLiteral: true })
-        // .where("lastName", "startsWith", "firstName", true)
+      // .where("lastName", "startsWith", "firstName", true)
         .take(20);
     stop();
     em.executeQuery(q).then(function (data) {
@@ -1576,7 +1582,6 @@
   });
 
 
-
   test("navigation results notification", function () {
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
@@ -1619,8 +1624,6 @@
       ok(query === sameQuery, "not the same query");
     }).fail(testFns.handleFail).fin(start);
   });
-
-
 
 
   test("duplicates after relation query", function () {
@@ -1742,7 +1745,7 @@
     // This is what the type of a date should be
     var someDate = new Date();
     ok("object" === typeof someDate,
-        "typeof someDate is " + typeof someDate);
+            "typeof someDate is " + typeof someDate);
 
     var firstOrderQuery = new EntityQuery("Orders")
         .where("orderDate", ">", new Date(1998, 3, 1))
@@ -1757,7 +1760,7 @@
 
       // THIS TEST FAILS!
       ok("object" === typeof orderDate,
-          "typeof orderDate is " + typeof orderDate);
+              "typeof orderDate is " + typeof orderDate);
       ok(core.isDate(orderDate), "should be a date");
       start();
     }).fail(testFns.handleFail);
@@ -1853,10 +1856,10 @@
 
     // SHOULD BE THE SAME. EITHER WAY ITS AN ATTACHED UNCHANGED ENTITY
     ok(customer.entityAspect.entityState.isUnchanged(),
-        "Attached entity is in state " + customer.entityAspect.entityState);
+            "Attached entity is in state " + customer.entityAspect.entityState);
 
     ok(em.getEntities().length === 1,
-        "# of entities in cache is " + em.getEntities().length);
+            "# of entities in cache is " + em.getEntities().length);
 
     // this refresh query will fill the customer values from remote storage
     var refreshQuery = breeze.EntityQuery.fromEntities(customer);
@@ -1880,14 +1883,12 @@
 
         // This test should succeed; it fails because of above bug!!!
         ok(results[0] === customer,
-            "refresh query result is the same as the customer in cache" +
+                "refresh query result is the same as the customer in cache" +
                 " whose updated name is " + customer.getProperty("companyName"));
       }
       start();
     }).fail(testFns.handleFail);
   });
-
-
 
 
   test("query uni (1-n) region and territories", function () {
@@ -2031,7 +2032,6 @@
   });
 
 
-
   test("not predicate with null", function () {
     var em = newEm();
 
@@ -2126,12 +2126,11 @@
       ok(false, "should not get here");
 
     }).fail(function (err) {
-      if (testFns.DEBUG_WEBAPI) {
-        ok(err.message.indexOf("orderDetails") >= 1, " message should be about missing OrderDetails property");
-      } else if (testFns.DEBUG_ODATA) {
+      if (testFns.DEBUG_ODATA) {
         ok(err.message.indexOf("Product") >= 1, "should be an error message about the Product query");
+      } else {
+        ok(err.message.indexOf("orderDetails") >= 1, " message should be about missing OrderDetails property");
       }
-
     }).fin(start);
   });
 
@@ -2161,9 +2160,9 @@
     var em = newEm();
 
     var query = new EntityQuery()
-         .from("Products")
-         .where("category.categoryName", "startswith", "S")
-         .expand("category");
+        .from("Products")
+        .where("category.categoryName", "startswith", "S")
+        .expand("category");
     var queryUrl = query._toUri(em);
     stop();
     em.executeQuery(query).then(function (data) {
@@ -2340,7 +2339,7 @@
       ok(!em.hasChanges(), "should not have any changes");
       ok(em.getChanges().length === 0, "getChanges should return 0 results");
       var orders = data.results;
-      ok(orders.length == 5, "should have 5 orders");
+      ok(orders.length > 0, "should have at least 1 order with no employeeID - check the db this may be a test bug");
       orders.map(function (order) {
         var emp = order.getProperty("employee");
         ok(emp == null, "employee should be null");
@@ -2437,12 +2436,12 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query expr - toLower", function () {
+  test("query function expr - toLower", function () {
     var em = newEm();
 
     var query = new EntityQuery()
         .from("Customers")
-        // .where("toLower(companyName)", "startsWith", "c");
+      // .where("toLower(companyName)", "startsWith", "c");
         .where({ "toLower(companyName)": { startsWith: "C" } });
     var queryUrl = query._toUri(em);
     stop();
@@ -2457,7 +2456,7 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query expr - toUpper/substring", function () {
+  test("query function expr - toUpper/substring", function () {
     var em = newEm();
 
     var query = new EntityQuery()
@@ -2475,7 +2474,7 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query expr - length", function () {
+  test("query function expr - length", function () {
     var em = newEm();
 
     var query = new EntityQuery()
@@ -2493,7 +2492,7 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query expr - navigation then length", function () {
+  test("query function expr - navigation then length", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - expand is not yet supported");
       return;
@@ -2518,7 +2517,7 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("bad query expr -  bad property name", function () {
+  test("bad query function expr -  bad property name", function () {
     var em = newEm();
 
     var query = new EntityQuery()
@@ -2536,14 +2535,13 @@
   });
 
 
-
   test("bad filter operator", function () {
     var em = newEm();
 
     try {
       var query = new EntityQuery()
-      .from("Customers")
-      .where("companyName", "startsXWith", "C");
+          .from("Customers")
+          .where("companyName", "startsXWith", "C");
       ok(false, "shouldn't get here");
     } catch (error) {
       ok(error instanceof Error);
@@ -2619,7 +2617,9 @@
       return em.executeQuery(q2);
     }).then(function (data2) {
       ok(data2.results.length > 0, "no data returned");
-      ok(data2.results.every(function (r) { return r.entityType === orderType; }));
+      ok(data2.results.every(function (r) {
+        return r.entityType === orderType;
+      }));
       var orders = emp.getProperty("orders");
       ok(orders.length === data2.results.length, "local array does not match queried results");
     }).fail(testFns.handleFail).fin(start);
@@ -2660,7 +2660,9 @@
       return emp.entityAspect.loadNavigationProperty("orders");
     }).then(function (data2) {
       ok(data2.results.length > 0, "no data returned");
-      ok(data2.results.every(function (r) { return r.entityType.shortName = "Order"; }));
+      ok(data2.results.every(function (r) {
+        return r.entityType.shortName = "Order";
+      }));
       var orders = emp.getProperty("orders");
       ok(orders.length === data2.results.length, "local array does not match queried results");
     }).fail(testFns.handleFail).fin(start);
@@ -2709,7 +2711,9 @@
       return orders.load();
     }).then(function (data2) {
       ok(data2.results.length > 0, "no data returned");
-      ok(data2.results.every(function (r) { return r.entityType === orderType; }));
+      ok(data2.results.every(function (r) {
+        return r.entityType === orderType;
+      }));
       ok(orders.length === data2.results.length, "local array does not match queried results");
     }).fail(testFns.handleFail).fin(start);
 

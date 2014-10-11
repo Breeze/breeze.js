@@ -10147,7 +10147,7 @@ breeze.NamingConvention = NamingConvention;
         this.op = null;
       }
       if (this.preds.length == 1) {
-        return preds[0];
+        return this.preds[0];
       }
     };
     
@@ -15453,8 +15453,9 @@ breeze.SaveOptions = SaveOptions;
         var data = httpResponse.data;
         try {
           var rData;
-          if (data && data.Results) {
-            rData = { results: data.Results, inlineCount: data.InlineCount, httpResponse: httpResponse };
+          var results = data && (data.results || data.Results);
+          if (results) {
+            rData = { results: results, inlineCount: data.inlineCount || data.InlineCount, httpResponse: httpResponse };
           } else {
             rData = { results: data, httpResponse: httpResponse };
           }
@@ -15639,27 +15640,16 @@ breeze.SaveOptions = SaveOptions;
       err.message = messagePrefix + "; " + err.message;
     }
     return deferred.reject(err);
-  };
+  }
 
   function createHttpError(httpResponse) {
     var err = new Error();
     err.httpResponse = httpResponse;
     err.status = httpResponse.status;
-    var errObj = httpResponse.data;
-    // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
-    // if not do it here.
-    if (typeof errObj === "string") {
-      try {
-        errObj = JSON.parse(errObj);
-      } catch (e) {
-      }
-      ;
-    }
-
-    processErrors(err, errObj, httpResponse);
+    processErrors(err, httpResponse);
     proto._catchNoConnectionError(err);
     return err;
-  };
+  }
 
   // Put this at the bottom of your http error analysis
   proto._catchNoConnectionError = function (err) {
@@ -15669,33 +15659,50 @@ breeze.SaveOptions = SaveOptions;
     }
   }
 
-  function processErrors(err, errObj, httpResponse) {
-    if (errObj) {
-      var tmp = errObj;
-      do {
-        err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
-        tmp = tmp.InnerException;
-      } while (tmp);
-      var saveContext = httpResponse.saveContext;
-      var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
-      if (saveContext && entityErrors) {
-        var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
-        err.entityErrors = entityErrors.map(function (e) {
-          return {
-            errorName: e.ErrorName,
-            entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
-            keyValues: e.KeyValues,
-            propertyName: e.PropertyName && propNameFn(e.PropertyName),
-            errorMessage: e.ErrorMessage
-          };
-        });
-        if (!err.message) {
-          err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
-        }
-      }
-    } else {
+
+  function processErrors(err, httpResponse) {
+    var errObj = httpResponse.data;
+
+    if (!errObj) {
       err.message = httpResponse.error && httpResponse.error.toString();
+      return;
     }
+
+    // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
+    // if not do it here.
+    if (typeof errObj === "string") {
+      try {
+        errObj = JSON.parse(errObj);
+      } catch (e) {
+        // sometimes httpResponse.data is just the error message itself
+        err.message = errObj;
+        return;
+      }
+    }
+
+    var tmp = errObj;
+    do {
+      err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
+      tmp = tmp.InnerException;
+    } while (tmp);
+    var saveContext = httpResponse.saveContext;
+    var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
+    if (saveContext && entityErrors) {
+      var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
+      err.entityErrors = entityErrors.map(function (e) {
+        return {
+          errorName: e.ErrorName,
+          entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
+          keyValues: e.KeyValues,
+          propertyName: e.PropertyName && propNameFn(e.PropertyName),
+          errorMessage: e.ErrorMessage
+        };
+      });
+      if (!err.message) {
+        err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
+      }
+    }
+
   }
 
   return ctor;
