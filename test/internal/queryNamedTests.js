@@ -60,7 +60,7 @@
     var query = EntityQuery.from("CustomerFirstOrDefault");
     stop();
     em.executeQuery(query).then(function (data) {
-      ok(data.results.length === 0);
+      ok(data.results.length === 0, "expected 0 results");
     }).fail(testFns.handleFail).fin(start);
 
   });
@@ -320,7 +320,7 @@
     em.executeQuery(q).then(function (data) {
       ok(false, "should not get here");
     }).fail(function (e) {
-      if (testFns.DEBUG_MONGO) {
+      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO) {
         ok(e.message.indexOf("companyName") >= 0, "companyName should have been in message");
       } else {
         ok(e.message.indexOf("foo") >= 0, "foo should have been in message");
@@ -354,7 +354,7 @@
     query.execute().then(function (data) {
       var names = data.results;
       ok(names.length > 0);
-      if (testFns.DEBUG_MONGO) {
+      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO) {
         var cname = names[0].companyName;
         ok(typeof cname === "string", "companyName should be a string");
       } else {
@@ -395,8 +395,8 @@
 
 
   test("project enumerables", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - .NET specific test");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "NA for Mongo/Sequelize - .NET specific test");
       return;
     }
 
@@ -415,11 +415,10 @@
   });
 
   test("project enumerables with filter", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - .NET specific test");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "NA for Mongo/Sequelize - .NET specific test");
       return;
     }
-
     var em = newEm();
     var query = EntityQuery.from("TypeEnvelopes")
       // .where("name.length",">", 10)   // OData filtering on nested anon props seem to work

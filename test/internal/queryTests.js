@@ -27,12 +27,28 @@
     }
   });
 
+  test("query with 'in'", function () {
+      var em1 = newEm();
+      
+      var countries = ['Austria', 'Italy', 'Norway']
+      var query = EntityQuery.from("Customers")
+          .where("country", 'in', countries);
+      stop();
+      em1.executeQuery(query).then(function (data) {
+        var r = data.results;
+        var isOk = r.every(function (cust) {
+            return countries.indexOf(cust.country) >= 0;
+        })
+        ok(isOk, "should be able to verify in test");
+        var r2 = em1.executeQueryLocally(query);
+        ok(r2.length === r.length);
+      }).fail(testFns.handleFail).fin(start);
+  });
 
-  //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
-  //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
-  //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
-  //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
-
+    //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
+    //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
+    //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
+    //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
   test("query nav prop change and expand", function () {
     var em1 = newEm();
     var em2 = newEm();

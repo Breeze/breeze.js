@@ -9871,22 +9871,18 @@ breeze.NamingConvention = NamingConvention;
     }
 
     proto.toJSONExt = function(context) {
-      return this.visit(toJSONVisitor, context);
+      return this.visit(context, toJSONVisitor);
     }
 
     proto.toFunction = function(context) {
-      return this.visit(toFunctionVisitor, context);
+      return this.visit(context, toFunctionVisitor);
     }
 
     proto.toString = function () {
       return JSON.stringify(this);
     };
 
-    proto.visit = function(visitor, context) {
-      var fn = visitor[this.visitorMethodName];
-      if (fn == null) {
-        throw new Error("Unable to locate method: " + this.visitorMethodName + " on visitor");
-      }
+    proto.visit = function(context, visitor) {
       if (__isEmpty(context)) {
         context = { entityType: null };
       } else if (context instanceof EntityType) {
@@ -9895,18 +9891,28 @@ breeze.NamingConvention = NamingConvention;
         throw new Error("All visitor methods must be called with a context object containing at least an 'entityType' property");
       }
 
+      if (visitor) {
+        context.visitor = visitor;
+      } else {
+        visitor = context.visitor;
+      }
+      var fn = visitor[this.visitorMethodName];
+      if (fn == null) {
+        throw new Error("Unable to locate method: " + this.visitorMethodName + " on visitor");
+      }
+
+
       var entityType = context.entityType;
       // don't both validating if already done so ( or if no _validate method
       if (this._validate && entityType == null || this._entityType !== entityType) {
         // don't need to capture return value because validation fn doesn't have one.
-        this._validate(entityType, context.useNameOnServer);
+        this._validate(entityType, context.usesNameOnServer);
         this._entityType = entityType;
       }
 
       // args = context, arg1, args2, ...
       var args = Array.prototype.slice.call(arguments, 1);
-      if (!context.visitor) context.visitor = visitor;
-      return this._visit(fn, visitor, context);
+      return fn.call(this, context);
     }
 
     proto._initialize = function (visitorMethodName,  opMap) {
@@ -10029,10 +10035,6 @@ breeze.NamingConvention = NamingConvention;
 
     proto._validate = __noop;
 
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context)
-    };
-    
     return ctor;
   })();
   
@@ -10047,12 +10049,8 @@ breeze.NamingConvention = NamingConvention;
       'not': { aliases: [ '!', '~' ] }
     });
 
-    proto._validate = function(entityType, useNameOnServer) {
-      this.pred._validate(entityType, useNameOnServer);
-    };
-
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context, this.pred.visit(visitor, context));
+    proto._validate = function(entityType, usesNameOnServer) {
+      this.pred._validate(entityType, usesNameOnServer);
     };
 
     return ctor;
@@ -10097,12 +10095,15 @@ breeze.NamingConvention = NamingConvention;
       'contains': {
         aliases: ["substringof"],
         isFunction: true
+      },
+      'in': {
+
       }
     });
 
 
-    proto._validate = function(entityType, useNameOnServer) {
-      var expr1Context = { entityType: entityType, useNameOnServer: useNameOnServer };
+    proto._validate = function(entityType, usesNameOnServer) {
+      var expr1Context = { entityType: entityType, usesNameOnServer: usesNameOnServer };
       this.expr1 = createExpr(this.expr1Source, expr1Context);
       if (this.expr1 == null) {
         throw new Error("Unable to validate 1st expression: " + this.expr1Source);
@@ -10112,6 +10113,9 @@ breeze.NamingConvention = NamingConvention;
         throw new Error("The left hand side of a binary predicate cannot be a literal expression, it must be a valid property or functional predicate expression: " + this.expr1Source);
       }
 
+      if (this.op.key == 'in' && !Array.isArray(this.expr2Source)) {
+        throw new Error("The 'in' operator requires that its right hand argument be an array");
+      }
       var expr2Context = __extend(expr1Context, { isRHS: true, dataType: this.expr1.dataType });
       this.expr2 = createExpr(this.expr2Source, expr2Context );
       if (this.expr2 == null) {
@@ -10122,10 +10126,6 @@ breeze.NamingConvention = NamingConvention;
         this.expr1.dataType = this.expr2.dataType;
       }
     }
-
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context, this.expr1.visit(visitor, context), this.expr2.visit(visitor, context));
-    };
 
     return ctor;
   })();
@@ -10157,19 +10157,12 @@ breeze.NamingConvention = NamingConvention;
       'or': { aliases: [ '||' ] }
     });
 
-    proto._validate = function(entityType, useNameOnServer) {
+    proto._validate = function(entityType, usesNameOnServer) {
       this.preds.every(function (pred) {
-        pred._validate(entityType, useNameOnServer);
+        pred._validate(entityType, usesNameOnServer);
       });
     }
 
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context, this.preds.map(function(pred) {
-        return pred.visit(visitor, context);
-      }));
-    };
-
-    
     return ctor;
   })();
   
@@ -10188,20 +10181,14 @@ breeze.NamingConvention = NamingConvention;
       'all': { aliases: ["every"] }
     });
 
-    proto._validate = function(entityType, useNameOnServer) {
-      this.expr = createExpr(this.exprSource, { entityType: entityType, useNameOnServer: useNameOnServer });
+    proto._validate = function(entityType, usesNameOnServer) {
+      this.expr = createExpr(this.exprSource, { entityType: entityType, usesNameOnServer: usesNameOnServer });
       // can't really know the predicateEntityType unless the original entity type was known.
       if (entityType == null || entityType.isAnonymous) {
         this.expr.dataType = null;
       }
-      this.pred._validate(this.expr.dataType, useNameOnServer);
+      this.pred._validate(this.expr.dataType, usesNameOnServer);
     }
-
-    proto._visit = function(fn, visitor, context) {
-      var predContext = __extend({}, context);
-      predContext.entityType = this.expr.dataType;
-      return fn.call(this, context, this.expr.visit(visitor, context), this.pred.visit(visitor, predContext));
-    };
 
     return ctor;
   })();
@@ -10212,9 +10199,6 @@ breeze.NamingConvention = NamingConvention;
     this.visit = Predicate.prototype.visit;
     // default impls - may be overridden
     this._validate = __noop;
-    this._visit = function(fn, visitor, context) {
-      return fn.call(this, context);
-    };
   }
 
   var LitExpr = (function () {
@@ -10226,8 +10210,13 @@ breeze.NamingConvention = NamingConvention;
       // that we should NOT attempt to parse it but just leave it alone
       // for now - this is usually because it is part of a Func expr.
       dataType = dataType || DataType.fromValue(value);
+
       if (dataType && dataType.parse) {
-        this.value = dataType.parse(value, typeof value);
+        if (Array.isArray(value)) {
+          this.value = value.map(function(v) { return dataType.parse(v, typeof v) });
+        } else {
+          this.value = dataType.parse(value, typeof value);
+        }
       } else {
         this.value = value;
       }
@@ -10262,10 +10251,10 @@ breeze.NamingConvention = NamingConvention;
     };
     var proto = ctor.prototype = new PredicateExpression('propExpr');
 
-    proto._validate = function(entityType, useNameOnServer) {
+    proto._validate = function(entityType, usesNameOnServer) {
 
       if (entityType == null || entityType.isAnonymous) return;
-      var props = entityType.getPropertiesOnPath(this.propertyPath, useNameOnServer, false);
+      var props = entityType.getPropertiesOnPath(this.propertyPath, usesNameOnServer, false);
 
       if (!props) {
         var msg = __formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
@@ -10285,10 +10274,10 @@ breeze.NamingConvention = NamingConvention;
   
   var FnExpr = (function () {
     
-    var ctor = function (fnName, exprArgs) {
-      // 4 public props: fnName, exprArgs, localFn, dataType
+    var ctor = function (fnName, exprs) {
+      // 4 public props: fnName, exprs, localFn, dataType
       this.fnName = fnName;
-      this.exprArgs = exprArgs;
+      this.exprs = exprs;
       var qf = _funcMap[fnName];
       if (qf == null) {
         throw new Error("Unknown function: " + fnName);
@@ -10298,17 +10287,11 @@ breeze.NamingConvention = NamingConvention;
     };
     var proto = ctor.prototype = new PredicateExpression('fnExpr');
 
-    proto._validate = function(entityType, useNameOnServer) {
-      this.exprArgs.forEach(function (expr) {
-        expr._validate(entityType, useNameOnServer);
+    proto._validate = function(entityType, usesNameOnServer) {
+      this.exprs.forEach(function (expr) {
+        expr._validate(entityType, usesNameOnServer);
       });
     }
-
-    proto._visit = function(fn, visitor, context) {
-      return fn.call(this, context, this.exprArgs.map(function(expr) {
-        return expr.visit(visitor, context);
-      }));
-    };
 
     // TODO: add dataTypes for the args next - will help to infer other dataTypes.
     var _funcMap = ctor.funcMap = {
@@ -10421,6 +10404,14 @@ breeze.NamingConvention = NamingConvention;
   function createExpr(source, exprContext) {
     var entityType = exprContext.entityType;
 
+    // the right hand side of an 'in' clause
+    if (Array.isArray(source)) {
+      if (!exprContext.isRHS) {
+        throw new Error("Array expressions are only permitted on the right hand side of a BinaryPredicate");
+      }
+      return new LitExpr(source, exprContext.dataType);
+    }
+
     if (!__isString(source)) {
       if (source != null && __isObject(source) && (!__isDate(source))) {
         if (source.value === undefined) {
@@ -10431,7 +10422,7 @@ breeze.NamingConvention = NamingConvention;
         } else {
           // we want to insure that any LitExpr created this way is tagged with 'hasExplicitDataType: true'
           // because we want to insure that if we roundtrip thru toJSON that we don't
-          // accidently reinterpret this node as a PropExpr.
+          // accidentally reinterpret this node as a PropExpr.
           // return new LitExpr(source.value, source.dataType || context.dataType, !!source.dataType);
           return new LitExpr(source.value, source.dataType || exprContext.dataType, true);
         }
@@ -10457,7 +10448,7 @@ breeze.NamingConvention = NamingConvention;
     }
 
     var expr = parseExpr(source, tokens, exprContext);
-    expr._validate(entityType, exprContext.useNameOnServer);
+    expr._validate(entityType, exprContext.usesNameOnServer);
     return expr;
   }
 
@@ -10490,7 +10481,7 @@ breeze.NamingConvention = NamingConvention;
         var mayBeIdentifier = RX_IDENTIFIER.test(value);
         if (mayBeIdentifier) {
           // if (entityType.getProperty(value, false) != null) {
-          if (entityType.getPropertiesOnPath(value, exprContext.useNameOnServer, false) != null) {
+          if (entityType.getPropertiesOnPath(value, exprContext.usesNameOnServer, false) != null) {
             return new PropExpr(value);
           }
         }
@@ -10517,10 +10508,10 @@ breeze.NamingConvention = NamingConvention;
       // the value if the expr is a literal
       newContext.dataType = DataType.Undefined;
       newContext.isFnArg = true;
-      var exprArgs = args.map(function (a) {
+      var exprs = args.map(function (a) {
         return parseExpr(a, tokens, newContext);
       });
-      return new FnExpr(fnName, exprArgs);
+      return new FnExpr(fnName, exprs);
     } catch (e) {
       return null;
     }
@@ -10533,7 +10524,8 @@ breeze.NamingConvention = NamingConvention;
         throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
       },
       
-      unaryPredicate: function (context, predFn) {
+      unaryPredicate: function (context) {
+        var predFn = this.pred.visit(context);
         switch (this.op.key) {
           case "not":
             return function (entity) {
@@ -10544,7 +10536,9 @@ breeze.NamingConvention = NamingConvention;
         }
       },
       
-      binaryPredicate: function (context, expr1Fn, expr2Fn) {
+      binaryPredicate: function (context) {
+        var expr1Fn = this.expr1.visit(context);
+        var expr2Fn = this.expr2.visit(context);
         var dataType = this.expr1.dataType || this.expr2.dataType;
         var lqco = context.entityType.metadataStore.localQueryComparisonOptions;
         var predFn = getBinaryPredicateFn(this, dataType, lqco);
@@ -10556,7 +10550,10 @@ breeze.NamingConvention = NamingConvention;
         };
       },
       
-      andOrPredicate: function (context, predFns) {
+      andOrPredicate: function (context) {
+        var predFns = this.preds.map(function(pred) {
+          return pred.visit(context);
+        });
         switch (this.op.key) {
           case "and":
             return function (entity) {
@@ -10577,7 +10574,11 @@ breeze.NamingConvention = NamingConvention;
         }
       },
       
-      anyAllPredicate: function (context, exprFn, predFn) {
+      anyAllPredicate: function (context) {
+        var exprFn = this.expr.visit(context);
+        var newContext = __extend({}, context);
+        newContext.entityType = this.expr.dataType;
+        var predFn = this.pred.visit(newContext);
         var anyAllPredFn = getAnyAllPredicateFn(this.op);
         return function (entity) {
           return anyAllPredFn(exprFn(entity), predFn);
@@ -10605,7 +10606,10 @@ breeze.NamingConvention = NamingConvention;
         }
       },
       
-      fnExpr: function (context, exprFns) {
+      fnExpr: function (context) {
+        var exprFns = this.exprs.map(function(expr) {
+          return expr.visit(context);
+        });
         var that = this;
         return function (entity) {
           var values = exprFns.map(function (exprFn) {
@@ -10696,6 +10700,13 @@ breeze.NamingConvention = NamingConvention;
             return stringContains(v1, v2, lqco);
           };
           break;
+        case 'in':
+          predFn = function (v1, v2) {
+            v1 = mc(v1);
+            v2 = v2.map(function(v) { return mc(v) });
+            return v2.indexOf(v1) >= 0;
+          };
+          break;
         default:
           return null;
       }
@@ -10752,13 +10763,16 @@ breeze.NamingConvention = NamingConvention;
         return this.value;
       },
       
-      unaryPredicate: function (context, predVal) {
+      unaryPredicate: function (context) {
+        var predVal = this.pred.visit(context);
         var json = {};
         json[this.op.key] = predVal;
         return json;
       },
       
-      binaryPredicate: function (context, expr1Val, expr2Val) {
+      binaryPredicate: function (context) {
+        var expr1Val = this.expr1.visit(context);
+        var expr2Val = this.expr2.visit(context);
         var json = {};
         if (this.expr2 instanceof PropExpr) {
           expr2Val = { value: expr2Val, isProperty: true };
@@ -10773,7 +10787,10 @@ breeze.NamingConvention = NamingConvention;
         return json;
       },
       
-      andOrPredicate: function (context, predVals) {
+      andOrPredicate: function (context) {
+        var predVals = this.preds.map(function(pred) {
+          return pred.visit(context);
+        });
         var json;
         // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
@@ -10788,11 +10805,15 @@ breeze.NamingConvention = NamingConvention;
         return json;
       },
       
-      anyAllPredicate: function (context, expr1Val, predVal) {
+      anyAllPredicate: function (context) {
+        var exprVal = this.expr.visit(context);
+        var newContext = __extend({}, context);
+        newContext.entityType = this.expr.dataType;
+        var predVal = this.pred.visit(newContext);
         var json = {};
         var value = {};
         value[this.op.key] = predVal;
-        json[expr1Val] = value;
+        json[exprVal] = value;
         return json;
       },
       
@@ -10812,7 +10833,10 @@ breeze.NamingConvention = NamingConvention;
         }
       },
       
-      fnExpr: function (context, exprVals) {
+      fnExpr: function (context) {
+        var exprVals = this.exprs.map(function(expr) {
+          return expr.visit(context);
+        });
         return this.fnName + "(" + exprVals.join(",") + ")";
       }
     };
@@ -11023,7 +11047,8 @@ breeze.Predicate = Predicate;
   
   
   /**
-  Returns a new query with an added filter criteria. Can be called multiple times which means to 'and' with any existing Predicate.
+  Returns a new query with an added filter criteria; Can be called multiple times which means to 'and' with any existing
+  Predicate or can be called with null to clear all predicates.
   @example
       var query = new EntityQuery("Customers")
                 .where("CompanyName", "startsWith", "C");
@@ -11082,9 +11107,8 @@ breeze.Predicate = Predicate;
       }
     }
     return clone(this, "wherePredicate", wherePredicate);
-
   };
-  
+
   /**
   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
   @example
@@ -11319,6 +11343,12 @@ breeze.Predicate = Predicate;
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, "inlineCountEnabled", enabled);
   };
+
+  proto.useNameOnServer = function(usesNameOnServer) {
+    assertParam(usesNameOnServer, "usesNameOnServer").isBoolean().isOptional().check();
+    usesNameOnServer = (usesNameOnServer === undefined) ? true : !!usesNameOnServer;
+    return clone(this, "usesNameOnServer", usesNameOnServer);
+  }
   
   /**
   Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query
@@ -11711,6 +11741,7 @@ breeze.Predicate = Predicate;
       "expandClause",
       "inlineCountEnabled",
       "noTrackingEnabled",
+      "usesNameOnServer",
       "queryOptions",
       "entityManager",
       "dataService",
@@ -17143,7 +17174,7 @@ breeze.SaveOptions = SaveOptions;
     function toWhereODataFragment(wherePredicate) {
       if (!wherePredicate) return;
       // validation occurs inside of the toODataFragment call here.
-      return wherePredicate.visit(toODataFragmentVisitor, { entityType: entityType});
+      return wherePredicate.visit({ entityType: entityType}, toODataFragmentVisitor );
     }
 
     function toOrderByODataFragment(orderByClause) {
@@ -17198,8 +17229,8 @@ breeze.SaveOptions = SaveOptions;
     }
   };
 
-  breeze.Predicate.prototype.toODataFragment = function(config) {
-    return this.visit(toODataFragmentVisitor, config);
+  breeze.Predicate.prototype.toODataFragment = function(context) {
+    return this.visit( context, toODataFragmentVisitor);
   }
 
   var toODataFragmentVisitor = (function () {
@@ -17209,11 +17240,14 @@ breeze.SaveOptions = SaveOptions;
         return this.value;
       },
 
-      unaryPredicate: function (context, predVal) {
+      unaryPredicate: function (context) {
+        var predVal = this.pred.visit(context);
         return odataOpFrom(this) + " " + "(" + predVal + ")";
       },
 
-      binaryPredicate: function (context, expr1Val, expr2Val) {
+      binaryPredicate: function (context) {
+        var expr1Val = this.expr1.visit(context);
+        var expr2Val = this.expr2.visit(context);
         var prefix = context.prefix;
         if (prefix) {
           expr1Val = prefix + "/" + expr1Val
@@ -17221,7 +17255,12 @@ breeze.SaveOptions = SaveOptions;
 
         var odataOp = odataOpFrom(this);
 
-        if (this.op.isFunction) {
+        if (this.op.key == 'in') {
+          var result = expr2Val.map(function (v) {
+            return "(" + expr1Val + " eq " + v + ")";
+          }).join(" or ");
+          return result;
+        } else if (this.op.isFunction) {
           if (odataOp == "substringof") {
             return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
           } else {
@@ -17232,14 +17271,16 @@ breeze.SaveOptions = SaveOptions;
         }
       },
 
-      andOrPredicate: function (context, predVals) {
-        var result = predVals.map(function (predVal) {
+      andOrPredicate: function (context) {
+        var result = this.preds.map(function (pred) {
+          var predVal = pred.visit(context);
           return "(" + predVal + ")";
         }).join(" " + odataOpFrom(this) + " ");
         return result;
       },
 
-      anyAllPredicate: function (context, exprVal, predVal) {
+      anyAllPredicate: function (context) {
+        var exprVal = this.expr.visit(context);
         var prefix = context.prefix;
         if (prefix) {
           exprVal = prefix + "/" + exprVal;
@@ -17247,16 +17288,20 @@ breeze.SaveOptions = SaveOptions;
         } else {
           prefix = "x1";
         }
-        // can't use predVal because of prefix logic below.
+        // need to create a new context because of 'prefix'
         var newContext = breeze.core.extend({}, context);
         newContext.entityType = this.expr.dataType;
         newContext.prefix = prefix;
-        var newPredVal = this.pred.visit(context.visitor, newContext)
+        var newPredVal = this.pred.visit(newContext)
         return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
       },
 
       litExpr: function () {
-        return this.dataType.fmtOData(this.value);
+        if (Array.isArray(this.value)) {
+          return this.value.map(function(v) { return this.dataType.fmtOData(v)}, this);
+        } else {
+          return this.dataType.fmtOData(this.value);
+        }
       },
 
       propExpr: function (context) {
@@ -17265,7 +17310,10 @@ breeze.SaveOptions = SaveOptions;
         return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
       },
 
-      fnExpr: function (context, exprVals) {
+      fnExpr: function (context) {
+        var exprVals = this.exprs.map(function(expr) {
+          return expr.visit(context);
+        });
         return this.fnName + "(" + exprVals.join(",") + ")";
       }
     };

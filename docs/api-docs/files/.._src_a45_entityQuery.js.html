@@ -383,7 +383,8 @@
   
   
   /**
-  Returns a new query with an added filter criteria. Can be called multiple times which means to &#x27;and&#x27; with any existing Predicate.
+  Returns a new query with an added filter criteria; Can be called multiple times which means to &#x27;and&#x27; with any existing
+  Predicate or can be called with null to clear all predicates.
   @example
       var query = new EntityQuery(&quot;Customers&quot;)
                 .where(&quot;CompanyName&quot;, &quot;startsWith&quot;, &quot;C&quot;);
@@ -442,9 +443,8 @@
       }
     }
     return clone(this, &quot;wherePredicate&quot;, wherePredicate);
-
   };
-  
+
   /**
   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
   @example
@@ -679,6 +679,12 @@
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, &quot;inlineCountEnabled&quot;, enabled);
   };
+
+  proto.useNameOnServer = function(usesNameOnServer) {
+    assertParam(usesNameOnServer, &quot;usesNameOnServer&quot;).isBoolean().isOptional().check();
+    usesNameOnServer = (usesNameOnServer === undefined) ? true : !!usesNameOnServer;
+    return clone(this, &quot;usesNameOnServer&quot;, usesNameOnServer);
+  }
   
   /**
   Returns a query with the &#x27;noTracking&#x27; capability either enabled or disabled.  With &#x27;noTracking&#x27; enabled, the results of this query
@@ -1071,6 +1077,7 @@
       &quot;expandClause&quot;,
       &quot;inlineCountEnabled&quot;,
       &quot;noTrackingEnabled&quot;,
+      &quot;usesNameOnServer&quot;,
       &quot;queryOptions&quot;,
       &quot;entityManager&quot;,
       &quot;dataService&quot;,

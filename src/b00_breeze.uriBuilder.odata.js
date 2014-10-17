@@ -54,7 +54,7 @@
     function toWhereODataFragment(wherePredicate) {
       if (!wherePredicate) return;
       // validation occurs inside of the toODataFragment call here.
-      return wherePredicate.visit(toODataFragmentVisitor, { entityType: entityType});
+      return wherePredicate.visit({ entityType: entityType}, toODataFragmentVisitor );
     }
 
     function toOrderByODataFragment(orderByClause) {
@@ -109,8 +109,8 @@
     }
   };
 
-  breeze.Predicate.prototype.toODataFragment = function(config) {
-    return this.visit(toODataFragmentVisitor, config);
+  breeze.Predicate.prototype.toODataFragment = function(context) {
+    return this.visit( context, toODataFragmentVisitor);
   }
 
   var toODataFragmentVisitor = (function () {
@@ -120,11 +120,14 @@
         return this.value;
       },
 
-      unaryPredicate: function (context, predVal) {
+      unaryPredicate: function (context) {
+        var predVal = this.pred.visit(context);
         return odataOpFrom(this) + " " + "(" + predVal + ")";
       },
 
-      binaryPredicate: function (context, expr1Val, expr2Val) {
+      binaryPredicate: function (context) {
+        var expr1Val = this.expr1.visit(context);
+        var expr2Val = this.expr2.visit(context);
         var prefix = context.prefix;
         if (prefix) {
           expr1Val = prefix + "/" + expr1Val
@@ -132,7 +135,12 @@
 
         var odataOp = odataOpFrom(this);
 
-        if (this.op.isFunction) {
+        if (this.op.key == 'in') {
+          var result = expr2Val.map(function (v) {
+            return "(" + expr1Val + " eq " + v + ")";
+          }).join(" or ");
+          return result;
+        } else if (this.op.isFunction) {
           if (odataOp == "substringof") {
             return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
           } else {
@@ -143,14 +151,16 @@
         }
       },
 
-      andOrPredicate: function (context, predVals) {
-        var result = predVals.map(function (predVal) {
+      andOrPredicate: function (context) {
+        var result = this.preds.map(function (pred) {
+          var predVal = pred.visit(context);
           return "(" + predVal + ")";
         }).join(" " + odataOpFrom(this) + " ");
         return result;
       },
 
-      anyAllPredicate: function (context, exprVal, predVal) {
+      anyAllPredicate: function (context) {
+        var exprVal = this.expr.visit(context);
         var prefix = context.prefix;
         if (prefix) {
           exprVal = prefix + "/" + exprVal;
@@ -158,16 +168,20 @@
         } else {
           prefix = "x1";
         }
-        // can't use predVal because of prefix logic below.
+        // need to create a new context because of 'prefix'
         var newContext = breeze.core.extend({}, context);
         newContext.entityType = this.expr.dataType;
         newContext.prefix = prefix;
-        var newPredVal = this.pred.visit(context.visitor, newContext)
+        var newPredVal = this.pred.visit(newContext)
         return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
       },
 
       litExpr: function () {
-        return this.dataType.fmtOData(this.value);
+        if (Array.isArray(this.value)) {
+          return this.value.map(function(v) { return this.dataType.fmtOData(v)}, this);
+        } else {
+          return this.dataType.fmtOData(this.value);
+        }
       },
 
       propExpr: function (context) {
@@ -176,7 +190,10 @@
         return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
       },
 
-      fnExpr: function (context, exprVals) {
+      fnExpr: function (context) {
+        var exprVals = this.exprs.map(function(expr) {
+          return expr.visit(context);
+        });
         return this.fnName + "(" + exprVals.join(",") + ")";
       }
     };

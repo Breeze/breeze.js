@@ -28,11 +28,18 @@ gulp.task('copyBreezeExtns', function() {
       .pipe(gulp.dest(destDir))
 });
 
-gulp.task('copyForTests', function() {
+gulp.task('copyForTests', ['minify'], function() {
 	testDir = '../test/breeze'
 	gulp.src( mapPath(destDir, [ 'breeze.*']))
       .pipe(gulp.dest(testDir))
 });
+
+// gulp.task('copyForNpm', function() {
+//    var npmDir = 
+// 	  gulp.src(destDir)
+// 		.pipe(changed(npmDir))
+// 		.pipe(gulp.dest(npmDir));
+// }); 
 
 gulp.task('yuidoc-full', ['yuidoc-clean'], function() {
   return gulp.src( mapPath(srcDir, fileNames))
@@ -63,8 +70,6 @@ gulp.task('yuidoc', function() {
       */
       .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));
 });
-
-
 
 gulp.task('default', ['minify', 'minify.base', 'copyBreezeExtns', 'copyForTests', 'yuidoc'], function() {
 

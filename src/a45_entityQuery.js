@@ -176,7 +176,8 @@
   
   
   /**
-  Returns a new query with an added filter criteria. Can be called multiple times which means to 'and' with any existing Predicate.
+  Returns a new query with an added filter criteria; Can be called multiple times which means to 'and' with any existing
+  Predicate or can be called with null to clear all predicates.
   @example
       var query = new EntityQuery("Customers")
                 .where("CompanyName", "startsWith", "C");
@@ -235,9 +236,8 @@
       }
     }
     return clone(this, "wherePredicate", wherePredicate);
-
   };
-  
+
   /**
   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
   @example
@@ -472,6 +472,12 @@
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, "inlineCountEnabled", enabled);
   };
+
+  proto.useNameOnServer = function(usesNameOnServer) {
+    assertParam(usesNameOnServer, "usesNameOnServer").isBoolean().isOptional().check();
+    usesNameOnServer = (usesNameOnServer === undefined) ? true : !!usesNameOnServer;
+    return clone(this, "usesNameOnServer", usesNameOnServer);
+  }
   
   /**
   Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query
@@ -864,6 +870,7 @@
       "expandClause",
       "inlineCountEnabled",
       "noTrackingEnabled",
+      "usesNameOnServer",
       "queryOptions",
       "entityManager",
       "dataService",
