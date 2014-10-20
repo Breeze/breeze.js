@@ -146,7 +146,11 @@
           }
 
           var contentId = cr.headers["Content-ID"];
-
+          // Olingo sends differnt case of 'ID' for the header name.
+          if(!contentId){
+            contentId = cr.headers["Content-Id"];
+          }
+          
           var rawEntity = cr.data;
           if (rawEntity) {
             var tempKey = tempKeys[contentId];
