@@ -46,6 +46,35 @@
     em.rejectChanges();
   });
 
+  test("entityChange on multiple setDeleted calls", function () {
+      var em = newEm();
+      var entity1 = em.createEntity("Customer")
+      var entity2 = em.createEntity("Customer")
+      var entity3 = em.createEntity("Customer")
+      var entity4 = em.createEntity("Customer");
+      entity1.entityAspect.acceptChanges();
+      entity2.entityAspect.acceptChanges();
+      entity3.entityAspect.acceptChanges();
+      entity4.entityAspect.acceptChanges();
+      var changedCount = 0;
+      em.entityChanged.subscribe(function (changeArgs) {
+          changedCount++;
+      })
+      entity1.entityAspect.setDeleted();
+      // entityChanged is called on the manager, where entityAction === EntityStateChange - all good.
+      ok(changedCount == 1, "changed 1");
+      entity2.entityAspect.setDeleted();
+      ok(changedCount == 2, "changed 2");
+      // entityChanged event no longer fired on the manager.
+      entity3.entityAspect.setDeleted();
+      ok(changedCount == 3, "changed 3");
+      // same problem
+      entity4.entityAspect.setDeleted();
+      ok(changedCount == 4, "changed 4");
+  });
+
+
+
   test("entityChangedAndHasChangesInterop", function () {
     var em = newEm();
 
@@ -1251,6 +1280,7 @@
 
     var em = newEm();
     var order = createOrderAndDetails(em);
+    var orderId = order.getProperty("orderID");
     var details = order.getProperty("orderDetails");
     var copyDetails = details.slice(0);
     ok(details.length > 0, "order should have details");
@@ -1261,11 +1291,67 @@
 
     copyDetails.forEach(function (od) {
       ok(od.getProperty("order") === null, "orderDetail.order should not be set");
-      var defaultOrderId = od.entityType.getProperty("orderID").defaultValue;
-      ok(od.getProperty("orderID") === defaultOrderId, "orderDetail.orderId should not be set");
+      ok(od.getProperty("orderID") === orderId, "orderDetail.orderId should still be set to orig orderID because it is part of the key");
       ok(od.entityAspect.entityState.isModified(), "orderDetail should be 'modified");
     });
   });
+
+
+  test("delete entity children then parent - check children", function () {
+    if (testFns.DEBUG_MONGO) {
+      ok(true, "NA for MONGO - OrderDetail issues");
+      return true;
+    }
+
+    var em = newEm();
+    var order = createOrderAndDetails(em);
+    var orderID = order.getProperty("orderID");
+    var details = order.getProperty("orderDetails");
+    var copyDetails = details.slice(0);
+    ok(details.length > 0, "order should have details");
+    copyDetails.forEach(function (od) {
+      od.entityAspect.setDeleted();
+    })
+    order.entityAspect.setDeleted();
+    ok(order.entityAspect.entityState.isDeleted(), "order should be deleted");
+
+    ok(details.length === 0, "order should now have no details");
+
+    copyDetails.forEach(function (od) {
+      ok(od.getProperty("order") === null, "orderDetail.order should not be set");
+      var defaultOrderId = od.entityType.getProperty("orderID").defaultValue;
+      ok(od.getProperty("orderID") === orderID, "orderDetail.orderID should still be set to orig orderID");
+      ok(od.entityAspect.entityState.isDeleted(), "orderDetail should be 'deleted'");
+    });
+  });
+
+  test("delete entity children then parent - check children (guid ids)", function () {
+    if (testFns.DEBUG_MONGO) {
+      ok(true, "NA for MONGO - OrderDetail issues");
+      return true;
+    }
+
+    var em = newEm();
+    var customer = createCustomerAndOrders(em);
+    var custID = customer.getProperty("customerID");
+    var orders = customer.getProperty("orders");
+    var copyOrders = orders.slice(0);
+    ok(copyOrders.length > 0, "order should have details");
+    copyOrders.forEach(function (order) {
+      order.entityAspect.setDeleted();
+    })
+    customer.entityAspect.setDeleted();
+    ok(customer.entityAspect.entityState.isDeleted(), "order should be deleted");
+
+    ok(orders.length === 0, "order should now have no details");
+
+    copyOrders.forEach(function (order) {
+      ok(order.getProperty("customer") === null, "order.customer should not be set");
+      ok(order.getProperty("customerID") === custID, "order.customerID should still be set to orig cust");
+      ok(order.entityAspect.entityState.isDeleted(), "order should be 'deleted'");
+    });
+  });
+
 
   test("delete entity - check parent", function () {
     if (testFns.DEBUG_MONGO) {
@@ -1399,32 +1485,33 @@
     ok(valid, "should no longer have any changes");
   });
 
+  
 
   function createOrderAndDetails(em, shouldAttachUnchanged) {
     if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
     var metadataStore = em.metadataStore;
     var orderType = em.metadataStore.getEntityType("Order");
     var orderDetailType = em.metadataStore.getEntityType("OrderDetail");
-    var order = orderType.createEntity();
-    ok(order.entityAspect.entityState.isDetached(), "order should be 'detached");
+    var order = em.createEntity(orderType);
+    
+    ok(order.entityAspect.entityState.isAdded(), "order should be 'detached");
     for (var i = 0; i < 3; i++) {
       var od = orderDetailType.createEntity();
       od.setProperty("productID", i + 1); // part of pk
       order.getProperty("orderDetails").push(od);
-      ok(od.entityAspect.entityState.isDetached(), "orderDetail should be 'detached");
+      ok(od.entityAspect.entityState.isAdded(), "orderDetail should be 'detached");
     }
-    var orderId;
+    var orderId = order.getProperty("orderID");
+    ok(orderId != 0, "orderID should not be 0");
     if (shouldAttachUnchanged) {
-      em.attachEntity(order);
-      orderId = order.getProperty("orderID");
+      order.entityAspect.acceptChanges();
       order.getProperty("orderDetails").forEach(function (od) {
+        od.entityAspect.acceptChanges();
         ok(od.getProperty("order") === order, "orderDetail.order not set");
         ok(od.getProperty("orderID") === orderId, "orderDetail.orderId not set");
         ok(od.entityAspect.entityState.isUnchanged(), "orderDetail should be 'unchanged");
       });
     } else {
-      em.addEntity(order);
-      orderId = order.getProperty("orderID");
       order.getProperty("orderDetails").forEach(function (od) {
         ok(od.getProperty("order") === order, "orderDetail.order not set");
         ok(od.getProperty("orderID") === orderId, "orderDetail.orderId not set");
@@ -1434,6 +1521,40 @@
     return order;
   }
 
+  function createCustomerAndOrders(em, shouldAttachUnchanged) {
+    if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
+    var metadataStore = em.metadataStore;
+    var customerType = em.metadataStore.getEntityType("Customer");
+    var orderType = em.metadataStore.getEntityType("Order");
+    
+    var customer = em.createEntity(customerType);
+    ok(customer.entityAspect.entityState.isAdded(), "customer should be 'added");
+    for (var i = 0; i < 3; i++) {
+      var order = em.createEntity(orderType);
+      customer.getProperty("orders").push(order);
+      ok(order.entityAspect.entityState.isAdded(), "order should be 'detached");
+    }
+    var customerId;
+    if (shouldAttachUnchanged) {
+      customer.entityAspect.acceptChanges();
+      var custId = customer.getProperty("customerID");
+      customer.getProperty("orders").forEach(function (order) {
+        order.entityAspect.acceptChanges();
+        ok(order.getProperty("customer") === customer, "order.customer not set");
+        ok(order.getProperty("customerID") === custId, "order.customerID not set");
+        ok(order.entityAspect.entityState.isUnchanged(), "order should be 'unchanged");
+      });
+    } else {
+      var orderId = order.getProperty("orderID");
+      var custId = customer.getProperty("customerID");
+      customer.getProperty("orders").forEach(function (order) {
+        ok(order.getProperty("customer") === customer, "order.customer not set");
+        ok(order.getProperty("customerID") === custId, "order.customerID not set");
+        ok(order.entityAspect.entityState.isAdded(), "order should be 'added");
+      });
+    }
+    return customer;
+  }
 
   function runQuery(em, callback) {
 
