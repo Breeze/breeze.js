@@ -1635,21 +1635,11 @@ var EntityManager = (function () {
 
   // protected methods
 
-  //proto._checkStateChange = function (entity, oldEntityState, newEntityState) {
-  //    if (oldEntityState == newEntityState) return;
-  //    var isUnchanged = newEntityState == EntityState.Unchanged;
-  //    this._notifyStateChange(entity, !isUnchanged);
-  //};
-
-
   proto._notifyStateChange = function (entity, needsSave) {
     var ecArgs = { entityAction: EntityAction.EntityStateChange, entity: entity };
 
     if (needsSave) {
-      if (!this._hasChanges) {
-        this._setHasChanges(true);
-        this.entityChanged.publish(ecArgs);
-      }
+      if (!this._hasChanges) this._setHasChanges(true);
     } else {
       // called when rejecting a change or merging an unchanged record.
       // NOTE: this can be slow with lots of entities in the cache.
@@ -1660,12 +1650,13 @@ var EntityManager = (function () {
             this._setHasChanges(null);
             this.entityChanged.publish(ecArgs);
           }.bind(this);
+          return;
         } else {
           this._setHasChanges(null);
-          this.entityChanged.publish(ecArgs);
         }
       }
     }
+    this.entityChanged.publish(ecArgs);
   };
 
   proto._setHasChanges = function (hasChanges) {

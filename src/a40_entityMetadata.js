@@ -66,7 +66,7 @@ var MetadataStore = (function () {
   used when performing "local queries" in order to match the semantics of queries against a remote service.
   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
   **/
-  var ctor = function (config) {
+  var ctor = function MetadataStore(config) {
     config = config || { };
     assertConfig(config)
         .whereParam("namingConvention").isOptional().isInstanceOf(NamingConvention).withDefault(NamingConvention.defaultInstance)
@@ -1191,7 +1191,7 @@ var EntityType = (function () {
   @param [config.serializerFn] A function that is used to mediate the serialization of instances of this type.
   @param [config.custom] {Object}
   **/
-  var ctor = function (config) {
+  var ctor = function EntityType(config) {
     if (arguments.length > 1) {
       throw new Error("The EntityType ctor has a single argument that is either a 'MetadataStore' or a configuration object.");
     }
@@ -2119,7 +2119,7 @@ var ComplexType = (function () {
   @param [config.dataProperties] {Array of DataProperties}
   @param [config.custom] {Object}
   **/
-  var ctor = function (config) {
+  var ctor = function ComplexType(config) {
     if (arguments.length > 1) {
       throw new Error("The ComplexType ctor has a single argument that is a configuration object.");
     }
@@ -2348,7 +2348,7 @@ var DataProperty = (function () {
   @param [config.validators] {Array of Validator}
   @param [config.custom] {Object}
   **/
-  var ctor = function (config) {
+  var ctor = function DataProperty(config) {
     assertConfig(config)
         .whereParam("name").isString().isOptional()
         .whereParam("nameOnServer").isString().isOptional()
@@ -2694,7 +2694,7 @@ var NavigationProperty = (function () {
   the NamingConvention on the MetadataStore associated with the EntityType to which this will be added.
   @param [config.validators] {Array of Validator}
   **/
-  var ctor = function (config) {
+  var ctor = function NavigationProperty(config) {
     assertConfig(config)
         .whereParam("name").isString().isOptional()
         .whereParam("nameOnServer").isString().isOptional()
