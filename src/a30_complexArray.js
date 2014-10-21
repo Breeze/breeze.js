@@ -54,7 +54,7 @@
   };
   //
 
-  complexArrayMixin._rejectChanges = function () {
+  complexArrayMixin._rejectChanges = function() {
     if (!this._origValues) return;
     var that = this;
     this.forEach(function (co) {
@@ -64,7 +64,6 @@
     this._origValues.forEach(function (co) {
       that.push(co);
     });
-    Array.prototype.push.apply(this, this._origValues);
   };
 
   complexArrayMixin._acceptChanges = function () {
