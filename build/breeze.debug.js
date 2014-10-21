@@ -275,13 +275,18 @@ function __toArray(item) {
 }
 
 // a version of Array.map that doesn't require an array, i.e. works on arrays and scalars.
-function __map(items, fn) {
+function __map(items, fn, includeNull) {
+  // whether to return nulls in array of results; default = true;
+  includeNull = includeNull == null ? true : includeNull;
   if (items == null) return items;
   var result;
   if (Array.isArray(items)) {
     result = [];
-    items.map(function (v, ix) {
-      result[ix] = fn(v, ix);
+    items.forEach(function (v, ix) {
+      var r = fn(v, ix);
+      if (r != null || includeNull) {
+        result[ix] = r;
+      }
     });
   } else {
     result = fn(items);
@@ -14567,7 +14572,8 @@ var EntityManager = (function () {
         dataService: dataService,
         mergeOptions: {
           mergeStrategy: queryOptions.mergeStrategy,
-          noTracking: !!query.noTrackingEnabled
+          noTracking: !!query.noTrackingEnabled,
+          includeDeleted: queryOptions.includeDeleted
         }
       });
 
@@ -14972,7 +14978,7 @@ var MappingContext = (function () {
         meta.entityType = query._getToEntityType && query._getToEntityType(that.metadataStore);
       }
       return processMeta(that, node, meta);
-    });
+    }, this.mergeOptions.includeDeleted);
   };
 
   proto.processDeferred = function () {
@@ -15104,6 +15110,7 @@ var MappingContext = (function () {
     }
   }
 
+  // can return null for a deleted entity if includeDeleted == false
   function mergeEntity(mc, node, meta) {
     node._$meta = meta;
     var em = mc.entityManager;
@@ -15148,6 +15155,9 @@ var MappingContext = (function () {
             em._notifyStateChange(targetEntity, false);
           }
         } else {
+          if (targetEntityState == EntityState.Deleted && !mc.mergeOptions.includeDeleted) {
+            return null;
+          }
           updateEntityNoMerge(mc, targetEntity, node);
         }
       }

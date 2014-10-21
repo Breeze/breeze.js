@@ -1980,7 +1980,8 @@ var EntityManager = (function () {
         dataService: dataService,
         mergeOptions: {
           mergeStrategy: queryOptions.mergeStrategy,
-          noTracking: !!query.noTrackingEnabled
+          noTracking: !!query.noTrackingEnabled,
+          includeDeleted: queryOptions.includeDeleted
         }
       });
 

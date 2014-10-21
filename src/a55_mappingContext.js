@@ -62,7 +62,7 @@ var MappingContext = (function () {
         meta.entityType = query._getToEntityType && query._getToEntityType(that.metadataStore);
       }
       return processMeta(that, node, meta);
-    });
+    }, this.mergeOptions.includeDeleted);
   };
 
   proto.processDeferred = function () {
@@ -194,6 +194,7 @@ var MappingContext = (function () {
     }
   }
 
+  // can return null for a deleted entity if includeDeleted == false
   function mergeEntity(mc, node, meta) {
     node._$meta = meta;
     var em = mc.entityManager;
@@ -238,6 +239,9 @@ var MappingContext = (function () {
             em._notifyStateChange(targetEntity, false);
           }
         } else {
+          if (targetEntityState == EntityState.Deleted && !mc.mergeOptions.includeDeleted) {
+            return null;
+          }
           updateEntityNoMerge(mc, targetEntity, node);
         }
       }

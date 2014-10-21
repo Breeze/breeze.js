@@ -247,13 +247,18 @@ function __toArray(item) {
 }
 
 // a version of Array.map that doesn't require an array, i.e. works on arrays and scalars.
-function __map(items, fn) {
+function __map(items, fn, includeNull) {
+  // whether to return nulls in array of results; default = true;
+  includeNull = includeNull == null ? true : includeNull;
   if (items == null) return items;
   var result;
   if (Array.isArray(items)) {
     result = [];
-    items.map(function (v, ix) {
-      result[ix] = fn(v, ix);
+    items.forEach(function (v, ix) {
+      var r = fn(v, ix);
+      if (r != null || includeNull) {
+        result[ix] = r;
+      }
     });
   } else {
     result = fn(items);
