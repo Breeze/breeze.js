@@ -772,7 +772,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 962,
+            "line": 967,
             "description": "FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink \"Predicate\"}}{{/crossLink}}\nfilter operators for an {{#crossLink \"EntityQuery\"}}{{/crossLink}}.",
             "static": 1
         },
@@ -6341,7 +6341,7 @@
         {
             "file": "..\\src\\a45_entityQuery.js",
             "line": 241,
-            "description": "Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.",
+            "description": "Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.\nOrderBy clauses may be chained.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .orderBy(\"CompanyName\");\n\nor to sort across multiple properties",
                 "\n    var query = new EntityQuery(\"Customers\")\n      .orderBy(\"Region, CompanyName\");\n\nNested property paths are also supported",
@@ -6373,7 +6373,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 280,
+            "line": 285,
             "description": "Returns a new query that orders the results of the query by property name in descending order.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .orderByDesc(\"CompanyName\");\n\nor to sort across multiple properties",
@@ -6399,7 +6399,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 306,
+            "line": 311,
             "description": "Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This\nwill be referred to as a projection.\nIf the result of this selection \"projection\" contains entities, these entities will automatically be added to EntityManager's cache and will\nbe made 'observable'.\nAny simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made 'observable'.",
             "example": [
                 "\nSimple data properties can be projected",
@@ -6427,7 +6427,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 347,
+            "line": 352,
             "description": "Returns a new query that skips the specified number of entities when returning results.\nAny existing 'skip' can be cleared by calling 'skip' with no arguments.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .where(\"CompanyName\", \"startsWith\", \"C\")\n      .skip(5);"
@@ -6451,7 +6451,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 364,
+            "line": 369,
             "description": "Returns a new query that returns only the specified number of entities when returning results. - Same as 'take'.\nAny existing 'top' can be cleared by calling 'top' with no arguments.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .top(5);"
@@ -6475,7 +6475,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 380,
+            "line": 385,
             "description": "Returns a new query that returns only the specified number of entities when returning results - Same as 'top'.\nAny existing take can be cleared by calling take with no arguments.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .take(5);"
@@ -6499,7 +6499,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 397,
+            "line": 402,
             "description": "Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property\nnames such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are 'expanded'.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .where(\"CompanyName\", \"startsWith\", \"C\")\n      .expand(\"Orders\");\nwill return the filtered customers each with its \"Orders\" properties fully resolved.\nMultiple paths may be specified by separating the paths by a ','",
@@ -6525,7 +6525,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 425,
+            "line": 430,
             "description": "Returns a new query that includes a collection of parameters to pass to the server.",
             "example": [
                 "\n    var query = EntityQuery.from(\"EmployeesFilteredByCountryAndBirthdate\")\n      .withParameters({ BirthDate: \"1/1/1960\", Country: \"USA\" });\n \nwill call the 'EmployeesFilteredByCountryAndBirthdate' method on the server and pass in 2 parameters. This\nquery will be uri encoded as",
@@ -6551,7 +6551,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 453,
+            "line": 458,
             "description": "Returns a query with the 'inlineCount' capability either enabled or disabled.  With 'inlineCount' enabled, an additional 'inlineCount' property\nwill be returned with the query results that will contain the number of entities that would have been returned by this\nquery with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .take(20)\n      .orderBy(\"CompanyName\")\n      .inlineCount(true);\nwill return the first 20 customers as well as a count of all of the customers in the remote store."
@@ -6575,7 +6575,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 482,
+            "line": 487,
             "description": "Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query\nwill not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.",
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n      .take(20)\n      .orderBy(\"CompanyName\")\n      .noTracking(true);"
@@ -6599,7 +6599,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 503,
+            "line": 508,
             "description": "Returns a copy of this EntityQuery with the specified {{#crossLink \"EntityManager\"}}{{/crossLink}}, {{#crossLink \"DataService\"}}{{/crossLink}},\n{{#crossLink \"JsonResultsAdapter\"}}{{/crossLink}}, {{#crossLink \"MergeStrategy\"}}{{/crossLink}} or {{#crossLink \"FetchStrategy\"}}{{/crossLink}} applied.",
             "example": [
                 "\n    // 'using' can be used to return a new query with a specified EntityManager.\n    var em = new EntityManager(serviceName);\n    var query = new EntityQuery(\"Orders\")\n      .using(em);\nor with a specified {{#crossLink \"MergeStrategy\"}}{{/crossLink}}",
@@ -6625,7 +6625,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 547,
+            "line": 552,
             "description": "Executes this query.  This method requires that an EntityManager has been previously specified via the \"using\" method.",
             "example": [
                 "\nThis method can be called using a 'promises' syntax ( recommended)",
@@ -6708,7 +6708,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 612,
+            "line": 617,
             "description": "Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the \"using\" method.",
             "example": [
                 "\n    // assume em is an entityManager already filled with order entities;\n    var query = new EntityQuery(\"Orders\").using(em);\n    var orders = query.executeLocally();\n\nNote that calling this method is the same as calling {{#crossLink \"EntityManager/executeQueryLocally\"}}{{/crossLink}}."
@@ -6720,7 +6720,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 697,
+            "line": 702,
             "description": "Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful\nto force a requery of selected entities, or to restrict an existing collection of entities according to some filter.",
             "example": [
                 "\n    // assuming 'customers' is an array of 'Customer' entities retrieved earlier.\n    var customersQuery = EntityQuery.fromEntities(customers);\nThe resulting query can, of course, be extended",
@@ -6747,7 +6747,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 738,
+            "line": 743,
             "description": "Creates an EntityQuery for the specified {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\n    var empType = metadataStore.getEntityType(\"Employee\");\n    var entityKey = new EntityKey(empType, 1);\n    var query = EntityQuery.fromEntityKey(entityKey);\nor",
@@ -6773,7 +6773,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 763,
+            "line": 768,
             "description": "Creates an EntityQuery for the specified entity and {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
             "example": [
                 "\n    // 'employee' is a previously queried employee\n    var ordersNavProp = employee.entityType.getProperty(\"Orders\");\n    var query = EntityQuery.fromEntityNavigation(employee, ordersNavProp);\nwill return a query for the \"Orders\" of the specified 'employee'."
@@ -6803,7 +6803,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 970,
+            "line": 975,
             "description": "Aliases: \"eq\", \"==\"",
             "itemtype": "property",
             "name": "Equals",
@@ -6815,7 +6815,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 977,
+            "line": 982,
             "description": "Aliases: \"ne\", \"!=\"",
             "itemtype": "property",
             "name": "NotEquals",
@@ -6827,7 +6827,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 984,
+            "line": 989,
             "description": "Aliases: \"gt\", \">\"",
             "itemtype": "property",
             "name": "GreaterThan",
@@ -6839,7 +6839,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 991,
+            "line": 996,
             "description": "Aliases: \"lt\", \"<\"",
             "itemtype": "property",
             "name": "LessThan",
@@ -6851,7 +6851,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 998,
+            "line": 1003,
             "description": "Aliases: \"ge\", \">=\"",
             "itemtype": "property",
             "name": "GreaterThanOrEqual",
@@ -6863,7 +6863,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1005,
+            "line": 1010,
             "description": "Aliases: \"le\", \"<=\"",
             "itemtype": "property",
             "name": "LessThanOrEqual",
@@ -6875,7 +6875,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1012,
+            "line": 1017,
             "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
             "itemtype": "property",
             "name": "Contains",
@@ -6887,7 +6887,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1020,
+            "line": 1025,
             "itemtype": "property",
             "name": "StartsWith",
             "type": "FilterQueryOp",
@@ -6898,7 +6898,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1026,
+            "line": 1031,
             "itemtype": "property",
             "name": "EndsWith",
             "type": "FilterQueryOp",
@@ -6909,7 +6909,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1033,
+            "line": 1038,
             "description": "Aliases: \"some\"",
             "itemtype": "property",
             "name": "Any",
@@ -6921,7 +6921,7 @@
         },
         {
             "file": "..\\src\\a45_entityQuery.js",
-            "line": 1041,
+            "line": 1046,
             "description": "Aliases: \"every\"",
             "itemtype": "property",
             "name": "All",

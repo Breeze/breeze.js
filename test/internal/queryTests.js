@@ -2225,6 +2225,39 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
+  test("orderBy 2 fields", function () {
+    var em = newEm();
+
+    var query = new EntityQuery("Customers")
+        .orderBy("country, city")
+        .where("country", "!=", null).where("city", "!=", null)
+        .take(30);
+    stop();
+    var custs, custs2;
+    em.executeQuery(query).then(function (data) {
+      custs = data.results;
+      custs.forEach(function (p) {
+        p.countryCity = testFns.removeAccents( p.getProperty("country") + ":" + p.getProperty("city"));
+      });
+      
+      testFns.assertIsSorted(custs, "countryCity", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+      var q2 = query.orderBy(null);
+      var q3 = q2.orderBy("country").orderBy("city");
+      return em.executeQuery(q3);
+    }).then(function(data2) {
+      custs2 = data2.results;
+      custs2.forEach(function (p) {
+        p.countryCity = testFns.removeAccents(p.getProperty("country") + ":" + p.getProperty("city"));
+      });
+      var isOk = breeze.core.arrayZip(custs, custs2, function(c1, c2) {
+        return c1.countryCity == c2.countryCity;
+      }).every(function(v) {
+        return v;
+      });
+      ok(isOk, "ordering should be the same");
+    }).fail(testFns.handleFail).fin(start);
+  });
+
   test("expand", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - expand is not yet supported");

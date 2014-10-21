@@ -3248,7 +3248,7 @@ breeze.ValidationOptions = ValidationOptions;
     this._origValues.forEach(function (co) {
       that.push(co);
     });
-  }
+  };
 
   complexArrayMixin._acceptChanges = function () {
     this._origValues = null;
@@ -11115,6 +11115,7 @@ breeze.Predicate = Predicate;
 
   /**
   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
+  OrderBy clauses may be chained.
   @example
       var query = new EntityQuery("Customers")
         .orderBy("CompanyName");
@@ -11148,7 +11149,11 @@ breeze.Predicate = Predicate;
   proto.orderBy = function (propertyPaths, isDescending) {
     // propertyPaths: can pass in create("A.X,B") or create("A.X desc, B") or create("A.X desc,B", true])
     // isDesc parameter trumps isDesc in propertyName.
+
     var orderByClause = propertyPaths == null ? null : new OrderByClause(normalizePropertyPaths(propertyPaths), isDescending);
+    if (this.orderByClause && orderByClause) {
+      orderByClause = new OrderByClause([this.orderByClause, orderByClause]);
+    }
     return clone(this, "orderByClause", orderByClause);
   }
   
@@ -11994,7 +11999,13 @@ var BooleanQueryOp = (function () {
 var OrderByClause = (function () {
   
   var ctor = function (propertyPaths, isDesc) {
+
     if (propertyPaths.length > 1) {
+      // you can also pass in an array of orderByClauses
+      if (propertyPaths[0] instanceof OrderByClause) {
+        this.items = Array.prototype.concat.bind(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
+        return;
+      }
       var items = propertyPaths.map(function (pp) {
         return new OrderByItem(pp, isDesc);
       });
@@ -12011,6 +12022,8 @@ var OrderByClause = (function () {
       item.validate(entityType)
     });
   };
+
+
   
   proto.getComparer = function (entityType) {
     var orderByFuncs = this.items.map(function (obc) {
