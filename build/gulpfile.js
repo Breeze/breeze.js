@@ -1,3 +1,5 @@
+// Build for breeze.js
+
 // include gulp
 var gulp = require('gulp'); 
  
@@ -23,14 +25,14 @@ buildMinify('', fileNames);
 buildMinify('.base', baseFileNames);
 
 gulp.task('copyBreezeExtns', function() {
-	gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
+	return gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
       // .pipe(newer(destDir))
       .pipe(gulp.dest(destDir))
 });
 
 gulp.task('copyForTests', ['minify'], function() {
 	testDir = '../test/breeze'
-	gulp.src( mapPath(destDir, [ 'breeze.*']))
+	return gulp.src( mapPath(destDir, [ 'breeze.*']))
       .pipe(gulp.dest(testDir))
 });
 
@@ -80,7 +82,7 @@ function buildMinify(extn, fileNames, destName) {
   var destName = 'breeze' + extn + '.debug.js'
   var minName = 'breeze' + extn + '.min.js'
   gulp.task('minify' + extn, function() {
-    gulp.src( mapPath(srcDir, fileNames))
+    return gulp.src( mapPath(srcDir, fileNames))
       .pipe(newer(destDir + destName))
       .pipe(concat(destName,  {newLine: ';'}))
       .pipe(gulp.dest(destDir))
