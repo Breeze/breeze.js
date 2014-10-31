@@ -404,6 +404,8 @@ function test_entityQuery() {
     var query = new breeze.EntityQuery("Customers")
         .where("toUpper(substring(CompanyName, 1, 2))", breeze.FilterQueryOp.Equals, "OM");
     var q2 = query.toType("foo").orderBy("foo2");
+
+    var json = query.toJSON();
 }
 
 function test_entityState() {

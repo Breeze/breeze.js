@@ -130,6 +130,7 @@ var __config = (function () {
   @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
   @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
   @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+  @param [config.uriBuilder] {String} - the name of a previously registered "uriBuilder" adapter
   @return [array of instances]
   **/
   __config.initializeAdapterInstances = function (config) {
