@@ -186,6 +186,7 @@ declare module breeze {
         adapterName: string;
         hasServerMetadata: boolean;
         serviceName: string;
+        uriBuilderName: string;
         jsonResultsAdapter: JsonResultsAdapter;
         useJsonp: boolean;
         constructor(config: DataServiceOptions);
@@ -195,6 +196,7 @@ declare module breeze {
     interface DataServiceOptions {
         serviceName?: string;
         adapterName?: string;
+        uriBuilderName?: string;
         hasServerMetadata?: boolean;
         jsonResultsAdapter?: JsonResultsAdapter;
         useJsonp?: boolean;
@@ -510,6 +512,8 @@ declare module breeze {
         wherePredicate: Predicate;
 
         constructor(resourceName?: string);
+        /** Create query from an expression tree */
+        constructor(tree: Object);
 
         execute(callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
         executeLocally(): Entity[];
@@ -523,8 +527,8 @@ declare module breeze {
         static fromEntityNavigation(entity: Entity, navigationProperty: NavigationProperty): EntityQuery;
         inlineCount(enabled?: boolean): EntityQuery;
         noTracking(enabled?: boolean): EntityQuery;
-        orderBy(propertyPaths: string): EntityQuery;
-        orderBy(propertyPaths: string[]): EntityQuery;
+        orderBy(propertyPaths: string, isDescending?: boolean): EntityQuery;
+        orderBy(propertyPaths: string[], isDescending?: boolean): EntityQuery;
         orderByDesc(propertyPaths: string): EntityQuery;
         orderByDesc(propertyPaths: string[]): EntityQuery;
         select(propertyPaths: string): EntityQuery;
@@ -547,6 +551,8 @@ declare module breeze {
         where(property: string, operator: FilterQueryOpSymbol, value: any): EntityQuery;
         where(predicate: FilterQueryOpSymbol): EntityQuery;
         withParameters(params: Object): EntityQuery;
+
+        toJSON(): string;
     }
 
     interface OrderByClause {
@@ -749,6 +755,8 @@ declare module breeze {
         constructor(property: string, operator: FilterQueryOpSymbol, value: any);
         constructor(property: string, operator: string, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
         constructor(property: string, operator: FilterQueryOpSymbol, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
+        /** Create predicate from an expression tree */
+        constructor(tree: Object);
 
         and: PredicateMethod;
         static and: PredicateMethod;
@@ -766,6 +774,8 @@ declare module breeze {
         toFunction(): Function;
         toString(): string;
         validate(entityType: EntityType): void;
+
+        toJSON(): string;
     }
 
     interface PredicateMethod {
@@ -779,6 +789,8 @@ declare module breeze {
         static defaultInstance: QueryOptions;
         fetchStrategy: FetchStrategySymbol;
         mergeStrategy: MergeStrategySymbol;
+        /** Whether query should return cached deleted entities (false by default) */
+        includeDeleted: boolean
 
         constructor(config?: QueryOptionsConfiguration);
 
@@ -821,7 +833,7 @@ declare module breeze {
         allowConcurrentSaves: boolean;
         resourceName: string;
         dataService: DataService;
-        tag: string;
+        tag: Object;
         static defaultInstance: SaveOptions;
 
         constructor(config?: { allowConcurrentSaves?: boolean; });
@@ -834,7 +846,7 @@ declare module breeze {
         allowConcurrentSaves?: boolean;
         resourceName?: string;
         dataService?: DataService;
-        tag?: string;
+        tag?: Object;
     }
 
     interface SaveResult {
@@ -997,6 +1009,7 @@ declare module breeze.config {
     @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
     @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
     @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+    @param [config.uriBuilder] {String} - the name of a previously registered "uriBuilder" adapter
     @return [array of instances]
     **/
     export function initializeAdapterInstances(config: Object): Object[];
