@@ -247,7 +247,7 @@ var EntityAspect = (function () {
         rejectChangesCore(cos);
       } else {
         cos._rejectChanges();
-        cos.forEach(rejectChangesCore(co));
+        cos.forEach(rejectChangesCore);
       }
     });
   }
@@ -389,9 +389,7 @@ var EntityAspect = (function () {
         clearOriginalValues(cos);
       } else {
         cos._acceptChanges();
-        cos.forEach(function (co) {
-          clearOriginalValues(co);
-        });
+        cos.forEach(clearOriginalValues);
       }
     });
   }
