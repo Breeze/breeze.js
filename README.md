@@ -1,4 +1,4 @@
-#![BreezeJS](http://www.breezejs.com/sites/all/themes/breeze/images/BreezeJsB.png "BreezeJS")
+#![BreezeJS](http://www.breezejs.com/sites/all/images/BreezeJsB.png "BreezeJS")
 
 ###Welcome to "**Breeze for JavaScript**" by [**IdeaBlade**](http://www.ideablade.com "IdeaBlade website"). 
 
@@ -8,7 +8,7 @@ This repository holds the Breeze assets **for HTML/JS client development**.
 
 **For technical questions, please go to [StackOverflow with the tag "breeze"](http://stackoverflow.com/questions/tagged/breeze?sort=newest "BreezeJS on StackOverflow").**
 
-<p><a title="BreezeJS on StackOverflow" href="http://stackoverflow.com/questions/tagged/breeze?sort=newest"><img src="http://www.breezejs.com/sites/all/themes/breeze/images/BreezeLovesStackOverflow.png" alt="BreezeJS loves StackOverflow"></a></p>
+<p><a title="BreezeJS on StackOverflow" href="http://stackoverflow.com/questions/tagged/breeze?sort=newest"><img src="http://www.breezejs.com/sites/all/images/BreezeLovesStackOverflow.png" alt="BreezeJS loves StackOverflow"></a></p>
 
 StackOverflow is a fantastic site where tons of developers help each other with their technical questions.
 
