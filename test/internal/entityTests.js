@@ -1163,8 +1163,8 @@
 
   test("category default rowversion value", function () {
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - no default values");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_EF_CODEFIRST || testFns.DEBUG_NHIBERNATE) {
+      ok(true, "NA for Mongo, Codefirst, and NHibernate  - no default values");
       return true;
     }
     var em = newEm();

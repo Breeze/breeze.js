@@ -31,8 +31,11 @@
 
     var q = EntityQuery
         .from("Employees")
-        .where(predicate1)
-        .noTracking();
+        .where(predicate1);
+    if (testFns.DEBUG_NHIBERNATE) {
+        q = q.expand("directReports");
+    }
+    q = q.noTracking();
     stop();
     em.executeQuery(q).then(function (data) {
       var r = data.results;

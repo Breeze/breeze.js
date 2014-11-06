@@ -79,15 +79,54 @@ breezeTestFns = (function (breeze) {
   }
 
   function updateTitle() {
-    testFns.title = "dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
+      testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
+      var maintitle = "Breeze Test Suite -> " + testFns.title;
+      var el = document.getElementById("title");
+      if (el) el.innerHTML = maintitle;
+      el = document.getElementById("qunit-header");
+      if (el) el.innerHTML = maintitle;
   }
 
   testFns.setSampleNamespace = function (value) {
     testFns.sampleNamespace = value;
   };
 
-  testFns.setDataService = function (value, version) {
+  testFns.queryServerVersion = function (url) {
+      url = url || "/testconfig";
+      var ajaxImpl = core.config.getAdapterInstance("ajax");
 
+      ajaxImpl.ajax({
+          type: "GET",
+          url: url,
+          dataType: 'json',
+          success: function (httpResponse) {
+              var data = httpResponse.data;
+              testFns.setServerVersion(data.value, data.version);
+              if (QUnit.urlParams.canStart) {
+                  QUnit.start(); // run tests
+              }
+          },
+          error: function (httpResponse) {
+              alert("error getting server version data: " + httpResponse.status);
+          }
+      });
+  }
+
+  testFns.setServerVersion = function (value, version) {
+      value = value.toLowerCase();
+      version = (version || "").toLowerCase();
+      testFns.serverVersion = value + '/' + version;
+
+      testFns.DEBUG_NHIBERNATE = version === "nhibernate";
+      testFns.DEBUG_EF_CODEFIRST = version === "codefirst_provider";
+      testFns.DEBUG_EF_DBFIRST = version === "databasefirst_new";
+      testFns.DEBUG_EF_DBFIRST_OLD = version === "databasefirst_old";
+      testFns.DEBUG_EF_ORACLE = version === "oracle_edmx";
+
+      updateTitle();
+  }
+
+  testFns.setDataService = function (value, version) {
     value = value.toLowerCase();
     version = (version || "").toLowerCase();
     testFns.DEBUG_WEBAPI = value === "webapi";
