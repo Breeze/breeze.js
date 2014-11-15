@@ -1753,6 +1753,7 @@ var __config = (function () {
   @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
   @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
   @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+  @param [config.uriBuilder] {String} - the name of a previously registered "uriBuilder" adapter
   @return [array of instances]
   **/
   __config.initializeAdapterInstances = function (config) {
@@ -3699,7 +3700,7 @@ var EntityAspect = (function () {
         rejectChangesCore(cos);
       } else {
         cos._rejectChanges();
-        cos.forEach(rejectChangesCore(co));
+        cos.forEach(rejectChangesCore);
       }
     });
   }
@@ -3841,9 +3842,7 @@ var EntityAspect = (function () {
         clearOriginalValues(cos);
       } else {
         cos._acceptChanges();
-        cos.forEach(function (co) {
-          clearOriginalValues(co);
-        });
+        cos.forEach(clearOriginalValues);
       }
     });
   }
@@ -11472,6 +11471,7 @@ breeze.Predicate = Predicate;
   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
   would have been applied.
+  @param callback.data.retrievedEntities {Array of Entity} All entities returned by the query.  Differs from results when .expand() is used.
 
   @param errorCallback {Function} Function called on failure.
 
@@ -12003,7 +12003,7 @@ var OrderByClause = (function () {
     if (propertyPaths.length > 1) {
       // you can also pass in an array of orderByClauses
       if (propertyPaths[0] instanceof OrderByClause) {
-        this.items = Array.prototype.concat.apply(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
+        this.items = Array.prototype.concat.bind(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
         return;
       }
       var items = propertyPaths.map(function (pp) {
@@ -13313,6 +13313,7 @@ var EntityManager = (function () {
   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
   would have been applied.
+  @param callback.data.retrievedEntities {Array of Entity} All entities returned by the query.  Differs from results when .expand() is used.
 
   @param [errorCallback] {Function} Function called on failure.
 
@@ -16510,13 +16511,22 @@ breeze.SaveOptions = SaveOptions;
   };
 
   proto._prepareSaveResult = function (saveContext, data) {
-    // HACK: need to change the 'case' of properties in the saveResult
-    // but KeyMapping properties internally are still ucase. ugh...
-    var keyMappings = data.KeyMappings.map(function (km) {
-      var entityTypeName = MetadataStore.normalizeTypeName(km.EntityTypeName);
-      return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
-    });
-    return { entities: data.Entities, keyMappings: keyMappings };
+    // if lower case then all properties are already in there 'correct' case
+    // and the entityType name is already a client side name.
+    if (data.entities) {
+      // data: { entities: array of entities, keyMappings array of keyMappings
+      //   where: keyMapping: { entityTypeName: ..., tempValue: ..., realValue ... }
+      return data;
+    } else {
+      // else if coming from .NET
+      // HACK: need to change the 'case' of properties in the saveResult
+      // but KeyMapping properties internally are still ucase. ugh...
+      var keyMappings = data.KeyMappings.map(function (km) {
+        var entityTypeName = MetadataStore.normalizeTypeName(km.EntityTypeName);
+        return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
+      });
+      return { entities: data.Entities, keyMappings: keyMappings };
+    }
   };
 
   proto.jsonResultsAdapter = new JsonResultsAdapter({

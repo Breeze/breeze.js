@@ -1777,6 +1777,17 @@ would have been applied.
                                             </div>
                                         </li>
                                         
+                                        <li class="param">
+                                            
+                                                <code class="param-name">retrievedEntities</code>
+                                                <span class="type">Array of Entity</span>
+                                            
+
+                                            <div class="param-description">
+                                                All entities returned by the query.  Differs from results when .expand() is used.
+                                            </div>
+                                        </li>
+                                        
                                     </ul>
                                 
                             </li>
@@ -1980,7 +1991,7 @@ query.execute().then( function(data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l755"><code>..\src\a50_entityManager.js:755</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l756"><code>..\src\a50_entityManager.js:756</code></a>
         
         </p>
 
@@ -2280,7 +2291,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</c
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1129"><code>..\src\a50_entityManager.js:1129</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1130"><code>..\src\a50_entityManager.js:1130</code></a>
         
         </p>
 
@@ -2450,7 +2461,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1153"><code>..\src\a50_entityManager.js:1153</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1154"><code>..\src\a50_entityManager.js:1154</code></a>
         
         </p>
 
@@ -2799,7 +2810,7 @@ em1.fetchMetadata()
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1216"><code>..\src\a50_entityManager.js:1216</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1217"><code>..\src\a50_entityManager.js:1217</code></a>
         
         </p>
 
@@ -2921,7 +2932,7 @@ var employee = em1.findEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1233"><code>..\src\a50_entityManager.js:1233</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1234"><code>..\src\a50_entityManager.js:1234</code></a>
         
         </p>
 
@@ -3056,7 +3067,7 @@ em1.saveChanges().then( function( data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1335"><code>..\src\a50_entityManager.js:1335</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1336"><code>..\src\a50_entityManager.js:1336</code></a>
         
         </p>
 
@@ -3192,7 +3203,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1389"><code>..\src\a50_entityManager.js:1389</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1390"><code>..\src\a50_entityManager.js:1390</code></a>
         
         </p>
 
@@ -3350,7 +3361,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1091"><code>..\src\a50_entityManager.js:1091</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1092"><code>..\src\a50_entityManager.js:1092</code></a>
         
         </p>
 
@@ -3484,7 +3495,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1103"><code>..\src\a50_entityManager.js:1103</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1104"><code>..\src\a50_entityManager.js:1104</code></a>
         
         </p>
 
@@ -3604,7 +3615,7 @@ var employee = em1.getEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1273"><code>..\src\a50_entityManager.js:1273</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1274"><code>..\src\a50_entityManager.js:1274</code></a>
         
         </p>
 
@@ -4126,7 +4137,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1365"><code>..\src\a50_entityManager.js:1365</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1366"><code>..\src\a50_entityManager.js:1366</code></a>
         
         </p>
 
@@ -4241,7 +4252,7 @@ var entities = em1.rejectChanges();</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l824"><code>..\src\a50_entityManager.js:824</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l825"><code>..\src\a50_entityManager.js:825</code></a>
         
         </p>
 
@@ -5189,7 +5200,7 @@ em.entityChanged.subscribe(function(changeArgs) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1309"><code>..\src\a50_entityManager.js:1309</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1310"><code>..\src\a50_entityManager.js:1310</code></a>
         
         </p>
 

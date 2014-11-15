@@ -1,12 +1,12 @@
 (function (testFns) {
 
-  if (testFns.DEBUG_SEQUELIZE) {
-    module("save", {});
-    test("Skipping tests for Sequelize", function () {
-      ok(true, "Skipped tests");
-    });
-    return;
-  };
+//  if (testFns.DEBUG_SEQUELIZE) {
+//    module("save", {});
+//    test("Skipping tests for Sequelize", function () {
+//      ok(true, "Skipped tests");
+//    });
+//    return;
+//  };
 
   var breeze = testFns.breeze;
   var core = breeze.core;
@@ -60,7 +60,7 @@
       ok(orderID == odOrderID, "orderID's should be the same");
       ok(productID == odProductID, "productID's should be the same");
       return em.saveChanges().fail(function (e) {
-        var x = e;
+        throw e;
       });
     }).then(function (sr) {
       ok(sr.entities.length == 1, "should have saved 1 entity");

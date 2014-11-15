@@ -94,7 +94,7 @@
     var entities = [];
     keys.forEach(function (key) {
       var entity = em.getEntityByKey(key.entityTypeName, key._id);
-      // entities created on the server will not be via getEntityByKey and hence null;
+      // entities created on the server will not be available via getEntityByKey and hence null;
       if (entity) {
         entities.push(entity);
       }

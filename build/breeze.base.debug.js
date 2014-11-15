@@ -1753,6 +1753,7 @@ var __config = (function () {
   @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
   @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
   @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
+  @param [config.uriBuilder] {String} - the name of a previously registered "uriBuilder" adapter
   @return [array of instances]
   **/
   __config.initializeAdapterInstances = function (config) {
@@ -3699,7 +3700,7 @@ var EntityAspect = (function () {
         rejectChangesCore(cos);
       } else {
         cos._rejectChanges();
-        cos.forEach(rejectChangesCore(co));
+        cos.forEach(rejectChangesCore);
       }
     });
   }
@@ -3841,9 +3842,7 @@ var EntityAspect = (function () {
         clearOriginalValues(cos);
       } else {
         cos._acceptChanges();
-        cos.forEach(function (co) {
-          clearOriginalValues(co);
-        });
+        cos.forEach(clearOriginalValues);
       }
     });
   }
@@ -11472,6 +11471,7 @@ breeze.Predicate = Predicate;
   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
   would have been applied.
+  @param callback.data.retrievedEntities {Array of Entity} All entities returned by the query.  Differs from results when .expand() is used.
 
   @param errorCallback {Function} Function called on failure.
 
@@ -13313,6 +13313,7 @@ var EntityManager = (function () {
   @param callback.data.inlineCount {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of
   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
   would have been applied.
+  @param callback.data.retrievedEntities {Array of Entity} All entities returned by the query.  Differs from results when .expand() is used.
 
   @param [errorCallback] {Function} Function called on failure.
 

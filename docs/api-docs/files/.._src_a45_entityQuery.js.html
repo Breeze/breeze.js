@@ -804,6 +804,7 @@
   @param callback.data.inlineCount {Integer} Only available if &#x27;inlineCount(true)&#x27; was applied to the query.  Returns the count of
   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
   would have been applied.
+  @param callback.data.retrievedEntities {Array of Entity} All entities returned by the query.  Differs from results when .expand() is used.
 
   @param errorCallback {Function} Function called on failure.
 

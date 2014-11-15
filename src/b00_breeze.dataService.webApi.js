@@ -55,13 +55,22 @@
   };
 
   proto._prepareSaveResult = function (saveContext, data) {
-    // HACK: need to change the 'case' of properties in the saveResult
-    // but KeyMapping properties internally are still ucase. ugh...
-    var keyMappings = data.KeyMappings.map(function (km) {
-      var entityTypeName = MetadataStore.normalizeTypeName(km.EntityTypeName);
-      return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
-    });
-    return { entities: data.Entities, keyMappings: keyMappings };
+    // if lower case then all properties are already in there 'correct' case
+    // and the entityType name is already a client side name.
+    if (data.entities) {
+      // data: { entities: array of entities, keyMappings array of keyMappings
+      //   where: keyMapping: { entityTypeName: ..., tempValue: ..., realValue ... }
+      return data;
+    } else {
+      // else if coming from .NET
+      // HACK: need to change the 'case' of properties in the saveResult
+      // but KeyMapping properties internally are still ucase. ugh...
+      var keyMappings = data.KeyMappings.map(function (km) {
+        var entityTypeName = MetadataStore.normalizeTypeName(km.EntityTypeName);
+        return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
+      });
+      return { entities: data.Entities, keyMappings: keyMappings };
+    }
   };
 
   proto.jsonResultsAdapter = new JsonResultsAdapter({
