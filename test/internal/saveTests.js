@@ -135,16 +135,16 @@
 
     stop();
     em.saveChanges()
-        .then(function () {
-          equal(hasChangesChangedRaised.length, 2,
-              "hasChangesChanged should have been raised twice");
-          ok(hasChangesChangedRaised[0] === true,
-              "first hasChangesChanged is true after create");
-          ok(hasChangesChangedRaised[1] === false,
-              "second hasChangesChanged is false after save");
-          ok(!em.hasChanges(),
-              "manager should not have pending changes after save");
-        }).fail(testFns.handleFail).fin(start);
+      .then(function () {
+        equal(hasChangesChangedRaised.length, 2,
+            "hasChangesChanged should have been raised twice");
+        ok(hasChangesChangedRaised[0] === true,
+            "first hasChangesChanged is true after create");
+        ok(hasChangesChangedRaised[1] === false,
+            "second hasChangesChanged is false after save");
+        ok(!em.hasChanges(),
+            "manager should not have pending changes after save");
+      }).fail(testFns.handleFail).fin(start);
   });
 
   test("delete without query", function () {
@@ -203,8 +203,6 @@
       return em.saveChanges();
     }).then(function (sr) {
       ok(false, "should not get here");
-
-
     }).fail(function (e) {
       var isOk = e.message.indexOf("part of the entity's key") > 0;
       ok(isOk, "error message should mention the entity key");
@@ -293,10 +291,14 @@
       ok(true, "Skipped tests - OData does not yet support enums");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for MONGO - no enum support.");
+      return;
+    }
+
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "N/A for SEQUELIZE - no enum support.");
       return;
     }
 
@@ -309,6 +311,9 @@
     var aRole2;
     aRole.setProperty("roleType", "Restricted");
     aRole.setProperty("name", "TEMP" + testFns.makeTempString(5));
+//    if (testFns.DEBUG_SEQUELIZE) {
+//      aRole.setProperty("ts", "xxx");
+//    }
     var ves = aRole.entityAspect.validateEntity();
     em.saveChanges().then(function (sr) {
       ok(sr.entities.length == 1, "should have saved (added) one entity");
@@ -340,7 +345,6 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
 
     var em = newEm();
@@ -359,7 +363,6 @@
       return em.saveChanges(null, so);
     }).then(function (sr) {
       ok("should not get here");
-
     }).fail(function (e) {
       ok(e);
     }).fail(testFns.handleFail).fin(start);
@@ -410,7 +413,6 @@
   //});
 
   test("check unmapped property on server", function () {
-
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for Mongo - Have not yet added SaveCheck code for Mongo");
       return;
@@ -536,7 +538,6 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for Mongo - Have not yet added SaveCheck code for Mongo");
@@ -569,8 +570,6 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
-
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for Mongo - test not yet implemented - requires server side async call");
@@ -586,11 +585,10 @@
 
       var entitiesToSave = new Array(category);
       var saveOptions = new SaveOptions({ tag: "increaseProductPrice" });
-      stop();
-      em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
-        ok(sr.entities.length === 13, "13 records should have been saved - 1 category + 12 products");
-        // TODO: we should now requery and check that the 12 products actually have increased in price.
-      }).fail(testFns.handleFail).fin(start);
+      return em.saveChanges(entitiesToSave, saveOptions);
+    }).then(function (sr) {
+      ok(sr.entities.length === 13, "13 records should have been saved - 1 category + 12 products");
+      // TODO: we should now requery and check that the 12 products actually have increased in price.
     }).fail(testFns.handleFail).fin(start);
   });
 
@@ -599,7 +597,6 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     var em = newEm();
 
@@ -682,41 +679,6 @@
 
   });
 
-  test("save data with alt resource and server side add", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped test - OData does not support server interception or alt resources");
-      return;
-    }
-    ;
-
-
-    var em = newEm();
-
-    var q = new EntityQuery("Orders").take(1);
-    stop();
-    var order;
-    var freight;
-    q.using(em).execute().then(function (data) {
-      order = data.results[0];
-      freight = order.getProperty("freight") + .5;
-      order.setProperty("freight", freight);
-
-      var so = new SaveOptions({ resourceName: "SaveWithComment", tag: "SaveWithComment - order" });
-
-      return em.saveChanges(null, so);
-    }).then(function (sr) {
-      ok(sr.entities.length == 2, "should have saved two entities");
-      sr.entities.forEach(function (e) {
-        ok(e.entityAspect, "entities should have an entityAspect after save");
-      });
-      var q2 = EntityQuery.fromEntities(order);
-      return q2.using(em).execute();
-    }).then(function (data2) {
-      var order2 = data2.results[0];
-      var freight2 = order2.getProperty("freight");
-      ok(freight2 == freight, "freight2=" + freight2 + " vs " + freight);
-    }).fail(testFns.handleFail).fin(start);
-  });
 
   test("save with date as part of key", function () {
     var em = newEm();
@@ -743,7 +705,12 @@
       ok(true, "Skipped test - Mongo does not YET support computed properties");
       return;
     }
-    ;
+
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped test - Sequelize does not YET support computed properties");
+      return;
+    }
+
     var em = newEm();
     var q = EntityQuery.from("Employees").take(3);
     stop();
@@ -769,7 +736,12 @@
       ok(true, "Skipped test - Mongo does not YET support computed properties");
       return;
     }
-    ;
+
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped test - Sequelize does not YET support computed properties");
+      return;
+    }
+
     var em = newEm();
     var q = EntityQuery.from("Employees").take(3);
     stop();
@@ -796,7 +768,12 @@
       ok(true, "Skipped test - Mongo does not YET support computed properties");
       return;
     }
-    ;
+
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped test - Sequelize does not YET support computed properties");
+      return;
+    }
+
     var em = newEm();
     var emp = em.createEntity("Employee");
     emp.setProperty("firstName", "Test fn");
@@ -846,39 +823,35 @@
         extraMetadata;
 
     stop();
-    new EntityQuery("Customers").take(1).using(em1).execute()
-        .then(function (data) {
-          cust = data.results[0];
+    new EntityQuery("Customers").take(1).using(em1).execute().then(function (data) {
+      cust = data.results[0];
 
-          if (testFns.DEBUG_ODATA) {
-            extraMetadata = cust.entityAspect.extraMetadata;
-            ok(extraMetadata,
-                "has OData extraMetadata on the original customer before export");
-          }
-          ;
+      if (testFns.DEBUG_ODATA) {
+        extraMetadata = cust.entityAspect.extraMetadata;
+        ok(extraMetadata,
+            "has OData extraMetadata on the original customer before export");
+      }
 
-          var exported = em1.exportEntities([cust], false); // exclude metadata ... not important
-          cust.entityAspect.setDetached(); // remove from cache
-          cust = em1.importEntities(exported).entities[0]; // get reimported customer
+      var exported = em1.exportEntities([cust], false); // exclude metadata ... not important
+      cust.entityAspect.setDetached(); // remove from cache
+      cust = em1.importEntities(exported).entities[0]; // get reimported customer
 
-          if (testFns.DEBUG_ODATA) {
-            // these tests fail for OData until #2574 fixed
-            var xtra = cust.entityAspect.extraMetadata;
-            ok(xtra, "has extraMetadata on the imported customer");
-            equal(xtra.etag, extraMetadata.etag,
-                "imported OData extraMetadata.etag matches original");
-          }
-          ;
+      if (testFns.DEBUG_ODATA) {
+        // these tests fail for OData until #2574 fixed
+        var xtra = cust.entityAspect.extraMetadata;
+        ok(xtra, "has extraMetadata on the imported customer");
+        equal(xtra.etag, extraMetadata.etag,
+            "imported OData extraMetadata.etag matches original");
+      }
 
-          testFns.morphStringProp(cust, "contactName");
-          // this will fail for OData until #2574 fixed because no etag
-          return em1.saveChanges();
-        })
-        .then(function (sr) {
-          var e = sr.entities;
-          ok(e.length === 1, "1 record should have been saved");
-        })
-        .fail(testFns.handleFail).fin(start);
+
+      testFns.morphStringProp(cust, "contactName");
+      // this will fail for OData until #2574 fixed because no etag
+      return em1.saveChanges();
+    }).then(function (sr) {
+      var e = sr.entities;
+      ok(e.length === 1, "1 record should have been saved");
+    }).fail(testFns.handleFail).fin(start);
   });
 
   test("save update with ES5 props and unmapped changes", function () {
@@ -936,8 +909,6 @@
       ok(true, "Skipped test - OData does not support server interception");
       return;
     }
-    ;
-
 
     var em = newEm();
 
@@ -949,12 +920,47 @@
     ok(hasChanges, "should have some changes");
     stop();
     em.saveChanges().then(function (sr) {
-      ok(sr.entities.length == 0, "should now have saved anything");
+      ok(sr.entities.length == 0, "should not have saved anything");
       hasChanges = em.hasChanges();
       ok(hasChanges, "should still have some changes because user should have been rejected on the server");
       // var q2 = EntityQuery.fromEntities(order);
     }).fail(testFns.handleFail).fin(start);
   });
+
+  test("save data with alt resource and server side add", function () {
+    if (testFns.DEBUG_ODATA) {
+      ok(true, "Skipped test - OData does not support server interception or alt resources");
+      return;
+    }
+
+    var em = newEm();
+
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1).orderBy("orderID");
+    stop();
+    var order;
+    var freight;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight") + .5;
+      order.setProperty("freight", freight);
+
+      var so = new SaveOptions({ resourceName: "SaveWithComment", tag: "SaveWithComment - order" });
+
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 2, "should have saved two entities");
+      sr.entities.forEach(function (e) {
+        ok(e.entityAspect, "entities should have an entityAspect after save");
+      });
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var freight2 = order2.getProperty("freight");
+      ok(freight2 == freight, "freight2=" + freight2 + " vs " + freight);
+    }).fail(testFns.handleFail).fin(start);
+  });
+
 
   test("save data with alt resource and server update", function () {
     if (testFns.DEBUG_ODATA) {
@@ -964,7 +970,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").take(1);
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
     stop();
     var order;
     var freight;
@@ -992,12 +998,10 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
-
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1);
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCountry;
     q.using(em).execute().then(function (data) {
@@ -1023,11 +1027,10 @@
       ok(true, "Skipped test - OData does not support server interception");
       return;
     }
-    ;
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1);
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCity;
     q.using(em).execute().then(function (data) {
@@ -1053,8 +1056,6 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
-
 
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1072,14 +1073,11 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "Skipped test - Mongo does not YET support server side validation");
       return;
     }
-    ;
-
 
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1122,14 +1120,11 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "Skipped test - Mongo does not YET support server side validation");
       return;
     }
-    ;
-
 
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1187,13 +1182,11 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "Skipped test - Mongo does not YET support server side validation");
       return;
     }
-    ;
 
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1215,13 +1208,12 @@
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
+
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "Skipped test - Mongo does not YET support server side validation");
       return;
     }
-    ;
 
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1330,6 +1322,11 @@
   });
 
   test("save data with millseconds - UTC time - IE bug", function () {
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped test - SEQUELIZE/MySQL does not support millisecond resolution");
+      return;
+    }
+
     var em = newEm();
     var dt = new Date(Date.parse("2012-12-17T13:35:15.690Z"));
     var offset = dt.getTimezoneOffset() * 60000;
@@ -1361,6 +1358,11 @@
   });
 
   test("save data with millseconds - local time", function () {
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped test - SEQUELIZE/MySQL does not support millisecond resolution");
+      return;
+    }
+
     var em = newEm();
     // Date.parse("2012-12-17T13:35:15.690");
     var dt = new Date(2012, 11, 17, 13, 35, 15, 690); // local time
@@ -1390,12 +1392,10 @@
   });
 
   test("save custom data annotation validation", function () {
-
     if (testFns.DEBUG_ODATA) {
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - server side 'test' logic not yet implemented");
@@ -1425,8 +1425,6 @@
       ok(error.entityErrors[0].errorMessage === custErrors[0].errorMessage);
       // ok(error.message.indexOf("the word 'Error'") > 0, "incorrect error message");
     }).fin(start);
-
-
   });
 
   test("save date", function () {
@@ -1540,9 +1538,7 @@
       ok(zzz.cust1.getProperty("orders").length === 2);
       ok(zzz.cust2.getProperty("orders").length === 0);
       ok(!em.hasChanges());
-    }).fail(function (err) {
-      ok(false, "should not get here - " + err);
-    }).fin(start);
+    }).fail(testFns.handleFail).fin(start);
   });
 
   test("allow concurrent saves with concurrency column", function () {
@@ -1666,23 +1662,10 @@
 
   test("modify parent and children", function () {
     var em = newEm();
-    var query = new EntityQuery()
-        .from("Customers")
-        .where("companyName", "startsWith", "C")
-        .take(5);
     stop();
-    var companyName, newCompanyName, orders, cust;
-    var custs, cust;
-    em.executeQuery(query).then(function (data) {
-      custs = data.results;
-      var promises = custs.map(function (c) {
-        return c.entityAspect.loadNavigationProperty("orders");
-      });
-      return Q.all(promises);
-    }).then(function () {
-      cust = core.arrayFirst(custs, function (c) {
-        return c.getProperty("orders").length > 0;
-      });
+    var cust;
+    saveNewCustAndOrders(em).then(function(savedCust) {
+      cust = savedCust;
       if (cust == null) {
         throw new Error("Test error - need a customer with orders");
       }
@@ -1722,6 +1705,65 @@
       ok(cust.getProperty("companyName") === newCompanyName, "company name was not changed on requery");
     }).fail(testFns.handleFail).fin(start);
   });
+
+//  test("modify parent and children", function () {
+//    var em = newEm();
+//    var query = new EntityQuery()
+//        .from("Customers")
+//        .where("companyName", "startsWith", "C")
+//        .take(5);
+//    stop();
+//    var companyName, newCompanyName, orders, cust;
+//    var custs, cust;
+//    em.executeQuery(query).then(function (data) {
+//      custs = data.results;
+//      var promises = custs.map(function (c) {
+//        return c.entityAspect.loadNavigationProperty("orders");
+//      });
+//      return Q.all(promises);
+//    }).then(function () {
+//      cust = core.arrayFirst(custs, function (c) {
+//        return c.getProperty("orders").length > 0;
+//      });
+//      if (cust == null) {
+//        throw new Error("Test error - need a customer with orders");
+//      }
+//      companyName = cust.getProperty("companyName");
+//      newCompanyName = testFns.morphStringProp(cust, "companyName");
+//      ok(cust.entityAspect.entityState.isModified(), "should be modified");
+//      orders = cust.getProperty("orders");
+//      orders.forEach(function (o) {
+//        testFns.morphStringProp(o, "shipName");
+//        ok(o.entityAspect.entityState.isModified(), "should be modified");
+//      });
+//      return em.saveChanges();
+//    }).then(function (saveResult) {
+//      ok(!em.hasChanges());
+//      var entities = saveResult.entities;
+//      ok(entities.length === 1 + orders.length, "wrong number of entities returned");
+//      ok(saveResult.keyMappings.length === 0, "no key mappings should be returned");
+//
+//      entities.forEach(function (e) {
+//        ok(e.entityAspect.entityState.isUnchanged(), "entity is not in unchanged state");
+//        if (e.entityType === cust.entityType) {
+//          ok(e === cust, "cust does not match");
+//        } else {
+//          ok(orders.indexOf(e) >= 0, "order does not match");
+//        }
+//      });
+//
+//      ok(cust.getProperty("companyName") === newCompanyName, "company name was not changed");
+//      ok(cust.entityAspect.entityState.isUnchanged(), "entityState should be unchanged");
+//      var q2 = EntityQuery.fromEntities(cust);
+//
+//      return em.executeQuery(q2);
+//    }).then(function (data2) {
+//      var entities2 = data2.results;
+//      ok(entities2.length === 1, "should only get a single entity");
+//      ok(entities2[0] === cust, "requery does not match cust");
+//      ok(cust.getProperty("companyName") === newCompanyName, "company name was not changed on requery");
+//    }).fail(testFns.handleFail).fin(start);
+//  });
 
   test("delete parent, children stranded", function () {
     var em = newEm();
@@ -1944,9 +1986,15 @@
       ok(false, "shouldn't get here");
     }).fail(function (error) {
       ok(em2.hasChanges());
-      var frag = (testFns.DEBUG_MONGO) ? "duplicate key error" : "primary key constraint";
+      var frag;
+      if (testFns.DEBUG_MONGO) {
+        frag = "duplicate key error"
+      } else if (testFns.DEBUG_SEQUELIZE) {
+        frag = "SequelizeUniqueConstraintError"
+      } else {
+        frag = "primary key constraint"
+      }
       ok(error.message.toLowerCase().indexOf(frag) >= 0, "wrong error message: " + error.message);
-
     }).fin(start);
   });
 
@@ -1955,7 +2003,6 @@
       ok(true, "Skipped tests - not applicable to OData");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "TODO for Mongo - need to create this test");
@@ -1996,7 +2043,6 @@
       ok(true, "Skipped test - OData does not support server side key generator (except identity)");
       return;
     }
-    ;
 
     var em = newEm();
 
@@ -2024,7 +2070,6 @@
       ok(true, "Skipped test - OData does not support server side key generator (except identity)");
       return;
     }
-    ;
 
     var em = newEm();
 
@@ -2092,7 +2137,6 @@
       ok(true, "Skipped test - OData does not support server side key generator (except identity)");
       return;
     }
-    ;
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for MONGO - expand is not YET supported.");
@@ -2165,7 +2209,6 @@
       ok(true, "Skipped test - OData does not support server side key generator (except identity)");
       return;
     }
-    ;
 
     var em = newEm();
     var em2 = newEm();
@@ -2288,9 +2331,7 @@
     }).then(function (sr) {
 
       ok(sr.entities.length, "deleted count:" + sr.entities.length);
-    }).fail(function (err) {
-      testFns.handleFail(err);
-    }).fin(start);
+    }).fail(testFns.handleFail).fin(start);
   });
 
   function createCustomer(em) {
@@ -2303,6 +2344,30 @@
     cust1.setProperty("fax", "510 999-9999");
     em.addEntity(cust1);
     return cust1;
+  }
+
+  function saveNewCustAndOrders(em) {
+    var metadataStore = em.metadataStore;
+    var custType = metadataStore.getEntityType("Customer");
+    var orderType = metadataStore.getEntityType("Order");
+    var cust1 = custType.createEntity();
+    cust1.setProperty("companyName", "Test_js_1");
+    cust1.setProperty("city", "Oakland");
+    cust1.setProperty("rowVersion", 13);
+    cust1.setProperty("fax", "510 999-9999");
+    em.addEntity(cust1);
+    var order1 = orderType.createEntity();
+    order1.setProperty("orderDate", new Date());
+    var order2 = orderType.createEntity();
+    var orders = cust1.getProperty("orders");
+    order2.setProperty("orderDate", new Date());
+    orders.push(order1);
+    orders.push(order2);
+    return em.saveChanges().then(function(data) {
+      var results = data.results;
+      ok(cust1.entityAspect.entityState.isUnchanged());
+      return cust1;
+    });
   }
 
   function createParentAndChildren(em) {

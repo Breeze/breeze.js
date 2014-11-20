@@ -511,28 +511,44 @@
       }
     }
 
-    var tmp = errObj;
-    do {
-      err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
-      tmp = tmp.InnerException;
-    } while (tmp);
     var saveContext = httpResponse.saveContext;
-    var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
-    if (saveContext &amp;&amp; entityErrors) {
-      var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
-      err.entityErrors = entityErrors.map(function (e) {
+
+    // if any of the follow properties exist the source is .NET
+    var tmp = errObj.Message || errObj.ExceptionMessage || errObj.EntityErrors || errObj.Errors;
+    var isDotNet = !!tmp;
+    var message, entityErrors;
+    if (!isDotNet) {
+      message = errObj.message;
+      entityErrors = errObj.entityErrors || errObj.errors;
+    } else {
+      var tmp = errObj;
+      do {
+        // .NET exceptions can provide both ExceptionMessage and Message but ExceptionMethod if it
+        // exists has a more detailed message.
+        message = tmp.ExceptionMessage || tmp.Message;
+        tmp = tmp.InnerException;
+      } while (tmp);
+      entityErrors = errObj.EntityErrors || errObj.Errors;
+      entityErrors = entityErrors &amp;&amp; entityErrors.map(function (e) {
         return {
           errorName: e.ErrorName,
           entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
           keyValues: e.KeyValues,
-          propertyName: e.PropertyName &amp;&amp; propNameFn(e.PropertyName),
+          propertyName: e.PropertyName,
           errorMessage: e.ErrorMessage
         };
       });
-      if (!err.message) {
-        err.message = &quot;Server side errors encountered - see the entityErrors collection on this object for more detail&quot;;
-      }
     }
+
+    if (saveContext &amp;&amp; entityErrors) {
+      var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
+      entityErrors.forEach(function (e) {
+        e.propertyName = e.propertyName &amp;&amp; propNameFn(e.propertyName);
+      });
+      err.entityErrors = entityErrors
+    }
+
+    err.message = message || &quot;Server side errors encountered - see the entityErrors collection on this object for more detail&quot;;
 
   }
 

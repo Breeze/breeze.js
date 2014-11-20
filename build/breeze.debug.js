@@ -644,6 +644,14 @@ function uncurry(f) {
   };
 }
 
+//function __normalizeProps(obj) {
+//  var newObj = {}
+//  Object.keys(obj).forEach(function(key) {
+//    newObj[key.toLowerCase()] = obj[key];
+//  });
+//  return newObj;
+//}
+
 // shims
 
 if (!Object.create) {
@@ -12003,7 +12011,7 @@ var OrderByClause = (function () {
     if (propertyPaths.length > 1) {
       // you can also pass in an array of orderByClauses
       if (propertyPaths[0] instanceof OrderByClause) {
-        this.items = Array.prototype.concat.bind(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
+        this.items = Array.prototype.concat.apply(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
         return;
       }
       var items = propertyPaths.map(function (pp) {
@@ -15725,28 +15733,44 @@ breeze.SaveOptions = SaveOptions;
       }
     }
 
-    var tmp = errObj;
-    do {
-      err.message = tmp.ExceptionMessage || tmp.exceptionMessage || tmp.Message || tmp.message;
-      tmp = tmp.InnerException;
-    } while (tmp);
     var saveContext = httpResponse.saveContext;
-    var entityErrors = errObj.EntityErrors || errObj.entityErrors || errObj.Errors || errObj.errors;
-    if (saveContext && entityErrors) {
-      var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
-      err.entityErrors = entityErrors.map(function (e) {
+
+    // if any of the follow properties exist the source is .NET
+    var tmp = errObj.Message || errObj.ExceptionMessage || errObj.EntityErrors || errObj.Errors;
+    var isDotNet = !!tmp;
+    var message, entityErrors;
+    if (!isDotNet) {
+      message = errObj.message;
+      entityErrors = errObj.entityErrors || errObj.errors;
+    } else {
+      var tmp = errObj;
+      do {
+        // .NET exceptions can provide both ExceptionMessage and Message but ExceptionMethod if it
+        // exists has a more detailed message.
+        message = tmp.ExceptionMessage || tmp.Message;
+        tmp = tmp.InnerException;
+      } while (tmp);
+      entityErrors = errObj.EntityErrors || errObj.Errors;
+      entityErrors = entityErrors && entityErrors.map(function (e) {
         return {
           errorName: e.ErrorName,
           entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
           keyValues: e.KeyValues,
-          propertyName: e.PropertyName && propNameFn(e.PropertyName),
+          propertyName: e.PropertyName,
           errorMessage: e.ErrorMessage
         };
       });
-      if (!err.message) {
-        err.message = "Server side errors encountered - see the entityErrors collection on this object for more detail";
-      }
     }
+
+    if (saveContext && entityErrors) {
+      var propNameFn = saveContext.entityManager.metadataStore.namingConvention.serverPropertyNameToClient;
+      entityErrors.forEach(function (e) {
+        e.propertyName = e.propertyName && propNameFn(e.propertyName);
+      });
+      err.entityErrors = entityErrors
+    }
+
+    err.message = message || "Server side errors encountered - see the entityErrors collection on this object for more detail";
 
   }
 

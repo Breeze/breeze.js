@@ -468,15 +468,15 @@ breezeTestFns = (function (breeze) {
     if (error.handled === true) return;
 
     if (error instanceof (Error)) {
-      if (error.message.indexOf("assertion outside test context") >= 0) {
-        alert(error.message);
+      var msg = error.message || "";
+      if (msg.indexOf("assertion outside test context") >= 0) {
+        alert(msg);
       }
-      var msg = (error.message || "") + ((error.responseText && " responseText: " + error.responseText) || "");
+      msg = msg + ((error.responseText && " responseText: " + error.responseText) || "");
       ok(false, "Failed: " + msg);
     } else {
       ok(false, "error is not an error object; error.status: " + error.status + "  error.message: " + error.message + "-" + error.responseText);
     }
-    // start();
     return;
   };
 

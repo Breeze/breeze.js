@@ -1129,7 +1129,7 @@ var OrderByClause = (function () {
     if (propertyPaths.length > 1) {
       // you can also pass in an array of orderByClauses
       if (propertyPaths[0] instanceof OrderByClause) {
-        this.items = Array.prototype.concat.bind(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
+        this.items = Array.prototype.concat.apply(propertyPaths[0].items, propertyPaths.slice(1).map(__pluck("items")) );
         return;
       }
       var items = propertyPaths.map(function (pp) {
