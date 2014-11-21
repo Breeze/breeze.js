@@ -1778,7 +1778,7 @@ var EntityManager = (function () {
       if (entityState.isAdded()) {
         newTempKey = getMappedKey(tempKeyMap, entityKey);
         // merge added records with non temp keys
-        targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
+        targetEntity = (newTempKey == null) ? entityGroup.findEntityByKey(entityKey) : null;
       } else {
         targetEntity = entityGroup.findEntityByKey(entityKey);
       }

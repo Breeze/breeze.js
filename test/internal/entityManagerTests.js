@@ -1397,6 +1397,63 @@
 
   });
 
+  test("can import added entity w/ perm key that was changed while in added state", function () {
+      // Fails D#2647 Reported https://github.com/Breeze/breeze.js/issues/49
+      expect(2);
+      var em1 = newEm();
+      var em2 = newEm();
+
+      // Customer has client-assigned keys
+      var cust1 = em1.createEntity('Customer', {
+          customerID: core.getUuid(),
+          companyName: 'Added Company',
+          contactName: 'Unforgettable'
+      });
+
+      // export cust1 to em2 (w/o metadata); becomes cust2
+      var exported = em1.exportEntities([cust1], false);
+      var cust2 = em2.importEntities(exported).entities[0];
+
+      // change a property of the Customer while in em2;
+      cust2.setProperty('companyName', 'Added Company + 1');
+
+      // re-import customer from em2 back to em1 with OverwriteChanges
+      exported = em2.exportEntities([cust2], false);
+      em1.importEntities(exported, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+      equal(cust1.getProperty('contactName'), 'Unforgettable', "'contactName' unchanged");
+      equal(cust1.getProperty('companyName'), 'Added Company + 1',
+        "'companyName' in em1 reflects change made in em2 and reimported to em1");
+  });
+
+  test("Expected failure - can import added entity w/ temp key that was changed while in added state", function () {
+      // See D#2648 Related to https://github.com/Breeze/breeze.js/issues/49
+      expect(2);
+      var em1 = newEm();
+      var em2 = newEm();
+
+      // Employee has store-generated temp keys
+      var emp1 = em1.createEntity('Employee', {
+          firstName: 'Ima',
+          lastName:  'Unforgettable'
+      });
+
+      // export emp1 to em2 (w/o metadata); becomes emp2
+      var exported = em1.exportEntities([emp1], false);
+      var emp2 = em2.importEntities(exported).entities[0];
+
+      // change a property of the Employee while in em2;
+      emp2.setProperty('firstName', 'Ima B.');
+
+      // re-import Employee from em2 back to em1 with OverwriteChanges
+      exported = em2.exportEntities([emp2], false);
+      em1.importEntities(exported, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+      equal(emp1.getProperty('lastName'), 'Unforgettable', "'lastName' unchanged");
+      equal(emp1.getProperty('firstName'), 'Ima B.',
+        "'firstName' in em1 reflects change made in em2 and reimported to em1");
+  });
+
   test("Export changes to local storage and re-import", 5, function () {
 
     var em = newEm();
@@ -1435,7 +1492,6 @@
     ok(newCust !== restoredCust,
         "Restored Cust is not the same object as the original Cust");
   });
-
 
   function createCust(em, companyName) {
     var custType = em.metadataStore.getEntityType("Customer");
