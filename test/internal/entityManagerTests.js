@@ -1397,8 +1397,8 @@
 
   });
 
-  test("can import added entity w/ perm key that was changed while in added state", function () {
-      // Fails D#2647 Reported https://github.com/Breeze/breeze.js/issues/49
+  test("can re-import and merge an added entity w/ PERM key that was changed in another manager", function () {
+      // D#2647 Reported https://github.com/Breeze/breeze.js/issues/49
       expect(2);
       var em1 = newEm();
       var em2 = newEm();
@@ -1426,16 +1426,16 @@
         "'companyName' in em1 reflects change made in em2 and reimported to em1");
   });
 
-  test("Expected failure - can import added entity w/ temp key that was changed while in added state", function () {
-      // See D#2648 Related to https://github.com/Breeze/breeze.js/issues/49
-      expect(2);
+  test("re-imported new entity w/ TEMP key that was changed in another manager is added, not merged", function () {
+      // This question was raised in https://github.com/Breeze/breeze.js/issues/49
+      expect(4);
       var em1 = newEm();
       var em2 = newEm();
 
       // Employee has store-generated temp keys
       var emp1 = em1.createEntity('Employee', {
           firstName: 'Ima',
-          lastName:  'Unforgettable'
+          lastName: 'Unforgettable'
       });
 
       // export emp1 to em2 (w/o metadata); becomes emp2
@@ -1447,11 +1447,18 @@
 
       // re-import Employee from em2 back to em1 with OverwriteChanges
       exported = em2.exportEntities([emp2], false);
-      em1.importEntities(exported, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+      var emp1b = em1.importEntities(exported,
+                    // strategy doesn't matter actually
+                    { mergeStrategy: breeze.MergeStrategy.OverwriteChanges })
+                    .entities[0];
 
-      equal(emp1.getProperty('lastName'), 'Unforgettable', "'lastName' unchanged");
-      equal(emp1.getProperty('firstName'), 'Ima B.',
-        "'firstName' in em1 reflects change made in em2 and reimported to em1");
+      notEqual(emp1.getProperty('employeeID'), emp1b.getProperty('employeeID'),
+        "re-imported employee is not the same as the original.");
+      equal(emp1.getProperty('firstName'), 'Ima',
+        "'emp1.firstName' is unchanged");
+      equal(emp1b.getProperty('firstName'), 'Ima B.',
+        "'emp1b.firstName' reflects change made in em2 and reimported to em1.");
+      equal(em1.getChanges().length, 2, "em1 now has TWO new entities.");
   });
 
   test("Export changes to local storage and re-import", 5, function () {

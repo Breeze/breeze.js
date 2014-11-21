@@ -1774,14 +1774,13 @@ var EntityManager = (function () {
 
       var entityKey = entityType.getEntityKeyFromRawEntity(rawEntity, rawValueFn);
       var entityState = EntityState.fromName(newAspect.entityState);
-      var newTempKey;
-      if (entityState.isAdded()) {
-        newTempKey = getMappedKey(tempKeyMap, entityKey);
-        // merge added records with non temp keys
-        targetEntity = (newTempKey == null) ? entityGroup.findEntityByKey(entityKey) : null;
-      } else {
-        targetEntity = entityGroup.findEntityByKey(entityKey);
-      }
+
+      // Merge if raw entity is in cache
+      // UNLESS this is a new entity w/ a temp key
+      // Cannot safely merge such entities even
+      // if could match temp key to an entity in cache.
+      var newTempKey = entityState.isAdded() && getMappedKey(tempKeyMap, entityKey);
+      targetEntity = newTempKey ? null : entityGroup.findEntityByKey(entityKey);
 
       if (targetEntity) {
         if (mergeStrategy === MergeStrategy.SkipMerge) {
@@ -1800,7 +1799,7 @@ var EntityManager = (function () {
       } else {
         targetEntity = entityType._createInstanceCore();
         entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-        if (newTempKey != null) {
+        if (newTempKey) {
           targetEntity.entityAspect.hasTempKey = true;
           // fixup pk
           targetEntity.setProperty(entityType.keyProperties[0].name, newTempKey.values[0]);
