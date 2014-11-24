@@ -33,7 +33,7 @@
         .from("Employees")
         .where(predicate1);
     if (testFns.DEBUG_NHIBERNATE) {
-        q = q.expand("directReports");
+        q = q.expand("directReports.directReports");
     }
     q = q.noTracking();
     stop();
