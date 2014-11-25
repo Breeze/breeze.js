@@ -157,19 +157,23 @@
       em.saveChanges()
       .then(function (sr) {
           ok(emp2.employeeID > -1, "responded with saved emp2 with permanent ID");
-          ok(emp2.entityAspect.entityState.isDeleted(), "emp2 scheduled for deletion");
+          ok(!emp2.entityAspect.entityState.isDeleted(), "emp2 NOT scheduled for deletion");
       })
-      .catch(function (err) {
+      .catch(function (e) {
           var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
           var id2 = emp2.getProperty('employeeID'); // detached with temp key
           var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
           // D#2649: Break here to see partial processing and broken cache
-          testFns.handleFail(err);
+          testFns.handleFail(e);
       })
       .finally(start);
 
-      // quickly delete the 2nd new employee before save can return;
-      emp2.entityAspect.setDeleted();
+      // try to delete the 2nd new employee before save can return;
+      try {
+          emp2.entityAspect.setDeleted();
+      } catch (error) {
+          // hope to trap error when call setDeleted() on added entity that is being saved.
+      }
   });
 
   test("delete without query", function () {
