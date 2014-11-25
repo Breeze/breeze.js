@@ -147,6 +147,31 @@
       }).fail(testFns.handleFail).fin(start);
   });
 
+  asyncTest("delete saved added entity (store-gen key) before server response", function () {
+      // Fails D#2649
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test fn1' });
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+      var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp2.employeeID > -1, "responded with saved emp2 with permanent ID");
+          ok(emp2.entityAspect.entityState.isDeleted(), "emp2 scheduled for deletion");
+      })
+      .catch(function (err) {
+          var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
+          var id2 = emp2.getProperty('employeeID'); // detached with temp key
+          var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
+          // D#2649: Break here to see partial processing and broken cache
+          testFns.handleFail(err);
+      })
+      .finally(start);
+
+      // quickly delete the 2nd new employee before save can return;
+      emp2.entityAspect.setDeleted();
+  });
+
   test("delete without query", function () {
     var em = newEm();
     var em2 = newEm();
