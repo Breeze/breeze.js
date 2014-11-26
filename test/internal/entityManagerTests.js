@@ -1156,6 +1156,20 @@
     }).fail(testFns.handleFail);
   });
 
+  test("can determine if 'entityChanged' event is enabled", function(){
+      // D#2652
+      // see http://www.breezejs.com/sites/all/apidocs/classes/Event.html#method_isEnabled
+      // which also describes EntityManager having propertyChanged event which it doesn't  
+      var em = newEm();
+      try {
+        var eventEnabled = Event.isEnabled("entityChanged", em); 
+        ok(true, "can ask if the 'entityChanged' event is enabled") ;     
+      } catch(e){
+        ok(false, "calling 'isEnabled' threw exception w/ msg = " +
+          e.message);
+      }
+  });
+
   test("entityChanged event suppressed", function () {
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");

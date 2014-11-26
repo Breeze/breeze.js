@@ -337,6 +337,52 @@
         .catch(handleFail).finally(start);
   });
 
+  // This test passes when the server returns the whole saved entity
+  // That won't be true for servers that return patch values
+  // rather than entire entities and therefore behavior can be different
+  asyncTest("reverts to saved values when save modifed entity then modify a different value before save response", function () {
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+            ok(sr.entities.length > 0, "Should have results for 'Add' save");
+            emp1.firstName = 'Test fn1 mod1';
+            var promise = em.saveChanges(); // save modified emp
+
+            // modify a different property while save is in-flight
+            emp1.lastName = 'Test ln1 mod2';
+
+            return promise;
+        })
+        .then(function (sr) {
+            ok(sr.entities.length > 0, "Should have results for 'Mod' save");
+            ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be unchanged");
+            equal(emp1.getProperty('lastName'), 'Test ln1', "lastName should have reverted to original saved value.");
+        })
+        .catch(handleFail).finally(start);
+  });
+
+  asyncTest("manager.hasChanges() is true after save if manager other changes were made during save", function () {
+      // D#2651
+      expect(2);
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+            var hasChanges = em.hasChanges();
+            var changes = em.getChanges();
+            equal(changes.length, 1, "should have one pending change, the added emp2");
+            ok(hasChanges, "'hasChanges()' should be true");
+          })
+        .catch(handleFail).finally(start);
+
+      // Create another entity while save is in progress
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+
+  });
+
   test("delete without query", function () {
     var em = newEm();
     var em2 = newEm();
