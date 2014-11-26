@@ -102,6 +102,7 @@ breezeTestFns = (function (breeze) {
           success: function (httpResponse) {
               var data = httpResponse.data;
               testFns.setServerVersion(data.value, data.version);
+              testFns.northwindIBMetadata = JSON.parse(data.metadata);
               if (QUnit.urlParams.canStart) {
                   QUnit.start(); // run tests
               }

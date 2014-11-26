@@ -39,7 +39,7 @@
     }
   });
 
-  test("compare NorthwindIB metadata to sample", function () {
+  test("compare NorthwindIB metadata to baseline", function () {
     var em = testFns.newEm();
     var store = em.metadataStore;
     ok(store.hasMetadataFor(testFns.serviceName));
@@ -59,10 +59,13 @@
       "structuralTypes.navigationProperties.invForeignKeyNames": "name"
     });
 
-    ok((!diffs || !diffs.length), "should be no differences");
-    var str = JSON.stringify(diffs, undefined, 4);
-    testFns.output("Metadata diff");
-    testFns.output(str);
+    var perfect = (!diffs || !diffs.length);
+    ok(perfect, "should be no differences");
+    if (!perfect) {
+      var str = JSON.stringify(diffs, undefined, 4);
+      testFns.output("Metadata diff");
+      testFns.output(str);
+    }
 
   });
 
