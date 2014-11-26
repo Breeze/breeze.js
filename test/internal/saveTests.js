@@ -147,17 +147,18 @@
       }).fail(testFns.handleFail).fin(start);
   });
 
-  asyncTest("delete saved added entity (store-gen key) before server response", function () {
-      // Fails D#2649
+  asyncTest("delete added entity (store-gen key) before server save response", function () {
+      // Fails D#2649 "Internal Error in key fixup - unable to locate entity"
       var em = newEm();
+      // Surround target emp (emp2) with other adds to see the effect on the cached adds
       var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test fn1' });
       var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
       var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
 
       em.saveChanges()
       .then(function (sr) {
-          ok(emp2.employeeID > -1, "responded with saved emp2 with permanent ID");
-          ok(!emp2.entityAspect.entityState.isDeleted(), "emp2 NOT scheduled for deletion");
+          ok(emp2.employeeID < 0, "emp2 should still have temp ID");
+          ok(emp2.entityAspect.entityState.isAdded(), "emp2 should still be in added state");
       })
       .catch(function (e) {
           var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
@@ -174,6 +175,85 @@
       } catch (error) {
           // hope to trap error when call setDeleted() on added entity that is being saved.
       }
+  });
+  asyncTest("detach added entity (store-gen key) before server save response", function () {
+      // Fails D#2650 fixupKeys: "Internal Error in key fixup - unable to locate entity"
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test fn1' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID < 0, "emp1 should still have temp ID");
+          ok(emp1.entityAspect.entityState.isAdded(), "emp1 should still be in added state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // detached with temp key
+          // D#2650: Break here to see state of these emps.
+          testFns.handleFail(e);
+      })
+      .finally(start);
+
+      // try to clear the manager before save can return;
+      try {
+          em.detachEntity(emp1);
+      } catch (error) {
+          // hope to trap error when call em.detachEntity on added entity that is being saved.
+      }
+  });
+  asyncTest("clear added entity (store-gen key) before server save response", function () {
+      // Fails D#2650 fixupKeys: "Unable to locate the following fully qualified EntityType..."
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test fn1' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID < 0, "emp1 should still have temp ID");
+          ok(emp1.entityAspect.entityState.isAdded(), "emp1 should still be in added state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // detached with temp key
+          // D#2650: Break here to see state of emp.
+          testFns.handleFail(e);
+      })
+      .finally(start);
+
+      // try to clear the manager before save can return;
+      try {
+          em.clear();
+      } catch (error) {
+          // hope to trap error when call em.clear() when an added entity is being saved.
+      }
+  });
+
+  asyncTest("can clear manager before server save response when no fixup needed", function () {
+      // See D#2650. What should be the behavior?
+      var query = breeze.EntityQuery.from('Employees').take(1);
+      var em = newEm(), emp1;
+      em.executeQuery(query).then(function (data) {
+          emp1 = data.results[0];
+          emp1.entityAspect.setModified();
+          var promise = em.saveChanges();
+
+          // THE FATEFUL MOMENT
+          // try to clear the manager before save can return;
+          try {
+              em.clear(); // should we throw?
+          } catch (error) {
+              // This would trap the error and assert that if we decided to throw
+          }
+          return promise;
+      })
+          .then(function (sr) {
+              ok(sr.entities.length > 0, "Should have results");
+              ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be detached? unchanged?");
+          })
+          .catch(function (e) {
+              var id1 = emp1 && emp1.getProperty('employeeID');
+              // D#2650: Break here to see state of the emp.
+              testFns.handleFail(e);
+          })
+          .finally(start);
+
   });
 
   test("delete without query", function () {
