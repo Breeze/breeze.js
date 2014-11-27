@@ -207,9 +207,42 @@
       })
       .finally(start);
 
-      // try to clear the manager before save can return;
+      // try to detach the added entity before save can return;
       try {
           em.detachEntity(emp1);
+      } catch (error) {
+          // hope to trap error when call em.detachEntity on added entity that is being saved.
+      }
+  });
+  asyncTest("should throw when call rejectChanges for saved added entity (store-gen key) before server save response", function () {
+      // Fails D#2649 fixupKeys: "Internal Error in key fixup - unable to locate entity"
+      var em = newEm();
+      // Surround target emp (emp2) with other adds to see the effect on the cached adds
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+      var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
+          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
+          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
+          var id2 = emp2.getProperty('employeeID'); // detached with temp key
+          var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
+          // D#2650: Break here to see partial processing and broken cache
+          handleFail(e);
+      })
+      .finally(start);
+
+      // try to rejectChanges for the added entity before save can return;
+      try {
+          emp1.entityAspect.rejectChanges();
       } catch (error) {
           // hope to trap error when call em.detachEntity on added entity that is being saved.
       }
