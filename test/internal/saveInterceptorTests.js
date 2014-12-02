@@ -1,13 +1,5 @@
 (function (testFns) {
 
-  if (testFns.DEBUG_SEQUELIZE) {
-    module("save interceptor", {});
-    test("Skipping tests for Sequelize", function () {
-      ok(true, "Skipped tests");
-    });
-    return;
-  };
-
 
   var breeze = testFns.breeze;
   var dsAdapter;

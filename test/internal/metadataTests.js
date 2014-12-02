@@ -469,17 +469,12 @@
   }
 
   test("external customer metadata", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped tests - not applicable to OData");
+    if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Skipped tests - not applicable to OData/Mongo/Sequelize");
       return;
     }
-    ;
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Skipped tests - not applicable to Mongo yet");
-      return;
-    }
-    ;
+
 
     var em = newAltEm();
     stop();
@@ -526,6 +521,11 @@
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for Mongo - Current impl provides camelCase naming convention on the server");
+      return;
+    }
+
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "N/A for Sequelize - Current impl uses a server side json metadata file");
       return;
     }
 

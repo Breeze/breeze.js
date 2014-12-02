@@ -56,6 +56,7 @@
     var query = new breeze.EntityQuery()
         .from("Orders")
         .where(p)
+        .orderBy("orderID")
         .expand("customer")
         .take(1);
     stop();
@@ -2528,16 +2529,16 @@
 
     var query = new EntityQuery()
         .from("Customers")
-        .where("length(companyName)", ">", 20);
+        .where("length(contactTitle)", ">", 17);
     var queryUrl = query._toUri(em);
     stop();
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       ok(custs.length > 0);
       ok(custs.every(function (cust) {
-        var val = cust.getProperty("companyName");
-        return val.length > 20;
-      }), "every cust have a name longer than 20 chars");
+        var val = cust.getProperty("contactTitle");
+        return val.length > 17;
+      }), "every cust have a name longer than 17 chars");
     }).fail(testFns.handleFail).fin(start);
   });
 

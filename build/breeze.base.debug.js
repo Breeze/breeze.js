@@ -644,14 +644,6 @@ function uncurry(f) {
   };
 }
 
-//function __normalizeProps(obj) {
-//  var newObj = {}
-//  Object.keys(obj).forEach(function(key) {
-//    newObj[key.toLowerCase()] = obj[key];
-//  });
-//  return newObj;
-//}
-
 // shims
 
 if (!Object.create) {
@@ -10235,6 +10227,9 @@ breeze.NamingConvention = NamingConvention;
       this.hasExplicitDataType = hasExplicitDataType;
     };
     var proto = ctor.prototype = new PredicateExpression('litExpr');
+    proto.toString = function() {
+      return " LitExpr - value: " + this.value.toString() + " dataType: " + this.dataType.toString();
+    };
 
     function resolveDataType(dataType) {
       if (dataType == null) return dataType;
@@ -10261,6 +10256,9 @@ breeze.NamingConvention = NamingConvention;
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype = new PredicateExpression('propExpr');
+    proto.toString = function() {
+      return " PropExpr - " + this.propertyPath;
+    };
 
     proto._validate = function(entityType, usesNameOnServer) {
 
@@ -10298,11 +10296,18 @@ breeze.NamingConvention = NamingConvention;
     };
     var proto = ctor.prototype = new PredicateExpression('fnExpr');
 
+    proto.toString = function() {
+      var exprStr = this.exprs.map(function(expr) {
+        expr.toString();
+      }).toString();
+      return "FnExpr - " + this.fnName + "(" + exprStr + ")";
+    };
+
     proto._validate = function(entityType, usesNameOnServer) {
       this.exprs.forEach(function (expr) {
         expr._validate(entityType, usesNameOnServer);
       });
-    }
+    };
 
     // TODO: add dataTypes for the args next - will help to infer other dataTypes.
     var _funcMap = ctor.funcMap = {
@@ -15518,7 +15523,7 @@ breeze.SaveOptions = SaveOptions;
           if (e instanceof Error) {
             deferred.reject(e);
           } else {
-            handleHttpError(httpResponse);
+            handleHttpError(deferred, httpResponse);
           }
         }
 
@@ -15550,17 +15555,15 @@ breeze.SaveOptions = SaveOptions;
       contentType: "application/json",
       data: bundle,
       success: function (httpResponse) {
-        var data = httpResponse.data;
         httpResponse.saveContext = saveContext;
-        var entityErrors = data.Errors || data.errors;
-        if (entityErrors) {
+        var data = httpResponse.data;
+        if (data.Errors || data.errors) {
           handleHttpError(deferred, httpResponse);
         } else {
           var saveResult = adapter._prepareSaveResult(saveContext, data);
           saveResult.httpResponse = httpResponse;
           deferred.resolve(saveResult);
         }
-
       },
       error: function (httpResponse) {
         httpResponse.saveContext = saveContext;
@@ -15688,37 +15691,25 @@ breeze.SaveOptions = SaveOptions;
   });
 
   function handleHttpError(deferred, httpResponse, messagePrefix) {
-    var err = createHttpError(httpResponse);
+    var err = createError(httpResponse);
+    proto._catchNoConnectionError(err);
     if (messagePrefix) {
       err.message = messagePrefix + "; " + err.message;
     }
     return deferred.reject(err);
   }
 
-  function createHttpError(httpResponse) {
+
+  function createError(httpResponse) {
     var err = new Error();
     err.httpResponse = httpResponse;
     err.status = httpResponse.status;
-    processErrors(err, httpResponse);
-    proto._catchNoConnectionError(err);
-    return err;
-  }
 
-  // Put this at the bottom of your http error analysis
-  proto._catchNoConnectionError = function (err) {
-    if (err.status == 0 && err.message == null) {
-      err.message = "HTTP response status 0 and no message.  " +
-          "Likely did not or could not reach server. Is the server running?";
-    }
-  }
-
-
-  function processErrors(err, httpResponse) {
     var errObj = httpResponse.data;
 
     if (!errObj) {
       err.message = httpResponse.error && httpResponse.error.toString();
-      return;
+      return err;
     }
 
     // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
@@ -15729,7 +15720,7 @@ breeze.SaveOptions = SaveOptions;
       } catch (e) {
         // sometimes httpResponse.data is just the error message itself
         err.message = errObj;
-        return;
+        return err;
       }
     }
 
@@ -15741,7 +15732,7 @@ breeze.SaveOptions = SaveOptions;
     var message, entityErrors;
     if (!isDotNet) {
       message = errObj.message;
-      entityErrors = errObj.entityErrors || errObj.errors;
+      entityErrors = errObj.errors || errObj.entityErrors;
     } else {
       var tmp = errObj;
       do {
@@ -15750,7 +15741,8 @@ breeze.SaveOptions = SaveOptions;
         message = tmp.ExceptionMessage || tmp.Message;
         tmp = tmp.InnerException;
       } while (tmp);
-      entityErrors = errObj.EntityErrors || errObj.Errors;
+      // .EntityErrors will only occur as a result of an EntityErrorsException being deliberately thrown on the server
+      entityErrors = errObj.Errors || errObj.EntityErrors;
       entityErrors = entityErrors && entityErrors.map(function (e) {
         return {
           errorName: e.ErrorName,
@@ -15771,7 +15763,15 @@ breeze.SaveOptions = SaveOptions;
     }
 
     err.message = message || "Server side errors encountered - see the entityErrors collection on this object for more detail";
+    return err;
+  }
 
+  // Put this at the bottom of your http error analysis
+  proto._catchNoConnectionError = function (err) {
+    if (err.status == 0 && err.message == null) {
+      err.message = "HTTP response status 0 and no message.  " +
+          "Likely did not or could not reach server. Is the server running?";
+    }
   }
 
   return ctor;

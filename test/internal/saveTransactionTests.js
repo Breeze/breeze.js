@@ -3,7 +3,7 @@
   if (testFns.DEBUG_SEQUELIZE) {
     module("saveTransaction", {});
     test("Skipping tests for Sequelize", function () {
-      ok(true, "Skipped tests");
+      ok(true, "Transaction tests not yet written for Sequelize - but trx are be supported");
     });
     return;
   };

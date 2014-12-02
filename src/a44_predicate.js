@@ -594,6 +594,9 @@
       this.hasExplicitDataType = hasExplicitDataType;
     };
     var proto = ctor.prototype = new PredicateExpression('litExpr');
+    proto.toString = function() {
+      return " LitExpr - value: " + this.value.toString() + " dataType: " + this.dataType.toString();
+    };
 
     function resolveDataType(dataType) {
       if (dataType == null) return dataType;
@@ -620,6 +623,9 @@
       // this.dataType resolved after validate ( if not on an anon type }
     };
     var proto = ctor.prototype = new PredicateExpression('propExpr');
+    proto.toString = function() {
+      return " PropExpr - " + this.propertyPath;
+    };
 
     proto._validate = function(entityType, usesNameOnServer) {
 
@@ -657,11 +663,18 @@
     };
     var proto = ctor.prototype = new PredicateExpression('fnExpr');
 
+    proto.toString = function() {
+      var exprStr = this.exprs.map(function(expr) {
+        expr.toString();
+      }).toString();
+      return "FnExpr - " + this.fnName + "(" + exprStr + ")";
+    };
+
     proto._validate = function(entityType, usesNameOnServer) {
       this.exprs.forEach(function (expr) {
         expr._validate(entityType, usesNameOnServer);
       });
-    }
+    };
 
     // TODO: add dataTypes for the args next - will help to infer other dataTypes.
     var _funcMap = ctor.funcMap = {

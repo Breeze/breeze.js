@@ -208,8 +208,8 @@
   });
 
   test("with parameter and count", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - this endpoint not yet implemented");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "NA for Mongo/Sequelize - this endpoint not yet implemented");
       return;
     }
     var em = newEm();

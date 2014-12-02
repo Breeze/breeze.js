@@ -2,7 +2,7 @@
 
   if (testFns.DEBUG_SEQUELIZE) {
     module("complexTypes", {});
-    test("Skipping tests for Sequelize", function () {
+    test("Skipping tests for Sequelize - complex types not yet supported", function () {
       ok(true, "Skipped tests");
     });
     return;

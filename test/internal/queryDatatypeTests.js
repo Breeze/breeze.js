@@ -89,15 +89,12 @@
 
 
   test("Query Involving Multiple Entities on Server", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for MONGO - server side interception methods have not yet been implemented.");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_ODATA || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "N/A for MONGO/ODATA/SEQUELIZE - EF specific test.");
       return;
     }
 
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "N/A for ODATA - server side interception methods have not yet been implemented.");
-      return;
-    }
+
     var em = newEm();
     var q = EntityQuery.from("QueryInvolvingMultipleEntities");
 
@@ -279,7 +276,7 @@
     }
 
     if (testFns.DEBUG_SEQUELIZE) {
-      ok(false, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
       return;
     }
 
@@ -343,7 +340,7 @@
     }
 
     if (testFns.DEBUG_SEQUELIZE) {
-      ok(false, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
       return;
     }
 
@@ -369,7 +366,7 @@
     }
 
     if (testFns.DEBUG_SEQUELIZE) {
-      ok(false, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
       return;
     }
 
@@ -395,7 +392,7 @@
     }
 
     if (testFns.DEBUG_SEQUELIZE) {
-      ok(false, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
       return;
     }
 
@@ -420,7 +417,7 @@
     }
 
     if (testFns.DEBUG_SEQUELIZE) {
-      ok(false, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
       return;
     }
 

@@ -600,7 +600,7 @@
 
     var em = newEm();
 
-    var supplier = em.createEntity("Supplier", { companyName: "CompName" });
+    var supplier = em.createEntity("Supplier", { companyName: "Test_CompName" });
     var entitiesToSave = new Array(supplier);
     var saveOptions = new SaveOptions({ tag: "addProdOnServer" });
     stop();
@@ -799,10 +799,13 @@
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     stop();
-    var q = new EntityQuery("Customers").take(1);
-    em1.executeQuery(q).then(function (data) {
+    var cust;
+    // to prime the ms
+    em1.executeQuery(new EntityQuery("Employees").take(1)).then(function() {
+      return saveNewCustAndOrders(em1)
+    }).then(function(newCust) {
+      cust = newCust;
       var custType = em1.metadataStore.getEntityType("Customer");
-      var cust = data.results[0];
       var oldContactName = cust.getProperty("contactName");
       var oldMiscData = cust.getProperty("miscData");
       testFns.morphStringProp(cust, "contactName");
@@ -819,12 +822,12 @@
   // "entityAspect.extraMetdata not preserved after export/import"
   test("save update after exporting and reimporting a customer", function () {
     var cust,
-        em1 = newEm(testFns.newMs()),
         extraMetadata;
 
     stop();
-    new EntityQuery("Customers").take(1).using(em1).execute().then(function (data) {
-      cust = data.results[0];
+    var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    saveNewCustAndOrders(em1).then(function(newCust) {
+      cust = newCust;
 
       if (testFns.DEBUG_ODATA) {
         extraMetadata = cust.entityAspect.extraMetadata;
@@ -855,14 +858,14 @@
   });
 
   test("save update with ES5 props and unmapped changes", function () {
-    var em1 = newEm(testFns.newMs());
+    var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Customer = testFns.models.CustomerWithES5Props();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     stop();
-    var q = new EntityQuery("Customers").take(1);
-    em1.executeQuery(q).then(function (data) {
+    saveNewCustAndOrders(em1).then(function(newCust) {
+      var cust = newCust;
       var custType = em1.metadataStore.getEntityType("Customer");
-      var cust = data.results[0];
+
       var oldContactName = cust.getProperty("contactName");
       var oldMiscData = cust.getProperty("miscData");
       testFns.morphStringProp(cust, "contactName");
@@ -935,7 +938,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
     stop();
     var order;
     var freight;
@@ -970,7 +973,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
     stop();
     var order;
     var freight;
@@ -1001,7 +1004,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCountry;
     q.using(em).execute().then(function (data) {
@@ -1030,7 +1033,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(4).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCity;
     q.using(em).execute().then(function (data) {
@@ -1405,12 +1408,11 @@
     // This is because ObjectContext.SaveChanges() does not automatically validate
     // entities. It must be done manually.
     var em = newEm();
-    var q = new EntityQuery("Customers").skip(20).take(1).orderBy("contactName");
     stop();
     var cust1;
-    q.using(em).execute().then(function (data) {
-      ok(data.results.length === 1);
-      cust1 = data.results[0];
+    // q.using(em).execute().then(function (data) {
+    saveNewCustAndOrders(em).then(function(newCust) {
+      cust1 = newCust;
       var region = cust1.getProperty("contactName");
       var newRegion = region == "Error" ? "Error again" : "Error";
       cust1.setProperty("contactName", newRegion);
@@ -1559,14 +1561,19 @@
       ok(false, "one save should have failed for concurrency reasons");
     }).fail(function (e) {
       var msg = e.message;
-      if (msg.indexOf("Store update, insert") >= 0) {
-        ok(true, "got expected (EF) exception " + msg);
-      } else if (msg.indexOf("Row was updated or deleted by another transaction") >= 0) {
-        ok(true, "got expected (Hibernate) exception " + msg);
-      } else if (msg.indexOf("concurrency check") >= 0) {
-        ok(true, "got expected (Mongo) exception " + msg);
+      if (testFns.DEBUG_SEQUELIZE) {
+        isOk = msg.indexOf("concurrency violation") >= 0;
+        ok(isOk,"got expected Sequelize exception");
       } else {
-        ok(false, msg);
+         if (msg.indexOf("Store update, insert") >= 0) {
+          ok(true, "got expected (EF) exception " + msg);
+        } else if (msg.indexOf("Row was updated or deleted by another transaction") >= 0) {
+          ok(true, "got expected (Hibernate) exception " + msg);
+        } else if (msg.indexOf("concurrency check") >= 0) {
+          ok(true, "got expected (Mongo) exception " + msg);
+        } else {
+          ok(false, msg);
+        }
       }
     }).fin(start);
 
@@ -1635,8 +1642,9 @@
         .take(2);
     stop();
     var newCompanyName, cust;
-    em.executeQuery(query).then(function (data) {
-      cust = data.results[0];
+    saveNewCustAndOrders(em).then(function(newCust) {
+      cust = newCust;
+
       var orders = cust.getProperty("orders");
       var companyName = cust.getProperty("companyName");
       newCompanyName = testFns.morphString(companyName);
@@ -1936,9 +1944,8 @@
     stop();
     var cust;
     var sameCust;
-    em.executeQuery(q).then(function (data) {
-      // query cust
-      cust = data.results[0];
+    saveNewCustAndOrders(em).then(function(newCust) {
+      cust = newCust;
       var q2 = EntityQuery.fromEntities(cust);
       return em2.executeQuery(q2);
     }).then(function (data2) {
@@ -1990,7 +1997,7 @@
       if (testFns.DEBUG_MONGO) {
         frag = "duplicate key error"
       } else if (testFns.DEBUG_SEQUELIZE) {
-        frag = "SequelizeUniqueConstraintError"
+        frag = "SequelizeUniqueConstraintError".toLowerCase();
       } else {
         frag = "primary key constraint"
       }
@@ -2294,7 +2301,7 @@
 
   });
 
-  test("cleanup  test data", function () {
+  test("cleanup test data", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - expand not yet supported");
       return;
@@ -2302,37 +2309,47 @@
 
     var em = newEm();
     var p = breeze.Predicate.create("companyName", FilterQueryOp.StartsWith, "Test")
-        .or("companyName", FilterQueryOp.StartsWith, "foo");
+        .or("companyName", FilterQueryOp.StartsWith, "error");
     var q = EntityQuery.from("Customers").where(p).expand("orders"); // .take(50);
     stop();
     em.executeQuery(q).then(function (data) {
-      // var promises = [];
       em.saveOptions = new SaveOptions({ allowConcurrentSaves: true });
       data.results.forEach(function (cust) {
         var orders = cust.getProperty("orders").slice(0);
         orders.forEach(function (order) {
-          //var details = order.getProperty("orderDetails");
-          //details.forEach(function (detail) {
-          //    detail.entityAspect.setDeleted();
-          //});
-          //var io = order.getProperty("internationalOrder");
-          //if (io) {
-          //    io.entityAspect.setDeleted();
-          //}
+          // assumes a cascade delete relation to orderDetails.
           order.entityAspect.setDeleted();
+
         });
         cust.entityAspect.setDeleted();
-        //var pr = em.saveChanges();
-        //promises.push(pr);
       });
-      // return Q.all(promises);
       return em.saveChanges();
 
     }).then(function (sr) {
-
-      ok(sr.entities.length, "deleted count:" + sr.entities.length);
+      ok(true, "customer/orders deleted count:" + sr.entities.length);
+      var q2 = EntityQuery.from("Orders").where( { or: [{ employeeID: null}, {customerID: null}, {shipName: {startsWith: 'Test '}} ]});
+      return em.executeQuery(q2);
+    }).then(function(data2) {
+      var orders = data2.results;
+      orders.forEach(function (order) {
+        order.entityAspect.setDeleted();
+      })
+      return em.saveChanges();
+    }).then(function(srOrders) {
+      ok(true, "orders deleted count:" + srOrders.entities.length);
+      var q3 = EntityQuery.from("Products").where("productName", "startsWith", "Test_");
+      return em.executeQuery(q3);
+    }).then(function(dataProducts){
+      dataProducts.results.forEach(function(product){
+        product.entityAspect.setDeleted();
+      });
+      return em.saveChanges();
+    }).then(function(srProducts) {
+      ok(true, "products deleted count:" + srProducts.entities.length);
     }).fail(testFns.handleFail).fin(start);
   });
+
+
 
   function createCustomer(em) {
     var metadataStore = em.metadataStore;
@@ -2355,6 +2372,7 @@
     cust1.setProperty("city", "Oakland");
     cust1.setProperty("rowVersion", 13);
     cust1.setProperty("fax", "510 999-9999");
+    cust1.setProperty("contactName", "John Smith");
     em.addEntity(cust1);
     var order1 = orderType.createEntity();
     order1.setProperty("orderDate", new Date());

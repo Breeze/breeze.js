@@ -46,6 +46,11 @@
 
 
   test("select - complex type", function () {
+    if (testFns.DEBUG_SEQUELIZE) {
+      ok(true, "NA for Sequelize - complex types not yet supported");
+      return;
+    }
+
     var em = newEm();
 
     var query = new EntityQuery()
@@ -66,14 +71,8 @@
   });
 
   test("select - anon with jra & dateTimes", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped tests - not written for OData (uses WebApi-jsonResultsAdapter)");
-      return;
-    }
-    ;
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - written specifically for webApi");
+    if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "N/A for Mongo/OData/Sequelize - (uses WebApi-jsonResultsAdapter)");
       return;
     }
 
@@ -213,7 +212,7 @@
     if (testFns.DEBUG_WEBAPI) {
       query = query.select("customer.companyName, customer, orderDate");
       query = query.expand("customer");
-    } else if (testFns.DEBUG_ODATA) {
+    } else {
       query = query.select("customer, orderDate");
       query = query.expand("customer");
     }
@@ -230,7 +229,7 @@
         if (testFns.DEBUG_WEBAPI) {
           ok(Object.keys(a).length === 3, "should have 3 properties");
           ok(typeof(a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
-        } else if (testFns.DEBUG_ODATA) {
+        } else {
           ok(Object.keys(a).length === 2, "should have 2 properties");
         }
         ok(a.customer.entityType === customerType, "a.customer is not of type Customer");
