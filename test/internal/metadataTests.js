@@ -39,6 +39,36 @@
     }
   });
 
+  test("compare NorthwindIB metadata to baseline", function () {
+    var em = testFns.newEm();
+    var store = em.metadataStore;
+    ok(store.hasMetadataFor(testFns.serviceName));
+
+    var exported = store.exportMetadata();
+    var metadata = JSON.parse(exported);
+    ok(metadata.structuralTypes, "should have structuralTypes");
+
+    // Compare metadata structures using https://github.com/eugeneware/changeset
+    var diffs = changeset.diff(testFns.northwindIBMetadata, metadata,
+    {
+      "structuralTypes": "shortName",
+      "structuralTypes.dataProperties": "name",
+      "structuralTypes.dataProperties.validators": "name",
+      "structuralTypes.navigationProperties": "name",
+      "structuralTypes.navigationProperties.foreignKeyNames": "name",
+      "structuralTypes.navigationProperties.invForeignKeyNames": "name"
+    });
+
+    var perfect = (!diffs || !diffs.length);
+    ok(perfect, "should be no differences");
+    if (!perfect) {
+      var str = JSON.stringify(diffs, undefined, 4);
+      testFns.output("Metadata diff");
+      testFns.output(str);
+    }
+
+  });
+
   test("add custom metadata", function () {
     var em = testFns.newEm();
     var store = em.metadataStore;

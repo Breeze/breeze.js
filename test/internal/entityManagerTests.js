@@ -1156,6 +1156,20 @@
     }).fail(testFns.handleFail);
   });
 
+  test("can determine if 'entityChanged' event is enabled", function(){
+      // D#2652
+      // see http://www.breezejs.com/sites/all/apidocs/classes/Event.html#method_isEnabled
+      // which also describes EntityManager having propertyChanged event which it doesn't  
+      var em = newEm();
+      try {
+        var eventEnabled = Event.isEnabled("entityChanged", em); 
+        ok(true, "can ask if the 'entityChanged' event is enabled") ;     
+      } catch(e){
+        ok(false, "calling 'isEnabled' threw exception w/ msg = " +
+          e.message);
+      }
+  });
+
   test("entityChanged event suppressed", function () {
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
@@ -1397,6 +1411,70 @@
 
   });
 
+  test("can re-import and merge an added entity w/ PERM key that was changed in another manager", function () {
+      // D#2647 Reported https://github.com/Breeze/breeze.js/issues/49
+      expect(2);
+      var em1 = newEm();
+      var em2 = newEm();
+
+      // Customer has client-assigned keys
+      var cust1 = em1.createEntity('Customer', {
+          customerID: core.getUuid(),
+          companyName: 'Added Company',
+          contactName: 'Unforgettable'
+      });
+
+      // export cust1 to em2 (w/o metadata); becomes cust2
+      var exported = em1.exportEntities([cust1], false);
+      var cust2 = em2.importEntities(exported).entities[0];
+
+      // change a property of the Customer while in em2;
+      cust2.setProperty('companyName', 'Added Company + 1');
+
+      // re-import customer from em2 back to em1 with OverwriteChanges
+      exported = em2.exportEntities([cust2], false);
+      em1.importEntities(exported, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+      equal(cust1.getProperty('contactName'), 'Unforgettable', "'contactName' unchanged");
+      equal(cust1.getProperty('companyName'), 'Added Company + 1',
+        "'companyName' in em1 reflects change made in em2 and reimported to em1");
+  });
+
+  test("re-imported new entity w/ TEMP key that was changed in another manager is added, not merged", function () {
+      // This question was raised in https://github.com/Breeze/breeze.js/issues/49
+      expect(4);
+      var em1 = newEm();
+      var em2 = newEm();
+
+      // Employee has store-generated temp keys
+      var emp1 = em1.createEntity('Employee', {
+          firstName: 'Ima',
+          lastName: 'Unforgettable'
+      });
+
+      // export emp1 to em2 (w/o metadata); becomes emp2
+      var exported = em1.exportEntities([emp1], false);
+      var emp2 = em2.importEntities(exported).entities[0];
+
+      // change a property of the Employee while in em2;
+      emp2.setProperty('firstName', 'Ima B.');
+
+      // re-import Employee from em2 back to em1 with OverwriteChanges
+      exported = em2.exportEntities([emp2], false);
+      var emp1b = em1.importEntities(exported,
+                    // strategy doesn't matter actually
+                    { mergeStrategy: breeze.MergeStrategy.OverwriteChanges })
+                    .entities[0];
+
+      notEqual(emp1.getProperty('employeeID'), emp1b.getProperty('employeeID'),
+        "re-imported employee is not the same as the original.");
+      equal(emp1.getProperty('firstName'), 'Ima',
+        "'emp1.firstName' is unchanged");
+      equal(emp1b.getProperty('firstName'), 'Ima B.',
+        "'emp1b.firstName' reflects change made in em2 and reimported to em1.");
+      equal(em1.getChanges().length, 2, "em1 now has TWO new entities.");
+  });
+
   test("Export changes to local storage and re-import", 5, function () {
 
     var em = newEm();
@@ -1435,7 +1513,6 @@
     ok(newCust !== restoredCust,
         "Restored Cust is not the same object as the original Cust");
   });
-
 
   function createCust(em, companyName) {
     var custType = em.metadataStore.getEntityType("Customer");

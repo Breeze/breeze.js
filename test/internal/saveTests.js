@@ -19,6 +19,7 @@
   var EntityKey = breeze.EntityKey;
   var EntityState = breeze.EntityState;
   var FilterQueryOp = breeze.FilterQueryOp;
+  var handleFail = testFns.handleFail;
 
   var newEm = testFns.newEm;
 
@@ -78,7 +79,7 @@
       return em.saveChanges();
     }).then(function (sr2) {
       ok(sr2.entities.length == 1, "should have saved 1 entity");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -114,7 +115,7 @@
       return em.saveChanges();
     }).then(function (sr2) {
       ok(sr2.entities.length == 1, "should have saved 1 entity");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -144,7 +145,275 @@
             "second hasChangesChanged is false after save");
         ok(!em.hasChanges(),
             "manager should not have pending changes after save");
-      }).fail(testFns.handleFail).fin(start);
+      }).fail(handleFail).fin(start);
+  });
+
+  asyncTest("should throw when delete saved added entity (store-gen key) before server save response", function () {
+      // Fails D#2649 "Internal Error in key fixup - unable to locate entity"
+      var em = newEm();
+      // Surround target emp (emp2) with other adds to see the effect on the cached adds
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+      var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
+          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
+          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
+          var id2 = emp2.getProperty('employeeID'); // detached with temp key
+          var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
+          // D#2649: Break here to see partial processing and broken cache
+          handleFail(e);
+      })
+      .finally(start);
+
+      // try to delete the 2nd new employee before save can return;
+      try {
+          emp2.entityAspect.setDeleted();
+      } catch (error) {
+          // hope to trap error when call setDeleted() on added entity that is being saved.
+      }
+  });
+  asyncTest("should throw when detach saved added entity (store-gen key) before server save response", function () {
+      // Fails D#2650 fixupKeys: "Internal Error in key fixup - unable to locate entity"
+      var em = newEm();
+      // Surround target emp (emp2) with other adds to see the effect on the cached adds
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+      var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
+          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
+          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
+          var id2 = emp2.getProperty('employeeID'); // detached with temp key
+          var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
+          // D#2650: Break here to see partial processing and broken cache
+          handleFail(e);
+      })
+      .finally(start);
+
+      // try to detach the added entity before save can return;
+      try {
+          em.detachEntity(emp1);
+      } catch (error) {
+          // hope to trap error when call em.detachEntity on added entity that is being saved.
+      }
+  });
+  asyncTest("should throw when call rejectChanges for saved added entity (store-gen key) before server save response", function () {
+      // Fails D#2649 fixupKeys: "Internal Error in key fixup - unable to locate entity"
+      var em = newEm();
+      // Surround target emp (emp2) with other adds to see the effect on the cached adds
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+      var emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
+          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
+          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // added state (wrong) but fixed up
+          var id2 = emp2.getProperty('employeeID'); // detached with temp key
+          var id3 = emp3.getProperty('employeeID'); // added state (wrong) with temp key (wrong)
+          // D#2650: Break here to see partial processing and broken cache
+          handleFail(e);
+      })
+      .finally(start);
+
+      // try to rejectChanges for the added entity before save can return;
+      try {
+          emp1.entityAspect.rejectChanges();
+      } catch (error) {
+          // hope to trap error when call em.detachEntity on added entity that is being saved.
+      }
+  });
+  asyncTest("should throw when clear manager before server save response of saved added entity (store-gen key)", function () {
+      // Fails D#2650 fixupKeys: "Unable to locate the following fully qualified EntityType..."
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+      .then(function (sr) {
+          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
+      })
+      .catch(function (e) {
+          var id1 = emp1.getProperty('employeeID'); // detached with temp key
+          // D#2650: Break here to see state of emp.
+          handleFail(e);
+      })
+      .finally(start);
+
+      // try to clear the manager before save can return;
+      try {
+          em.clear();
+      } catch (error) {
+          // hope to trap error when call em.clear() when an added entity is being saved.
+      }
+  });
+
+  asyncTest("can clear manager before server save response when no fixup needed", function () {
+      // See D#2650. What should be the behavior?
+      var query = breeze.EntityQuery.from('Employees').take(1);
+      var em = newEm(), emp1;
+      em.executeQuery(query).then(function (data) {
+          emp1 = data.results[0];
+          emp1.entityAspect.setModified();
+          var promise = em.saveChanges();
+
+          // THE FATEFUL MOMENT
+          // try to clear the manager before save can return;
+          try {
+              em.clear(); // should we throw?
+          } catch (error) {
+              // This would trap the error and assert that if we decided to throw
+          }
+          return promise;
+      })
+          .then(function (sr) {
+              ok(sr.entities.length > 0, "Should have results");
+              ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be detached? unchanged?");
+          })
+          .catch(function (e) {
+              var id1 = emp1 && emp1.getProperty('employeeID');
+              // D#2650: Break here to see state of the emp.
+              handleFail(e);
+          })
+          .finally(start);
+  });
+
+  // This test passes when the server returns the saved added entity as most servers do
+  asyncTest("reverts to saved values when save an added entity then modify it before save response", function () {
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+          ok(sr.entities.length > 0, "Should have results");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be unchanged");
+          equal(emp1.getProperty('firstName'), 'Test fn1', "firstName should have reverted to saved value.");
+        })
+        .catch(handleFail).finally(start);
+
+      // modify it while save is in-flight
+      emp1.firstName = 'Test fn1 mod';
+  });
+
+  // This test passes when the server returns the saved entity
+  // That won't be true for every server and therefore behavior can be different
+  asyncTest("reverts to saved values when save modifed entity then modify it again before save response", function () {
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+          ok(sr.entities.length > 0, "Should have results for 'Add' save");
+          emp1.firstName = 'Test fn1 mod1';
+          var promise = em.saveChanges(); // save modified emp
+
+          // modify it again while save is in-flight
+          emp1.firstName = 'Test fn1 mod2';
+
+          return promise;
+        })
+        .then(function (sr) {
+          ok(sr.entities.length > 0, "Should have results for 'Mod' save");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be unchanged");
+          equal(emp1.getProperty('firstName'), 'Test fn1 mod1', "firstName should have reverted to saved modified value.");
+        })
+        .catch(handleFail).finally(start);
+  });
+
+  // This test passes when the server returns the whole saved entity
+  // That won't be true for servers that return patch values
+  // rather than entire entities and therefore behavior can be different
+  asyncTest("reverts to saved values when save modifed entity then modify a different value before save response", function () {
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+          ok(sr.entities.length > 0, "Should have results for 'Add' save");
+          emp1.firstName = 'Test fn1 mod1';
+          var promise = em.saveChanges(); // save modified emp
+
+          // modify a different property while save is in-flight
+          emp1.lastName = 'Test ln1 mod2';
+
+          return promise;
+        })
+        .then(function (sr) {
+          ok(sr.entities.length > 0, "Should have results for 'Mod' save");
+          ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be unchanged");
+          equal(emp1.getProperty('lastName'), 'Test ln1', "lastName should have reverted to original saved value.");
+        })
+        .catch(handleFail).finally(start);
+  });
+
+  // This test passes when the server returns the whole saved entity
+  // That won't be true for servers that return patch values
+  // rather than entire entities and therefore behavior can be different
+  asyncTest("reverts to saved values when save modifed entity then modify a different value before save response", function () {
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+            ok(sr.entities.length > 0, "Should have results for 'Add' save");
+            emp1.firstName = 'Test fn1 mod1';
+            var promise = em.saveChanges(); // save modified emp
+
+            // modify a different property while save is in-flight
+            emp1.lastName = 'Test ln1 mod2';
+
+            return promise;
+        })
+        .then(function (sr) {
+            ok(sr.entities.length > 0, "Should have results for 'Mod' save");
+            ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be unchanged");
+            equal(emp1.getProperty('lastName'), 'Test ln1', "lastName should have reverted to original saved value.");
+        })
+        .catch(handleFail).finally(start);
+  });
+
+  asyncTest("manager.hasChanges() is true after save if manager other changes were made during save", function () {
+      // D#2651
+      expect(2);
+      var em = newEm();
+      var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
+
+      em.saveChanges()
+        .then(function (sr) {
+            var hasChanges = em.hasChanges();
+            var changes = em.getChanges();
+            equal(changes.length, 1, "should have one pending change, the added emp2");
+            ok(hasChanges, "'hasChanges()' should be true");
+          })
+        .catch(handleFail).finally(start);
+
+      // Create another entity while save is in progress
+      var emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
+
   });
 
   test("delete without query", function () {
@@ -176,7 +445,7 @@
       ok(savedEnts.length === 1, "should have saved 1 entity");
       ok(savedEnts[0] === similarEmp, "should be the same similarEmp");
       ok(similarAspect.entityState.isDetached(), "should be detached");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
 
   });
@@ -206,7 +475,7 @@
     }).fail(function (e) {
       var isOk = e.message.indexOf("part of the entity's key") > 0;
       ok(isOk, "error message should mention the entity key");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("product update active", function () {
@@ -239,7 +508,7 @@
       ok(true, "save succeeded");
     }).fail(function (e) {
       ok(false, "error on save: " + e.message);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   }
 
   test("add UserRole", function () {
@@ -282,7 +551,7 @@
       ok(true, "delete succeeded");
     }).fail(function (e) {
       ok(false, "error on save: " + e.message);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -337,7 +606,7 @@
     }).then(function (sr3) {
       ok(sr3.entities.length == 1, "should have deleted one entity");
       ok(aRole2.entityAspect.entityState.isDetached(), "should be detached");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("exceptions thrown on server", function () {
@@ -365,7 +634,7 @@
       ok("should not get here");
     }).fail(function (e) {
       ok(e);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete entity with Int32 property set to null", function () {
@@ -397,7 +666,7 @@
       return em.saveChanges();
     }).then(function (sr) {
       ok(true);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   // Breeze does not YET support an option to requery after save.
@@ -409,7 +678,7 @@
   //    em.saveChanges().then(function (sr) {
   //        var comment = sr.entities[0].comment;
   //        ok(comment === "happy", "should have requeried the value updated by trigger");
-  //    }).fail(testFns.handleFail).fin(start);
+  //    }).fail(handleFail).fin(start);
   //});
 
   test("check unmapped property on server", function () {
@@ -437,7 +706,7 @@
 
     em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
       ok(true);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("test unmapped property serialization on server", function () {
@@ -488,7 +757,7 @@
 
     em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
       ok(true);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("test unmapped property suppression", function () {
@@ -529,7 +798,7 @@
 
     em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
       ok(true);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
 
@@ -562,7 +831,7 @@
       var ents = sr.entities;
       ok(ents.length === 2, "since an Order was created/saved in the interceptor, length should be 2");
       ok(ents[1].getProperty("shipCountry") === "Brazil", "initializer was not 'hit'");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("entities modified on server being saved as new entities", function () {
@@ -589,7 +858,7 @@
     }).then(function (sr) {
       ok(sr.entities.length === 13, "13 records should have been saved - 1 category + 12 products");
       // TODO: we should now requery and check that the 12 products actually have increased in price.
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with with additional entity added on server", function () {
@@ -600,7 +869,7 @@
 
     var em = newEm();
 
-    var supplier = em.createEntity("Supplier", { companyName: "Test_CompName" });
+    var supplier = em.createEntity("Supplier", { companyName: "CompName" });
     var entitiesToSave = new Array(supplier);
     var saveOptions = new SaveOptions({ tag: "addProdOnServer" });
     stop();
@@ -608,7 +877,7 @@
       var addedProducts = em.getEntities(["Product"], EntityState.Added);
 
       ok(addedProducts.length === 0, "There should be no Added Products");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("can save a Northwind Order & InternationalOrder", function () {
@@ -641,7 +910,7 @@
               "the new internationalOrder should have the same OrderID as its new parent Order, " + orderId);
       ok(orderId > 0, "the OrderID is positive, indicating it is a permanent order");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -675,7 +944,7 @@
       var orderId = order.getProperty("orderID");
       ok(orderId > 0, "orderID is positive");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -696,7 +965,7 @@
     }).then(function (data) {
       var comments2 = data.results;
       ok(comments2.length === 2, "should have returned 2 comments");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
 
@@ -728,7 +997,7 @@
       } else {
         ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
       }
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save computed update - mod computed", function () {
@@ -760,7 +1029,7 @@
       } else {
         ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
       }
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save computed insert", function () {
@@ -789,7 +1058,7 @@
       ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
 
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save update with unmapped changes", function () {
@@ -799,13 +1068,10 @@
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     stop();
-    var cust;
-    // to prime the ms
-    em1.executeQuery(new EntityQuery("Employees").take(1)).then(function() {
-      return saveNewCustAndOrders(em1)
-    }).then(function(newCust) {
-      cust = newCust;
+    var q = new EntityQuery("Customers").take(1);
+    em1.executeQuery(q).then(function (data) {
       var custType = em1.metadataStore.getEntityType("Customer");
+      var cust = data.results[0];
       var oldContactName = cust.getProperty("contactName");
       var oldMiscData = cust.getProperty("miscData");
       testFns.morphStringProp(cust, "contactName");
@@ -815,19 +1081,19 @@
 
       var e = sr.entities;
       ok(e.length === 1, "1 record should have been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   // Test asserts will fail for OData until we fix #2574
   // "entityAspect.extraMetdata not preserved after export/import"
   test("save update after exporting and reimporting a customer", function () {
     var cust,
+        em1 = newEm(testFns.newMs()),
         extraMetadata;
 
     stop();
-    var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-    saveNewCustAndOrders(em1).then(function(newCust) {
-      cust = newCust;
+    new EntityQuery("Customers").take(1).using(em1).execute().then(function (data) {
+      cust = data.results[0];
 
       if (testFns.DEBUG_ODATA) {
         extraMetadata = cust.entityAspect.extraMetadata;
@@ -854,18 +1120,18 @@
     }).then(function (sr) {
       var e = sr.entities;
       ok(e.length === 1, "1 record should have been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save update with ES5 props and unmapped changes", function () {
-    var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var em1 = newEm(testFns.newMs());
     var Customer = testFns.models.CustomerWithES5Props();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     stop();
-    saveNewCustAndOrders(em1).then(function(newCust) {
-      var cust = newCust;
+    var q = new EntityQuery("Customers").take(1);
+    em1.executeQuery(q).then(function (data) {
       var custType = em1.metadataStore.getEntityType("Customer");
-
+      var cust = data.results[0];
       var oldContactName = cust.getProperty("contactName");
       var oldMiscData = cust.getProperty("miscData");
       testFns.morphStringProp(cust, "contactName");
@@ -875,7 +1141,7 @@
 
       var e = sr.entities;
       ok(e.length === 1, "1 record should have been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save delete with unmapped changes", function () {
@@ -902,7 +1168,7 @@
       var r = sr.entities;
       ok(zzz.cust1.entityAspect.entityState.isDetached());
       ok(r.length === 3, "3 child records should have been modified ( stranded)");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
 
   });
@@ -927,7 +1193,7 @@
       hasChanges = em.hasChanges();
       ok(hasChanges, "should still have some changes because user should have been rejected on the server");
       // var q2 = EntityQuery.fromEntities(order);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with alt resource and server side add", function () {
@@ -938,7 +1204,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1).orderBy("orderID");
     stop();
     var order;
     var freight;
@@ -961,7 +1227,7 @@
       var order2 = data2.results[0];
       var freight2 = order2.getProperty("freight");
       ok(freight2 == freight, "freight2=" + freight2 + " vs " + freight);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
 
@@ -973,7 +1239,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
     stop();
     var order;
     var freight;
@@ -993,7 +1259,7 @@
       var order2 = data2.results[0];
       var freight2 = order2.getProperty("freight");
       ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with alt resource and server update - ForceUpdate", function () {
@@ -1004,7 +1270,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCountry;
     q.using(em).execute().then(function (data) {
@@ -1022,7 +1288,7 @@
       var order2 = data2.results[0];
       var freight2 = order2.getProperty("freight");
       ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with server update - original values fixup", function () {
@@ -1033,7 +1299,7 @@
 
     var em = newEm();
 
-    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(4).take(1).orderBy("orderID");
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
     stop();
     var order, freight, shipCity;
     q.using(em).execute().then(function (data) {
@@ -1051,7 +1317,7 @@
       var order2 = data2.results[0];
       var freight2 = order2.getProperty("freight");
       ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save with saveOptions exit", function () {
@@ -1067,7 +1333,7 @@
     stop();
     em.saveChanges(null, so).then(function (sr) {
       ok(sr.entities.length == 0);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -1114,7 +1380,7 @@
       ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
       ok(order1ValErrorsChangedArgs[0].added.length == 0, "should have removed 1");
       ok(order1ValErrorsChangedArgs[0].removed.length == 1, "should have removed 1");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -1157,7 +1423,7 @@
       return em.saveChanges();
     }).then(function (sr) {
       ok(sr.entities.length === 4, "should have saved ok");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
 
   });
 
@@ -1262,7 +1528,7 @@
       return realEm.saveChanges();
     }).then(function (sr) {
       ok(realEm.hasChanges() === false, "The entity manager must not have changes");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("bigsave", function () {
@@ -1285,7 +1551,7 @@
       endMs = Date.now();
       var elapsed = (endMs - startMs) / 1000;
       ok(elapsed, "Elapsed time: " + elapsed);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("bigsave many children", function () {
@@ -1308,7 +1574,7 @@
       endMs = Date.now();
       var elapsed = (endMs - startMs) / 1000;
       ok(elapsed, "Elapsed time: " + elapsed);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("noop", function () {
@@ -1321,7 +1587,7 @@
       ok(Array.isArray(sr.entities));
       ok(sr.entities.length == 0);
       ok(!em.hasChanges());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with millseconds - UTC time - IE bug", function () {
@@ -1357,7 +1623,7 @@
       var order2 = data2.results[0];
       var sameDt2 = order2.getProperty("shippedDate");
       ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save data with millseconds - local time", function () {
@@ -1391,7 +1657,7 @@
       var order2 = data2.results[0];
       var sameDt2 = order2.getProperty("shippedDate");
       ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save custom data annotation validation", function () {
@@ -1408,11 +1674,12 @@
     // This is because ObjectContext.SaveChanges() does not automatically validate
     // entities. It must be done manually.
     var em = newEm();
+    var q = new EntityQuery("Customers").skip(20).take(1).orderBy("contactName");
     stop();
     var cust1;
-    // q.using(em).execute().then(function (data) {
-    saveNewCustAndOrders(em).then(function(newCust) {
-      cust1 = newCust;
+    q.using(em).execute().then(function (data) {
+      ok(data.results.length === 1);
+      cust1 = data.results[0];
       var region = cust1.getProperty("contactName");
       var newRegion = region == "Error" ? "Error again" : "Error";
       cust1.setProperty("contactName", newRegion);
@@ -1456,7 +1723,7 @@
       ok(core.isDate(newOrderDate2), "is not a date");
       ok(newOrderDate.getTime() == newOrderDate2.getTime());
       ok(orderDate != newOrderDate2);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("unmapped save", function () {
@@ -1485,7 +1752,7 @@
       var saved = sr.entities;
       ok(saved.length === 0);
       ok(!em1.hasChanges());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("unmapped save with ES5 props", function () {
@@ -1513,7 +1780,7 @@
       var saved = sr.entities;
       ok(saved.length === 0);
       ok(!em1.hasChanges());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("add parent and children", function () {
@@ -1540,7 +1807,7 @@
       ok(zzz.cust1.getProperty("orders").length === 2);
       ok(zzz.cust2.getProperty("orders").length === 0);
       ok(!em.hasChanges());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("allow concurrent saves with concurrency column", function () {
@@ -1561,19 +1828,14 @@
       ok(false, "one save should have failed for concurrency reasons");
     }).fail(function (e) {
       var msg = e.message;
-      if (testFns.DEBUG_SEQUELIZE) {
-        isOk = msg.indexOf("concurrency violation") >= 0;
-        ok(isOk,"got expected Sequelize exception");
+      if (msg.indexOf("Store update, insert") >= 0) {
+        ok(true, "got expected (EF) exception " + msg);
+      } else if (msg.indexOf("Row was updated or deleted by another transaction") >= 0) {
+        ok(true, "got expected (Hibernate) exception " + msg);
+      } else if (msg.indexOf("concurrency check") >= 0) {
+        ok(true, "got expected (Mongo) exception " + msg);
       } else {
-         if (msg.indexOf("Store update, insert") >= 0) {
-          ok(true, "got expected (EF) exception " + msg);
-        } else if (msg.indexOf("Row was updated or deleted by another transaction") >= 0) {
-          ok(true, "got expected (Hibernate) exception " + msg);
-        } else if (msg.indexOf("concurrency check") >= 0) {
-          ok(true, "got expected (Mongo) exception " + msg);
-        } else {
-          ok(false, msg);
-        }
+        ok(false, msg);
       }
     }).fin(start);
 
@@ -1642,9 +1904,8 @@
         .take(2);
     stop();
     var newCompanyName, cust;
-    saveNewCustAndOrders(em).then(function(newCust) {
-      cust = newCust;
-
+    em.executeQuery(query).then(function (data) {
+      cust = data.results[0];
       var orders = cust.getProperty("orders");
       var companyName = cust.getProperty("companyName");
       newCompanyName = testFns.morphString(companyName);
@@ -1665,7 +1926,7 @@
       ok(entities2.length === 1);
       ok(entities2[0] === cust);
       ok(cust.getProperty("companyName") === newCompanyName);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("modify parent and children", function () {
@@ -1711,7 +1972,7 @@
       ok(entities2.length === 1, "should only get a single entity");
       ok(entities2[0] === cust, "requery does not match cust");
       ok(cust.getProperty("companyName") === newCompanyName, "company name was not changed on requery");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
 //  test("modify parent and children", function () {
@@ -1770,7 +2031,7 @@
 //      ok(entities2.length === 1, "should only get a single entity");
 //      ok(entities2[0] === cust, "requery does not match cust");
 //      ok(cust.getProperty("companyName") === newCompanyName, "company name was not changed on requery");
-//    }).fail(testFns.handleFail).fin(start);
+//    }).fail(handleFail).fin(start);
 //  });
 
   test("delete parent, children stranded", function () {
@@ -1790,7 +2051,7 @@
       //ok(error instanceof Error, "should be an error");
       //ok(error.message.indexOf("FOREIGN KEY") >= 0, "message should contain 'FOREIGN KEY'");
       //});
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete parent, then clear", function () {
@@ -1813,7 +2074,7 @@
       } catch (e) {
         ok(false, "clear should not fail: " + e);
       }
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete parent then delete children", function () {
@@ -1835,7 +2096,7 @@
       ok(zzz.order1.entityAspect.entityState.isDetached(), "order1 should be marked as detached");
       ok(zzz.order2.entityAspect.entityState.isDetached(), "order2 should be marked as detached");
       ok(zzz.cust1.entityAspect.entityState.isDetached(), "cust1 should be marked as detached");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete children then delete parent", function () {
@@ -1861,7 +2122,7 @@
       ok(zzz.order1.entityAspect.entityState.isDetached(), "order1 should be marked as detached");
       ok(zzz.order2.entityAspect.entityState.isDetached(), "order2 should be marked as detached");
       ok(zzz.cust1.entityAspect.entityState.isDetached(), "cust1 should be marked as detached");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete children then delete parent after query", function () {
@@ -1893,7 +2154,7 @@
       sr.entities.forEach(function (e) {
         ok(e.entityAspect.entityState.isDetached(), "entity should be marked as detached");
       });
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete children, leave parent alone", function () {
@@ -1912,7 +2173,7 @@
       ok(!em.hasChanges());
       ok(zzz.order1.entityAspect.entityState.isDetached(), "should be marked as detached");
       ok(zzz.cust1.getProperty("orders").length === 0, "should be no orders now");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("delete parent, move children", function () {
@@ -1931,7 +2192,7 @@
       ok(sr2.entities.length === 3);
       ok(zzz.cust1.entityAspect.entityState.isDetached(), "should be marked as detached");
       ok(zzz.order1.entityAspect.entityState.isUnchanged(), "should be marked as unchanged");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("concurrency violation", function () {
@@ -1944,8 +2205,9 @@
     stop();
     var cust;
     var sameCust;
-    saveNewCustAndOrders(em).then(function(newCust) {
-      cust = newCust;
+    em.executeQuery(q).then(function (data) {
+      // query cust
+      cust = data.results[0];
       var q2 = EntityQuery.fromEntities(cust);
       return em2.executeQuery(q2);
     }).then(function (data2) {
@@ -1997,7 +2259,7 @@
       if (testFns.DEBUG_MONGO) {
         frag = "duplicate key error"
       } else if (testFns.DEBUG_SEQUELIZE) {
-        frag = "SequelizeUniqueConstraintError".toLowerCase();
+        frag = "SequelizeUniqueConstraintError"
       } else {
         frag = "primary key constraint"
       }
@@ -2042,7 +2304,7 @@
       return em.saveChanges();
     }).then(function (sr2) {
       ok(true, "save successful");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("insert with generated key", function () {
@@ -2069,7 +2331,7 @@
     }).then(function (data2) {
       // curious about synchronous results
       ok(data2.entities.length == 2);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("insert uni (1-n) relationships with generated key", function () {
@@ -2135,7 +2397,7 @@
       ok(data4.results.length === 4, "should be 4 terrs");
       ok(terrs1y.length === 4, "terrs1y should be of length 4");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
 
@@ -2208,7 +2470,7 @@
       ok(data4.results.length === 1, "should be 1 region");
       terrs1y = data4.results[0].getProperty("territories");
       ok(terrs1y.length === 4, "should still be 4 recs");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("insert uni (1-n) relationships with unattached children - v3", function () {
@@ -2256,7 +2518,7 @@
       var region1a = data3.results[0];
       var terrs1a = region1a.getProperty("territories");
       ok(terrs1a.length == 2, "should be 2 terrs in region1");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("save of deleted entity should not trigger validation", function () {
@@ -2278,7 +2540,7 @@
       ok(sr2.entities.length === 1, "one entity should have been saved");
       ok(sr2.entities[0] === cust, "save result should contain region");
       ok(cust.entityAspect.entityState.isDetached(), "cust should now be detached");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(handleFail).fin(start);
   });
 
   test("bad save call", function () {
@@ -2301,7 +2563,7 @@
 
   });
 
-  test("cleanup test data", function () {
+  test("cleanup  test data", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - expand not yet supported");
       return;
@@ -2309,47 +2571,37 @@
 
     var em = newEm();
     var p = breeze.Predicate.create("companyName", FilterQueryOp.StartsWith, "Test")
-        .or("companyName", FilterQueryOp.StartsWith, "error");
+        .or("companyName", FilterQueryOp.StartsWith, "foo");
     var q = EntityQuery.from("Customers").where(p).expand("orders"); // .take(50);
     stop();
     em.executeQuery(q).then(function (data) {
+      // var promises = [];
       em.saveOptions = new SaveOptions({ allowConcurrentSaves: true });
       data.results.forEach(function (cust) {
         var orders = cust.getProperty("orders").slice(0);
         orders.forEach(function (order) {
-          // assumes a cascade delete relation to orderDetails.
+          //var details = order.getProperty("orderDetails");
+          //details.forEach(function (detail) {
+          //    detail.entityAspect.setDeleted();
+          //});
+          //var io = order.getProperty("internationalOrder");
+          //if (io) {
+          //    io.entityAspect.setDeleted();
+          //}
           order.entityAspect.setDeleted();
-
         });
         cust.entityAspect.setDeleted();
+        //var pr = em.saveChanges();
+        //promises.push(pr);
       });
+      // return Q.all(promises);
       return em.saveChanges();
 
     }).then(function (sr) {
-      ok(true, "customer/orders deleted count:" + sr.entities.length);
-      var q2 = EntityQuery.from("Orders").where( { or: [{ employeeID: null}, {customerID: null}, {shipName: {startsWith: 'Test '}} ]});
-      return em.executeQuery(q2);
-    }).then(function(data2) {
-      var orders = data2.results;
-      orders.forEach(function (order) {
-        order.entityAspect.setDeleted();
-      })
-      return em.saveChanges();
-    }).then(function(srOrders) {
-      ok(true, "orders deleted count:" + srOrders.entities.length);
-      var q3 = EntityQuery.from("Products").where("productName", "startsWith", "Test_");
-      return em.executeQuery(q3);
-    }).then(function(dataProducts){
-      dataProducts.results.forEach(function(product){
-        product.entityAspect.setDeleted();
-      });
-      return em.saveChanges();
-    }).then(function(srProducts) {
-      ok(true, "products deleted count:" + srProducts.entities.length);
-    }).fail(testFns.handleFail).fin(start);
+
+      ok(sr.entities.length, "deleted count:" + sr.entities.length);
+    }).fail(handleFail).fin(start);
   });
-
-
 
   function createCustomer(em) {
     var metadataStore = em.metadataStore;
@@ -2372,7 +2624,6 @@
     cust1.setProperty("city", "Oakland");
     cust1.setProperty("rowVersion", 13);
     cust1.setProperty("fax", "510 999-9999");
-    cust1.setProperty("contactName", "John Smith");
     em.addEntity(cust1);
     var order1 = orderType.createEntity();
     order1.setProperty("orderDate", new Date());

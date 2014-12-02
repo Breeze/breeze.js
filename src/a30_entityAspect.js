@@ -96,6 +96,14 @@ var EntityAspect = (function () {
   **/
 
   /**
+  Extra metadata about this entity such as the entity's etag.
+  You may extend this object with your own metadata information.
+  Breeze (de)serializes this object when importing/exporting the entity.
+
+  @property extraMetadata {Object}
+  **/
+
+  /**
   Whether this entity is in the process of being saved.
 
   __readOnly__
