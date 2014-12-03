@@ -3549,6 +3549,14 @@ var EntityAspect = (function () {
   **/
 
   /**
+  Extra metadata about this entity such as the entity's etag.
+  You may extend this object with your own metadata information.
+  Breeze (de)serializes this object when importing/exporting the entity.
+
+  @property extraMetadata {Object}
+  **/
+
+  /**
   Whether this entity is in the process of being saved.
 
   __readOnly__
@@ -3646,6 +3654,7 @@ var EntityAspect = (function () {
   @method acceptChanges
   **/
   proto.acceptChanges = function () {
+    this._checkOperation("acceptChanges");
     var em = this.entityManager;
     if (this.entityState.isDeleted()) {
       em.detachEntity(this.entity);
@@ -3665,6 +3674,7 @@ var EntityAspect = (function () {
   @method rejectChanges
   **/
   proto.rejectChanges = function () {
+    this._checkOperation("rejectChanges");
     var entity = this.entity;
     var entityManager = this.entityManager;
     // we do not want PropertyChange or EntityChange events to occur here
@@ -3789,6 +3799,7 @@ var EntityAspect = (function () {
   **/
   proto.setEntityState = function (entityState) {
     if (this.entityState === entityState) return false;
+    this._checkOperation("setEntityState");
     if (this.entityState.isDetached()) {
       throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
     }
@@ -4142,6 +4153,14 @@ var EntityAspect = (function () {
 
   // internal methods
 
+  proto._checkOperation = function(operationName) {
+    if (this.isBeingSaved) {
+      throw new Error("Cannot perform a '" + operationName + "' on an entity that is in the process of being saved");
+    }
+    // allows chaining
+    return this;
+  }
+
   proto._detach = function () {
     this.entityGroup = null;
     this.entityManager = null;
@@ -4262,6 +4281,8 @@ var EntityAspect = (function () {
       return true;
     }
   }
+
+
 
   return ctor;
 
@@ -12541,6 +12562,14 @@ var EntityGroup = (function () {
     return this._entities.filter(filter);
   };
 
+  proto._checkOperation = function(operationName) {
+    this._entities.forEach(function (entity) {
+      entity && entity.entityAspect._checkOperation(operationName);
+    });
+    // for chaining;
+    return this;
+  };
+
   // do not expose this method. It is doing a special purpose INCOMPLETE fast detach operation
   // just for the entityManager clear method - the entityGroup will be in an inconsistent state
   // after this op, which is ok because it will be thrown away.
@@ -12925,10 +12954,12 @@ var EntityManager = (function () {
   @method acceptChanges
   **/
   proto.acceptChanges = function () {
-    this.getChanges().forEach(function (entity) {
-      entity.entityAspect.acceptChanges();
+    this.getChanges().map(function(entity) {
+      return entity.entityAspect._checkOperation("acceptChanges");
+    }).forEach(function (aspect) {
+      aspect.acceptChanges();
     });
-  }
+  };
 
   /**
   Exports an entire EntityManager or just selected entities into a serialized string for external storage.
@@ -13083,8 +13114,9 @@ var EntityManager = (function () {
   @method clear
   **/
   proto.clear = function () {
-    __objectForEach(this._entityGroupMap, function (key, entityGroup) {
-      // remove en
+    __objectMap(this._entityGroupMap, function (key, entityGroup) {
+      return entityGroup._checkOperation();
+    }).forEach(function(entityGroup) {
       entityGroup._clear();
     });
 
@@ -13576,13 +13608,16 @@ var EntityManager = (function () {
 
     function saveSuccess(saveResult) {
       var em = saveContext.entityManager;
+      markIsBeingSaved(entitiesToSave, false);
       var savedEntities = saveResult.entities = saveContext.processSavedEntities(saveResult);
 
       // update _hasChanges after save.
-      var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
-      em._setHasChanges(hasChanges);
+      em._setHasChanges(null);
 
-      markIsBeingSaved(entitiesToSave, false);
+      // can't do this anymore because other changes might have been made while saved entities in flight.
+//      var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
+//      em._setHasChanges(hasChanges);
+
       if (callback) callback(saveResult);
       return Q.resolve(saveResult);
     }
@@ -13590,6 +13625,7 @@ var EntityManager = (function () {
     function processSavedEntities(saveResult) {
 
       var savedEntities = saveResult.entities;
+
       if (savedEntities.length === 0) {
         return [];
       }
@@ -13690,15 +13726,16 @@ var EntityManager = (function () {
     });
   }
 
-  function haveSameContents(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-    for (var i = 0, c = arr1.length; i < c; i++) {
-      if (arr1[i] !== arr2[i]) return false;
-    }
-    return true;
-  }
+  // No longer used
+//  function haveSameContents(arr1, arr2) {
+//    if (arr1.length !== arr2.length) {
+//      return false;
+//    }
+//    for (var i = 0, c = arr1.length; i < c; i++) {
+//      if (arr1[i] !== arr2[i]) return false;
+//    }
+//    return true;
+//  }
 
 
   proto._findEntityGroup = function (entityType) {
@@ -13996,9 +14033,12 @@ var EntityManager = (function () {
     var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
     var changes = getEntitiesCore(this, null, entityStates);
     // next line stops individual reject changes from each calling _hasChangesCore
+    var aspects = changes.map(function(e) {
+      return e.entityAspect._checkOperation("rejectChanges");
+    });
     this._hasChanges = false;
-    changes.forEach(function (e) {
-      e.entityAspect.rejectChanges();
+    aspects.forEach(function (aspect) {
+      aspect.rejectChanges();
     });
     this.hasChangesChanged.publish({ entityManager: this, hasChanges: false });
     return changes;
@@ -14391,14 +14431,13 @@ var EntityManager = (function () {
 
       var entityKey = entityType.getEntityKeyFromRawEntity(rawEntity, rawValueFn);
       var entityState = EntityState.fromName(newAspect.entityState);
-      var newTempKey;
-      if (entityState.isAdded()) {
-        newTempKey = getMappedKey(tempKeyMap, entityKey);
-        // merge added records with non temp keys
-        targetEntity = (newTempKey === undefined) ? entityGroup.findEntityByKey(entityKey) : null;
-      } else {
-        targetEntity = entityGroup.findEntityByKey(entityKey);
-      }
+
+      // Merge if raw entity is in cache
+      // UNLESS this is a new entity w/ a temp key
+      // Cannot safely merge such entities even
+      // if could match temp key to an entity in cache.
+      var newTempKey = entityState.isAdded() && getMappedKey(tempKeyMap, entityKey);
+      targetEntity = newTempKey ? null : entityGroup.findEntityByKey(entityKey);
 
       if (targetEntity) {
         if (mergeStrategy === MergeStrategy.SkipMerge) {
@@ -14417,7 +14456,7 @@ var EntityManager = (function () {
       } else {
         targetEntity = entityType._createInstanceCore();
         entityType._updateTargetFromRaw(targetEntity, rawEntity, rawValueFn);
-        if (newTempKey != null) {
+        if (newTempKey) {
           targetEntity.entityAspect.hasTempKey = true;
           // fixup pk
           targetEntity.setProperty(entityType.keyProperties[0].name, newTempKey.values[0]);

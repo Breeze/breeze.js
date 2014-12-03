@@ -303,6 +303,14 @@ var EntityAspect = (function () {
   **/
 
   /**
+  Extra metadata about this entity such as the entity&#x27;s etag.
+  You may extend this object with your own metadata information.
+  Breeze (de)serializes this object when importing/exporting the entity.
+
+  @property extraMetadata {Object}
+  **/
+
+  /**
   Whether this entity is in the process of being saved.
 
   __readOnly__
@@ -400,6 +408,7 @@ var EntityAspect = (function () {
   @method acceptChanges
   **/
   proto.acceptChanges = function () {
+    this._checkOperation(&quot;acceptChanges&quot;);
     var em = this.entityManager;
     if (this.entityState.isDeleted()) {
       em.detachEntity(this.entity);
@@ -419,6 +428,7 @@ var EntityAspect = (function () {
   @method rejectChanges
   **/
   proto.rejectChanges = function () {
+    this._checkOperation(&quot;rejectChanges&quot;);
     var entity = this.entity;
     var entityManager = this.entityManager;
     // we do not want PropertyChange or EntityChange events to occur here
@@ -543,6 +553,7 @@ var EntityAspect = (function () {
   **/
   proto.setEntityState = function (entityState) {
     if (this.entityState === entityState) return false;
+    this._checkOperation(&quot;setEntityState&quot;);
     if (this.entityState.isDetached()) {
       throw new Error(&quot;You cannot set the &#x27;entityState&#x27; of an entity when it is detached - except by first attaching it to an EntityManager&quot;);
     }
@@ -896,6 +907,14 @@ var EntityAspect = (function () {
 
   // internal methods
 
+  proto._checkOperation = function(operationName) {
+    if (this.isBeingSaved) {
+      throw new Error(&quot;Cannot perform a &#x27;&quot; + operationName + &quot;&#x27; on an entity that is in the process of being saved&quot;);
+    }
+    // allows chaining
+    return this;
+  }
+
   proto._detach = function () {
     this.entityGroup = null;
     this.entityManager = null;
@@ -1016,6 +1035,8 @@ var EntityAspect = (function () {
       return true;
     }
   }
+
+
 
   return ctor;
 

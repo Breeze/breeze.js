@@ -308,10 +308,12 @@ var EntityManager = (function () {
   @method acceptChanges
   **/
   proto.acceptChanges = function () {
-    this.getChanges().forEach(function (entity) {
-      entity.entityAspect.acceptChanges();
+    this.getChanges().map(function(entity) {
+      return entity.entityAspect._checkOperation("acceptChanges");
+    }).forEach(function (aspect) {
+      aspect.acceptChanges();
     });
-  }
+  };
 
   /**
   Exports an entire EntityManager or just selected entities into a serialized string for external storage.
@@ -466,8 +468,9 @@ var EntityManager = (function () {
   @method clear
   **/
   proto.clear = function () {
-    __objectForEach(this._entityGroupMap, function (key, entityGroup) {
-      // remove en
+    __objectMap(this._entityGroupMap, function (key, entityGroup) {
+      return entityGroup._checkOperation();
+    }).forEach(function(entityGroup) {
       entityGroup._clear();
     });
 
@@ -959,13 +962,16 @@ var EntityManager = (function () {
 
     function saveSuccess(saveResult) {
       var em = saveContext.entityManager;
+      markIsBeingSaved(entitiesToSave, false);
       var savedEntities = saveResult.entities = saveContext.processSavedEntities(saveResult);
 
       // update _hasChanges after save.
-      var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
-      em._setHasChanges(hasChanges);
+      em._setHasChanges(null);
 
-      markIsBeingSaved(entitiesToSave, false);
+      // can't do this anymore because other changes might have been made while saved entities in flight.
+//      var hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
+//      em._setHasChanges(hasChanges);
+
       if (callback) callback(saveResult);
       return Q.resolve(saveResult);
     }
@@ -973,6 +979,7 @@ var EntityManager = (function () {
     function processSavedEntities(saveResult) {
 
       var savedEntities = saveResult.entities;
+
       if (savedEntities.length === 0) {
         return [];
       }
@@ -1073,15 +1080,16 @@ var EntityManager = (function () {
     });
   }
 
-  function haveSameContents(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-    for (var i = 0, c = arr1.length; i < c; i++) {
-      if (arr1[i] !== arr2[i]) return false;
-    }
-    return true;
-  }
+  // No longer used
+//  function haveSameContents(arr1, arr2) {
+//    if (arr1.length !== arr2.length) {
+//      return false;
+//    }
+//    for (var i = 0, c = arr1.length; i < c; i++) {
+//      if (arr1[i] !== arr2[i]) return false;
+//    }
+//    return true;
+//  }
 
 
   proto._findEntityGroup = function (entityType) {
@@ -1379,9 +1387,12 @@ var EntityManager = (function () {
     var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
     var changes = getEntitiesCore(this, null, entityStates);
     // next line stops individual reject changes from each calling _hasChangesCore
+    var aspects = changes.map(function(e) {
+      return e.entityAspect._checkOperation("rejectChanges");
+    });
     this._hasChanges = false;
-    changes.forEach(function (e) {
-      e.entityAspect.rejectChanges();
+    aspects.forEach(function (aspect) {
+      aspect.rejectChanges();
     });
     this.hasChangesChanged.publish({ entityManager: this, hasChanges: false });
     return changes;

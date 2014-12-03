@@ -98,6 +98,14 @@ var EntityGroup = (function () {
     return this._entities.filter(filter);
   };
 
+  proto._checkOperation = function(operationName) {
+    this._entities.forEach(function (entity) {
+      entity && entity.entityAspect._checkOperation(operationName);
+    });
+    // for chaining;
+    return this;
+  };
+
   // do not expose this method. It is doing a special purpose INCOMPLETE fast detach operation
   // just for the entityManager clear method - the entityGroup will be in an inconsistent state
   // after this op, which is ok because it will be thrown away.

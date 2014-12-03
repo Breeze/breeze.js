@@ -201,6 +201,7 @@ var EntityAspect = (function () {
   @method acceptChanges
   **/
   proto.acceptChanges = function () {
+    this._checkOperation("acceptChanges");
     var em = this.entityManager;
     if (this.entityState.isDeleted()) {
       em.detachEntity(this.entity);
@@ -220,6 +221,7 @@ var EntityAspect = (function () {
   @method rejectChanges
   **/
   proto.rejectChanges = function () {
+    this._checkOperation("rejectChanges");
     var entity = this.entity;
     var entityManager = this.entityManager;
     // we do not want PropertyChange or EntityChange events to occur here
@@ -344,6 +346,7 @@ var EntityAspect = (function () {
   **/
   proto.setEntityState = function (entityState) {
     if (this.entityState === entityState) return false;
+    this._checkOperation("setEntityState");
     if (this.entityState.isDetached()) {
       throw new Error("You cannot set the 'entityState' of an entity when it is detached - except by first attaching it to an EntityManager");
     }
@@ -697,6 +700,14 @@ var EntityAspect = (function () {
 
   // internal methods
 
+  proto._checkOperation = function(operationName) {
+    if (this.isBeingSaved) {
+      throw new Error("Cannot perform a '" + operationName + "' on an entity that is in the process of being saved");
+    }
+    // allows chaining
+    return this;
+  }
+
   proto._detach = function () {
     this.entityGroup = null;
     this.entityManager = null;
@@ -817,6 +828,8 @@ var EntityAspect = (function () {
       return true;
     }
   }
+
+
 
   return ctor;
 
