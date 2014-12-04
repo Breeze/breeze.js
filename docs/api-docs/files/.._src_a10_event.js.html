@@ -451,7 +451,8 @@ var Event = (function () {
   ctor.isEnabled = function (eventName, obj) {
     assertParam(eventName, &quot;eventName&quot;).isNonEmptyString().check();
     assertParam(obj, &quot;obj&quot;).isObject().check();
-    if (!obj._getEventParent) {
+    // null is ok - it just means that the object is at the top level.
+    if (obj._getEventParent === undefined) {
       throw new Error(&quot;This object does not support event enabling/disabling&quot;);
     }
     // return ctor._isEnabled(obj, getFullEventName(eventName));
