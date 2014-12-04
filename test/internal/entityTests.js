@@ -105,6 +105,40 @@
 
   });
 
+  test("changing a child FK to ID of entity-not-in cache clears the navigation", function() {
+    expect(2);
+    var em = newEm();
+    var dummyCustID = breeze.core.getUuid();
+
+    // create a parent Customer and its child order
+    var parentCustomer = em.createEntity("Customer", {
+      customerID: dummyCustID,
+      companyName: 'TestCo'
+    }, EntityState.Unchanged);
+
+    var order = em.createEntity("Order", {
+      customerID: parentCustomer.getProperty("customerID")
+    }, EntityState.Unchanged);
+
+    // If uncommented, this entity will be in cache and returned by the Order.Customer
+    //var alfredsCustomer = em.createEntity("Customer", {
+    //    CustomerID: testFns.wellKnownData.alfredsID,
+    //    CompanyName: 'Alfreds'
+    //}, UNCHGD);
+
+    var orderCustomer = order.getProperty("customer");
+    ok(orderCustomer, "order parent 'Customer' property should return a Customer entity before change");
+
+    // change FK to ID of an entity not-in-cache
+    order.setProperty("customerID", testFns.wellKnownData.alfredsID);
+
+    orderCustomer = order.getProperty("customer");
+    ok(orderCustomer === null,
+            "order parent 'Customer' property should be null after change; is "+
+            (orderCustomer ? orderCustomer.getProperty("companyName") : "null"));
+
+  });
+
   test("new instead of createEntity with entityAspect", function () {
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
 
@@ -175,7 +209,6 @@
       em.attachEntity(cust0);
       ok(cust0.getProperty("city") === "zzz", "city should be zzz");
     }
-
 
   });
 

@@ -5128,6 +5128,7 @@ function setDpValueSimple(context, rawAccessorFn) {
       } else {
         // it may not have been fetched yet in which case we want to add it as an unattachedChild.
         entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent);
+        parent.setProperty(relatedNavProp.name, null);
       }
     } else {
       parent.setProperty(relatedNavProp.name, null);
