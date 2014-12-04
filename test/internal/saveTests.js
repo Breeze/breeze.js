@@ -158,11 +158,11 @@
 
       em.saveChanges()
       .then(function (sr) {
-          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.getProperty("employeeID") > -1, "emp1 should have a perm ID");
           ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
-          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.getProperty("employeeID") > -1, "emp2 should have a perm ID");
           ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
-          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.getProperty("employeeID") > -1, "emp3 should have a perm ID");
           ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
       })
       .catch(function (e) {
@@ -191,11 +191,11 @@
 
       em.saveChanges()
       .then(function (sr) {
-          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.getProperty("employeeID") > -1, "emp1 should have a perm ID");
           ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
-          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.getProperty("employeeID") > -1, "emp2 should have a perm ID");
           ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
-          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.getProperty("employeeID") > -1, "emp3 should have a perm ID");
           ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
       })
       .catch(function (e) {
@@ -224,11 +224,11 @@
 
       em.saveChanges()
       .then(function (sr) {
-          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.getProperty("employeeID") > -1, "emp1 should have a perm ID");
           ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
-          ok(emp2.employeeID > -1, "emp2 should have a perm ID");
+          ok(emp2.getProperty("employeeID") > -1, "emp2 should have a perm ID");
           ok(emp2.entityAspect.entityState.isUnchanged(), "emp2 should be in Unchanged state");
-          ok(emp3.employeeID > -1, "emp3 should have a perm ID");
+          ok(emp3.getProperty("employeeID") > -1, "emp3 should have a perm ID");
           ok(emp3.entityAspect.entityState.isUnchanged(), "emp3 should be in Unchanged state");
       })
       .catch(function (e) {
@@ -254,7 +254,7 @@
 
       em.saveChanges()
       .then(function (sr) {
-          ok(emp1.employeeID > -1, "emp1 should have a perm ID");
+          ok(emp1.getProperty("employeeID") > -1, "emp1 should have a perm ID");
           ok(emp1.entityAspect.entityState.isUnchanged(), "emp1 should be in Unchanged state");
       })
       .catch(function (e) {
@@ -316,7 +316,7 @@
         .catch(handleFail).finally(start);
 
       // modify it while save is in-flight
-      emp1.firstName = 'Test fn1 mod';
+      emp1.setProperty('firstName', 'Test fn1 mod');
   });
 
   // This test passes when the server returns the saved entity
@@ -328,11 +328,11 @@
       em.saveChanges()
         .then(function (sr) {
           ok(sr.entities.length > 0, "Should have results for 'Add' save");
-          emp1.firstName = 'Test fn1 mod1';
+          emp1.setProperty('firstName', 'Test fn1 mod1');
           var promise = em.saveChanges(); // save modified emp
 
           // modify it again while save is in-flight
-          emp1.firstName = 'Test fn1 mod2';
+          emp1.setProperty('firstName', 'Test fn1 mod2');
 
           return promise;
         })
@@ -347,18 +347,18 @@
   // This test passes when the server returns the whole saved entity
   // That won't be true for servers that return patch values
   // rather than entire entities and therefore behavior can be different
-  asyncTest("reverts to saved values when save modifed entity then modify a different value before save response", function () {
+  asyncTest("reverts to saved values when save modified entity then modify a different value before save response", function () {
       var em = newEm();
       var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
 
       em.saveChanges()
         .then(function (sr) {
           ok(sr.entities.length > 0, "Should have results for 'Add' save");
-          emp1.firstName = 'Test fn1 mod1';
+          emp1.setProperty('firstName', 'Test fn1 mod1');
           var promise = em.saveChanges(); // save modified emp
 
           // modify a different property while save is in-flight
-          emp1.lastName = 'Test ln1 mod2';
+          emp1.setProperty('lastName', 'Test ln1 mod2');
 
           return promise;
         })
@@ -373,18 +373,18 @@
   // This test passes when the server returns the whole saved entity
   // That won't be true for servers that return patch values
   // rather than entire entities and therefore behavior can be different
-  asyncTest("reverts to saved values when save modifed entity then modify a different value before save response", function () {
+  asyncTest("reverts to saved values when save modified entity then modify a different value before save response", function () {
       var em = newEm();
       var emp1 = em.createEntity("Employee", { firstName: 'Test fn1', lastName: 'Test ln1' });
 
       em.saveChanges()
         .then(function (sr) {
             ok(sr.entities.length > 0, "Should have results for 'Add' save");
-            emp1.firstName = 'Test fn1 mod1';
+            emp1.setProperty('firstName', 'Test fn1 mod1');
             var promise = em.saveChanges(); // save modified emp
 
             // modify a different property while save is in-flight
-            emp1.lastName = 'Test ln1 mod2';
+            emp1.setProperty('lastName',  'Test ln1 mod2');
 
             return promise;
         })
