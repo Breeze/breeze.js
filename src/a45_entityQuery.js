@@ -230,7 +230,7 @@
   proto.where = function (wherePredicate) {
     if (wherePredicate != null) {
       wherePredicate = Predicate.create(__arraySlice(arguments));
-      if (this.fromEntityType) wherePredicate.validate(this.fromEntityType);
+      if (this.fromEntityType) wherePredicate._validate(this.fromEntityType);
       if (this.wherePredicate) {
         wherePredicate = this.wherePredicate.and(wherePredicate);
       }

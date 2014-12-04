@@ -27,6 +27,26 @@
     }
   });
 
+  test("should not throw when add where clause to query with a `.fromEntityType` value", function () {
+    var em = newEm();
+    var query = new EntityQuery("Customers");
+
+    // Don't care about the query result.
+    // Just want the `fromEntityType` property to set as a side effect or execution
+    em.executeQueryLocally(query);
+
+    // now we can repro the bug reported in https://github.com/Breeze/breeze.js/issues/44
+    // This next statement throws the "undefined is not a function" exception in 1.5.1
+    var q2 = query.where('city', 'eq', 'London');
+
+    ok(true, "should get here");
+    stop();
+    em.executeQuery(q2).then(function (data) {
+      var r = data.results;
+      ok(r.length > 0, "should have gotten some results");
+    }).fail(testFns.handleFail).fin(start);
+  });
+
   test("query with 'in'", function () {
       var em1 = newEm();
       
