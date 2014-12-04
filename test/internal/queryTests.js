@@ -57,7 +57,7 @@
       em1.executeQuery(query).then(function (data) {
         var r = data.results;
         var isOk = r.every(function (cust) {
-            return countries.indexOf(cust.country) >= 0;
+            return countries.indexOf(cust.getProperty("country")) >= 0;
         })
         ok(isOk, "should be able to verify in test");
         var r2 = em1.executeQueryLocally(query);
@@ -2257,11 +2257,13 @@
     var custs, custs2;
     em.executeQuery(query).then(function (data) {
       custs = data.results;
-      custs.forEach(function (p) {
-        p.countryCity = testFns.removeAccents( p.getProperty("country") + ":" + p.getProperty("city"));
+      var countryCities = custs.map(function (p) {
+        var countryCity = testFns.removeAccents( p.getProperty("country") + ":" + p.getProperty("city"));
+        p.countryCity = countryCity;
+        return countryCity;
       });
       
-      testFns.assertIsSorted(custs, "countryCity", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+      testFns.assertIsSorted(countryCities, null, breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
       var q2 = query.orderBy(null);
       var q3 = q2.orderBy("country").orderBy("city");
       return em.executeQuery(q3);

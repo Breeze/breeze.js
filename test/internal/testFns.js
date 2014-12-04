@@ -528,19 +528,33 @@ breezeTestFns = (function (breeze) {
   };
 
   testFns.assertIsSorted = function (collection, propertyName, dataType, isDescending, isCaseSensitive) {
+    var extractFn = null;
+    if (propertyName) {
+      extractFn = function(obj) { return obj && obj.getProperty(propertyName); }
+    }
     isCaseSensitive = isCaseSensitive == null ? true : isCaseSensitive;
-    var fn = function (a, b) {
+    var compareFn = function (a, b) {
       // localeCompare has issues in Chrome.
       // var compareResult = a[propertyName].localeCompare(b.propertyName);
-      return compare(a, b, propertyName, dataType, isDescending, isCaseSensitive);
+      return compare(a, b, extractFn, dataType, isDescending, isCaseSensitive);
     };
+    var isOk = assertIsSorted(collection, compareFn);
+    if (propertyName) {
+      ok(isOk, propertyName + " not sorted correctly");
+    } else {
+      ok(isOk, "collection not sorted correctly");
+    }
+    return isOk;
+  };
+
+  function assertIsSorted(collection, compareFn) {
     var firstTime = true;
     var prevItem;
     var isOk = collection.every(function (item) {
       if (firstTime) {
         firstTime = false;
       } else {
-        var r = fn(prevItem, item);
+        var r = compareFn(prevItem, item);
         if (r > 0) {
           return false;
         }
@@ -548,10 +562,8 @@ breezeTestFns = (function (breeze) {
       prevItem = item;
       return true;
     });
-
-    ok(isOk, propertyName + " not sorted correctly");
-
-  };
+    return isOk;
+  }
 
   testFns.haveSameContents = function (a1, a2) {
     var areBothArrays = Array.isArray(a1) && Array.isArray(a2);
@@ -562,9 +574,16 @@ breezeTestFns = (function (breeze) {
     });
   }
 
-  function compare(a, b, propertyName, dataType, isDescending, isCaseSensitive) {
+  function compareByProperty(a, b, propertyName, dataType, isDescending, isCaseSensitive) {
     var value1 = a && a.getProperty(propertyName);
     var value2 = b && b.getProperty(propertyName);
+    return compare(value1, value2, dataType, isDescending, isCaseSensitive);
+  }
+
+  function compare(a, b, extractValueFn, dataType, isDescending, isCaseSensitive) {
+    extractValueFn = extractValueFn || function(x) { return x; }
+    var value1 = extractValueFn(a);
+    var value2 = extractValueFn(b);
     value1 = value1 === undefined ? null : value1;
     value2 = value2 === undefined ? null : value2;
     if (dataType === DataType.String) {
@@ -584,6 +603,7 @@ breezeTestFns = (function (breeze) {
     } else {
       return isDescending ? 1 : -1;
     }
+
   }
 
   function getComparableFn(dataType) {

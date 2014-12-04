@@ -277,8 +277,9 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("with two parameters", function () {
+  test("with two parameters (date as string)", function () {
     var em = newEm();
+    var born = new Date(1960, 1, 1);
     var q = EntityQuery.from("EmployeesFilteredByCountryAndBirthdate")
         .withParameters({ birthDate: "1/1/1960", country: "USA" });
 
@@ -287,24 +288,24 @@
       var r = data.results;
       ok(r.length > 0, "should be some results");
       var allok = r.every(function (emp) {
-        return emp.getProperty("country") === "USA";
+        return emp.getProperty("country") === "USA" && emp.getProperty("birthDate") >= born;
       });
       ok(allok, "all employees should be in the US");
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("with Date parameters", function () {
+  test("with two parameters (date as date)", function () {
     var em = newEm();
     var born = new Date(1960, 1, 1);
     var q = EntityQuery.from("EmployeesFilteredByCountryAndBirthdate")
-        .withParameters({ birthDate: born, country: "USA" });
+        .withParameters({ birthDate: born.toISOString(), country: "USA" });
 
     stop();
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should be some results");
       var allok = r.every(function (emp) {
-        return emp.getProperty("birthDate") >= born;
+        return emp.getProperty("country") === "USA" && emp.getProperty("birthDate") >= born;
       });
       ok(allok, "all employees should be born after " + born);
     }).fail(testFns.handleFail).fin(start);
