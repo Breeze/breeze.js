@@ -690,6 +690,8 @@ core.stringStartsWith = __stringStartsWith;
 core.stringEndsWith = __stringEndsWith;
 core.formatString = __formatString;
 
+core.getPropertyDescriptor = __getPropDescriptor;
+
 core.toJSONSafe = __toJSONSafe;
 
 core.parent = breeze;

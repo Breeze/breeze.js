@@ -28,6 +28,43 @@
     }
   });
 
+  test("can add unmapped 'foo' property directly to EntityType", function () {
+    expect(3);
+    var store = MetadataStore.importMetadata(testFns.metadataStore.exportMetadata());
+    assertFooPropertyDefined(store, false);
+
+    var customerType = store.getEntityType('Customer');
+    var fooProp = new breeze.DataProperty({
+      name: 'foo',
+      defaultValue: 42,
+      isUnmapped: true  // !!!
+    });
+    customerType.addProperty(fooProp);
+
+    assertFooPropertyDefined(store, true);
+
+    var cust = store.getEntityType('Customer').createEntity();
+    var custID = cust.getProperty("customerID");
+    var fooValue = cust.getProperty('foo');
+    ok(fooValue == 42,
+        "'cust.foo' should return the default=42");
+
+//    equal(cust._backingStore.foo, 42,
+//        "'cust._backingStore.foo' should return the default=42");
+  });
+
+  function assertFooPropertyDefined(metadataStore, shouldBe) {
+    var custType = metadataStore.getEntityType("Customer");
+    var fooProp = custType.getDataProperty('foo');
+    if (shouldBe) {
+      ok(fooProp && fooProp.isUnmapped,
+          "'foo' property should be defined as unmapped property after registration.");
+    } else {
+      ok(!fooProp, "'foo' property should NOT be defined before registration.");
+    }
+    return fooProp;
+  }
+
   test("merge new into deleted entity", function () {
     var em = newEm();
     var custX = em.createEntity("Customer");

@@ -690,6 +690,8 @@ core.stringStartsWith = __stringStartsWith;
 core.stringEndsWith = __stringEndsWith;
 core.formatString = __formatString;
 
+core.getPropertyDescriptor = __getPropDescriptor;
+
 core.toJSONSafe = __toJSONSafe;
 
 core.parent = breeze;
@@ -16770,6 +16772,14 @@ breeze.SaveOptions = SaveOptions;
     var stype = proto.entityType || proto.complexType;
     stype.getProperties().forEach(function (prop) {
       var propName = prop.name;
+      if (prop.isUnmapped) {
+        // insure that any unmapped properties that were added after entityType
+        // was first created are wrapped with a property descriptor.
+        if (!core.getPropertyDescriptor(proto, propName)) {
+          var descr = makePropDescription(proto, prop);
+          Object.defineProperty(proto, propName, descr);
+        }
+      }
       if (!instance.hasOwnProperty(propName)) return;
       // pulls off the value, removes the instance property and then rewrites it via ES5 accessor
       var value = instance[propName];
@@ -16778,6 +16788,8 @@ breeze.SaveOptions = SaveOptions;
     });
     return bs;
   }
+
+
 
   function makePropDescription(proto, property) {
     var propName = property.name;
