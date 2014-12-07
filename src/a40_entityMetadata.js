@@ -1631,11 +1631,8 @@ var EntityType = (function () {
   };
 
   function createEmptyCtor(type) {
-    var fn, name = type.name.replace(/\W/g, '_');
-    /*jshint evil:false */
-    eval('fn=(function(){return function '+name+'(){}})()');
-    /*jshint evil:true */
-    return fn;
+    var name = type.name.replace(/\W/g, '_');
+    return Function('return function '+name+'(){}')();
   }
 
   // May make public later.
