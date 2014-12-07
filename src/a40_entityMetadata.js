@@ -1619,7 +1619,7 @@ var EntityType = (function () {
 
     if (!aCtor) {
       var createCtor = __modelLibraryDef.getDefaultInstance().createCtor;
-      aCtor = createCtor ? createCtor(this) : createEmptyCtor();
+      aCtor = createCtor ? createCtor(this) : createEmptyCtor(this);
     }
 
     this.initFn = r.initFn;
@@ -1630,9 +1630,12 @@ var EntityType = (function () {
     return aCtor;
   };
 
-  function createEmptyCtor() {
-    return function () {
-    };
+  function createEmptyCtor(type) {
+    var fn, name = type.name.replace(/\W/g, '_');
+    /*jshint evil:false */
+    eval('fn=(function(){return function '+name+'(){}})()');
+    /*jshint evil:true */
+    return fn;
   }
 
   // May make public later.
