@@ -27,6 +27,22 @@
     }
   });
 
+  test("can handle parens in right hand side of predicate", function () {
+    var em = newEm();
+    var query = new EntityQuery("Customers");
+
+    // a valid query that returns no data
+    var q2 = query.where('city', 'startsWith', 'Lon (don )');
+
+    ok(true, "should get here");
+    stop();
+    em.executeQuery(q2).then(function (data) {
+      var r = data.results;
+      ok(r.length == 0, "should have gotten 0 results");
+    }).fail(testFns.handleFail).fin(start);
+  });
+
+
   test("should not throw when add where clause to query with a `.fromEntityType` value", function () {
     var em = newEm();
     var query = new EntityQuery("Customers");

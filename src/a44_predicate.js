@@ -814,25 +814,29 @@
       }
     }
 
-    // if entityType is unknown then assume that the rhs is a literal
-    if (exprContext.isRHS && (entityType == null || entityType.isAnonymous)) {
-      return new LitExpr(source, exprContext.dataType);
-    }
+    if (exprContext.isRHS) {
+      if (entityType == null || entityType.isAnonymous) {
+        // if entityType is unknown then assume that the rhs is a literal
+        return new LitExpr(source, exprContext.dataType);
+      } else {
+        return parseLitOrPropExpr(source, exprContext);
+      }
+    } else {
+      var regex = /\([^()]*\)/;
+      var m;
+      var tokens = [];
+      var i = 0;
+      while (m = regex.exec(source)) {
+        var token = m[0];
+        tokens.push(token);
+        var repl = DELIM + i++;
+        source = source.replace(token, repl);
+      }
 
-    var regex = /\([^()]*\)/;
-    var m;
-    var tokens = [];
-    var i = 0;
-    while (m = regex.exec(source)) {
-      var token = m[0];
-      tokens.push(token);
-      var repl = DELIM + i++;
-      source = source.replace(token, repl);
+      var expr = parseExpr(source, tokens, exprContext);
+      expr._validate(entityType, exprContext.usesNameOnServer);
+      return expr;
     }
-
-    var expr = parseExpr(source, tokens, exprContext);
-    expr._validate(entityType, exprContext.usesNameOnServer);
-    return expr;
   }
 
   function parseExpr(source, tokens, exprContext) {
