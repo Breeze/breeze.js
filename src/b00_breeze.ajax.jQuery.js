@@ -17,7 +17,7 @@
 
   var jQuery;
 
-  var ctor = function () {
+  var ctor = function AjaxJQueryAdapter() {
     this.name = "jQuery";
     this.defaultSettings = { };
     this.requestInterceptor = null;

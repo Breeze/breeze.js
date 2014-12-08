@@ -64,7 +64,7 @@ var Enum = (function () {
   @param [methodObj] {Object}
   **/
 
-  var ctor = function (name, methodObj) {
+  var ctor = function Enum(name, methodObj) {
     this.name = name;
     var prototype = new EnumSymbol(methodObj);
     prototype.parentEnum = this;

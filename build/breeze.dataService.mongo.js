@@ -26,7 +26,7 @@
     return new ObjectId().toString();
   }
 
-  var ctor = function () {
+  var ctor = function DataServiceMongoAdapter() {
     this.name = "mongo";
     breeze.DataType.MongoObjectId = breeze.DataType.addSymbol({
       defaultValue: "",

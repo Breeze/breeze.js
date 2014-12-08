@@ -32,7 +32,7 @@ var EntityKey = (function () {
   @param entityType {EntityType} The {{#crossLink "EntityType"}}{{/crossLink}} of the entity.
   @param keyValues {value|Array of values} A single value or an array of values.
   **/
-  var ctor = function (entityType, keyValues) {
+  var ctor = function EntityKey(entityType, keyValues) {
     assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
     var subtypes = entityType.getSelfAndSubtypes();
     if (subtypes.length > 1) {

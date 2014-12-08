@@ -17,7 +17,7 @@ var SaveOptions = (function () {
   @param [config.dataService] {DataService} The DataService to be used for this save.
   @param [config.tag] {Object} Free form value that will be sent to the server during the save.
   **/
-  var ctor = function (config) {
+  var ctor = function SaveOptions(config) {
     updateWithConfig(this, config);
   };
 

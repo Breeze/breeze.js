@@ -6,7 +6,7 @@
 
 var MappingContext = (function () {
 
-  var ctor = function (config) {
+  var ctor = function MappingContext(config) {
 
     __extend(this, config, [
       "query", "entityManager", "dataService", "mergeOptions"

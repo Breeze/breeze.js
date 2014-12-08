@@ -46,7 +46,7 @@ var DataService = (function () {
   @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
   @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
   **/
-  var ctor = function (config) {
+  var ctor = function DataService(config) {
     // this.uriBuilder = uriBuilderForOData;
     updateWithConfig(this, config);
   };
@@ -236,7 +236,7 @@ var JsonResultsAdapter = (function () {
   This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query.
   @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload.
   **/
-  var ctor = function (config) {
+  var ctor = function JsonResultsAdapter(config) {
     if (arguments.length !== 1) {
       throw new Error("The JsonResultsAdapter ctor should be called with a single argument that is a configuration object.");
     }

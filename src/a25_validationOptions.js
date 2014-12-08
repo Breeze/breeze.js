@@ -23,7 +23,7 @@ var ValidationOptions = (function () {
   @param [config.validateOnQuery=false] {Boolean}
   @param [config.validateOnPropertyChange=true] {Boolean}
   **/
-  var ctor = function (config) {
+  var ctor = function ValidationOptions(config) {
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;

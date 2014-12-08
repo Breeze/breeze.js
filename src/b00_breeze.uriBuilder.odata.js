@@ -12,7 +12,7 @@
   "use strict";
   var EntityType = breeze.EntityType;
 
-  var ctor = function() {
+  var ctor = function UriBuilderODataAdapter() {
     this.name = "odata";
   };
   var proto = ctor.prototype;

@@ -52,7 +52,7 @@ var EntityManager = (function () {
   @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
   @param [config.keyGeneratorCtor] {Function}
   **/
-  var ctor = function (config) {
+  var ctor = function EntityManager(config) {
 
     if (arguments.length > 1) {
       throw new Error("The EntityManager ctor has a single optional argument that is either a 'serviceName' or a configuration object.");

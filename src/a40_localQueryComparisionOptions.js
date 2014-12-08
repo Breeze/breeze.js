@@ -39,7 +39,7 @@ var LocalQueryComparisonOptions = (function () {
   inequality predicates, and not with operations like 'startsWith', 'endsWith' or 'contains'.  Default is true.
   **/
 
-  var ctor = function (config) {
+  var ctor = function LocalQueryComparisonOptions(config) {
     assertConfig(config || {})
         .whereParam("name").isOptional().isString()
         .whereParam("isCaseSensitive").isOptional().isBoolean()

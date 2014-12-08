@@ -12,7 +12,7 @@
   "use strict";
   var core = breeze.core;
 
-  var ctor = function () {
+  var ctor = function ModelLibraryBackingStoreAdapter() {
     this.name = "backingStore";
   };
   // protoFn used instead of proto here to avoid naming collision with function params.

@@ -20,7 +20,7 @@
 
   var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-  var ctor = function () {
+  var ctor = function ModelLibraryBackboneAdapter() {
     this.name = "backbone";
   };
   // protoFn used instead of proto here to avoid naming collision with function params.

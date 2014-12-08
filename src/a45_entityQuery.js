@@ -21,7 +21,7 @@
   @method <ctor> EntityQuery
   @param [resourceName] {String}
   **/
-  var ctor = function (resourceName) {
+  var ctor = function EntityQuery(resourceName) {
     if (resourceName != null && !__isString(resourceName)) {
       return fromJSON(this, resourceName);
     }

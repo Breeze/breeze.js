@@ -11,7 +11,7 @@
 }(function (breeze) {
   "use strict";
 
-  var ctor = function() {
+  var ctor = function UriBuilderJsonAdapter() {
     this.name = "json";
   };
   var proto = ctor.prototype;

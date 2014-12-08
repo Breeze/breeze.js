@@ -18,7 +18,7 @@
 
   var OData;
 
-  var ctor = function () {
+  var ctor = function DataServiceODataAdapter() {
     this.name = "OData";
   };
 

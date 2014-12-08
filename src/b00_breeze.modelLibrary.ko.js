@@ -13,7 +13,7 @@
   var core = breeze.core;
   var ko;
 
-  var ctor = function () {
+  var ctor = function ModelLibraryKnockoutAdapter() {
     this.name = "ko";
   };
   // protoFn used instead of proto here to avoid naming collision with function params.

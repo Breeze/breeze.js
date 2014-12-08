@@ -159,7 +159,7 @@ var Validator = (function () {
   This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
   of additional properties that will be automatically added to this object if not otherwise specified.
   **/
-  var ctor = function (name, valFn, context) {
+  var ctor = function Validator(name, valFn, context) {
     // _baseContext is what will get serialized
     this._baseContext = context || {};
     this._baseContext.name = name;
@@ -899,7 +899,7 @@ var ValidationError = (function () {
   @param errorMessage { String} The actual error message
   @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here.
   **/
-  var ctor = function (validator, context, errorMessage, key) {
+  var ctor = function ValidationError(validator, context, errorMessage, key) {
     assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
     assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
     assertParam(key, "key").isOptional().isNonEmptyString().check();

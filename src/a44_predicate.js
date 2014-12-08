@@ -397,7 +397,7 @@
   })();
   
   var PassthruPredicate = (function () {
-    var ctor = function (value) {
+    var ctor = function PassthruPredicate(value) {
       this.value = value;
     };
     var proto = ctor.prototype = new Predicate();
@@ -409,7 +409,7 @@
   })();
   
   var UnaryPredicate = (function () {
-    var ctor = function (op, pred) {
+    var ctor = function UnaryPredicate(op, pred) {
       this.op = this._resolveOp(op);
       this.pred = Predicate(pred);
     };
@@ -427,7 +427,7 @@
   })();
   
   var BinaryPredicate = (function () {
-    var ctor = function (op, expr1, expr2) {
+    var ctor = function BinaryPredicate(op, expr1, expr2) {
       // 5 public props op, expr1Source, expr2Source, expr1, expr2
       this.op = this._resolveOp(op);
       this.expr1Source = expr1;
@@ -502,7 +502,7 @@
   
   var AndOrPredicate = (function () {
     // two public props: op, preds
-    var ctor = function (op, preds) {
+    var ctor = function AndOrPredicate(op, preds) {
       this.op = this._resolveOp(op);
       if (preds.length == 1 && Array.isArray(preds[0])) {
         preds = preds[0];
@@ -538,7 +538,7 @@
   
   var AnyAllPredicate = (function () {
     // 4 public props: op, exprSource, expr, pred
-    var ctor = function (op, expr, pred) {
+    var ctor = function AnyAllPredicate(op, expr, pred) {
       this.op = this._resolveOp(op);
       this.exprSource = expr;
       // this.expr will not be resolved until validate is called
@@ -573,7 +573,7 @@
 
   var LitExpr = (function () {
     // 2 public props: value, dataType
-    var ctor = function (value, dataType, hasExplicitDataType) {
+    var ctor = function LitExpr(value, dataType, hasExplicitDataType) {
       // dataType may come is an a string
       dataType = resolveDataType(dataType);
       // if the DataType comes in as Undefined this means
@@ -617,7 +617,7 @@
   
   var PropExpr = (function () {
     // two public props: propertyPath, dateType
-    var ctor = function (propertyPath) {
+    var ctor = function PropExpr(propertyPath) {
       this.propertyPath = propertyPath;
       //this.dataType = DataType.Undefined;
       // this.dataType resolved after validate ( if not on an anon type }
@@ -650,7 +650,7 @@
   
   var FnExpr = (function () {
     
-    var ctor = function (fnName, exprs) {
+    var ctor = function FnExpr(fnName, exprs) {
       // 4 public props: fnName, exprs, localFn, dataType
       this.fnName = fnName;
       this.exprs = exprs;

@@ -1126,7 +1126,7 @@ var Enum = (function () {
   @param [methodObj] {Object}
   **/
 
-  var ctor = function (name, methodObj) {
+  var ctor = function Enum(name, methodObj) {
     this.name = name;
     var prototype = new EnumSymbol(methodObj);
     prototype.parentEnum = this;
@@ -1365,7 +1365,7 @@ var Event = (function () {
   @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
   **/
 
-  var ctor = function (name, publisher, defaultErrorCallback) {
+  var ctor = function Event(name, publisher, defaultErrorCallback) {
     assertParam(name, "eventName").isNonEmptyString().check();
     assertParam(publisher, "publisher").isObject().check();
 
@@ -2228,7 +2228,7 @@ var Validator = (function () {
   This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
   of additional properties that will be automatically added to this object if not otherwise specified.
   **/
-  var ctor = function (name, valFn, context) {
+  var ctor = function Validator(name, valFn, context) {
     // _baseContext is what will get serialized
     this._baseContext = context || {};
     this._baseContext.name = name;
@@ -2968,7 +2968,7 @@ var ValidationError = (function () {
   @param errorMessage { String} The actual error message
   @param [key] {String} An optional key used to define a key for this error. One will be created automatically if not provided here.
   **/
-  var ctor = function (validator, context, errorMessage, key) {
+  var ctor = function ValidationError(validator, context, errorMessage, key) {
     assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
     assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
     assertParam(key, "key").isOptional().isNonEmptyString().check();
@@ -3083,7 +3083,7 @@ var ValidationOptions = (function () {
   @param [config.validateOnQuery=false] {Boolean}
   @param [config.validateOnPropertyChange=true] {Boolean}
   **/
-  var ctor = function (config) {
+  var ctor = function ValidationOptions(config) {
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;
@@ -3474,7 +3474,7 @@ var EntityAspect = (function () {
       var currentState = aspect.entityState;
   @class EntityAspect
   **/
-  var ctor = function (entity) {
+  var ctor = function EntityAspect(entity) {
     if (entity === null) {
       var nullInstance = EntityAspect._nullInstance;
       if (nullInstance) return nullInstance;
@@ -4307,7 +4307,7 @@ var ComplexAspect = (function () {
       // aCustomer === aspect.parent;
   @class ComplexAspect
   **/
-  var ctor = function (complexObject, parent, parentProperty) {
+  var ctor = function ComplexAspect(complexObject, parent, parentProperty) {
     if (!complexObject) {
       throw new Error("The  ComplexAspect ctor requires an entity as its only argument.");
     }
@@ -4449,7 +4449,7 @@ var EntityKey = (function () {
   @param entityType {EntityType} The {{#crossLink "EntityType"}}{{/crossLink}} of the entity.
   @param keyValues {value|Array of values} A single value or an array of values.
   **/
-  var ctor = function (entityType, keyValues) {
+  var ctor = function EntityKey(entityType, keyValues) {
     assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
     var subtypes = entityType.getSelfAndSubtypes();
     if (subtypes.length > 1) {
@@ -5978,7 +5978,7 @@ var DataService = (function () {
   @param [config.jsonResultsAdapter] {JsonResultsAdapter}  The JsonResultsAdapter used to process the results of any query against this service.
   @param [config.useJsonp] {Boolean}  Whether to use JSONP when making a 'get' request against this service.
   **/
-  var ctor = function (config) {
+  var ctor = function DataService(config) {
     // this.uriBuilder = uriBuilderForOData;
     updateWithConfig(this, config);
   };
@@ -6168,7 +6168,7 @@ var JsonResultsAdapter = (function () {
   This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query.
   @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload.
   **/
-  var ctor = function (config) {
+  var ctor = function JsonResultsAdapter(config) {
     if (arguments.length !== 1) {
       throw new Error("The JsonResultsAdapter ctor should be called with a single argument that is a configuration object.");
     }
@@ -7816,7 +7816,7 @@ var EntityType = (function () {
 
     if (!aCtor) {
       var createCtor = __modelLibraryDef.getDefaultInstance().createCtor;
-      aCtor = createCtor ? createCtor(this) : createEmptyCtor();
+      aCtor = createCtor ? createCtor(this) : createEmptyCtor(this);
     }
 
     this.initFn = r.initFn;
@@ -7827,9 +7827,9 @@ var EntityType = (function () {
     return aCtor;
   };
 
-  function createEmptyCtor() {
-    return function () {
-    };
+  function createEmptyCtor(type) {
+    var name = type.name.replace(/\W/g, '_');
+    return Function('return function '+name+'(){}')();
   }
 
   // May make public later.
@@ -9318,7 +9318,7 @@ var KeyGenerator = (function () {
   /*
   @class KeyGenerator
   */
-  var ctor = function () {
+  var ctor = function KeyGenerator() {
     // key is dataProperty.name + || + entityType.name, value is propEntry
     // propEntry = { entityType, propertyName, keyMap }
     // keyMap has key of the actual value ( as a string) and a value of null or the real id.
@@ -9469,7 +9469,7 @@ var LocalQueryComparisonOptions = (function () {
   inequality predicates, and not with operations like 'startsWith', 'endsWith' or 'contains'.  Default is true.
   **/
 
-  var ctor = function (config) {
+  var ctor = function LocalQueryComparisonOptions(config) {
     assertConfig(config || {})
         .whereParam("name").isOptional().isString()
         .whereParam("isCaseSensitive").isOptional().isBoolean()
@@ -9560,7 +9560,7 @@ var NamingConvention = (function () {
   @param config.serverPropertyNameToClient {Function} Function that takes a server property name add converts it into a client side property name.
   @param config.clientPropertyNameToServer {Function} Function that takes a client property name add converts it into a server side property name.
   **/
-  var ctor = function (config) {
+  var ctor = function NamingConvention(config) {
     assertConfig(config || {})
         .whereParam("name").isOptional().isString()
         .whereParam("serverPropertyNameToClient").isFunction()
@@ -10055,7 +10055,7 @@ breeze.NamingConvention = NamingConvention;
   })();
   
   var PassthruPredicate = (function () {
-    var ctor = function (value) {
+    var ctor = function PassthruPredicate(value) {
       this.value = value;
     };
     var proto = ctor.prototype = new Predicate();
@@ -10067,7 +10067,7 @@ breeze.NamingConvention = NamingConvention;
   })();
   
   var UnaryPredicate = (function () {
-    var ctor = function (op, pred) {
+    var ctor = function UnaryPredicate(op, pred) {
       this.op = this._resolveOp(op);
       this.pred = Predicate(pred);
     };
@@ -10085,7 +10085,7 @@ breeze.NamingConvention = NamingConvention;
   })();
   
   var BinaryPredicate = (function () {
-    var ctor = function (op, expr1, expr2) {
+    var ctor = function BinaryPredicate(op, expr1, expr2) {
       // 5 public props op, expr1Source, expr2Source, expr1, expr2
       this.op = this._resolveOp(op);
       this.expr1Source = expr1;
@@ -10160,7 +10160,7 @@ breeze.NamingConvention = NamingConvention;
   
   var AndOrPredicate = (function () {
     // two public props: op, preds
-    var ctor = function (op, preds) {
+    var ctor = function AndOrPredicate(op, preds) {
       this.op = this._resolveOp(op);
       if (preds.length == 1 && Array.isArray(preds[0])) {
         preds = preds[0];
@@ -10196,7 +10196,7 @@ breeze.NamingConvention = NamingConvention;
   
   var AnyAllPredicate = (function () {
     // 4 public props: op, exprSource, expr, pred
-    var ctor = function (op, expr, pred) {
+    var ctor = function AnyAllPredicate(op, expr, pred) {
       this.op = this._resolveOp(op);
       this.exprSource = expr;
       // this.expr will not be resolved until validate is called
@@ -10231,7 +10231,7 @@ breeze.NamingConvention = NamingConvention;
 
   var LitExpr = (function () {
     // 2 public props: value, dataType
-    var ctor = function (value, dataType, hasExplicitDataType) {
+    var ctor = function LitExpr(value, dataType, hasExplicitDataType) {
       // dataType may come is an a string
       dataType = resolveDataType(dataType);
       // if the DataType comes in as Undefined this means
@@ -10275,7 +10275,7 @@ breeze.NamingConvention = NamingConvention;
   
   var PropExpr = (function () {
     // two public props: propertyPath, dateType
-    var ctor = function (propertyPath) {
+    var ctor = function PropExpr(propertyPath) {
       this.propertyPath = propertyPath;
       //this.dataType = DataType.Undefined;
       // this.dataType resolved after validate ( if not on an anon type }
@@ -10308,7 +10308,7 @@ breeze.NamingConvention = NamingConvention;
   
   var FnExpr = (function () {
     
-    var ctor = function (fnName, exprs) {
+    var ctor = function FnExpr(fnName, exprs) {
       // 4 public props: fnName, exprs, localFn, dataType
       this.fnName = fnName;
       this.exprs = exprs;
@@ -10933,7 +10933,7 @@ breeze.Predicate = Predicate;
   @method <ctor> EntityQuery
   @param [resourceName] {String}
   **/
-  var ctor = function (resourceName) {
+  var ctor = function EntityQuery(resourceName) {
     if (resourceName != null && !__isString(resourceName)) {
       return fromJSON(this, resourceName);
     }
@@ -12344,7 +12344,7 @@ var QueryOptions = (function () {
   @param [config.mergeStrategy] {MergeStrategy}
   @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default)
   **/
-  var ctor = function (config) {
+  var ctor = function QueryOptions(config) {
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;
@@ -12474,7 +12474,7 @@ var EntityGroup = (function () {
 
   var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
 
-  var ctor = function (entityManager, entityType) {
+  var ctor = function EntityGroup(entityManager, entityType) {
     this.entityManager = entityManager;
     this.entityType = entityType;
     // freeze the entityType after the first instance of this type is either created or queried.
@@ -12702,7 +12702,7 @@ var EntityManager = (function () {
   @param [config.validationOptions=ValidationOptions.defaultInstance] {ValidationOptions}
   @param [config.keyGeneratorCtor] {Function}
   **/
-  var ctor = function (config) {
+  var ctor = function EntityManager(config) {
 
     if (arguments.length > 1) {
       throw new Error("The EntityManager ctor has a single optional argument that is either a 'serviceName' or a configuration object.");
@@ -14991,7 +14991,7 @@ breeze.EntityManager = EntityManager;
 
 var MappingContext = (function () {
 
-  var ctor = function (config) {
+  var ctor = function MappingContext(config) {
 
     __extend(this, config, [
       "query", "entityManager", "dataService", "mergeOptions"
@@ -15390,7 +15390,7 @@ var SaveOptions = (function () {
   @param [config.dataService] {DataService} The DataService to be used for this save.
   @param [config.tag] {Object} Free form value that will be sent to the server during the save.
   **/
-  var ctor = function (config) {
+  var ctor = function SaveOptions(config) {
     updateWithConfig(this, config);
   };
 
@@ -15837,7 +15837,7 @@ breeze.SaveOptions = SaveOptions;
   "use strict";
   var core = breeze.core;
 
-  var ctor = function () {
+  var ctor = function AjaxAngularAdapter() {
     this.name = "angular";
     this.defaultSettings = { };
     this.requestInterceptor = null;
@@ -16010,7 +16010,7 @@ breeze.SaveOptions = SaveOptions;
 
   var jQuery;
 
-  var ctor = function () {
+  var ctor = function AjaxJQueryAdapter() {
     this.name = "jQuery";
     this.defaultSettings = { };
     this.requestInterceptor = null;
@@ -16130,7 +16130,7 @@ breeze.SaveOptions = SaveOptions;
 
   var OData;
 
-  var ctor = function () {
+  var ctor = function DataServiceODataAdapter() {
     this.name = "OData";
   };
 
@@ -16538,7 +16538,7 @@ breeze.SaveOptions = SaveOptions;
   var JsonResultsAdapter = breeze.JsonResultsAdapter;
   var AbstractDataServiceAdapter = breeze.AbstractDataServiceAdapter;
 
-  var ctor = function () {
+  var ctor = function DataServiceWebApiAdapter() {
     this.name = "webApi";
   };
   var proto = ctor.prototype = new AbstractDataServiceAdapter();
@@ -16634,7 +16634,7 @@ breeze.SaveOptions = SaveOptions;
   "use strict";
   var core = breeze.core;
 
-  var ctor = function () {
+  var ctor = function ModelLibraryBackingStoreAdapter() {
     this.name = "backingStore";
   };
   // protoFn used instead of proto here to avoid naming collision with function params.
@@ -16927,7 +16927,7 @@ breeze.SaveOptions = SaveOptions;
   var core = breeze.core;
   var ko;
 
-  var ctor = function () {
+  var ctor = function ModelLibraryKnockoutAdapter() {
     this.name = "ko";
   };
   // protoFn used instead of proto here to avoid naming collision with function params.
@@ -17191,7 +17191,7 @@ breeze.SaveOptions = SaveOptions;
 }(function (breeze) {
   "use strict";
 
-  var ctor = function() {
+  var ctor = function UriBuilderJsonAdapter() {
     this.name = "json";
   };
   var proto = ctor.prototype;
@@ -17232,7 +17232,7 @@ breeze.SaveOptions = SaveOptions;
   "use strict";
   var EntityType = breeze.EntityType;
 
-  var ctor = function() {
+  var ctor = function UriBuilderODataAdapter() {
     this.name = "odata";
   };
   var proto = ctor.prototype;

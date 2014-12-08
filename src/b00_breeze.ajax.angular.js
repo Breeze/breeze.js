@@ -15,7 +15,7 @@
   "use strict";
   var core = breeze.core;
 
-  var ctor = function () {
+  var ctor = function AjaxAngularAdapter() {
     this.name = "angular";
     this.defaultSettings = { };
     this.requestInterceptor = null;

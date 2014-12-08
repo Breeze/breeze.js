@@ -25,7 +25,7 @@ var Event = (function () {
   @param [defaultErrorCallback.e] {Error} Any error encountered during subscription execution.
   **/
 
-  var ctor = function (name, publisher, defaultErrorCallback) {
+  var ctor = function Event(name, publisher, defaultErrorCallback) {
     assertParam(name, "eventName").isNonEmptyString().check();
     assertParam(publisher, "publisher").isObject().check();
 

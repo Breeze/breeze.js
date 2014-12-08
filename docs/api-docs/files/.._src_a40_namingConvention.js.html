@@ -240,7 +240,7 @@ var NamingConvention = (function () {
   @param config.serverPropertyNameToClient {Function} Function that takes a server property name add converts it into a client side property name.
   @param config.clientPropertyNameToServer {Function} Function that takes a client property name add converts it into a server side property name.
   **/
-  var ctor = function (config) {
+  var ctor = function NamingConvention(config) {
     assertConfig(config || {})
         .whereParam(&quot;name&quot;).isOptional().isString()
         .whereParam(&quot;serverPropertyNameToClient&quot;).isFunction()

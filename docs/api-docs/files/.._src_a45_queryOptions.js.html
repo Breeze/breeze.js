@@ -315,7 +315,7 @@ var QueryOptions = (function () {
   @param [config.mergeStrategy] {MergeStrategy}
   @param [config.includeDeleted] {Boolean} Whether query should return cached deleted entities (false by default)
   **/
-  var ctor = function (config) {
+  var ctor = function QueryOptions(config) {
     updateWithConfig(this, config);
   };
   var proto = ctor.prototype;

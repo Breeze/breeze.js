@@ -1826,7 +1826,7 @@ var EntityType = (function () {
 
     if (!aCtor) {
       var createCtor = __modelLibraryDef.getDefaultInstance().createCtor;
-      aCtor = createCtor ? createCtor(this) : createEmptyCtor();
+      aCtor = createCtor ? createCtor(this) : createEmptyCtor(this);
     }
 
     this.initFn = r.initFn;
@@ -1837,9 +1837,9 @@ var EntityType = (function () {
     return aCtor;
   };
 
-  function createEmptyCtor() {
-    return function () {
-    };
+  function createEmptyCtor(type) {
+    var name = type.name.replace(/\W/g, &#x27;_&#x27;);
+    return Function(&#x27;return function &#x27;+name+&#x27;(){}&#x27;)();
   }
 
   // May make public later.

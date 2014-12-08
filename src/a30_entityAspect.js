@@ -18,7 +18,7 @@ var EntityAspect = (function () {
       var currentState = aspect.entityState;
   @class EntityAspect
   **/
-  var ctor = function (entity) {
+  var ctor = function EntityAspect(entity) {
     if (entity === null) {
       var nullInstance = EntityAspect._nullInstance;
       if (nullInstance) return nullInstance;
@@ -851,7 +851,7 @@ var ComplexAspect = (function () {
       // aCustomer === aspect.parent;
   @class ComplexAspect
   **/
-  var ctor = function (complexObject, parent, parentProperty) {
+  var ctor = function ComplexAspect(complexObject, parent, parentProperty) {
     if (!complexObject) {
       throw new Error("The  ComplexAspect ctor requires an entity as its only argument.");
     }

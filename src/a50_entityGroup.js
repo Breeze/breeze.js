@@ -6,7 +6,7 @@ var EntityGroup = (function () {
 
   var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
 
-  var ctor = function (entityManager, entityType) {
+  var ctor = function EntityGroup(entityManager, entityType) {
     this.entityManager = entityManager;
     this.entityType = entityType;
     // freeze the entityType after the first instance of this type is either created or queried.

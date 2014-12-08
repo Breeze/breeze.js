@@ -15,7 +15,7 @@
   var JsonResultsAdapter = breeze.JsonResultsAdapter;
   var AbstractDataServiceAdapter = breeze.AbstractDataServiceAdapter;
 
-  var ctor = function () {
+  var ctor = function DataServiceWebApiAdapter() {
     this.name = "webApi";
   };
   var proto = ctor.prototype = new AbstractDataServiceAdapter();
