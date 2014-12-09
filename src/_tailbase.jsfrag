@@ -1,0 +1,13 @@
+
+// when using breeze.base.js  you MUST initialize all breeze adapters manually after breeze.base.js executes.
+//    Something like:
+//
+// breeze.config.initializeAdapterInstances( {
+//     dataService: "webApi",        // or "odata"
+//     modelLibrary: "backingStore", // or "ko" or "backbone"
+//     ajax: "jQuery",               // or "angular"
+//     uriBuilder: "odata"           // or "json:
+// });
+
+return breeze;
+});

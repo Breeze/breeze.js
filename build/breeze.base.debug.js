@@ -15825,18 +15825,15 @@ breeze.SaveOptions = SaveOptions;
 
 })();
 ;
-// set defaults
-// will no longer fail at initialization time if jQuery is not found.
-breeze.config.initializeAdapterInstances( { dataService: "webApi", ajax: "jQuery", uriBuilder: "odata" });
-
-
-var ko = __requireLibCore("ko");
-
-if (ko) {
-    breeze.config.initializeAdapterInstance("modelLibrary", "ko");
-} else {
-    breeze.config.initializeAdapterInstance("modelLibrary", "backingStore");
-}
+// when using breeze.base.js  you MUST initialize all breeze adapters manually after breeze.base.js executes.
+//    Something like:
+//
+// breeze.config.initializeAdapterInstances( {
+//     dataService: "webApi",        // or "odata"
+//     modelLibrary: "backingStore", // or "ko" or "backbone"
+//     ajax: "jQuery",               // or "angular"
+//     uriBuilder: "odata"           // or "json:
+// });
 
 return breeze;
 });

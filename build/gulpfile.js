@@ -18,7 +18,7 @@ var destDir = './';
 var yuidocDestDir  = '../docs/api-docs/';
 var yuidocThemeDir = '../docs/api-docs-theme/';
 
-var baseFileNames = [ '_head.jsfrag', 'a??_*.js', '_tail.jsfrag'];
+var baseFileNames = [ '_head.jsfrag', 'a??_*.js', '_tailbase.jsfrag'];
 var fileNames     = [ '_head.jsfrag', 'a??_*.js', 'b??_*.js', '_tail.jsfrag'];
 
 buildMinify('', fileNames);

@@ -17448,7 +17448,6 @@ breeze.SaveOptions = SaveOptions;
 // will no longer fail at initialization time if jQuery is not found.
 breeze.config.initializeAdapterInstances( { dataService: "webApi", ajax: "jQuery", uriBuilder: "odata" });
 
-
 var ko = __requireLibCore("ko");
 
 if (ko) {
