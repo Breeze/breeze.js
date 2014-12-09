@@ -42,8 +42,7 @@
     setup: function () {
       testFns.setup({ serviceName: altServiceName });
     },
-    teardown: function () {
-    }
+    teardown: testFns.teardown_inheritanceReset
   });
 
   function tweakMetadataOnFetch(metadataStore, extn) {
