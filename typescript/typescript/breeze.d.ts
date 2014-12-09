@@ -169,15 +169,21 @@ declare module breeze {
     interface DataPropertyOptions {
         complexTypeName?: string;
         concurrencyMode?: string;
+        custom?: any;
         dataType?: DataTypeSymbol;
         defaultValue?: any;
+        displayName?: string;
+        enumType?: any;
         fixedLength?: boolean;
         isNullable?: boolean;
         isPartOfKey?: boolean;
+        isScalar?: boolean;
+        isSettable?: boolean;
         isUnmapped?: boolean;
         maxLength?: number;
         name?: string;
         nameOnServer?: string;
+        rawTypeName?: string;
         validators?: Validator[];
     }
 
