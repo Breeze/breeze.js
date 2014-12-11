@@ -27,6 +27,17 @@
     }
   });
 
+  test("can handle simple json query syntax ", function () {
+    var em = newEm();
+    var query = EntityQuery.from('Customers').using(em).where({ 'city': { '==': 'London' } });
+    var url = query._toUri(em);
+    stop();
+    em.executeQuery(query).then(function (data) {
+      var r = data.results;
+      ok(r.length > 0, "should have gotten some results");
+    }).fail(testFns.handleFail).fin(start);
+  });
+
   test("can handle parens in right hand side of predicate", function () {
     var em = newEm();
     var query = new EntityQuery("Customers");
