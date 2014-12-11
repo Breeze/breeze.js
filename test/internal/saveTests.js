@@ -861,7 +861,7 @@
     }).fail(handleFail).fin(start);
   });
 
-  test("save data with with additional entity added on server", function () {
+  test("save data with additional entity added on server", function () {
     if (testFns.DEBUG_ODATA) {
       ok(true, "Skipped test - OData does not support server interception or alt resources");
       return;
