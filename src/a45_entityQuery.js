@@ -701,8 +701,12 @@
   }
   
   /**
-  Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
+  Static method that creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
   to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
+
+  Works for a single entity or an array of entities of the SAME type.
+  Does not work for an array of entities of different types.
+
   @example
       // assuming 'customers' is an array of 'Customer' entities retrieved earlier.
       var customersQuery = EntityQuery.fromEntities(customers);
@@ -728,7 +732,14 @@
       entities = __arraySlice(arguments);
     }
     var firstEntity = entities[0];
-    var q = new EntityQuery(firstEntity.entityType.defaultResourceName);
+    var type = firstEntity.entityType;
+    if (entities.some(function(e){
+      return e.entityType !== type;
+    })) {
+      throw new Error("All 'fromEntities' must be the same type; at least one is not of type " +
+        type.name);
+    }
+    var q = new EntityQuery(type.defaultResourceName);
     var preds = entities.map(function (entity) {
       return buildPredicate(entity);
     });
