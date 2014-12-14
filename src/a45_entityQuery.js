@@ -1066,26 +1066,7 @@ var FilterQueryOp = (function () {
   aEnum.IsTypeOf = aEnum.addSymbol({ operator: "isof" });
   
   aEnum.resolveSymbols();
-  aEnum._map = function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  }();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 
@@ -1096,26 +1077,7 @@ var BooleanQueryOp = (function () {
   aEnum.Not = aEnum.addSymbol({ operator: "not" });
   
   aEnum.resolveSymbols();
-  aEnum._map = (function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  })();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 

@@ -439,22 +439,22 @@
     var proto = ctor.prototype = new Predicate();
     proto._initialize('binaryPredicate', {
       'eq': {
-        aliases: ["=="]
+        aliases: ["==", "equals" ]
       },
       'ne': {
-        aliases: ["!=", '~=']
+        aliases: ["!=", "~=", "notequals" ]
       },
       'lt': {
-        aliases: ["<" ]
+        aliases: ["<", "lessthan" ]
       },
       'le': {
-        aliases: ["<=" ]
+        aliases: ["<=", "lessthanorequal" ]
       },
       'gt': {
-        aliases: [">"]
+        aliases: [">", "greaterthan"]
       },
       'ge': {
-        aliases: [">=" ]
+        aliases: [">=", "greaterthanorequal" ]
       },
       'startswith': {
         isFunction: true
@@ -796,7 +796,8 @@
     }
 
     if (!__isString(source)) {
-      if (source != null && __isObject(source) && (!__isDate(source))) {
+      if (source != null && __isObject(source) && !source.toISOString) { 
+        // source is an object but not a Date-like thing such as a JS or MomentJS Date
         if (source.value === undefined) {
           throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + entityType.name);
         }
