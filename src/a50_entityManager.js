@@ -364,6 +364,40 @@ var EntityManager = (function () {
   };
 
   /**
+  Exports all of the entities from this EntityManager by a specific Type.
+  @example
+  This method can be used to snapshot a particular type for export to a typed store such as indexedDB
+  or WebSQL.  You may later import these entries by calling importEntitiesByType.
+  @example
+      // assume em is an EntityManager containing a number of existing entities.
+      // and aType is an EntityType which is NOT complex
+      // and objectStore is an indexedDB objectStore which can store this type
+      var entities = em.exportEntitiesByType(aType);
+      //stuff all the entities into the objectStore
+      for( var i = 0; i < entities.length; i++) {
+        objectStore.upsert(entities[i]);
+      }
+      // assume the code below occurs in a different session.
+      var allEntitiesAgain = objectStore.getAll();
+      var em2 = new EntityManager({
+          serviceName: em1.serviceName,
+          metadataStore: em1.metadataStore
+      });
+      em2.importEntitiesByType(aType, allEntitiesAgain);
+      // em2 will now have a complete copy of what was in em1
+  @method exportEntitiesByType
+  @param entityType {EntityType} The entity type to export for
+  @param [entities] {Array of Entity} A set of entities to export.
+
+  @return {Array} An Array of the exported items
+  **/
+  proto.exportEntitiesByType = function (entityType, entities) {
+      var entityGroup = entityGroupForType(this, entityType, entities);
+      var exportBundle = exportEntityGroup(entityGroup, []);
+      return exportBundle.entities;
+  };
+
+  /**
   Imports a previously exported result into this EntityManager.
   @example
   This method can be used to make a complete copy of any previously created entityManager, even if created
@@ -456,8 +490,51 @@ var EntityManager = (function () {
     };
   };
 
-
   /**
+  Imports entities exported by exportEntitiesByType
+  @example
+  This method can be used to make a complete copy of any previously created entityManager, even if created
+  in a previous session and stored in indexedDB.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      // assume aType is an EntityType
+      var entities = em1.exportEntitiesByType(aType);
+      // bundle can be stored in window.localStorage or just held in memory.
+      var em2 = new EntityManager({
+          serviceName: em1.serviceName,
+          metadataStore: em1.metadataStore
+      });
+      em2.importEntitiesByType(aType, entities);
+      // em2 will now have a complete copy of what was in em1
+  It can also be used to merge the contents of a previously created EntityManager with an
+  existing EntityManager with control over how the two are merged.
+  @example
+      var entities = em1.exportEntitiesByType(aType);
+      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+      em2.importEntitiesByType(aType, entities, { mergeStrategy: MergeStrategy.PreserveChanges} );
+      // em2 will now contain all of the entities from both em1 and em2.  Any em2 entities with previously
+      // made modifications will not have been touched, but all other entities from em1 will have been imported.
+  @method importEntitiesByType
+  @param entityType {EntityType} The result of a previous 'exportEntitiesByType' call.
+  @param [config] {Object} A configuration object.
+      @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
+      merging into an existing EntityManager.
+      @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+      and may be used to perform version checking.
+  @return result {Object}
+      result.entities {Array of Entities} The entities that were imported.
+      result.tempKeyMap {Object} Mapping from original EntityKey in the import bundle to its corresponding EntityKey in this EntityManager.
+  **/
+  proto.importEntitiesByType = function (entityType, entities, config) {
+      var jsonPayload = {
+          tempKeys: [],
+          entityGroupMap: {}
+      };
+      jsonPayload.entityGroupMap[entityType.name] = { entities: entities };
+      return this.importEntities(jsonPayload, config);
+  };
+
+   /**
   Clears this EntityManager's cache but keeps all other settings. Note that this
   method is not as fast as creating a new EntityManager via 'new EntityManager'.
   This is because clear actually detaches all of the entities from the EntityManager.
@@ -1679,7 +1756,24 @@ var EntityManager = (function () {
     });
 
     return { entityGroupMap: newGroupMap, tempKeys: tempKeys };
-  }
+  };
+
+  function entityGroupForType( em, entityType, entities) {
+      var group = em._entityGroupMap[entityType.name];
+      if (!group) {
+          group = {
+              entityType: entityType,
+              _entities: []
+          };
+      }
+      if ( entities && entities.length > 0 ) {
+          group = {
+              entityType: entityType,
+              _entities: entities
+          }
+      }
+      return group;
+  };
 
   function exportEntityGroup(entityGroup, tempKeys) {
     var resultGroup = {};
