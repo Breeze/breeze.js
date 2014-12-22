@@ -447,7 +447,9 @@ var EntityManager = (function () {
         Array.prototype.push.apply(entitiesToLink, entities);
       });
       entitiesToLink.forEach(function (entity) {
-        that._linkRelatedEntities(entity);
+        if (!entity.entityAspect.entityState.isDeleted()) {
+          that._linkRelatedEntities(entity);
+        }
       });
     });
     return {

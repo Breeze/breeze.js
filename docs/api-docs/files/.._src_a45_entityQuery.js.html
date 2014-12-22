@@ -908,8 +908,12 @@
   }
   
   /**
-  Static method tht creates an EntityQuery that will allow &#x27;requerying&#x27; an entity or a collection of entities by primary key. This can be useful
+  Static method that creates an EntityQuery that will allow &#x27;requerying&#x27; an entity or a collection of entities by primary key. This can be useful
   to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
+
+  Works for a single entity or an array of entities of the SAME type.
+  Does not work for an array of entities of different types.
+
   @example
       // assuming &#x27;customers&#x27; is an array of &#x27;Customer&#x27; entities retrieved earlier.
       var customersQuery = EntityQuery.fromEntities(customers);
@@ -935,7 +939,14 @@
       entities = __arraySlice(arguments);
     }
     var firstEntity = entities[0];
-    var q = new EntityQuery(firstEntity.entityType.defaultResourceName);
+    var type = firstEntity.entityType;
+    if (entities.some(function(e){
+      return e.entityType !== type;
+    })) {
+      throw new Error(&quot;All &#x27;fromEntities&#x27; must be the same type; at least one is not of type &quot; +
+        type.name);
+    }
+    var q = new EntityQuery(type.defaultResourceName);
     var preds = entities.map(function (entity) {
       return buildPredicate(entity);
     });
@@ -1262,26 +1273,7 @@ var FilterQueryOp = (function () {
   aEnum.IsTypeOf = aEnum.addSymbol({ operator: &quot;isof&quot; });
   
   aEnum.resolveSymbols();
-  aEnum._map = function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  }();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 
@@ -1292,26 +1284,7 @@ var BooleanQueryOp = (function () {
   aEnum.Not = aEnum.addSymbol({ operator: &quot;not&quot; });
   
   aEnum.resolveSymbols();
-  aEnum._map = (function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  })();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 

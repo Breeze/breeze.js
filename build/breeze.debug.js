@@ -10097,22 +10097,22 @@ breeze.NamingConvention = NamingConvention;
     var proto = ctor.prototype = new Predicate();
     proto._initialize('binaryPredicate', {
       'eq': {
-        aliases: ["=="]
+        aliases: ["==", "equals" ]
       },
       'ne': {
-        aliases: ["!=", '~=']
+        aliases: ["!=", "~=", "notequals" ]
       },
       'lt': {
-        aliases: ["<" ]
+        aliases: ["<", "lessthan" ]
       },
       'le': {
-        aliases: ["<=" ]
+        aliases: ["<=", "lessthanorequal" ]
       },
       'gt': {
-        aliases: [">"]
+        aliases: [">", "greaterthan"]
       },
       'ge': {
-        aliases: [">=" ]
+        aliases: [">=", "greaterthanorequal" ]
       },
       'startswith': {
         isFunction: true
@@ -10454,7 +10454,8 @@ breeze.NamingConvention = NamingConvention;
     }
 
     if (!__isString(source)) {
-      if (source != null && __isObject(source) && (!__isDate(source))) {
+      if (source != null && __isObject(source) && !source.toISOString) { 
+        // source is an object but not a Date-like thing such as a JS or MomentJS Date
         if (source.value === undefined) {
           throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + entityType.name);
         }
@@ -11617,8 +11618,12 @@ breeze.Predicate = Predicate;
   }
   
   /**
-  Static method tht creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
+  Static method that creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
   to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
+
+  Works for a single entity or an array of entities of the SAME type.
+  Does not work for an array of entities of different types.
+
   @example
       // assuming 'customers' is an array of 'Customer' entities retrieved earlier.
       var customersQuery = EntityQuery.fromEntities(customers);
@@ -11644,7 +11649,14 @@ breeze.Predicate = Predicate;
       entities = __arraySlice(arguments);
     }
     var firstEntity = entities[0];
-    var q = new EntityQuery(firstEntity.entityType.defaultResourceName);
+    var type = firstEntity.entityType;
+    if (entities.some(function(e){
+      return e.entityType !== type;
+    })) {
+      throw new Error("All 'fromEntities' must be the same type; at least one is not of type " +
+        type.name);
+    }
+    var q = new EntityQuery(type.defaultResourceName);
     var preds = entities.map(function (entity) {
       return buildPredicate(entity);
     });
@@ -11971,26 +11983,7 @@ var FilterQueryOp = (function () {
   aEnum.IsTypeOf = aEnum.addSymbol({ operator: "isof" });
   
   aEnum.resolveSymbols();
-  aEnum._map = function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  }();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 
@@ -12001,26 +11994,7 @@ var BooleanQueryOp = (function () {
   aEnum.Not = aEnum.addSymbol({ operator: "not" });
   
   aEnum.resolveSymbols();
-  aEnum._map = (function () {
-    var map = {};
-    aEnum.getSymbols().forEach(function (s) {
-      map[s.name.toLowerCase()] = s;
-      map[s.operator.toLowerCase()] = s;
-      if (s.aliases) {
-        s.aliases.forEach(function (alias) {
-          map[alias.toLowerCase()] = s;
-        });
-      }
-    });
-    return map;
-  })();
-  aEnum.from = function (op) {
-    if (aEnum.contains(op)) {
-      return op;
-    } else {
-      return aEnum._map[op.toLowerCase()];
-    }
-  };
+
   return aEnum;
 })();
 
@@ -13101,7 +13075,9 @@ var EntityManager = (function () {
         Array.prototype.push.apply(entitiesToLink, entities);
       });
       entitiesToLink.forEach(function (entity) {
-        that._linkRelatedEntities(entity);
+        if (!entity.entityAspect.entityState.isDeleted()) {
+          that._linkRelatedEntities(entity);
+        }
       });
     });
     return {
@@ -15973,7 +15949,7 @@ breeze.SaveOptions = SaveOptions;
           innerObj[fullSubName] = subValue;
           query += encodeParams(innerObj) + '&';
         }
-      } else if (value instanceof Date) {
+      } else if (value && value.toISOString) { // a feature of Date-like things
         query += encodeURIComponent(name) + '=' + encodeURIComponent(value.toISOString()) + '&';
       } else if (value instanceof Object) {
         for (var subName in value) {

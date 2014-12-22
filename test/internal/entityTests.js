@@ -28,6 +28,39 @@
     }
   });
 
+  /*********************************************************
+    * Create an EM with parent/child relationship data.  Export the EM and import it into a new one, delete the child item in the exported EM
+    * export the 2nd EM into the first EM.
+    *********************************************************/
+  test("test imported deleted nav properties", function () {
+    var em = newEm();
+
+    var parentCustomer = createCustomerAndOrders(em, true, 1);
+
+    var newOrder = parentCustomer.getProperty("orders")[0];
+     
+    // clone the EM data
+    var expEntities = em.exportEntities(null, true);
+
+    //var newEm = newEm();
+    var newEM = new breeze.EntityManager();
+    newEM.importEntities(expEntities, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+    // delete the order
+    var newOrderCopy = newEM.getEntities("Order")[0];
+    newOrderCopy.entityAspect.setDeleted();
+
+    // export the cloned EM
+    var expEntitiesNew = newEM.exportEntities();
+    // merge to the original EM
+    em.importEntities(expEntitiesNew, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+    var deletedOrders = parentCustomer.getProperty("orders");
+
+    ok(newOrder.entityAspect.entityState.isDeleted(), "newOrder should be 'deleted'");
+    ok(deletedOrders.length === 0, "parentCustomer's 'Orders' should be empty");
+  });
+
   test("can add unmapped 'foo' property directly to EntityType", function () {
     expect(3);
     var store = MetadataStore.importMetadata(testFns.metadataStore.exportMetadata());
@@ -1591,7 +1624,8 @@
     return order;
   }
 
-  function createCustomerAndOrders(em, shouldAttachUnchanged) {
+  function createCustomerAndOrders(em, shouldAttachUnchanged, orderCount) {
+    if (!orderCount) orderCount = 3;
     if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
     var metadataStore = em.metadataStore;
     var customerType = em.metadataStore.getEntityType("Customer");
@@ -1599,7 +1633,7 @@
     
     var customer = em.createEntity(customerType);
     ok(customer.entityAspect.entityState.isAdded(), "customer should be 'added");
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < orderCount; i++) {
       var order = em.createEntity(orderType);
       customer.getProperty("orders").push(order);
       ok(order.entityAspect.entityState.isAdded(), "order should be 'detached");
