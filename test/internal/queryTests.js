@@ -27,6 +27,17 @@
     }
   });
 
+  test("can specify datatype ", function () {
+    var em = newEm();
+    var query = EntityQuery.from('Products').using(em).where({ 'unitPrice': { '>=': { value: 100, dataType: breeze.DataType.Decimal } } });
+    var url = query._toUri(em);
+    ok(url.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal")
+    var query2 = EntityQuery.from('Products').using(em).where( 'unitPrice', '>=', { value: 100, dataType: breeze.DataType.Decimal }) ;
+    var url2 = query2._toUri(em);
+    ok(url2.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal - again")
+
+  });
+
   test("can handle simple json query syntax ", function () {
     var em = newEm();
     var query = EntityQuery.from('Customers').using(em).where({ 'city': { '==': 'London' } });
