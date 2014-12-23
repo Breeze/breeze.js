@@ -923,18 +923,10 @@ var EntityManager = (function () {
 
     clearServerErrors(entitiesToSave);
 
-    if (this.validationOptions.validateOnSave) {
-      var failedEntities = entitiesToSave.filter(function (entity) {
-        var aspect = entity.entityAspect;
-        var isValid = aspect.entityState.isDeleted() || aspect.validateEntity();
-        return !isValid;
-      });
-      if (failedEntities.length > 0) {
-        var valError = new Error("Client side validation errors encountered - see the entityErrors collection on this object for more detail");
-        valError.entityErrors = createEntityErrors(failedEntities);
-        if (errorCallback) errorCallback(valError);
-        return Q.reject(valError);
-      }
+    var valError = this.saveChangesValidateOnClient(entitiesToSave);
+    if (valError) {
+      if (errorCallback) errorCallback(valError);
+      return Q.reject(valError);
     }
 
     var dataService = DataService.resolve([saveOptions.dataService, this.dataService]);
@@ -1015,6 +1007,37 @@ var EntityManager = (function () {
       return Q.reject(error);
     }
   };
+
+  /**
+  Run the "saveChanges" pre-save client validation logic.
+
+  This is NOT a general purpose validation method.
+  It is intended for utilities that must know if saveChanges
+  would reject the save due to client validation errors.
+
+  It only validates entities if the EntityManager's
+  {{#crossLink "ValidationOptions"}}{{/crossLink}}.validateOnSave is true.
+
+  @method saveChangesValidateOnClient
+  @param entitiesToSave {Array of Entity} The list of entities to save (to validate).
+  @return {Error} Validation error or null if no error
+  **/
+  proto.saveChangesValidateOnClient = function(entitiesToSave) {
+
+    if (this.validationOptions.validateOnSave) {
+      var failedEntities = entitiesToSave.filter(function (entity) {
+        var aspect = entity.entityAspect;
+        var isValid = aspect.entityState.isDeleted() || aspect.validateEntity();
+        return !isValid;
+      });
+      if (failedEntities.length > 0) {
+        var valError = new Error("Client side validation errors encountered - see the entityErrors collection on this object for more detail");
+        valError.entityErrors = createEntityErrors(failedEntities);
+        return valError;
+      }
+    }
+    return null;
+  }
 
   function clearServerErrors(entities) {
     entities.forEach(function (entity) {
