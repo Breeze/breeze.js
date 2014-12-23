@@ -28,6 +28,10 @@
   });
 
   test("can specify datatype ", function () {
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+      ok(true, "Mongo (eventually) and Sequelize new do NOT use OData syntax");
+      return;
+    }
     var em = newEm();
     var query = EntityQuery.from('Products').using(em).where({ 'unitPrice': { '>=': { value: 100, dataType: breeze.DataType.Decimal } } });
     var url = query._toUri(em);

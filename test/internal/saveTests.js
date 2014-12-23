@@ -1834,6 +1834,8 @@
         ok(true, "got expected (Hibernate) exception " + msg);
       } else if (msg.indexOf("concurrency check") >= 0) {
         ok(true, "got expected (Mongo) exception " + msg);
+      } else if (msg.indexOf("concurrency violation") >= 0) {
+        ok(true, "got expected (Sequelize) exception " + msg);
       } else {
         ok(false, msg);
       }
@@ -2259,7 +2261,7 @@
       if (testFns.DEBUG_MONGO) {
         frag = "duplicate key error"
       } else if (testFns.DEBUG_SEQUELIZE) {
-        frag = "SequelizeUniqueConstraintError"
+        frag = "SequelizeUniqueConstraintError".toLowerCase();
       } else {
         frag = "primary key constraint"
       }
