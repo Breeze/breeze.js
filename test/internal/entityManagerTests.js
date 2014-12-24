@@ -1514,11 +1514,175 @@
         "Restored Cust is not the same object as the original Cust");
   });
 
+  test("export/import all entities as JSON", function () {
+    expect(1);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+    var entities = em1.getEntities();
+    var exp = em1.exportEntitiesToJson(null, false); // no metadata
+    var imps = em2.importEntities(exp).entities;
+
+    equal(imps.length, entities.length,
+      'should imported every cached entity; count = ' + imps.length);
+  });
+
+  test("export/import two entities as JSON", function () {
+    expect(3);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+    var emp  = em1.getEntities('Employee', breeze.EntityState.Added)[0];
+    var cust = em1.getEntities('Customer', breeze.EntityState.Modified)[0];
+    ok(emp != null && cust != null, 'got emp and cust from cache');
+
+    var exp = em1.exportEntitiesToJson([emp, cust], false); // no metadata
+    em2.importEntities(exp);
+    var imps = em2.getEntities();
+    equal(imps.length, 2, 'should have imported two entities');
+    equal(em2.getEntities().length, 2, 'both have changes');
+  });
+
+  test("export/import employees by type name as JSON", function () {
+    expect(3);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+    var emps = em1.getEntities(['Employee']);
+    var empType = emps[0].entityType;
+
+    var exp = em1.exportEntitiesToJson(['Employee'], false); // no metadata
+    em2.importEntities(exp);
+
+    var imps = em2.getEntities();
+    ok(imps.every(function (e) { return e.entityType === empType; }),
+      'every imported entity is an Employee');
+    equal(imps.length, emps.length, 'should have imported ALL the Employees');
+
+    var changes = em2.getChanges();
+    equal(changes.length, 3, 'the expected 3 entities were imported w/ changes');
+  });
+
+  test("export/import employees by EntityType as JSON", function () {
+    expect(3);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+    var emps = em1.getEntities(['Employee']);
+    var empType = emps[0].entityType;
+
+    var exp = em1.exportEntitiesToJson([empType], false); // no metadata
+    var imps = em2.importEntities(exp).entities;
+
+    ok(imps.every(function (e) { return e.entityType === empType; }),
+      'every imported entity is an Employee');
+    equal(imps.length, emps.length, 'should have imported ALL the Employees');
+
+    var changes = em2.getChanges();
+    equal(changes.length, 3, 'the expected 3 entities were imported w/ changes');
+  });
+
+  test("export/import entities of empty 'Category' type as JSON", function () {
+    expect(1);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+
+    var catType = removeAllOfType(em1, 'Category');
+    var exp = em1.exportEntitiesToJson([catType], false); // no metadata
+    var imps = em2.importEntities(exp).entities;
+
+    equal(imps.length, 0, 'should not have imported anything');
+  });
+
+  test("export/import entities of several types as JSON", function () {
+    expect(2);
+    var em1 = newEm(), em2 = newEm();
+    createCachedData(em1);
+
+    var typeNames = ['Category', 'Customer', 'Employee'];
+
+    // make one of the types an empty group
+    removeAllOfType(em1, 'Category');
+
+    var entities = em1.getEntities(typeNames);
+    var expectedChanges = em1.getChanges(typeNames);
+
+    var exp = em1.exportEntitiesToJson(typeNames, false); // no metadata
+
+    var imps = em2.importEntities(exp).entities;
+
+    equal(imps.length, entities.length,
+      'should have expected number of imported entities, ' + entities.length);
+
+    var changes = em2.getChanges();
+    equal(changes.length, expectedChanges.length,
+      'should have imported the expected number of changed entities, ' +
+        expectedChanges.length);
+  });
+
+  test("throws when export/import unknown type as JSON", function () {
+    expect(1);
+    var em1 = newEm(), exp;
+
+    throws(function () {
+      // there is no 'foo' type
+      exp = em1.exportEntitiesToJson(['foo'], false); // no metadata     
+    },
+    /.*type.*foo/i, // error message like "Unable to locate a 'Type' by the name: 'foo'"
+    'the export method threw because there is no "Foo" type');
+  });
+
+  ////////////////////////
+  function createCachedData(em) {
+    var DEL = breeze.EntityState.Deleted;
+    var UNCHG = breeze.EntityState.Unchanged;
+    var cat1, cat2, cust1, cust2, emp1, ord1, od1, prod1, prod2, prod3;
+    // Categories
+    cat1 = em.createEntity('Category', { categoryID: 1, categoryName: 'Animal' }, UNCHG);
+    cat2 = em.createEntity('Category', { categoryID: 2, categoryName: 'Vegetable' }, UNCHG);
+    // Customers
+    cust1 = em.createEntity('Customer', {customerID: core.getUuid(), companyName: 'cust 1'});
+    cust2 = em.createEntity('Customer', {customerID: core.getUuid(), companyName: 'cust 2'}, UNCHG);
+    em.createEntity('Customer', {customerID: core.getUuid(), companyName: 'cust 3'}, UNCHG);
+    em.createEntity('Customer', {customerID: core.getUuid(), companyName: 'cust 3'}, DEL);
+    // Employees
+    em.createEntity('Employee', {firstName: 'Abe'});
+    em.createEntity('Employee', {employeeID: 2, firstName: 'Beth'}, UNCHG);
+    emp1 = em.createEntity('Employee', {employeeID: 3, firstName: 'Cat'}, UNCHG);
+    em.createEntity('Employee', {employeeID: 4, firstName: 'Don'}, DEL);
+    // Orders
+    em.createEntity('Order', {employee: emp1, customer: cust1, shipName: 'Acme'});
+    ord1 = em.createEntity('Order', {orderID: 12, employee: emp1, customer: cust1, shipName: 'Beta'}, UNCHG);
+    em.createEntity('Order', {orderID: 13, employee: emp1, customer: cust2, shipName: 'Gamma'}, UNCHG);
+    em.createEntity('Order', {orderID: 14, employee: emp1, customer: cust2, shipName: 'Delta'}, DEL);
+    // Products
+    prod1 = em.createEntity('Product', { productName: 'Apple', category: cat2 });
+    prod2 = em.createEntity('Product', { productID: 22, productName: 'Beet', category: cat2 }, UNCHG);
+    prod3 = em.createEntity('Product', { productID: 23, productName: 'Cat', category: cat1 }, UNCHG);
+    em.createEntity('Product', { productID: 24, productName: 'Dill', category: cat2 }, DEL);
+    // OrderDetails
+    em.createEntity('OrderDetail', {order: ord1, product: prod1, quantity: 1});
+    od1 = em.createEntity('OrderDetail', {order: ord1, product: prod2, quantity: 2}, UNCHG);
+    em.createEntity('OrderDetail', { order: ord1, product: prod3, quantity: 3 }, UNCHG);
+
+    // Modify some
+    cust2.setProperty('companyName', 'cust2-M');
+    emp1.setProperty('firstName', 'Cat-M');
+    prod3.setProperty('productName', 'Carrot-M');
+    od1.setProperty('quantity', 42);
+
+  }
+
   function createCust(em, companyName) {
     var custType = em.metadataStore.getEntityType("Customer");
     var cust = custType.createEntity();
     cust.setProperty("companyName", companyName);
     return cust;
+  }
+
+  function removeAllOfType(em, typeName) {
+    var type = em.metadataStore.getEntityType(typeName);
+    var entities = em.getEntities(type);
+    entities.forEach(function (e) {
+      em.detachEntity(e);
+    });
+    return type;
   }
 
   // Uncomment when doing FULL testing

@@ -339,8 +339,14 @@ var EntityManager = (function () {
       var bundle = em1.exportEntities(entitiesToExport);
       // assume em2 is another entityManager containing some of the same entities possibly with modifications.
       em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+  You can also export all entities of one or more specified types.
+  @example
+      // Export all Customer and Employee entities; do not include the metadata
+      var bundle = em1.exportEntities(['Customer', 'Employee'], false);
   @method exportEntities
-  @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
+  @param [entities] {Array of Entity | Array of EntityType | Array of String}
+    The entities to export or the EntityType(s) of the entities to export;
+    all entities are exported if this parameter is omitted or null.
   @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
   @return {String} A serialized version of the exported data.
   **/
@@ -352,6 +358,8 @@ var EntityManager = (function () {
 
   /**
   Exports an entire EntityManager or just selected entities into a JSON "bundle".
+
+  This method is experimental and aspects of it may change.
   @example
   This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
   memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
@@ -359,7 +367,6 @@ var EntityManager = (function () {
       // assume em1 is an EntityManager containing a number of existing entities.
       var bundle = em1.exportEntitiesToJson();
       // store JSON bundle somewhere ... perhaps indexDb.
-
       em2.importEntities(bundleFromStorage);
       // em2 will now have a complete copy of what was in em1
   You can also control exactly which entities are exported.
@@ -368,12 +375,30 @@ var EntityManager = (function () {
       var bundle = em1.exportEntitiesToJson(entitiesToExport);
       // assume em2 is another entityManager containing some of the same entities possibly with modifications.
       em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+  You can also export all entities of one or more specified types.
+  @example
+      // Export all Customer and Employee entities; do not include the metadata
+      var bundle = em1.exportEntitiesToJson(['Customer', 'Employee'], false);
+
   @method exportEntitiesToJson
-  @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
+  @param [entities] {Array of Entity | Array of EntityType | Array of String}
+    The entities to export or the EntityType(s) of the entities to export;
+    all entities are exported if this parameter is omitted or null.
   @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
-  @return {Object} A JSON object with exported data.
+  @return {Object} A JSON object with exported data including the entities, their change-state,
+  and the associated temporary key mappings (if any).
+
+  N.B.: The returned JSON bundle is currently a Breeze internal representation
+  and may change over time. Use it with appropriate caution and
+  be prepared to update your code in future versions of Breeze.
   **/
   proto.exportEntitiesToJson = function (entities, includeMetadata) {
+    assertParam(entities, "entities").isArray().isEntity()
+    .or().isNonEmptyArray().isInstanceOf(EntityType)
+    .or().isNonEmptyArray().isString()
+    .or().isOptional().check();
+
+    //assertParam(entities, "entities").isArray().isOptional().check();
     assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
     includeMetadata = (includeMetadata == null) ? true : includeMetadata;
 
@@ -1706,20 +1731,33 @@ var EntityManager = (function () {
 
   function exportEntityGroups(em, entities) {
     var entityGroupMap;
-    if (entities) {
+    var first = entities && entities[0];
+    if (first) {
       // group entities by entityType and
       // create 'groups' that look like entityGroups.
       entityGroupMap = {};
-      entities.forEach(function (e) {
-        var group = entityGroupMap[e.entityType.name];
-        if (!group) {
-          group = {};
-          group.entityType = e.entityType;
-          group._entities = [];
-          entityGroupMap[e.entityType.name] = group;
-        }
-        group._entities.push(e);
-      });
+      if (first.entityType) {
+        // assume "entities" is an array of entities;
+        entities.forEach(function (e) {
+          var group = entityGroupMap[e.entityType.name];
+          if (!group) {
+            group = {};
+            group.entityType = e.entityType;
+            group._entities = [];
+            entityGroupMap[e.entityType.name] = group;
+          }
+          group._entities.push(e);
+        });
+      } else {
+        // assume "entities" is an array of EntityTypes (or names)
+        var entityTypes = checkEntityTypes(em, entities)
+        entityTypes.forEach(function(et){
+          var group = em._entityGroupMap[et.name];
+          if (group && group._entities.length) {
+            entityGroupMap[et.name] = group;
+          }
+        })
+      }
     } else {
       entityGroupMap = em._entityGroupMap;
     }

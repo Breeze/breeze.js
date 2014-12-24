@@ -335,6 +335,13 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_exportEntitiesToJson">exportEntitiesToJson</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_fetchEntityByKey">fetchEntityByKey</a>
 
                                 
@@ -431,6 +438,13 @@
                         
                             <li class="index-item method">
                                 <a href="#method_saveChanges">saveChanges</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_saveChangesValidateOnClient">saveChangesValidateOnClient</a>
 
                                 
                                 
@@ -745,27 +759,27 @@
 <p>Usually however, configuration objects will contain more than just the &#39;serviceName&#39;;</p>
 <pre class="code prettyprint"><code>var metadataStore = new MetadataStore();
 var entityManager = new EntityManager( {
-    serviceName: &quot;breeze/NorthwindIBModel&quot;, 
-    metadataStore: metadataStore 
+    serviceName: &quot;breeze/NorthwindIBModel&quot;,
+    metadataStore: metadataStore
 });</code></pre>
 <p>or</p>
 <pre class="code prettyprint"><code>return new QueryOptions({
-    mergeStrategy: obj, 
-    fetchStrategy: this.fetchStrategy 
+    mergeStrategy: obj,
+    fetchStrategy: this.fetchStrategy
 });
 var queryOptions = new QueryOptions({
-    mergeStrategy: MergeStrategy.OverwriteChanges, 
-    fetchStrategy: FetchStrategy.FromServer 
+    mergeStrategy: MergeStrategy.OverwriteChanges,
+    fetchStrategy: FetchStrategy.FromServer
 });
 var validationOptions = new ValidationOptions({
-    validateOnAttach: true, 
-    validateOnSave: true, 
+    validateOnAttach: true,
+    validateOnSave: true,
     validateOnQuery: false
 });
 var entityManager = new EntityManager({
-    serviceName: &quot;breeze/NorthwindIBModel&quot;, 
-    queryOptions: queryOptions, 
-    validationOptions: validationOptions 
+    serviceName: &quot;breeze/NorthwindIBModel&quot;,
+    queryOptions: queryOptions,
+    validationOptions: validationOptions
 });</code></pre>
 
             </div>
@@ -875,7 +889,7 @@ var entityManager = new EntityManager({
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l503"><code>..\src\a50_entityManager.js:503</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l555"><code>..\src\a50_entityManager.js:555</code></a>
         
         </p>
 
@@ -1011,7 +1025,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l524"><code>..\src\a50_entityManager.js:524</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l576"><code>..\src\a50_entityManager.js:576</code></a>
         
         </p>
 
@@ -1150,7 +1164,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l462"><code>..\src\a50_entityManager.js:462</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l514"><code>..\src\a50_entityManager.js:514</code></a>
         
         </p>
 
@@ -1222,7 +1236,7 @@ em1.clear();
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l487"><code>..\src\a50_entityManager.js:487</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l539"><code>..\src\a50_entityManager.js:539</code></a>
         
         </p>
 
@@ -1518,7 +1532,7 @@ var emp4 = em1.createEntity(&quot;Employee&quot;, { id: 435, lastName: Smith&quo
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l593"><code>..\src\a50_entityManager.js:593</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l645"><code>..\src\a50_entityManager.js:645</code></a>
         
         </p>
 
@@ -1652,7 +1666,7 @@ em1.detachEntity(cust1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l667"><code>..\src\a50_entityManager.js:667</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l719"><code>..\src\a50_entityManager.js:719</code></a>
         
         </p>
 
@@ -1921,7 +1935,7 @@ em.executeQuery(query).then( function(data) {
 <p>or with callbacks</p>
 <pre class="code prettyprint"><code>var em = new EntityManager(serviceName);
 var query = new EntityQuery("Orders");
-em.executeQuery(query, 
+em.executeQuery(query,
     function(data) {
         var orders = data.results;
         ... query results processed here
@@ -1991,7 +2005,7 @@ query.execute().then( function(data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l761"><code>..\src\a50_entityManager.js:761</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l813"><code>..\src\a50_entityManager.js:813</code></a>
         
         </p>
 
@@ -2150,14 +2164,15 @@ em.executeQuery(query).then( function(data) {
                 <li class="param">
                     
                         <code class="param-name optional">[entities]</code>
-                        <span class="type">Array of entities</span>
+                        <span class="type">Array of Entity | Array of EntityType | Array of String</span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The entities to export; all entities are exported if this is omitted or null</p>
+                        <p>  The entities to export or the EntityType(s) of the entities to export;
+  all entities are exported if this parameter is omitted or null.</p>
 
                     </div>
 
@@ -2214,8 +2229,8 @@ window.localStorage.setItem(&quot;myEntityManager&quot;, bundle);
 // assume the code below occurs in a different session.
 var bundleFromStorage = window.localStorage.getItem(&quot;myEntityManager&quot;);
 var em2 = new EntityManager({
-        serviceName: em1.serviceName, 
-        metadataStore: em1.metadataStore 
+        serviceName: em1.serviceName,
+        metadataStore: em1.metadataStore
     });
 em2.importEntities(bundleFromStorage);
 // em2 will now have a complete copy of what was in em1</code></pre>
@@ -2224,6 +2239,168 @@ em2.importEntities(bundleFromStorage);
 var bundle = em1.exportEntities(entitiesToExport);
 // assume em2 is another entityManager containing some of the same entities possibly with modifications.
 em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</code></pre>
+<p>You can also export all entities of one or more specified types.</p>
+<pre class="code prettyprint"><code>// Export all Customer and Employee entities; do not include the metadata
+var bundle = em1.exportEntities([&#39;Customer&#39;, &#39;Employee&#39;], false);</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
+                    <div id="method_exportEntitiesToJson" class="method item">
+    <h3 class="name"><code>exportEntitiesToJson</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code class="optional">[entities]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>[includeMetadata</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._src_a50_entityManager.js.html#l359"><code>..\src\a50_entityManager.js:359</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Exports an entire EntityManager or just selected entities into a JSON &quot;bundle&quot;.</p>
+<p>This method is experimental and aspects of it may change.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[entities]</code>
+                        <span class="type">Array of Entity | Array of EntityType | Array of String</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>  The entities to export or the EntityType(s) of the entities to export;
+  all entities are exported if this parameter is omitted or null.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">[includeMetadata</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>= true]  Whether to include metadata in the export; the default is true</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Object</span>:
+                    
+                    <p>A JSON object with exported data including the entities, their change-state,
+and the associated temporary key mappings (if any).</p>
+<p>N.B.: The returned JSON bundle is currently a Breeze internal representation
+and may change over time. Use it with appropriate caution and
+be prepared to update your code in future versions of Breeze.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <p>This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
+memory.  This snapshot can be restored or merged into an another EntityManager at some later date.</p>
+<pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+var bundle = em1.exportEntitiesToJson();
+// store JSON bundle somewhere ... perhaps indexDb.
+em2.importEntities(bundleFromStorage);
+// em2 will now have a complete copy of what was in em1</code></pre>
+<p>You can also control exactly which entities are exported.</p>
+<pre class="code prettyprint"><code>// assume entitiesToExport is an array of entities to export.
+var bundle = em1.exportEntitiesToJson(entitiesToExport);
+// assume em2 is another entityManager containing some of the same entities possibly with modifications.
+em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</code></pre>
+<p>You can also export all entities of one or more specified types.</p>
+<pre class="code prettyprint"><code>// Export all Customer and Employee entities; do not include the metadata
+var bundle = em1.exportEntitiesToJson([&#39;Customer&#39;, &#39;Employee&#39;], false);</code></pre>
 
             </div>
         </div>
@@ -2291,7 +2468,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</c
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1140"><code>..\src\a50_entityManager.js:1140</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1215"><code>..\src\a50_entityManager.js:1215</code></a>
         
         </p>
 
@@ -2461,7 +2638,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1164"><code>..\src\a50_entityManager.js:1164</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1239"><code>..\src\a50_entityManager.js:1239</code></a>
         
         </p>
 
@@ -2616,7 +2793,7 @@ em1.fetchEntityByKey(employeeKey).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l619"><code>..\src\a50_entityManager.js:619</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l671"><code>..\src\a50_entityManager.js:671</code></a>
         
         </p>
 
@@ -2810,7 +2987,7 @@ em1.fetchMetadata()
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1227"><code>..\src\a50_entityManager.js:1227</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1302"><code>..\src\a50_entityManager.js:1302</code></a>
         
         </p>
 
@@ -2932,7 +3109,7 @@ var employee = em1.findEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1244"><code>..\src\a50_entityManager.js:1244</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1319"><code>..\src\a50_entityManager.js:1319</code></a>
         
         </p>
 
@@ -3010,8 +3187,8 @@ em1.saveChanges().then( function( data) {
     var sameCust1 = data.results[0];
     // cust1 === sameCust1;
     // but cust1.getProperty(&quot;CustomerId&quot;) != customerId
-    // because the server will have generated a new id 
-    // and the client will have been updated with this 
+    // because the server will have generated a new id
+    // and the client will have been updated with this
     // new id.
 })</code></pre>
 
@@ -3067,7 +3244,7 @@ em1.saveChanges().then( function( data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1346"><code>..\src\a50_entityManager.js:1346</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1421"><code>..\src\a50_entityManager.js:1421</code></a>
         
         </p>
 
@@ -3203,7 +3380,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1403"><code>..\src\a50_entityManager.js:1403</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1478"><code>..\src\a50_entityManager.js:1478</code></a>
         
         </p>
 
@@ -3361,7 +3538,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1102"><code>..\src\a50_entityManager.js:1102</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1177"><code>..\src\a50_entityManager.js:1177</code></a>
         
         </p>
 
@@ -3495,7 +3672,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1114"><code>..\src\a50_entityManager.js:1114</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1189"><code>..\src\a50_entityManager.js:1189</code></a>
         
         </p>
 
@@ -3615,7 +3792,7 @@ var employee = em1.getEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1284"><code>..\src\a50_entityManager.js:1284</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1359"><code>..\src\a50_entityManager.js:1359</code></a>
         
         </p>
 
@@ -3957,7 +4134,7 @@ var em2 = EntityManager.importEntities(bundleFromStorage);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l366"><code>..\src\a50_entityManager.js:366</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l418"><code>..\src\a50_entityManager.js:418</code></a>
         
         </p>
 
@@ -4082,8 +4259,8 @@ very similar process.</p>
 var bundle = em1.exportEntities();
 // bundle can be stored in window.localStorage or just held in memory.
 var em2 = new EntityManager({
-    serviceName: em1.serviceName, 
-    metadataStore: em1.metadataStore 
+    serviceName: em1.serviceName,
+    metadataStore: em1.metadataStore
 });
 em2.importEntities(bundle);
 // em2 will now have a complete copy of what was in em1</code></pre>
@@ -4137,7 +4314,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1376"><code>..\src\a50_entityManager.js:1376</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1451"><code>..\src\a50_entityManager.js:1451</code></a>
         
         </p>
 
@@ -4252,7 +4429,7 @@ var entities = em1.rejectChanges();</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l830"><code>..\src\a50_entityManager.js:830</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l882"><code>..\src\a50_entityManager.js:882</code></a>
         
         </p>
 
@@ -4527,6 +4704,118 @@ function(saveResult) {
 
             </div>
         </div>
+    
+</div>
+
+                
+                    <div id="method_saveChangesValidateOnClient" class="method item">
+    <h3 class="name"><code>saveChangesValidateOnClient</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>entitiesToSave</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Error</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/.._src_a50_entityManager.js.html#l1063"><code>..\src\a50_entityManager.js:1063</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Run the "saveChanges" pre-save client validation logic.</p>
+<p>This is NOT a general purpose validation method.
+It is intended for utilities that must know if saveChanges
+would reject the save due to client validation errors.</p>
+<p>It only validates entities if the EntityManager&#39;s
+<a href="../classes/ValidationOptions.html" class="crosslink">ValidationOptions</a>.validateOnSave is true.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">entitiesToSave</code>
+                        <span class="type">Array of Entity</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The list of entities to save (to validate).</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Error</span>:
+                    
+                    <p>Validation error or null if no error</p>
+
+                
+            </div>
+        </div>
+    
+
     
 </div>
 
@@ -5164,7 +5453,7 @@ em1.setProperties( {
             <div class="example-content">
                 <pre class="code prettyprint"><code>var em = new EntityManager( {serviceName: &quot;breeze/NorthwindIBModel&quot; });
 em.entityChanged.subscribe(function(changeArgs) {
-    // This code will be executed any time any entity within the entityManager is added, modified, deleted or detached for any reason. 
+    // This code will be executed any time any entity within the entityManager is added, modified, deleted or detached for any reason.
     var action = changeArgs.entityAction;
     var entity = changeArgs.entity;
     // .. do something to this entity when it is changed.
@@ -5200,7 +5489,7 @@ em.entityChanged.subscribe(function(changeArgs) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1320"><code>..\src\a50_entityManager.js:1320</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1395"><code>..\src\a50_entityManager.js:1395</code></a>
         
         </p>
 
@@ -5379,9 +5668,9 @@ errors that have been &#39;fixed&#39;</p>
             <div class="example-content">
                 <pre class="code prettyprint"><code>var em = new EntityManager( {serviceName: &quot;breeze/NorthwindIBModel&quot; });
 em.validationErrorsChanged.subscribe(function(changeArgs) {
-        // This code will be executed any time any entity within the entityManager experiences a change to its validationErrors collection. 
+        // This code will be executed any time any entity within the entityManager experiences a change to its validationErrors collection.
         function (validationChangeArgs) {
-            var entity == validationChangeArgs.entity; 
+            var entity == validationChangeArgs.entity;
             var errorsAdded = validationChangeArgs.added;
             var errorsCleared = validationChangeArgs.removed;
             // ... do something interesting with the order.
