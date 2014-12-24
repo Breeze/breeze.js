@@ -345,6 +345,35 @@ var EntityManager = (function () {
   @return {String} A serialized version of the exported data.
   **/
   proto.exportEntities = function (entities, includeMetadata) {
+    var json = this.exportEntitiesToJson(entities, includeMetadata);
+    var result = JSON.stringify(json, null, __config.stringifyPad);
+    return result;
+  };
+
+  /**
+  Exports an entire EntityManager or just selected entities into a JSON "bundle".
+  @example
+  This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
+  memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
+  @example
+      // assume em1 is an EntityManager containing a number of existing entities.
+      var bundle = em1.exportEntitiesToJson();
+      // store JSON bundle somewhere ... perhaps indexDb.
+
+      em2.importEntities(bundleFromStorage);
+      // em2 will now have a complete copy of what was in em1
+  You can also control exactly which entities are exported.
+  @example
+      // assume entitiesToExport is an array of entities to export.
+      var bundle = em1.exportEntitiesToJson(entitiesToExport);
+      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+      em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
+  @method exportEntitiesToJson
+  @param [entities] {Array of entities} The entities to export; all entities are exported if this is omitted or null
+  @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
+  @return {Object} A JSON object with exported data.
+  **/
+  proto.exportEntitiesToJson = function (entities, includeMetadata) {
     assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
     includeMetadata = (includeMetadata == null) ? true : includeMetadata;
 
@@ -358,9 +387,7 @@ var EntityManager = (function () {
       json.metadataVersion = breeze.metadataVersion;
       json.metadataStoreName = this.metadataStore.name;
     }
-
-    var result = JSON.stringify(json, null, __config.stringifyPad);
-    return result;
+    return json;
   };
 
   /**
