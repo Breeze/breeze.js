@@ -838,7 +838,49 @@
 
   });
 
-  test("em.acceptChanges", function () {
+  test("hasChanges is true when filter for a type that has changes", function () {
+    var em = newEm();
+    em.createEntity('Order');
+    em.createEntity('Product', null, breeze.EntityState.Unchanged);
+    var hasOrderChanges = em.hasChanges(['Order']);
+    ok(hasOrderChanges, 'expected to have changes when filtering for "Order" changes only');
+  });
+
+  test("hasChanges is false when filter for a type that does NOT have changes", function () {
+    var em = newEm();
+    em.createEntity('Order');
+    em.createEntity('Product', null, breeze.EntityState.Unchanged);
+    // There are changes but there are no Product changes
+    var hasChanges = em.hasChanges();
+    ok(hasChanges, 'should have changes in cache');
+    var hasProductChanges = em.hasChanges(['Product']);
+    ok(!hasProductChanges, 'expected no changes when filter for "Product" changes only');
+  });
+
+  // D#2663
+  test("hasChanges is false when filter for a type that is not in cache", function () {
+    var em = newEm();
+    em.createEntity('Order');
+    // While 'Product' is a defined type, there are no Products in cache this time.
+    // There are changes but there are no Product changes
+    var hasChanges = em.hasChanges();
+    ok(hasChanges, 'should have changes in cache');
+    var hasProductChanges = em.hasChanges(['Product']);
+    ok(!hasProductChanges, 'expected no changes when filter for "Product" changes only');
+  });
+
+  test("hasChanges throws error when filter for a type that doesn't exist", function () {
+    var em = newEm();
+    em.createEntity('Order');
+    var hasChanges = em.hasChanges();
+    ok(hasChanges, 'should have changes in cache');
+    // There are changes but there is no 'Foo' type
+    throws(function() {
+      em.hasChanges(['Foo']);
+    }, /unable to locate a 'Type'/i, 'should throw breeze type error for "Foo"');
+  });
+
+  test("hasChanges with em.acceptChanges", function () {
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
 
@@ -1159,11 +1201,11 @@
   test("can determine if 'entityChanged' event is enabled", function(){
       // D#2652
       // see http://www.breezejs.com/sites/all/apidocs/classes/Event.html#method_isEnabled
-      // which also describes EntityManager having propertyChanged event which it doesn't  
+      // which also describes EntityManager having propertyChanged event which it doesn't
       var em = newEm();
       try {
-        var eventEnabled = Event.isEnabled("entityChanged", em); 
-        ok(true, "can ask if the 'entityChanged' event is enabled") ;     
+        var eventEnabled = Event.isEnabled("entityChanged", em);
+        ok(true, "can ask if the 'entityChanged' event is enabled") ;
       } catch(e){
         ok(false, "calling 'isEnabled' threw exception w/ msg = " +
           e.message);
@@ -1622,7 +1664,7 @@
 
     throws(function () {
       // there is no 'foo' type
-      exp = em1.exportEntitiesToJson(['foo'], false); // no metadata     
+      exp = em1.exportEntitiesToJson(['foo'], false); // no metadata
     },
     /.*type.*foo/i, // error message like "Unable to locate a 'Type' by the name: 'foo'"
     'the export method threw because there is no "Foo" type');

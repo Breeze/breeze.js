@@ -14042,7 +14042,7 @@ var EntityManager = (function () {
     entityTypes = checkEntityTypes(this, entityTypes);
     var entityGroups = getEntityGroups(this, entityTypes);
     return entityGroups.some(function (eg) {
-      return eg.hasChanges();
+      return eg && eg.hasChanges();
     });
   };
 
