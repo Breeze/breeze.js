@@ -34,7 +34,7 @@ var __hasOwnProperty = uncurry(Object.prototype.hasOwnProperty);
 var __arraySlice = uncurry(Array.prototype.slice);
 var __isES5Supported = function () {
   try {
-    return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+    return !!(Object.getPrototypeOf && Object.defineProperty({}, 'x', {}));
   } catch (e) {
     return false;
   }
@@ -92,7 +92,7 @@ function __getPropDescriptor(obj, propertyName) {
   }
 }
 
-// Functional extensions 
+// Functional extensions
 
 // can be used like: persons.filter(propEq("firstName", "John"))
 function __propEq(propertyName, value) {
@@ -16991,6 +16991,13 @@ breeze.SaveOptions = SaveOptions;
   }
 }(function (breeze) {
   "use strict";
+  var canIsolateES5Props = function () {
+    try {
+      return !!(Object.getPrototypeOf && Object.defineProperty({}, 'x', {}));
+    } catch (e) {
+      return false;
+    }
+  }();
   var core = breeze.core;
   var ko;
 
@@ -17060,19 +17067,11 @@ breeze.SaveOptions = SaveOptions;
       return this;
     };
 
-    if (canIsolateES5Props()) {
+    if (canIsolateES5Props) {
       isolateES5Props(proto);
     }
 
   };
-
-  function canIsolateES5Props() {
-    try {
-      return Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
-    } catch (e) {
-      return false;
-    }
-  }
 
   function isolateES5Props(proto) {
 
@@ -17094,7 +17093,7 @@ breeze.SaveOptions = SaveOptions;
   }
 
   function getES5PropDescriptor(proto, propName) {
-    if (!canIsolateES5Props()) {
+    if (!canIsolateES5Props) {
       return null;
     }
     if (proto.hasOwnProperty(propName)) {

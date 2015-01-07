@@ -10,6 +10,13 @@
   }
 }(function (breeze) {
   "use strict";
+  var canIsolateES5Props = function () {
+    try {
+      return !!(Object.getPrototypeOf && Object.defineProperty({}, 'x', {}));
+    } catch (e) {
+      return false;
+    }
+  }();
   var core = breeze.core;
   var ko;
 
@@ -79,19 +86,11 @@
       return this;
     };
 
-    if (canIsolateES5Props()) {
+    if (canIsolateES5Props) {
       isolateES5Props(proto);
     }
 
   };
-
-  function canIsolateES5Props() {
-    try {
-      return Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
-    } catch (e) {
-      return false;
-    }
-  }
 
   function isolateES5Props(proto) {
 
@@ -113,7 +112,7 @@
   }
 
   function getES5PropDescriptor(proto, propName) {
-    if (!canIsolateES5Props()) {
+    if (!canIsolateES5Props) {
       return null;
     }
     if (proto.hasOwnProperty(propName)) {

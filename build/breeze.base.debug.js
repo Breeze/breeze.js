@@ -34,7 +34,7 @@ var __hasOwnProperty = uncurry(Object.prototype.hasOwnProperty);
 var __arraySlice = uncurry(Array.prototype.slice);
 var __isES5Supported = function () {
   try {
-    return !!Object.getPrototypeOf && Object.defineProperty({}, 'x', {});
+    return !!(Object.getPrototypeOf && Object.defineProperty({}, 'x', {}));
   } catch (e) {
     return false;
   }
@@ -92,7 +92,7 @@ function __getPropDescriptor(obj, propertyName) {
   }
 }
 
-// Functional extensions 
+// Functional extensions
 
 // can be used like: persons.filter(propEq("firstName", "John"))
 function __propEq(propertyName, value) {
