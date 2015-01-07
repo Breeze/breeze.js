@@ -335,13 +335,6 @@
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_exportEntitiesToJson">exportEntitiesToJson</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
                                 <a href="#method_fetchEntityByKey">fetchEntityByKey</a>
 
                                 
@@ -889,7 +882,7 @@ var entityManager = new EntityManager({
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l555"><code>..\src\a50_entityManager.js:555</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l553"><code>..\src\a50_entityManager.js:553</code></a>
         
         </p>
 
@@ -1025,7 +1018,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l576"><code>..\src\a50_entityManager.js:576</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l574"><code>..\src\a50_entityManager.js:574</code></a>
         
         </p>
 
@@ -1164,7 +1157,7 @@ em1.attachEntity(cust1, EntityState.Added);</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l514"><code>..\src\a50_entityManager.js:514</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l512"><code>..\src\a50_entityManager.js:512</code></a>
         
         </p>
 
@@ -1236,7 +1229,7 @@ em1.clear();
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l539"><code>..\src\a50_entityManager.js:539</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l537"><code>..\src\a50_entityManager.js:537</code></a>
         
         </p>
 
@@ -1532,7 +1525,7 @@ var emp4 = em1.createEntity(&quot;Employee&quot;, { id: 435, lastName: Smith&quo
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l645"><code>..\src\a50_entityManager.js:645</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l643"><code>..\src\a50_entityManager.js:643</code></a>
         
         </p>
 
@@ -1666,7 +1659,7 @@ em1.detachEntity(cust1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l719"><code>..\src\a50_entityManager.js:719</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l717"><code>..\src\a50_entityManager.js:717</code></a>
         
         </p>
 
@@ -2005,7 +1998,7 @@ query.execute().then( function(data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l813"><code>..\src\a50_entityManager.js:813</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l811"><code>..\src\a50_entityManager.js:811</code></a>
         
         </p>
 
@@ -2103,7 +2096,7 @@ em.executeQuery(query).then( function(data) {
             
                 <li class="arg">
                     
-                        <code>[includeMetadata</code>
+                        <code class="optional">[config]</code>
                     
                 </li>
             
@@ -2113,7 +2106,7 @@ em.executeQuery(query).then( function(data) {
 
     
         <span class="returns-inline">
-            <span class="type">String</span>
+            <span class="type">String | Object</span>
         </span>
     
 
@@ -2151,7 +2144,7 @@ em.executeQuery(query).then( function(data) {
     </div>
 
     <div class="description">
-        <p>Exports an entire EntityManager or just selected entities into a serialized string for external storage.</p>
+        <p>Exports selected entities, all entities of selected types, or an entire EntityManager cache.</p>
 
     </div>
 
@@ -2181,17 +2174,52 @@ em.executeQuery(query).then( function(data) {
             
                 <li class="param">
                     
-                        <code class="param-name">[includeMetadata</code>
-                        <span class="type">Boolean</span>
+                        <code class="param-name optional">[config]</code>
+                        <span class="type">Object | Boolean</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>= true]  Whether to include metadata in the export; the default is true</p>
+                        <p>Export configuration options</p>
 
                     </div>
 
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[asString=true]</code>
+                                    <span class="type">Boolean</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>If true (default), return export bundle as a string.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[includeMetadata=true]</code>
+                                    <span class="type">Boolean</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>If true (default), include metadata in the export bundle.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -2206,9 +2234,14 @@ em.executeQuery(query).then( function(data) {
             <div class="returns-description">
                 
                     
-                        <span class="type">String</span>:
+                        <span class="type">String | Object</span>:
                     
-                    <p>A serialized version of the exported data.</p>
+                    <p>The export bundle either serialized (default) or as a JSON object.
+The bundle contains the metadata (unless excluded) and the entity data grouped by type.
+The entity data include property values, change-state, and temporary key mappings (if any).</p>
+<p>The export bundle is an undocumented, Breeze-internal representation of entity data
+suitable for export, storage, and import. The schema and contents of the bundle may change in future versions of Breeze.
+Manipulate it at your own risk with appropriate caution.</p>
 
                 
             </div>
@@ -2220,187 +2253,44 @@ em.executeQuery(query).then( function(data) {
             <h4>Example:</h4>
 
             <div class="example-content">
-                <p>This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
-memory.  This snapshot can be restored or merged into an another EntityManager at some later date.</p>
-<pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
+                <p>This method takes a snapshot of an EntityManager that can be stored offline or held in memory.
+Use the <code>EntityManager.importEntities</code> method to restore or merge the snapshot
+into another EntityManager at some later time.</p>
+<pre class="code prettyprint"><code>// let em1 be an EntityManager containing a number of existing entities.
+// export every entity in em1.
 var bundle = em1.exportEntities();
-// can be stored via the web storage api
+// save to the browser&#39;s local storage
 window.localStorage.setItem(&quot;myEntityManager&quot;, bundle);
-// assume the code below occurs in a different session.
+// later retrieve the export
 var bundleFromStorage = window.localStorage.getItem(&quot;myEntityManager&quot;);
-var em2 = new EntityManager({
-        serviceName: em1.serviceName,
-        metadataStore: em1.metadataStore
-    });
+// import the retrieved export bundle into another manager
+var em2 = em1.createEmptyCopy();
 em2.importEntities(bundleFromStorage);
-// em2 will now have a complete copy of what was in em1</code></pre>
+// em2 now has a complete, faithful copy of the entities that were in em1</code></pre>
 <p>You can also control exactly which entities are exported.</p>
-<pre class="code prettyprint"><code>// assume entitiesToExport is an array of entities to export.
-var bundle = em1.exportEntities(entitiesToExport);
-// assume em2 is another entityManager containing some of the same entities possibly with modifications.
+<pre class="code prettyprint"><code>// get em1&#39;s unsaved changes (an array) and export them.
+var changes = em1.getChanges();
+var bundle = em1.exportEntities(changes);
+// merge these entities into em2 which may contains some of the same entities.
+// do NOT overwrite the entities in em2 if they themselves have unsaved changes.
 em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</code></pre>
-<p>You can also export all entities of one or more specified types.</p>
-<pre class="code prettyprint"><code>// Export all Customer and Employee entities; do not include the metadata
-var bundle = em1.exportEntities([&#39;Customer&#39;, &#39;Employee&#39;], false);</code></pre>
-
-            </div>
-        </div>
-    
-</div>
-
-                
-                    <div id="method_exportEntitiesToJson" class="method item">
-    <h3 class="name"><code>exportEntitiesToJson</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code class="optional">[entities]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>[includeMetadata</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">Object</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/.._src_a50_entityManager.js.html#l359"><code>..\src\a50_entityManager.js:359</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Exports an entire EntityManager or just selected entities into a JSON &quot;bundle&quot;.</p>
-<p>This method is experimental and aspects of it may change.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[entities]</code>
-                        <span class="type">Array of Entity | Array of EntityType | Array of String</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>  The entities to export or the EntityType(s) of the entities to export;
-  all entities are exported if this parameter is omitted or null.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">[includeMetadata</code>
-                        <span class="type">Boolean</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>= true]  Whether to include metadata in the export; the default is true</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Object</span>:
-                    
-                    <p>A JSON object with exported data including the entities, their change-state,
-and the associated temporary key mappings (if any).</p>
-<p>N.B.: The returned JSON bundle is currently a Breeze internal representation
-and may change over time. Use it with appropriate caution and
-be prepared to update your code in future versions of Breeze.</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-        <div class="example">
-            <h4>Example:</h4>
-
-            <div class="example-content">
-                <p>This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
-memory.  This snapshot can be restored or merged into an another EntityManager at some later date.</p>
-<pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of existing entities.
-var bundle = em1.exportEntitiesToJson();
-// store JSON bundle somewhere ... perhaps indexDb.
-em2.importEntities(bundleFromStorage);
-// em2 will now have a complete copy of what was in em1</code></pre>
-<p>You can also control exactly which entities are exported.</p>
-<pre class="code prettyprint"><code>// assume entitiesToExport is an array of entities to export.
-var bundle = em1.exportEntitiesToJson(entitiesToExport);
-// assume em2 is another entityManager containing some of the same entities possibly with modifications.
-em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );</code></pre>
-<p>You can also export all entities of one or more specified types.</p>
-<pre class="code prettyprint"><code>// Export all Customer and Employee entities; do not include the metadata
-var bundle = em1.exportEntitiesToJson([&#39;Customer&#39;, &#39;Employee&#39;], false);</code></pre>
+<p>Metadata are included in an export by default. You may want to exclude the metadata
+especially if you&#39;re exporting just a few entities for local storage.</p>
+<pre class="code prettyprint"><code>var bundle = em1.exportEntities(arrayOfSelectedEntities, {includeMetadata: false});
+window.localStorage.setItem(&quot;goodStuff&quot;, bundle);</code></pre>
+<p>You may still express this option as a boolean value although this older syntax is deprecated.</p>
+<pre class="code prettyprint"><code>// Exclude the metadata (deprecated syntax)
+var bundle = em1.exportEntities(arrayOfSelectedEntities, false);</code></pre>
+<p>You can export all entities of one or more specified EntityTypes.</p>
+<pre class="code prettyprint"><code>// Export all Customer and Employee entities (and also exclude metadata)
+var bundle = em1.exportEntities([&#39;Customer&#39;, &#39;Employee&#39;], {includeMetadata: false});</code></pre>
+<p>All of the above examples return an export bundle as a string which is the default format.
+You can export the bundle as JSON if you prefer by setting the <code>asString</code> option to false.</p>
+<pre class="code prettyprint"><code>// Export all Customer and Employee entities as JSON and exclude the metadata
+var bundle = em1.exportEntities([&#39;Customer&#39;, &#39;Employee&#39;],
+                                {asString: false, includeMetadata: false});
+// store JSON bundle somewhere ... perhaps indexDb ... and later import as we do here.
+em2.importEntities(bundle);</code></pre>
 
             </div>
         </div>
@@ -2468,7 +2358,7 @@ var bundle = em1.exportEntitiesToJson([&#39;Customer&#39;, &#39;Employee&#39;], 
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1215"><code>..\src\a50_entityManager.js:1215</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1213"><code>..\src\a50_entityManager.js:1213</code></a>
         
         </p>
 
@@ -2638,7 +2528,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1239"><code>..\src\a50_entityManager.js:1239</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1237"><code>..\src\a50_entityManager.js:1237</code></a>
         
         </p>
 
@@ -2793,7 +2683,7 @@ em1.fetchEntityByKey(employeeKey).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l671"><code>..\src\a50_entityManager.js:671</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l669"><code>..\src\a50_entityManager.js:669</code></a>
         
         </p>
 
@@ -2987,7 +2877,7 @@ em1.fetchMetadata()
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1302"><code>..\src\a50_entityManager.js:1302</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1300"><code>..\src\a50_entityManager.js:1300</code></a>
         
         </p>
 
@@ -3109,7 +2999,7 @@ var employee = em1.findEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1319"><code>..\src\a50_entityManager.js:1319</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1317"><code>..\src\a50_entityManager.js:1317</code></a>
         
         </p>
 
@@ -3244,7 +3134,7 @@ em1.saveChanges().then( function( data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1421"><code>..\src\a50_entityManager.js:1421</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1419"><code>..\src\a50_entityManager.js:1419</code></a>
         
         </p>
 
@@ -3380,7 +3270,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1478"><code>..\src\a50_entityManager.js:1478</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1476"><code>..\src\a50_entityManager.js:1476</code></a>
         
         </p>
 
@@ -3538,7 +3428,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1177"><code>..\src\a50_entityManager.js:1177</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1175"><code>..\src\a50_entityManager.js:1175</code></a>
         
         </p>
 
@@ -3672,7 +3562,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1189"><code>..\src\a50_entityManager.js:1189</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1187"><code>..\src\a50_entityManager.js:1187</code></a>
         
         </p>
 
@@ -3792,7 +3682,7 @@ var employee = em1.getEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1359"><code>..\src\a50_entityManager.js:1359</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1357"><code>..\src\a50_entityManager.js:1357</code></a>
         
         </p>
 
@@ -4134,7 +4024,7 @@ var em2 = EntityManager.importEntities(bundleFromStorage);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l418"><code>..\src\a50_entityManager.js:418</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l416"><code>..\src\a50_entityManager.js:416</code></a>
         
         </p>
 
@@ -4314,7 +4204,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1451"><code>..\src\a50_entityManager.js:1451</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1449"><code>..\src\a50_entityManager.js:1449</code></a>
         
         </p>
 
@@ -4429,7 +4319,7 @@ var entities = em1.rejectChanges();</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l882"><code>..\src\a50_entityManager.js:882</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l880"><code>..\src\a50_entityManager.js:880</code></a>
         
         </p>
 
@@ -4754,7 +4644,7 @@ function(saveResult) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1063"><code>..\src\a50_entityManager.js:1063</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1061"><code>..\src\a50_entityManager.js:1061</code></a>
         
         </p>
 
@@ -5489,7 +5379,7 @@ em.entityChanged.subscribe(function(changeArgs) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1395"><code>..\src\a50_entityManager.js:1395</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1393"><code>..\src\a50_entityManager.js:1393</code></a>
         
         </p>
 

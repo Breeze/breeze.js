@@ -38,9 +38,9 @@
     var parentCustomer = createCustomerAndOrders(em, true, 1);
 
     var newOrder = parentCustomer.getProperty("orders")[0];
-     
-    // clone the EM data
-    var expEntities = em.exportEntities(null, true);
+
+    // clone the EM data; includeMetadata is true by default but we're being explicit in this test
+    var expEntities = em.exportEntities(null, {includeMetadata: true});
 
     //var newEm = newEm();
     var newEM = new breeze.EntityManager();
@@ -389,7 +389,7 @@
     var cfg = {};
     cfg[testFns.customerKeyName] = breeze.core.getUuid();
     var customer = m1.createEntity("Customer", cfg);
-    var exported = m1.exportEntities([customer], false);
+    var exported = m1.exportEntities([customer], {includeMetadata: false});
     var m2 = em.createEmptyCopy();
 
     m2.importEntities(exported);
@@ -409,7 +409,7 @@
     var cfg = {};
     cfg[testFns.customerKeyName] = breeze.core.getUuid();
     var customer = m1.createEntity("Customer", cfg);
-    var exported = m1.exportEntities([customer], false);
+    var exported = m1.exportEntities([customer], {includeMetadata: false});
     var m2 = em.createEmptyCopy();
 
     m2.importEntities(exported);
@@ -685,7 +685,7 @@
     em.addEntity(user);
     // need to do this after the addEntity call
     var id = user.getProperty(testFns.userKeyName);
-    var exported = em.exportEntities(null, false);
+    var exported = em.exportEntities(null, {includeMetadata: false});
     var em2 = newEm();
     em2.importEntities(exported);
     var user2 = em2.getEntityByKey("User", id);
@@ -1151,7 +1151,7 @@
         return dp.isUnmapped ? undefined : value;
       }
     });
-    var bundle = em1.exportEntities(null, false);
+    var bundle = em1.exportEntities(null, {includeMetadata: false});
 
     var em2 = new EntityManager({ serviceName: testFns.serviceName, metadataStore: em1.metadataStore });
     em2.importEntities(bundle);
@@ -1183,7 +1183,7 @@
     em1.metadataStore.setProperties({
       name: "version 1.1"
     });
-    var bundle = em1.exportEntities(null, false);
+    var bundle = em1.exportEntities(null, {includeMetadata: false});
     var em2 = new EntityManager({ serviceName: testFns.serviceName, metadataStore: em1.metadataStore });
     try {
       em2.importEntities(bundle, {
@@ -1588,7 +1588,7 @@
     ok(valid, "should no longer have any changes");
   });
 
-  
+
 
   function createOrderAndDetails(em, shouldAttachUnchanged) {
     if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
@@ -1596,7 +1596,7 @@
     var orderType = em.metadataStore.getEntityType("Order");
     var orderDetailType = em.metadataStore.getEntityType("OrderDetail");
     var order = em.createEntity(orderType);
-    
+
     ok(order.entityAspect.entityState.isAdded(), "order should be 'detached");
     for (var i = 0; i < 3; i++) {
       var od = orderDetailType.createEntity();
@@ -1630,7 +1630,7 @@
     var metadataStore = em.metadataStore;
     var customerType = em.metadataStore.getEntityType("Customer");
     var orderType = em.metadataStore.getEntityType("Order");
-    
+
     var customer = em.createEntity(customerType);
     ok(customer.entityAspect.entityState.isAdded(), "customer should be 'added");
     for (var i = 0; i < orderCount; i++) {

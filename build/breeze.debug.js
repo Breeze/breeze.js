@@ -12944,103 +12944,101 @@ var EntityManager = (function () {
   };
 
   /**
-  Exports an entire EntityManager or just selected entities into a serialized string for external storage.
+  Exports selected entities, all entities of selected types, or an entire EntityManager cache.
   @example
-  This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
-  memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
+  This method takes a snapshot of an EntityManager that can be stored offline or held in memory.
+  Use the `EntityManager.importEntities` method to restore or merge the snapshot
+  into another EntityManager at some later time.
   @example
-      // assume em1 is an EntityManager containing a number of existing entities.
+      // let em1 be an EntityManager containing a number of existing entities.
+      // export every entity in em1.
       var bundle = em1.exportEntities();
-      // can be stored via the web storage api
+      // save to the browser's local storage
       window.localStorage.setItem("myEntityManager", bundle);
-      // assume the code below occurs in a different session.
+      // later retrieve the export
       var bundleFromStorage = window.localStorage.getItem("myEntityManager");
-      var em2 = new EntityManager({
-              serviceName: em1.serviceName,
-              metadataStore: em1.metadataStore
-          });
+      // import the retrieved export bundle into another manager
+      var em2 = em1.createEmptyCopy();
       em2.importEntities(bundleFromStorage);
-      // em2 will now have a complete copy of what was in em1
+      // em2 now has a complete, faithful copy of the entities that were in em1
   You can also control exactly which entities are exported.
   @example
-      // assume entitiesToExport is an array of entities to export.
-      var bundle = em1.exportEntities(entitiesToExport);
-      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
+      // get em1's unsaved changes (an array) and export them.
+      var changes = em1.getChanges();
+      var bundle = em1.exportEntities(changes);
+      // merge these entities into em2 which may contains some of the same entities.
+      // do NOT overwrite the entities in em2 if they themselves have unsaved changes.
       em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-  You can also export all entities of one or more specified types.
+  Metadata are included in an export by default. You may want to exclude the metadata
+  especially if you're exporting just a few entities for local storage.
   @example
-      // Export all Customer and Employee entities; do not include the metadata
-      var bundle = em1.exportEntities(['Customer', 'Employee'], false);
+      var bundle = em1.exportEntities(arrayOfSelectedEntities, {includeMetadata: false});
+      window.localStorage.setItem("goodStuff", bundle);
+  You may still express this option as a boolean value although this older syntax is deprecated.
+  @example
+      // Exclude the metadata (deprecated syntax)
+      var bundle = em1.exportEntities(arrayOfSelectedEntities, false);
+  You can export all entities of one or more specified EntityTypes.
+  @example
+      // Export all Customer and Employee entities (and also exclude metadata)
+      var bundle = em1.exportEntities(['Customer', 'Employee'], {includeMetadata: false});
+  All of the above examples return an export bundle as a string which is the default format.
+  You can export the bundle as JSON if you prefer by setting the `asString` option to false.
+  @example
+      // Export all Customer and Employee entities as JSON and exclude the metadata
+      var bundle = em1.exportEntities(['Customer', 'Employee'],
+                                      {asString: false, includeMetadata: false});
+      // store JSON bundle somewhere ... perhaps indexDb ... and later import as we do here.
+      em2.importEntities(bundle);
   @method exportEntities
   @param [entities] {Array of Entity | Array of EntityType | Array of String}
     The entities to export or the EntityType(s) of the entities to export;
     all entities are exported if this parameter is omitted or null.
-  @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
-  @return {String} A serialized version of the exported data.
+  @param [config] {Object | Boolean} Export configuration options
+  @param [config.asString=true] {Boolean} If true (default), return export bundle as a string.
+  @param [config.includeMetadata=true] {Boolean} If true (default), include metadata in the export bundle.
+  @return {String | Object} The export bundle either serialized (default) or as a JSON object.
+  The bundle contains the metadata (unless excluded) and the entity data grouped by type.
+  The entity data include property values, change-state, and temporary key mappings (if any).
+
+  The export bundle is an undocumented, Breeze-internal representation of entity data
+  suitable for export, storage, and import. The schema and contents of the bundle may change in future versions of Breeze.
+  Manipulate it at your own risk with appropriate caution.
   **/
-  proto.exportEntities = function (entities, includeMetadata) {
-    var json = this.exportEntitiesToJson(entities, includeMetadata);
-    var result = JSON.stringify(json, null, __config.stringifyPad);
-    return result;
-  };
-
-  /**
-  Exports an entire EntityManager or just selected entities into a JSON "bundle".
-
-  This method is experimental and aspects of it may change.
-  @example
-  This method can be used to take a snapshot of an EntityManager that can be either stored offline or held
-  memory.  This snapshot can be restored or merged into an another EntityManager at some later date.
-  @example
-      // assume em1 is an EntityManager containing a number of existing entities.
-      var bundle = em1.exportEntitiesToJson();
-      // store JSON bundle somewhere ... perhaps indexDb.
-      em2.importEntities(bundleFromStorage);
-      // em2 will now have a complete copy of what was in em1
-  You can also control exactly which entities are exported.
-  @example
-      // assume entitiesToExport is an array of entities to export.
-      var bundle = em1.exportEntitiesToJson(entitiesToExport);
-      // assume em2 is another entityManager containing some of the same entities possibly with modifications.
-      em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
-  You can also export all entities of one or more specified types.
-  @example
-      // Export all Customer and Employee entities; do not include the metadata
-      var bundle = em1.exportEntitiesToJson(['Customer', 'Employee'], false);
-
-  @method exportEntitiesToJson
-  @param [entities] {Array of Entity | Array of EntityType | Array of String}
-    The entities to export or the EntityType(s) of the entities to export;
-    all entities are exported if this parameter is omitted or null.
-  @param [includeMetadata = true] {Boolean} Whether to include metadata in the export; the default is true
-  @return {Object} A JSON object with exported data including the entities, their change-state,
-  and the associated temporary key mappings (if any).
-
-  N.B.: The returned JSON bundle is currently a Breeze internal representation
-  and may change over time. Use it with appropriate caution and
-  be prepared to update your code in future versions of Breeze.
-  **/
-  proto.exportEntitiesToJson = function (entities, includeMetadata) {
+  proto.exportEntities = function (entities, config) {
     assertParam(entities, "entities").isArray().isEntity()
     .or().isNonEmptyArray().isInstanceOf(EntityType)
     .or().isNonEmptyArray().isString()
     .or().isOptional().check();
 
-    //assertParam(entities, "entities").isArray().isOptional().check();
-    assertParam(includeMetadata, "includeMetadata").isBoolean().isOptional().check();
-    includeMetadata = (includeMetadata == null) ? true : includeMetadata;
+    assertParam(config, "config").isObject()
+    .or().isBoolean()
+    .or().isOptional().check();
+
+    if (config == null) {
+      config = { includeMetadata: true, asString: true };
+    } else if (typeof config === 'boolean') { // deprecated
+      config = { includeMetadata: config, asString: true };
+    }
+
+    assertConfig(config)
+        .whereParam("asString").isBoolean().isOptional().withDefault(true)
+        .whereParam("includeMetadata").isBoolean().isOptional().withDefault(true)
+        .applyAll(config);
 
     var exportBundle = exportEntityGroups(this, entities);
     var json = __extend({}, exportBundle, ["tempKeys", "entityGroupMap"]);
 
-    if (includeMetadata) {
+    if (config.includeMetadata) {
       json = __extend(json, this, ["dataService", "saveOptions", "queryOptions", "validationOptions"]);
       json.metadataStore = this.metadataStore.exportMetadata();
     } else {
       json.metadataVersion = breeze.metadataVersion;
       json.metadataStoreName = this.metadataStore.name;
     }
-    return json;
+
+    var result = config.asString ? JSON.stringify(json, null, __config.stringifyPad) : json;
+    return result;
   };
 
   /**

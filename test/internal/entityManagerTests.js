@@ -174,6 +174,8 @@
       var custs = data.results;
       custs[0].setProperty("companyName", null);
       custs[1].setProperty("city", null);
+      //exported = em.exportEntities(null, {includeMetadata: false});
+      // use the deprecated syntax to exclude metadata
       exported = em.exportEntities(null, false);
       var em2 = newEm();
       em2.importEntities(exported);
@@ -630,7 +632,7 @@
       return em.saveChanges();
     }).then(function (sr) {
       ok(sr.entities.length == 2);
-      var exported = em.exportEntities(null, false);
+      var exported = em.exportEntities(null, {includeMetadata: false});
       var em2 = newEm();
       em2.importEntities(exported);
     }).fail(function (e) {
@@ -726,7 +728,7 @@
       ok(!cust1.entityAspect.wasLoaded);
       order1.setProperty("employee", emp1);
       order1.setProperty("customer", cust1);
-      var exportedEm = em.exportEntities(null, false);
+      var exportedEm = em.exportEntities(null, {includeMetadata: false});
 
       em2.importEntities(exportedEm);
       var suppliers = em2.getEntities("Supplier");
@@ -1049,8 +1051,8 @@
     var adds;
     query.execute().then(function (data) {
       var customer = data.results[0];
-      exportedCustomer = em.exportEntities([customer], false);
-      exportedEm = em.exportEntities(null, false);
+      exportedCustomer = em.exportEntities([customer], {includeMetadata: false});
+      exportedEm = em.exportEntities(null, {includeMetadata: false});
       em2.importEntities(exportedCustomer);
       var sameCustomer = em2.findEntityByKey(customer.entityAspect.getKey());
       var orders = sameCustomer.getProperty("orders");
@@ -1342,7 +1344,7 @@
     var em2;
     em.executeQuery(q, function (data) {
       ok(data.results.length == 2, "results.length should be 2");
-      var exportedEm = em.exportEntities(null, false);
+      var exportedEm = em.exportEntities(null, {includeMetadata: false});
       em2 = newEm();
       var r = em2.importEntities(exportedEm);
       // 5 = 3 created + 2 queried
@@ -1467,14 +1469,14 @@
       });
 
       // export cust1 to em2 (w/o metadata); becomes cust2
-      var exported = em1.exportEntities([cust1], false);
+      var exported = em1.exportEntities([cust1], {includeMetadata: false});
       var cust2 = em2.importEntities(exported).entities[0];
 
       // change a property of the Customer while in em2;
       cust2.setProperty('companyName', 'Added Company + 1');
 
       // re-import customer from em2 back to em1 with OverwriteChanges
-      exported = em2.exportEntities([cust2], false);
+      exported = em2.exportEntities([cust2], {includeMetadata: false});
       em1.importEntities(exported, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
 
       equal(cust1.getProperty('contactName'), 'Unforgettable', "'contactName' unchanged");
@@ -1495,14 +1497,14 @@
       });
 
       // export emp1 to em2 (w/o metadata); becomes emp2
-      var exported = em1.exportEntities([emp1], false);
+      var exported = em1.exportEntities([emp1], {includeMetadata: false});
       var emp2 = em2.importEntities(exported).entities[0];
 
       // change a property of the Employee while in em2;
       emp2.setProperty('firstName', 'Ima B.');
 
       // re-import Employee from em2 back to em1 with OverwriteChanges
-      exported = em2.exportEntities([emp2], false);
+      exported = em2.exportEntities([emp2], {includeMetadata: false});
       var emp1b = em1.importEntities(exported,
                     // strategy doesn't matter actually
                     { mergeStrategy: breeze.MergeStrategy.OverwriteChanges })
@@ -1528,7 +1530,7 @@
     em.addEntity(createCust(em, "Export/import safely #3"));
 
     var changes = em.getChanges();
-    var changesExport = em.exportEntities(changes, null);
+    var changesExport = em.exportEntities(changes, {includeMetadata: false});
 
     ok(window.localStorage, "this browser supports local storage");
 
@@ -1561,7 +1563,7 @@
     var em1 = newEm(), em2 = newEm();
     createCachedData(em1);
     var entities = em1.getEntities();
-    var exp = em1.exportEntitiesToJson(null, false); // no metadata
+    var exp = em1.exportEntities(null, {asString: false, includeMetadata: false});
     var imps = em2.importEntities(exp).entities;
 
     equal(imps.length, entities.length,
@@ -1576,7 +1578,7 @@
     var cust = em1.getEntities('Customer', breeze.EntityState.Modified)[0];
     ok(emp != null && cust != null, 'got emp and cust from cache');
 
-    var exp = em1.exportEntitiesToJson([emp, cust], false); // no metadata
+    var exp = em1.exportEntities([emp, cust], {asString: false, includeMetadata: false});
     em2.importEntities(exp);
     var imps = em2.getEntities();
     equal(imps.length, 2, 'should have imported two entities');
@@ -1590,7 +1592,7 @@
     var emps = em1.getEntities(['Employee']);
     var empType = emps[0].entityType;
 
-    var exp = em1.exportEntitiesToJson(['Employee'], false); // no metadata
+    var exp = em1.exportEntities(['Employee'], {asString: false, includeMetadata: false});
     em2.importEntities(exp);
 
     var imps = em2.getEntities();
@@ -1609,7 +1611,7 @@
     var emps = em1.getEntities(['Employee']);
     var empType = emps[0].entityType;
 
-    var exp = em1.exportEntitiesToJson([empType], false); // no metadata
+    var exp = em1.exportEntities([empType], {asString: false, includeMetadata: false});
     var imps = em2.importEntities(exp).entities;
 
     ok(imps.every(function (e) { return e.entityType === empType; }),
@@ -1626,7 +1628,7 @@
     createCachedData(em1);
 
     var catType = removeAllOfType(em1, 'Category');
-    var exp = em1.exportEntitiesToJson([catType], false); // no metadata
+    var exp = em1.exportEntities([catType], {asString: false, includeMetadata: false});
     var imps = em2.importEntities(exp).entities;
 
     equal(imps.length, 0, 'should not have imported anything');
@@ -1645,7 +1647,7 @@
     var entities = em1.getEntities(typeNames);
     var expectedChanges = em1.getChanges(typeNames);
 
-    var exp = em1.exportEntitiesToJson(typeNames, false); // no metadata
+    var exp = em1.exportEntities(typeNames, {asString: false, includeMetadata: false});
 
     var imps = em2.importEntities(exp).entities;
 
@@ -1664,7 +1666,7 @@
 
     throws(function () {
       // there is no 'foo' type
-      exp = em1.exportEntitiesToJson(['foo'], false); // no metadata
+      exp = em1.exportEntities(['foo'], {asString: false, includeMetadata: false});
     },
     /.*type.*foo/i, // error message like "Unable to locate a 'Type' by the name: 'foo'"
     'the export method threw because there is no "Foo" type');

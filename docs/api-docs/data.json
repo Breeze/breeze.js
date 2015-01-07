@@ -7500,12 +7500,15 @@
         {
             "file": "..\\src\\a50_entityManager.js",
             "line": 318,
-            "description": "Exports an entire EntityManager or just selected entities into a serialized string for external storage.",
+            "description": "Exports selected entities, all entities of selected types, or an entire EntityManager cache.",
             "example": [
-                "\nThis method can be used to take a snapshot of an EntityManager that can be either stored offline or held\nmemory.  This snapshot can be restored or merged into an another EntityManager at some later date.",
-                "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var bundle = em1.exportEntities();\n    // can be stored via the web storage api\n    window.localStorage.setItem(\"myEntityManager\", bundle);\n    // assume the code below occurs in a different session.\n    var bundleFromStorage = window.localStorage.getItem(\"myEntityManager\");\n    var em2 = new EntityManager({\n            serviceName: em1.serviceName,\n            metadataStore: em1.metadataStore\n        });\n    em2.importEntities(bundleFromStorage);\n    // em2 will now have a complete copy of what was in em1\nYou can also control exactly which entities are exported.",
-                "\n    // assume entitiesToExport is an array of entities to export.\n    var bundle = em1.exportEntities(entitiesToExport);\n    // assume em2 is another entityManager containing some of the same entities possibly with modifications.\n    em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );\nYou can also export all entities of one or more specified types.",
-                "\n    // Export all Customer and Employee entities; do not include the metadata\n    var bundle = em1.exportEntities(['Customer', 'Employee'], false);"
+                "\nThis method takes a snapshot of an EntityManager that can be stored offline or held in memory.\nUse the `EntityManager.importEntities` method to restore or merge the snapshot\ninto another EntityManager at some later time.",
+                "\n    // let em1 be an EntityManager containing a number of existing entities.\n    // export every entity in em1.\n    var bundle = em1.exportEntities();\n    // save to the browser's local storage\n    window.localStorage.setItem(\"myEntityManager\", bundle);\n    // later retrieve the export\n    var bundleFromStorage = window.localStorage.getItem(\"myEntityManager\");\n    // import the retrieved export bundle into another manager\n    var em2 = em1.createEmptyCopy();\n    em2.importEntities(bundleFromStorage);\n    // em2 now has a complete, faithful copy of the entities that were in em1\nYou can also control exactly which entities are exported.",
+                "\n    // get em1's unsaved changes (an array) and export them.\n    var changes = em1.getChanges();\n    var bundle = em1.exportEntities(changes);\n    // merge these entities into em2 which may contains some of the same entities.\n    // do NOT overwrite the entities in em2 if they themselves have unsaved changes.\n    em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );\nMetadata are included in an export by default. You may want to exclude the metadata\nespecially if you're exporting just a few entities for local storage.",
+                "\n    var bundle = em1.exportEntities(arrayOfSelectedEntities, {includeMetadata: false});\n    window.localStorage.setItem(\"goodStuff\", bundle);\nYou may still express this option as a boolean value although this older syntax is deprecated.",
+                "\n    // Exclude the metadata (deprecated syntax)\n    var bundle = em1.exportEntities(arrayOfSelectedEntities, false);\nYou can export all entities of one or more specified EntityTypes.",
+                "\n    // Export all Customer and Employee entities (and also exclude metadata)\n    var bundle = em1.exportEntities(['Customer', 'Employee'], {includeMetadata: false});\nAll of the above examples return an export bundle as a string which is the default format.\nYou can export the bundle as JSON if you prefer by setting the `asString` option to false.",
+                "\n    // Export all Customer and Employee entities as JSON and exclude the metadata\n    var bundle = em1.exportEntities(['Customer', 'Employee'],\n                                    {asString: false, includeMetadata: false});\n    // store JSON bundle somewhere ... perhaps indexDb ... and later import as we do here.\n    em2.importEntities(bundle);"
             ],
             "itemtype": "method",
             "name": "exportEntities",
@@ -7517,53 +7520,38 @@
                     "optional": true
                 },
                 {
-                    "name": "[includeMetadata",
-                    "description": "= true]  Whether to include metadata in the export; the default is true",
-                    "type": "Boolean"
+                    "name": "config",
+                    "description": "Export configuration options",
+                    "type": "Object | Boolean",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "asString",
+                            "description": "If true (default), return export bundle as a string.",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "true"
+                        },
+                        {
+                            "name": "includeMetadata",
+                            "description": "If true (default), include metadata in the export bundle.",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "true"
+                        }
+                    ]
                 }
             ],
             "return": {
-                "description": "A serialized version of the exported data.",
-                "type": "String"
+                "description": "The export bundle either serialized (default) or as a JSON object.\nThe bundle contains the metadata (unless excluded) and the entity data grouped by type.\nThe entity data include property values, change-state, and temporary key mappings (if any).\n\nThe export bundle is an undocumented, Breeze-internal representation of entity data\nsuitable for export, storage, and import. The schema and contents of the bundle may change in future versions of Breeze.\nManipulate it at your own risk with appropriate caution.",
+                "type": "String | Object"
             },
             "class": "EntityManager",
             "module": "breeze"
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 359,
-            "description": "Exports an entire EntityManager or just selected entities into a JSON \"bundle\".\n\nThis method is experimental and aspects of it may change.",
-            "example": [
-                "\nThis method can be used to take a snapshot of an EntityManager that can be either stored offline or held\nmemory.  This snapshot can be restored or merged into an another EntityManager at some later date.",
-                "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var bundle = em1.exportEntitiesToJson();\n    // store JSON bundle somewhere ... perhaps indexDb.\n    em2.importEntities(bundleFromStorage);\n    // em2 will now have a complete copy of what was in em1\nYou can also control exactly which entities are exported.",
-                "\n    // assume entitiesToExport is an array of entities to export.\n    var bundle = em1.exportEntitiesToJson(entitiesToExport);\n    // assume em2 is another entityManager containing some of the same entities possibly with modifications.\n    em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );\nYou can also export all entities of one or more specified types.",
-                "\n    // Export all Customer and Employee entities; do not include the metadata\n    var bundle = em1.exportEntitiesToJson(['Customer', 'Employee'], false);"
-            ],
-            "itemtype": "method",
-            "name": "exportEntitiesToJson",
-            "params": [
-                {
-                    "name": "entities",
-                    "description": "\n  The entities to export or the EntityType(s) of the entities to export;\n  all entities are exported if this parameter is omitted or null.",
-                    "type": "Array of Entity | Array of EntityType | Array of String",
-                    "optional": true
-                },
-                {
-                    "name": "[includeMetadata",
-                    "description": "= true]  Whether to include metadata in the export; the default is true",
-                    "type": "Boolean"
-                }
-            ],
-            "return": {
-                "description": "A JSON object with exported data including the entities, their change-state,\nand the associated temporary key mappings (if any).\n\nN.B.: The returned JSON bundle is currently a Breeze internal representation\nand may change over time. Use it with appropriate caution and\nbe prepared to update your code in future versions of Breeze.",
-                "type": "Object"
-            },
-            "class": "EntityManager",
-            "module": "breeze"
-        },
-        {
-            "file": "..\\src\\a50_entityManager.js",
-            "line": 418,
+            "line": 416,
             "description": "Imports a previously exported result into this EntityManager.",
             "example": [
                 "\nThis method can be used to make a complete copy of any previously created entityManager, even if created\nin a previous session and stored in localStorage. The static version of this method performs a\nvery similar process.",
@@ -7607,7 +7595,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 514,
+            "line": 512,
             "description": "Clears this EntityManager's cache but keeps all other settings. Note that this\nmethod is not as fast as creating a new EntityManager via 'new EntityManager'.\nThis is because clear actually detaches all of the entities from the EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    em1.clear();\n    // em1 is will now contain no entities, but all other setting will be maintained."
@@ -7619,7 +7607,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 539,
+            "line": 537,
             "description": "Creates an empty copy of this EntityManager",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var em2 = em1.createEmptyCopy();\n    // em2 is a new EntityManager with all of em1's settings\n    // but no entities."
@@ -7635,7 +7623,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 555,
+            "line": 553,
             "description": "Attaches an entity to this EntityManager with an  {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Added'.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var cust1 = custType.createEntity();\n    em1.addEntity(cust1);\nNote that this is the same as using 'attachEntity' with an {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Added'.",
@@ -7659,7 +7647,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 576,
+            "line": 574,
             "description": "Attaches an entity to this EntityManager with a specified {{#crossLink \"EntityState\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var cust1 = custType.createEntity();\n    em1.attachEntity(cust1, EntityState.Added);"
@@ -7696,7 +7684,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 645,
+            "line": 643,
             "description": "Detaches an entity from this EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    // assume cust1 is a customer Entity previously attached to em1\n    em1.detachEntity(cust1);\n    // em1 will now no longer contain cust1 and cust1 will have an\n    // entityAspect.entityState of EntityState.Detached"
@@ -7719,7 +7707,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 671,
+            "line": 669,
             "description": "Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call\noccurs internally before the first query to any service if the metadata hasn't already been\nloaded.",
             "example": [
                 "\nUsually you will not actually process the results of a fetchMetadata call directly, but will instead\nask for the metadata from the EntityManager after the fetchMetadata call returns.",
@@ -7767,7 +7755,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 719,
+            "line": 717,
             "description": "Executes the specified query.",
             "example": [
                 "\nThis method can be called using a 'promises' syntax ( recommended)",
@@ -7871,7 +7859,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 813,
+            "line": 811,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "example": [
                 "\nBecause this method is executed immediately there is no need for a promise or a callback",
@@ -7896,7 +7884,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 882,
+            "line": 880,
             "description": "Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities\nspecified then there will be no server side call made but a valid 'empty' saveResult will still be returned.",
             "example": [
                 "\nOften we will be saving all of the entities within an EntityManager that are either added, modified or deleted\nand we will let the 'saveChanges' call determine which entities these are.",
@@ -7998,7 +7986,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1063,
+            "line": 1061,
             "description": "Run the \"saveChanges\" pre-save client validation logic.\n\nThis is NOT a general purpose validation method.\nIt is intended for utilities that must know if saveChanges\nwould reject the save due to client validation errors.\n\nIt only validates entities if the EntityManager's\n{{#crossLink \"ValidationOptions\"}}{{/crossLink}}.validateOnSave is true.",
             "itemtype": "method",
             "name": "saveChangesValidateOnClient",
@@ -8018,7 +8006,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1177,
+            "line": 1175,
             "description": "Attempts to locate an entity within this EntityManager by its key.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employee = em1.getEntityByKey(\"Employee\", 1);\n    // employee will either be an entity or null."
@@ -8046,7 +8034,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1189,
+            "line": 1187,
             "description": "Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    var employee = em1.getEntityByKey(employeeKey);\n    // employee will either be an entity or null."
@@ -8069,7 +8057,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1215,
+            "line": 1213,
             "description": "Attempts to fetch an entity from the server by its key with\nan option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy\nwill be used to merge any server side entity returned by this method.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    em1.fetchEntityByKey(\"Employee\", 1).then(function(result) {\n        var employee = result.entity;\n        var entityKey = result.entityKey;\n        var fromCache = result.fromCache;\n    });"
@@ -8103,7 +8091,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1239,
+            "line": 1237,
             "description": "Attempts to fetch an entity from the server by its {{#crossLink \"EntityKey\"}}{{/crossLink}} with\nan option to check the local cache first.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    em1.fetchEntityByKey(employeeKey).then(function(result) {\n        var employee = result.entity;\n        var entityKey = result.entityKey;\n        var fromCache = result.fromCache;\n    });"
@@ -8132,7 +8120,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1302,
+            "line": 1300,
             "description": "[Deprecated] - Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    var employee = em1.findEntityByKey(employeeKey);\n    // employee will either be an entity or null."
@@ -8157,7 +8145,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1319,
+            "line": 1317,
             "description": "Generates a temporary key for the specified entity.  This is used to insure that newly\ncreated entities have unique keys and to register that these keys are temporary and\nneed to be automatically replaced with 'real' key values once these entities are saved.\n\nThe EntityManager.keyGeneratorCtor property is used internally by this method to actually generate\nthe keys - See the  {{#crossLink \"~keyGenerator-interface\"}}{{/crossLink}} interface description to see\nhow a custom key generator can be plugged in.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var custumer = custType.createEntity();\n    var customerId = em.generateTempKeyValue(custumer);\n    // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value\n    // This property will change again after a successful save of the 'customer' entity.\n\n    em1.saveChanges().then( function( data) {\n        var sameCust1 = data.results[0];\n        // cust1 === sameCust1;\n        // but cust1.getProperty(\"CustomerId\") != customerId\n        // because the server will have generated a new id\n        // and the client will have been updated with this\n        // new id.\n    })"
@@ -8180,7 +8168,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1359,
+            "line": 1357,
             "description": "Returns whether there are any changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
                 "\nThis method can be used to determine if an EntityManager has any changes",
@@ -8207,7 +8195,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1395,
+            "line": 1393,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.",
             "example": [
                 "\n    var em = new EntityManager( {serviceName: \"breeze/NorthwindIBModel\" });\n    em.hasChangesChanged.subscribe(function(args) {\n            var hasChangesChanged = args.hasChanges;\n            var entityManager = args.entityManager;\n        });\n    });"
@@ -8232,7 +8220,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1421,
+            "line": 1419,
             "description": "Returns a array of all changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
                 "\nThis method can be used to get all of the changed entities within an EntityManager",
@@ -8259,7 +8247,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1451,
+            "line": 1449,
             "description": "Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.\nCalls EntityAspect.rejectChanges on every changed entity in this EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var entities = em1.rejectChanges();"
@@ -8275,7 +8263,7 @@
         },
         {
             "file": "..\\src\\a50_entityManager.js",
-            "line": 1478,
+            "line": 1476,
             "description": "Returns a array of all entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s with the specified {{#crossLink \"EntityState\"}}{{/crossLink}}s.",
             "example": [
                 "\nThis method can be used to get all of the entities within an EntityManager",

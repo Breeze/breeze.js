@@ -1101,7 +1101,7 @@
             "has OData extraMetadata on the original customer before export");
       }
 
-      var exported = em1.exportEntities([cust], false); // exclude metadata ... not important
+      var exported = em1.exportEntities([cust], {includeMetadata: false}); // exclude metadata ... not important
       cust.entityAspect.setDetached(); // remove from cache
       cust = em1.importEntities(exported).entities[0]; // get reimported customer
 
