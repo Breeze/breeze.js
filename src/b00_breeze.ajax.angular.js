@@ -2,7 +2,7 @@
 // See https://docs.angularjs.org/api/ng/service/$http
 (function (factory) {
   // Module systems magic dance.
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -35,7 +35,7 @@
         rootScope = $rootScope;
       }]);
       this.$http = http;
-      this.$rootScope = rootScope;     
+      this.$rootScope = rootScope;
     }
 
   };

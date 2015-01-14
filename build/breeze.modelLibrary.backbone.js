@@ -1,5 +1,5 @@
 (function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"

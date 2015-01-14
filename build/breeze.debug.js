@@ -15891,7 +15891,7 @@ breeze.SaveOptions = SaveOptions;
 // See https://docs.angularjs.org/api/ng/service/$http
 (function (factory) {
   // Module systems magic dance.
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -15924,7 +15924,7 @@ breeze.SaveOptions = SaveOptions;
         rootScope = $rootScope;
       }]);
       this.$http = http;
-      this.$rootScope = rootScope;     
+      this.$rootScope = rootScope;
     }
 
   };
@@ -16062,7 +16062,7 @@ breeze.SaveOptions = SaveOptions;
 // see https://api.jquery.com/jQuery.ajax/
 (function (factory) {
   // Module systems magic dance.
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -16178,7 +16178,7 @@ breeze.SaveOptions = SaveOptions;
 
 }));
 ;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -16589,7 +16589,7 @@ breeze.SaveOptions = SaveOptions;
 
 
 }));;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -16688,7 +16688,7 @@ breeze.SaveOptions = SaveOptions;
   breeze.config.registerAdapter("dataService", ctor);
 
 }));;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -16980,7 +16980,7 @@ breeze.SaveOptions = SaveOptions;
 
 }));
 ;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -17245,7 +17245,7 @@ breeze.SaveOptions = SaveOptions;
 
 }));
 ;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
@@ -17285,7 +17285,7 @@ breeze.SaveOptions = SaveOptions;
 
 
 ;(function (factory) {
-  if (breeze) {
+  if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
