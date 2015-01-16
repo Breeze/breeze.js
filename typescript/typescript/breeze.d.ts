@@ -8,6 +8,7 @@
 // Updated Sep 26 2013 for Breeze 1.4.3 - Steve Schmitt ( www.ideablade.com).
 // Updated Jul 22 2014 for Breeze 1.4.16 - Steve Schmitt ( www.ideablade.com)
 // Updated Aug 22 2014 for Breeze 1.4.17 and removing Q dependency - Steve Schmitt ( www.ideablade.com)
+// Updated Jan 16 2014 for Breeze 1.4.17 to add support for noimplicitany - Kevin Wilson ( www.kwilson.me.uk )
 
 declare module breeze.core {
 
@@ -70,7 +71,7 @@ declare module breeze.core {
 
     export function requireLib(libnames: string, errMessage: string): Object;
     export function using(obj: Object, property: string, tempValue: any, fn: () => any): any;
-    export function memoize(fn: (...any) => any): any;
+    export function memoize(fn: (...any: any[]) => any): any;
     export function getUuid(): string;
     export function durationToSeconds(duration: string): number;
 
@@ -139,7 +140,7 @@ declare module breeze {
         shortName: string;
         unmappedProperties: DataProperty[];
         validators: Validator[];
-        addProperty(dataProperty: DataProperty);
+        addProperty(dataProperty: DataProperty): void;
         getProperties(): DataProperty[];
     }
 
@@ -425,10 +426,10 @@ declare module breeze {
         hasChanges(entityType: EntityType): boolean;
         hasChanges(entityTypes: EntityType[]): boolean;
 
-        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): EntityManager;
-        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): EntityManager;
-        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
-        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
+        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
+        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
         saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): breeze.promises.IPromise<SaveResult>;
@@ -683,8 +684,8 @@ declare module breeze {
         addDataService(dataService: DataService, shouldOverwrite?: boolean): void;
         addEntityType(structuralType: IStructuralType): void;
         exportMetadata(): string;
-        fetchMetadata(dataService: string, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
-        fetchMetadata(dataService: DataService, callback?: (data) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
+        fetchMetadata(dataService: string, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
+        fetchMetadata(dataService: DataService, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
         getDataService(serviceName: string): DataService;
         getEntityType(entityTypeName: string, okIfNotFound?: boolean): IStructuralType;
         getEntityTypes(): IStructuralType[];
@@ -693,11 +694,11 @@ declare module breeze {
         importMetadata(exportedString: string, allowMerge?: boolean): MetadataStore;
         isEmpty(): boolean;
         registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (entity: Entity) => Entity): void;
-        trackUnmappedType(entityCtor: Function, interceptor?: Function);
+        trackUnmappedType(entityCtor: Function, interceptor?: Function): void;
         setEntityTypeForResourceName(resourceName: string, entityType: EntityType): void;
         setEntityTypeForResourceName(resourceName: string, entityTypeName: string): void;
         getEntityTypeNameForResourceName(resourceName: string): string;
-        setProperties(config: { name?: string; serializerFn?: Function });
+        setProperties(config: { name?: string; serializerFn?: Function }): void;
     }
 
     interface MetadataStoreOptions {
@@ -718,7 +719,7 @@ declare module breeze {
         serverPropertyNameToClient(serverPropertyName: string): string;
         serverPropertyNameToClient(serverPropertyName: string, property: IProperty): string;
 
-        setAsDefault();
+        setAsDefault(): void;
     }
 
     interface NamingConventionOptions {
@@ -937,9 +938,9 @@ declare module breeze {
         /** Creates a validator instance from a JSON object or an array of instances from an array of JSON objects. */
         static fromJSON(json: string): Validator;
         /** Register a validator instance so that any deserialized metadata can reference it. */
-        static register(validator: Validator);
+        static register(validator: Validator): void;
         /** Register a validator factory so that any deserialized metadata can reference it.  */
-        static registerFactory(fn: () => Validator, name: string);
+        static registerFactory(fn: () => Validator, name: string): void;
         /** Creates a regular expression validator with a fixed expression. */
         static makeRegExpValidator(validatorName: string, expression: RegExp, defaultMessage: string, context?: any): Validator;
 
@@ -1043,12 +1044,12 @@ declare module breeze.config {
 /** Promises interface used by Breeze.  Usually implemented by Q (https://github.com/kriskowal/q) or angular.$q using breeze.config.setQ(impl) */
 declare module breeze.promises {
     interface IPromise<T> {
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason) => U): IPromise<U>;
-        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason) => U): IPromise<U>;
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason) => IPromise<U>): IPromise<U>;
-        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason) => IPromise<U>): IPromise<U>;
-        catch<U>(onRejected: (reason) => U): IPromise<U>;
-        catch<U>(onRejected: (reason) => IPromise<U>): IPromise<U>;
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U): IPromise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => U): IPromise<U>;
+        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
+        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
+        catch<U>(onRejected: (reason: any) => U): IPromise<U>;
+        catch<U>(onRejected: (reason: any) => IPromise<U>): IPromise<U>;
         finally(finallyCallback: () => any): IPromise<T>;
     }
 
@@ -1060,7 +1061,7 @@ declare module breeze.promises {
 
     interface IPromiseService {
         defer<T>(): IDeferred<T>;
-        reject(reason?): IPromise<any>;
+        reject(reason?: any): IPromise<any>;
         resolve<T>(object: T): IPromise<T>;
         resolve<T>(object: IPromise<T>): IPromise<T>;
     }
