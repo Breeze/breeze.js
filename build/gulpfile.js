@@ -12,6 +12,7 @@ var rimraf  = require('gulp-rimraf');
 var shell   = require('gulp-shell');
 var newer   = require('gulp-newer');
 var through = require('through');
+var eventStream = require('event-stream');
  
 var srcDir = '../src/';
 var destDir = './';
@@ -25,9 +26,19 @@ buildMinify('', fileNames);
 buildMinify('.base', baseFileNames);
 
 gulp.task('copyBreezeExtns', function() {
-	return gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
-      // .pipe(newer(destDir))
-      .pipe(gulp.dest(destDir))
+   return eventStream.concat(
+    // copy the 'embedded' adapters and remove the 'b00'
+    gulp.src( mapPath(srcDir, [ 'b00_breeze.*.*.js' ]))
+      .pipe(rename(function(path) {
+          // replace 'b??_breeze' with 'breeze.'
+          var name = path.basename;
+          path.basename = 'breeze' + name.substring(name.indexOf('.'))
+      }))
+      .pipe(gulp.dest(destDir + 'adapters')),
+    // copy the external adapters
+    gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
+      .pipe(gulp.dest(destDir + 'adapters'))
+  );
 });
 
 gulp.task('copyForTests', ['minify'], function() {
@@ -35,13 +46,6 @@ gulp.task('copyForTests', ['minify'], function() {
 	return gulp.src( mapPath(destDir, [ 'breeze.*']))
       .pipe(gulp.dest(testDir))
 });
-
-// gulp.task('copyForNpm', function() {
-//    var npmDir = 
-// 	  gulp.src(destDir)
-// 		.pipe(changed(npmDir))
-// 		.pipe(gulp.dest(npmDir));
-// }); 
 
 gulp.task('yuidoc-full', ['yuidoc-clean'], function() {
   return gulp.src( mapPath(srcDir, fileNames))

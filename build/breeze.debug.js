@@ -6102,7 +6102,14 @@ var DataService = (function () {
     json.jsonResultsAdapter = __config._fetchObject(JsonResultsAdapter, json.jsonResultsAdapter);
     return new DataService(json);
   };
-  
+
+  /**
+   Returns a url for this dataService with the specified suffix. This method handles dataService names either
+   with or without trailing '/'s.
+   @method qualifyUrl
+   @param suffix {String} The resulting url.
+   @return {a Url string}
+   **/
   proto.qualifyUrl = function (suffix) {
     var url = this.serviceName;
     // remove any trailing "/"
@@ -16991,14 +16998,9 @@ breeze.SaveOptions = SaveOptions;
   }
 }(function (breeze) {
   "use strict";
-  var canIsolateES5Props = function () {
-    try {
-      return !!(Object.getPrototypeOf && Object.defineProperty({}, 'x', {}));
-    } catch (e) {
-      return false;
-    }
-  }();
   var core = breeze.core;
+  var canIsolateES5Props = core.__isES5Supported;
+
   var ko;
 
   var ctor = function ModelLibraryKnockoutAdapter() {

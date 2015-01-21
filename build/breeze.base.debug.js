@@ -6102,7 +6102,14 @@ var DataService = (function () {
     json.jsonResultsAdapter = __config._fetchObject(JsonResultsAdapter, json.jsonResultsAdapter);
     return new DataService(json);
   };
-  
+
+  /**
+   Returns a url for this dataService with the specified suffix. This method handles dataService names either
+   with or without trailing '/'s.
+   @method qualifyUrl
+   @param suffix {String} The resulting url.
+   @return {a Url string}
+   **/
   proto.qualifyUrl = function (suffix) {
     var url = this.serviceName;
     // remove any trailing "/"

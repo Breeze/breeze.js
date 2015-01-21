@@ -1,4 +1,4 @@
-﻿(function (factory) {
+(function (factory) {
   if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
