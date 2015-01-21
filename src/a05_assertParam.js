@@ -57,7 +57,7 @@ var Param = (function () {
     return addContext(this, {
       fn: isTypeOf,
       typeName: typeName,
-      msg: __formatString("must be a '%1'", typeName)
+      msg: "must be a " + typeName
     });
   };
 
@@ -73,7 +73,7 @@ var Param = (function () {
       fn: isInstanceOf,
       type: type,
       typeName: typeName,
-      msg: __formatString("must be an instance of '%1'", typeName)
+      msg: "must be an instance of " + typeName
     });
   };
 
@@ -86,7 +86,7 @@ var Param = (function () {
     return addContext(this, {
       fn: hasProperty,
       propertyName: propertyName,
-      msg: __formatString("must have a '%1' property ", propertyName)
+      msg: "must have a " + propertyName + " property"
     });
   };
 
@@ -99,7 +99,7 @@ var Param = (function () {
     return addContext(this, {
       fn: isEnumOf,
       enumType: enumType,
-      msg: __formatString("must be an instance of the '%1' enumeration", enumType.name)
+      msg: "must be an instance of the " + enumType.name + " enumeration"
     });
   };
 
