@@ -255,8 +255,8 @@ function test_entityManager() {
         metadataStore: em1.metadataStore
     });
     em2.importEntities(bundle);
-    var bundle = em1.exportEntities();
-    em2.importEntities(bundle, { mergeStrategy: breeze.MergeStrategy.PreserveChanges });
+    var bundle2 = em1.exportEntities(null, { asString: true, includeMetadata: true });
+    em2.importEntities(bundle2, { mergeStrategy: breeze.MergeStrategy.PreserveChanges });
     em.saveChanges().then(function (saveResult) {
         var savedEntities = saveResult.entities;
         var keyMappings = saveResult.keyMappings;
@@ -365,6 +365,8 @@ function test_entityQuery() {
     var query = new breeze.EntityQuery("Customers").where("toLower(CompanyName)", "startsWith", "c");
     var query = new breeze.EntityQuery("Customers").where("toUpper(substring(CompanyName, 1, 2))", breeze.FilterQueryOp.Equals, "OM");
     var q2 = query.toType("foo").orderBy("foo2");
+
+    var json = query.toJSON();
 }
 
 function test_entityState() {
@@ -442,50 +444,6 @@ function test_entityType() {
     });
 }
 
-//function test_enum() {
-//    var prototype = {
-//        nextDay: function () {
-//            var nextIndex = (this.dayIndex + 1) % 7;
-//            return DayOfWeek.getSymbols()[nextIndex];
-//        }
-//    };
-//    var DayOfWeek = new core.Enum("DayOfWeek", prototype);
-//    DayOfWeek.Monday = DayOfWeek.addSymbol({ dayIndex: 0 });
-//    var symbol = DayOfWeek.Friday;
-//    if (DayOfWeek.contains(symbol)) { }
-//    var dayOfWeek = DayOfWeek.from("Thursday");
-//    var symbols = DayOfWeek.getNames();
-//    var symbols = DayOfWeek.getSymbols();
-//    if (core.Enum.isSymbol(DayOfWeek.Wednesday)) { };
-//    DayOfWeek.seal();
-//    var name = DayOfWeek.Monday.getName();
-//    var name = DayOfWeek.Monday.toString();
-//    var prototype = {
-//        nextDay: function () {
-//            var nextIndex = (this.dayIndex + 1) % 7;
-//            return DayOfWeek.getSymbols()[nextIndex];
-//        }
-//    };
-//    var DayOfWeek = new core.Enum("DayOfWeek", prototype);
-//    DayOfWeek.Monday = DayOfWeek.addSymbol({ dayIndex: 0 });
-//    DayOfWeek.Tuesday = DayOfWeek.addSymbol({ dayIndex: 1 });
-//    DayOfWeek.Wednesday = DayOfWeek.addSymbol({ dayIndex: 2 });
-//    DayOfWeek.Thursday = DayOfWeek.addSymbol({ dayIndex: 3 });
-//    DayOfWeek.Friday = DayOfWeek.addSymbol({ dayIndex: 4 });
-//    DayOfWeek.Saturday = DayOfWeek.addSymbol({ dayIndex: 5, isWeekend: true });
-//    DayOfWeek.Sunday = DayOfWeek.addSymbol({ dayIndex: 6, isWeekend: true });
-//    DayOfWeek.seal();
-//    DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday;
-//    DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday;
-//    DayOfWeek.Tuesday.isWeekend === undefined;
-//    DayOfWeek.Saturday.isWeekend == true;
-//    DayOfWeek instanceof core.Enum;
-//    core.Enum.isSymbol(DayOfWeek.Wednesday);
-//    DayOfWeek.contains(DayOfWeek.Thursday);
-//    DayOfWeek.Tuesday.parentEnum == DayOfWeek;
-//    DayOfWeek.getSymbols().length === 7;
-//    DayOfWeek.Friday.toString() === "Friday";
-//}
 function test_event() {
     var myEntityManager;
     var myEntity, person;
@@ -839,12 +797,10 @@ function test_config() {
     s = config.interfaceInitialized.type;
     o = config.interfaceRegistry;
     o = config.objectRegistry;
-    config.registerAdapter("myAdapterName", function () {
-    });
     var f1;
+    config.registerAdapter("myAdapterName", f1);
     config.registerFunction(f1, "myFunction");
     config.registerType(f1, "myCtor");
     s = config.stringifyPad;
     o = config.typeRegistry;
 }
-//# sourceMappingURL=breeze-tests.js.map
