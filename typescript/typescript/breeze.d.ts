@@ -8,7 +8,8 @@
 // Updated Sep 26 2013 for Breeze 1.4.3 - Steve Schmitt ( www.ideablade.com).
 // Updated Jul 22 2014 for Breeze 1.4.16 - Steve Schmitt ( www.ideablade.com)
 // Updated Aug 22 2014 for Breeze 1.4.17 and removing Q dependency - Steve Schmitt ( www.ideablade.com)
-// Updated Jan 16 2014 for Breeze 1.4.17 to add support for noimplicitany - Kevin Wilson ( www.kwilson.me.uk )
+// Updated Jan 16 2015 for Breeze 1.4.17 to add support for noimplicitany - Kevin Wilson ( www.kwilson.me.uk )
+// Updated Jan 20 2015 for Breeze 1.5.2 and merging changes from DefinitelyTyped
 
 declare module breeze.core {
 
@@ -62,12 +63,12 @@ declare module breeze.core {
     export function extend(target: Object, source: Object): Object;
     export function propEq(propertyName: string, value: any): (obj: Object) => boolean;
     export function pluck(propertyName: string): (obj: Object) => any;
-    export function arrayEquals(a1: Array<any>, a2: Array<any>, equalsFn: (e1: any, e2: any) => boolean): boolean;
-    export function arrayFirst(a1: Array<any>, predicate: (e: any) => boolean): any;
-    export function arrayIndexOf(a1: Array<any>, predicate: (e: any) => boolean): number;
-    export function arrayRemoveItem(array: Array<any>, item: any, shouldRemoveMultiple: boolean): any;
-    export function arrayRemoveItem(array: Array<any>, predicate: (e: any) => boolean, shouldRemoveMultiple: boolean): any;
-    export function arrayZip(a1: Array<any>, a2: Array<any>, callback: (e1: any, e2: any) => any): Array<any>;
+    export function arrayEquals(a1: any[], a2: any[], equalsFn: (e1: any, e2: any) => boolean): boolean;
+    export function arrayFirst(a1: any[], predicate: (e: any) => boolean): any;
+    export function arrayIndexOf(a1: any[], predicate: (e: any) => boolean): number;
+    export function arrayRemoveItem(array: any[], item: any, shouldRemoveMultiple: boolean): any;
+    export function arrayRemoveItem(array: any[], predicate: (e: any) => boolean, shouldRemoveMultiple: boolean): any;
+    export function arrayZip(a1: any[], a2: any[], callback: (e1: any, e2: any) => any): any[];
 
     export function requireLib(libnames: string, errMessage: string): Object;
     export function using(obj: Object, property: string, tempValue: any, fn: () => any): any;
@@ -140,7 +141,7 @@ declare module breeze {
         shortName: string;
         unmappedProperties: DataProperty[];
         validators: Validator[];
-        addProperty(dataProperty: DataProperty): void;
+        addProperty(dataProperty: DataProperty): ComplexType;
         getProperties(): DataProperty[];
     }
 
@@ -303,6 +304,9 @@ declare module breeze {
         getValidationErrors(property: IProperty): ValidationError[];
         hasValidationErrors: boolean;
 
+        isNavigationPropertyLoaded(navigationProperty: string): boolean;
+        isNavigationPropertyLoaded(navigationProperty: NavigationProperty): boolean;
+
         loadNavigationProperty(navigationProperty: string, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
         loadNavigationProperty(navigationProperty: NavigationProperty, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
 
@@ -366,6 +370,10 @@ declare module breeze {
         entityKey: EntityKey;
         fromCache: boolean;
     }
+    interface ExportEntitiesOptions {
+        asString: boolean;  // default true
+        includeMetadata: boolean;  // default true
+    }
 
     class EntityManager {
         dataService: DataService;
@@ -395,6 +403,7 @@ declare module breeze {
 
         executeQueryLocally(query: EntityQuery): Entity[];
         exportEntities(entities?: Entity[], includeMetadata?: boolean): string;
+        exportEntities(entities?: Entity[], options?: ExportEntitiesOptions): any; // string | Object
         fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
         fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
         fetchEntityByKey(entityKey: EntityKey): breeze.promises.IPromise<EntityByKeyResult>;
@@ -553,6 +562,8 @@ declare module breeze {
         where(predicate: Predicate): EntityQuery;
         where(property: string, operator: string, value: any): EntityQuery;
         where(property: string, operator: FilterQueryOpSymbol, value: any): EntityQuery;
+        where(property: string, filterop: FilterQueryOpSymbol, property2: string, filterop2: FilterQueryOpSymbol, value: any): EntityQuery;  // for any/all clauses
+        where(property: string, filterop: string, property2: string, filterop2: string, value: any): EntityQuery;  // for any/all clauses
         where(predicate: FilterQueryOpSymbol): EntityQuery;
         withParameters(params: Object): EntityQuery;
 
@@ -719,7 +730,7 @@ declare module breeze {
         serverPropertyNameToClient(serverPropertyName: string): string;
         serverPropertyNameToClient(serverPropertyName: string, property: IProperty): string;
 
-        setAsDefault(): void;
+        setAsDefault(): NamingConvention;
     }
 
     interface NamingConventionOptions {
