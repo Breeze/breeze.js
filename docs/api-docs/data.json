@@ -616,7 +616,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a40_dataService.js",
-            "line": 192,
+            "line": 199,
             "description": "A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service.\nThis facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class 'breeze' citizens."
         },
         "MetadataStore": {
@@ -1526,7 +1526,7 @@
             "description": "Validator constructor - This method is used to create create custom validations.  Several\nbasic \"Validator\" construction methods are also provided as static methods to this class. These methods\nprovide a simpler syntax for creating basic validations.\n\nMany of these stock validators are inspired by and implemented to conform to the validators defined at\nhttp://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx\n\nSometimes a custom validator will be required.",
             "example": [
                 "\nMost validators will be 'property' level validators, like this.",
-                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\",\n        messageTemplate: \"'%displayName%' must start with 'US'\"\n    });\n\n    // Now plug it into Breeze.\n    // Assume em1 is a preexisting EntityManager.\n    var custType = metadataStore.getEntityType(\"Customer\");\n    var countryProp = custType.getProperty(\"Country\");\n    // Note that validator is added to a 'DataProperty' validators collection.\n    prop.validators.push(countryValidator);\nEntity level validators are also possible",
+                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\", \n        messageTemplate: \"'%displayName%' must start with 'US'\" \n    });\n\n    // Now plug it into Breeze.\n    // Assume em1 is a preexisting EntityManager.\n    var custType = metadataStore.getEntityType(\"Customer\");\n    var countryProp = custType.getProperty(\"Country\");\n    // Note that validator is added to a 'DataProperty' validators collection.\n    prop.validators.push(countryValidator);\nEntity level validators are also possible",
                 "\n    function isValidZipCode(value) {\n        var re = /^\\d{5}([\\-]\\d{4})?$/;\n        return (re.test(value));\n    }\n\n    // v in this case will be a Customer entity\n    var valFn = function (v) {\n        // This validator only validates US Zip Codes.\n        if ( v.getProperty(\"Country\") === \"USA\") {\n            var postalCode = v.getProperty(\"PostalCode\");\n            return isValidZipCode(postalCode);\n        }\n        return true;\n    };\n    var zipCodeValidator = new Validator(\"zipCodeValidator\", valFn,\n        { messageTemplate: \"For the US, this is not a valid PostalCode\" });\n\n    // Now plug it into Breeze.\n    // Assume em1 is a preexisting EntityManager.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    // Note that validator is added to an 'EntityType' validators collection.\n    custType.validators.push(zipCodeValidator);\nWhat is commonly needed is a way of creating a parameterized function that will itself\nreturn a new Validator.  This requires the use of a 'context' object.",
                 "\n    // create a function that will take in a config object\n    // and will return a validator\n    var numericRangeValidator = function(context) {\n        var valFn = function(v, ctx) {\n            if (v == null) return true;\n            if (typeof(v) !== \"number\") return false;\n            if (ctx.min != null && v < ctx.min) return false;\n            if (ctx.max != null && v > ctx.max) return false;\n            return true;\n        };\n        // The last parameter below is the 'context' object that will be passed into the 'ctx' parameter above\n        // when this validator executes. Several other properties, such as displayName will get added to this object as well.\n        return new Validator(\"numericRange\", valFn, {\n            messageTemplate: \"'%displayName%' must be a number between the values of %min% and %max%\",\n            min: context.min,\n            max: context.max\n        });\n    };\n    // Assume that freightProperty is a DataEntityProperty that describes numeric values.\n    // register the validator\n    freightProperty.validators.push(numericRangeValidator({ min: 100, max: 500 }));\n\nBreeze substitutes context values and functions for the tokens in the messageTemplate when preparing the runtime error message;\n'displayName' is a pre-defined context function that is always available.\n\nPlease note that Breeze substitutes the empty string for falsey parameters. That usually works in your favor.\nSometimes it doesn't as when the 'min' value is zero in which case the message text would have a hole\nwhere the 'min' value goes, saying: \"... an integer between the values of and ...\". That is not what you want.\n\nTo avoid this effect, you may can bake certain of the context values into the 'messageTemplate' itself\nas shown in this revision to the pertinent part of the previous example:",
                 "\n    // ... as before\n    // ... but bake the min/max values into the message template.\n    var template = breeze.core.formatString(\n        \"'%displayName%' must be a number between the values of %1 and %2\",\n        context.min, context.max);\n    return new Validator(\"numericRange\", valFn, {\n        messageTemplate: template,\n        min: context.min,\n        max: context.max\n    });"
@@ -1719,7 +1719,7 @@
             "line": 316,
             "description": "Map of standard error message templates keyed by validator name.\nYou can add to or modify this object to customize the template used for any validation error message.",
             "example": [
-                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, { displayName: \"Country\" });\n    Validator.messageTemplates[\"countryIsUS\", \"'%displayName%' must start with 'US'\");\n    This will have a similar effect to this\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\",\n        messageTemplate: \"'%displayName%' must start with 'US'\"\n    });"
+                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, { displayName: \"Country\" });\n    Validator.messageTemplates[\"countryIsUS\", \"'%displayName%' must start with 'US'\");\n    This will have a similar effect to this\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\", \n        messageTemplate: \"'%displayName%' must start with 'US'\" \n    });"
             ],
             "itemtype": "property",
             "name": "messageTemplates",
@@ -3846,7 +3846,27 @@
         },
         {
             "file": "..\\src\\a40_dataService.js",
-            "line": 199,
+            "line": 174,
+            "description": "Returns a url for this dataService with the specified suffix. This method handles dataService names either\nwith or without trailing '/'s.",
+            "itemtype": "method",
+            "name": "qualifyUrl",
+            "params": [
+                {
+                    "name": "suffix",
+                    "description": "The resulting url.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "A Url string"
+            },
+            "class": "DataService",
+            "module": "breeze"
+        },
+        {
+            "file": "..\\src\\a40_dataService.js",
+            "line": 206,
             "description": "JsonResultsAdapter constructor",
             "example": [
                 "\n    //\n    var jsonResultsAdapter = new JsonResultsAdapter({\n        name: \"test1e\",\n        extractResults: function(json) {\n            return json.results;\n        },\n        visitNode: function(node, mappingContext, nodeContext) {\n            var entityType = normalizeTypeName(node.$type);\n            var propertyName = nodeContext.propertyName;\n            var ignore = propertyName && propertyName.substr(0, 1) === \"$\";\n\n            return {\n                entityType: entityType,\n                nodeId: node.$id,\n                nodeRefId: node.$ref,\n                ignore: ignore\n            };\n        }\n    });\n\n    var dataService = new DataService( {\n            serviceName: \"breeze/foo\",\n            jsonResultsAdapter: jsonResultsAdapter\n    });\n\n    var entityManager = new EntityManager( {\n        dataService: dataService\n    });"

@@ -264,8 +264,8 @@ var Validator = (function () {
           return (core.stringStartsWith(v, &quot;US&quot;));
       };
       var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn, {
-          displayName: &quot;Country&quot;,
-          messageTemplate: &quot;&#x27;%displayName%&#x27; must start with &#x27;US&#x27;&quot;
+          displayName: &quot;Country&quot;, 
+          messageTemplate: &quot;&#x27;%displayName%&#x27; must start with &#x27;US&#x27;&quot; 
       });
 
       // Now plug it into Breeze.
@@ -533,8 +533,8 @@ var Validator = (function () {
       Validator.messageTemplates[&quot;countryIsUS&quot;, &quot;&#x27;%displayName%&#x27; must start with &#x27;US&#x27;&quot;);
       This will have a similar effect to this
       var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn, {
-          displayName: &quot;Country&quot;,
-          messageTemplate: &quot;&#x27;%displayName%&#x27; must start with &#x27;US&#x27;&quot;
+          displayName: &quot;Country&quot;, 
+          messageTemplate: &quot;&#x27;%displayName%&#x27; must start with &#x27;US&#x27;&quot; 
       });
   @property messageTemplates {Object}
   @static
@@ -1195,7 +1195,7 @@ var ValidationError = (function () {
 
 breeze.Validator = Validator;
 breeze.ValidationError = ValidationError;
-
+ 
 
     </pre>
 </div>

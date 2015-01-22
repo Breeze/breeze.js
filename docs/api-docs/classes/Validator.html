@@ -777,8 +777,8 @@ var valFn = function (v) {
     return (core.stringStartsWith(v, &quot;US&quot;));
 };
 var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn, {
-    displayName: &quot;Country&quot;,
-    messageTemplate: &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot;
+    displayName: &quot;Country&quot;, 
+    messageTemplate: &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot; 
 });
 
 // Now plug it into Breeze.
@@ -3655,8 +3655,8 @@ var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn, { displayNa
 Validator.messageTemplates[&quot;countryIsUS&quot;, &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot;);
 This will have a similar effect to this
 var countryValidator = new Validator(&quot;countryIsUS&quot;, valFn, {
-    displayName: &quot;Country&quot;,
-    messageTemplate: &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot;
+    displayName: &quot;Country&quot;, 
+    messageTemplate: &quot;&#39;%displayName%&#39; must start with &#39;US&#39;&quot; 
 });</code></pre>
 
             </div>
