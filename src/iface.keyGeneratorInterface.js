@@ -11,13 +11,14 @@
  A KeyGenerator implementation is assigned to an EntityManager via the {{#crossLink "EntityManager/setProperties"}}{{/crossLink}}
  method with a config parameter of 'keyGeneratorCtor'.
 
- MyKeyGenerator = function() {
-        // your code here
-    }
- MyKeyGenerator.prototype.generateTempKeyValue = function(entityType) {
-        // your implementation here.
-    }
- em.setProperties( {keyGeneratorCtor: MyKeyGenerator });
+     MyKeyGenerator = function() {
+         // your code here
+     }
+     MyKeyGenerator.prototype.generateTempKeyValue = function(entityType) {
+         // your implementation here.
+     }
+     em.setProperties( {keyGeneratorCtor: MyKeyGenerator });
+
  The assigned KeyGenerator is then called whenever the
  EntityManager.generateTempKeyValue method is called.  The EntityManager internally keeps track of all of the generated keys
  and handles all of the mapping of these temporary keys to real keys after any save.
