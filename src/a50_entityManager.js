@@ -1325,8 +1325,8 @@ var EntityManager = (function () {
   @example
       // assume em1 is an EntityManager containing a number of preexisting entities.
       var custType = em1.metadataStore.getEntityType("Customer");
-      var custumer = custType.createEntity();
-      var customerId = em.generateTempKeyValue(custumer);
+      var customer = custType.createEntity();
+      var customerId = em.generateTempKeyValue(customer);
       // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value
       // This property will change again after a successful save of the 'customer' entity.
 
