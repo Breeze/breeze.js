@@ -1320,7 +1320,7 @@ var EntityManager = (function () {
   need to be automatically replaced with 'real' key values once these entities are saved.
 
   The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
-  the keys - See the  {{#crossLink "~keyGenerator-interface"}}{{/crossLink}} interface description to see
+  the keys - See the  {{#crossLink "_keyGenerator_interface"}}{{/crossLink}} interface description to see
   how a custom key generator can be plugged in.
   @example
       // assume em1 is an EntityManager containing a number of preexisting entities.
