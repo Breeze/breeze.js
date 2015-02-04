@@ -82,7 +82,7 @@
     var requestInfo = {
       adapter: this,      // this adapter
       config: ngConfig,   // angular's $http configuration object
-      zConfig: config,    // the config arg from the calling Breeze data service adapter
+      dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
       error: errorFn      // adapter's error callback
     }

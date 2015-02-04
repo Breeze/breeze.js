@@ -54,7 +54,7 @@
     var requestInfo = {
       adapter: this,      // this adapter
       config: jqConfig,   // jQuery's ajax 'settings' object
-      zConfig: config,    // the config arg from the calling Breeze data service adapter
+      dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
       error: errorFn      // adapter's error callback
     }
