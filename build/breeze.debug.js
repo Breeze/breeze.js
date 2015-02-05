@@ -8137,7 +8137,8 @@ var EntityType = (function () {
   function updateClientServerNames(nc, parent, clientPropName) {
     var serverPropName = clientPropName + "OnServer";
     var clientName = parent[clientPropName];
-    if (clientName && clientName.length) {
+    var serverName = parent[serverPropName];
+    if (clientName && clientName.length && !(serverName && serverName.length > 0))
       // if (parent.isUnmapped) return;
       var serverNames = __toArray(clientName).map(function (cName) {
         var sName = nc.clientPropertyNameToServer(cName, parent);
@@ -8148,9 +8149,7 @@ var EntityType = (function () {
         return sName;
       });
       parent[serverPropName] = Array.isArray(clientName) ? serverNames : serverNames[0];
-    } else {
-      var serverName = parent[serverPropName];
-      if ((!serverName) || serverName.length === 0) return;
+  } else if (serverName && serverName.length && !(clientName && clientName.length > 0)) {
       var clientNames = __toArray(serverName).map(function (sName) {
         var cName = nc.serverPropertyNameToClient(sName, parent);
         var testName = nc.clientPropertyNameToServer(cName, parent);
