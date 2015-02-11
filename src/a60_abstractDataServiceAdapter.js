@@ -64,7 +64,7 @@
   };
 
   proto.executeQuery = function (mappingContext) {
-
+    var adapter = mappingContext.adapter = this;
     var deferred = Q.defer();
     var url = mappingContext.getUrl();
 
