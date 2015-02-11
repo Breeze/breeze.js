@@ -164,7 +164,7 @@
             return request;
         };
         this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
+            // alter the array of requests representing the entire change-set
             // based on the saveContext and saveBundle
         };
     }
@@ -213,7 +213,7 @@
      Returned value is ignored.
      @example
      this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
+            // alter the array of requests representing the entire change-set
             // based on the saveContext and saveBundle
         };
      @method done
@@ -225,12 +225,13 @@
 
   proto._createChangeRequestInterceptor = function (saveContext, saveBundle) {
     var adapter = saveContext.adapter;
+    var cri = adapter.changeRequestInterceptor;
     var isFn = __isFunction;
-    var CRI = adapter.changeRequestInterceptor;
-    var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
-    var post = " is missing or not a function.";
-    if (isFn(CRI)) {
-      var interceptor = new CRI(saveContext, saveBundle);
+
+    if (isFn(cri)) {
+      var pre = adapter.name + " DataServiceAdapter's ChangeRequestInterceptor";
+      var post = " is missing or not a function.";
+      var interceptor = new cri(saveContext, saveBundle);
       if (!isFn(interceptor.getRequest)) {
         throw new Error(pre + '.getRequest' + post);
       }
