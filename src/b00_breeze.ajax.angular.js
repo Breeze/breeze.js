@@ -7,7 +7,7 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"]) {
+  } else if (typeof define === "function" && define["amd"] && typeof breeze === "undefined") {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
