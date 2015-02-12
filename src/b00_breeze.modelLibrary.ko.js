@@ -4,7 +4,7 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"]) {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
@@ -96,12 +96,11 @@
       if (propDescr) {
         es5Descriptors[prop.name] = propDescr;
       }
-    })
-    if (!__isEmpty(es5Descriptors)) {
+    });
+    if (!core.isEmpty(es5Descriptors)) {
       var extra = stype._extra;
       extra.es5Descriptors = es5Descriptors;
       stype._koDummy = ko.observable(null);
-
     }
 
   }
@@ -142,7 +141,8 @@
           var setFn = propDescr.set.bind(entity);
           var rawAccessorFn = function (newValue) {
             if (arguments.length === 0) {
-              return getFn();
+              getFn();
+              return;
             } else {
               setFn(newValue);
             }
@@ -204,7 +204,6 @@
         };
         entity[propName] = koObj;
       }
-
 
     });
 
