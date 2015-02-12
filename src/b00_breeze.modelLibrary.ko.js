@@ -4,7 +4,7 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"] && typeof breeze === "undefined") {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
@@ -91,13 +91,15 @@
 
     var stype = proto.entityType || proto.complexType;
     var es5Descriptors = {};
+    vor found = false;
     stype.getProperties().forEach(function (prop) {
       var propDescr = getES5PropDescriptor(proto, prop.name);
       if (propDescr) {
         es5Descriptors[prop.name] = propDescr;
+        found=true;
       }
     })
-    if (!__isEmpty(es5Descriptors)) {
+    if (found) {
       var extra = stype._extra;
       extra.es5Descriptors = es5Descriptors;
       stype._koDummy = ko.observable(null);
