@@ -4,13 +4,14 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"]) {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
 }(function (breeze) {
   "use strict";
   var EntityType = breeze.EntityType;
+  var toODataFragmentVisitor;
 
   var ctor = function UriBuilderODataAdapter() {
     this.name = "odata";
@@ -52,39 +53,39 @@
     // private methods to this func.
 
     function toWhereODataFragment(wherePredicate) {
-      if (!wherePredicate) return;
+      if (!wherePredicate) return undefined;
       // validation occurs inside of the toODataFragment call here.
       return wherePredicate.visit({ entityType: entityType}, toODataFragmentVisitor );
     }
 
     function toOrderByODataFragment(orderByClause) {
-      if (!orderByClause) return;
+      if (!orderByClause) return undefined;
       orderByClause.validate(entityType);
       var strings = orderByClause.items.map(function (item) {
         return entityType.clientPropertyPathToServer(item.propertyPath, "/") + (item.isDesc ? " desc" : "");
       });
       // should return something like CompanyName,Address/City desc
       return strings.join(',');
-    };
+    }
 
     function toSelectODataFragment(selectClause) {
-      if (!selectClause) return;
+      if (!selectClause) return undefined;
       selectClause.validate(entityType);
       var frag = selectClause.propertyPaths.map(function (pp) {
         return  entityType.clientPropertyPathToServer(pp, "/");
       }).join(",");
       return frag;
-    };
+    }
 
     function toExpandODataFragment(expandClause) {
-      if (!expandClause) return;
+      if (!expandClause) return undefined;
       // no validate on expand clauses currently.
       // expandClause.validate(entityType);
       var frag = expandClause.propertyPaths.map(function (pp) {
         return entityType.clientPropertyPathToServer(pp, "/");
       }).join(",");
       return frag;
-    };
+    }
 
     function toQueryOptionsString(queryOptions) {
       var qoStrings = [];
@@ -113,7 +114,7 @@
     return this.visit( context, toODataFragmentVisitor);
   }
 
-  var toODataFragmentVisitor = (function () {
+  toODataFragmentVisitor = (function () {
     var visitor = {
 
       passthruPredicate: function () {
@@ -130,18 +131,18 @@
         var expr2Val = this.expr2.visit(context);
         var prefix = context.prefix;
         if (prefix) {
-          expr1Val = prefix + "/" + expr1Val
+          expr1Val = prefix + "/" + expr1Val;
         }
 
         var odataOp = odataOpFrom(this);
 
-        if (this.op.key == 'in') {
+        if (this.op.key === 'in') {
           var result = expr2Val.map(function (v) {
             return "(" + expr1Val + " eq " + v + ")";
           }).join(" or ");
           return result;
         } else if (this.op.isFunction) {
-          if (odataOp == "substringof") {
+          if (odataOp === "substringof") {
             return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
           } else {
             return odataOp + "(" + expr1Val + "," + expr2Val + ") eq true";
@@ -172,7 +173,7 @@
         var newContext = breeze.core.extend({}, context);
         newContext.entityType = this.expr.dataType;
         newContext.prefix = prefix;
-        var newPredVal = this.pred.visit(newContext)
+        var newPredVal = this.pred.visit(newContext);
         return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
       },
 

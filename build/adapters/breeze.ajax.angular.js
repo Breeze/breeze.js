@@ -19,8 +19,9 @@
     this.name = "angular";
     this.defaultSettings = { };
     this.requestInterceptor = null;
-    this.$http;
-    this.$rootScope;
+    // Will set:
+    //   this.$http;
+    //   this.$rootScope;
   };
   var proto = ctor.prototype;
 
@@ -82,7 +83,7 @@
     var requestInfo = {
       adapter: this,      // this adapter
       config: ngConfig,   // angular's $http configuration object
-      zConfig: config,    // the config arg from the calling Breeze data service adapter
+      dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
       error: errorFn      // adapter's error callback
     }
@@ -133,7 +134,7 @@
 
   function encodeParams(obj) {
     var query = '';
-    var key, subValue, innerObj, fullSubName;
+    var subValue, innerObj, fullSubName;
 
     for (var name in obj) {
       var value = obj[name];

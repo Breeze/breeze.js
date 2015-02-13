@@ -8,13 +8,14 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"]) {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
 }(function (breeze, global) {
   "use strict";
 
+  var ObjectId;
   var JsonResultsAdapter = breeze.JsonResultsAdapter;
   var AbstractDataServiceAdapter = breeze.AbstractDataServiceAdapter;
 
@@ -107,7 +108,6 @@
     return { entities: entities, keyMappings: data.keyMappings, httpResponse: data.httpResponse };
   };
 
-
   proto.jsonResultsAdapter = new JsonResultsAdapter({
     name: "mongo",
 
@@ -138,7 +138,7 @@
    * and converts between that format and the standard 24 character representation.
    */
   if (global.document) {
-    var ObjectId = (function () {
+    ObjectId = (function () {
       var increment = 0;
       var pid = Math.floor(Math.random() * (32767));
       var machine = Math.floor(Math.random() * (16777216));
@@ -150,13 +150,13 @@
         }
         // Just always stick the value in.
         localStorage['mongoMachineId'] = machine;
-        document.cookie = 'mongoMachineId=' + machine + ';expires=Tue, 19 Jan 2038 05:00:00 GMT'
+        document.cookie = 'mongoMachineId=' + machine + ';expires=Tue, 19 Jan 2038 05:00:00 GMT';
       }
       else if (document) {
         var cookieList = document.cookie.split('; ');
         for (var i in cookieList) {
           var cookie = cookieList[i].split('=');
-          if (cookie[0] == 'mongoMachineId' && cookie[1] >= 0 && cookie[1] <= 16777215) {
+          if (cookie[0] === 'mongoMachineId' && cookie[1] >= 0 && cookie[1] <= 16777215) {
             machine = cookie[1];
             break;
           }
@@ -176,13 +176,13 @@
           this.pid = arguments[0].pid;
           this.increment = arguments[0].increment;
         }
-        else if (typeof (arguments[0]) == 'string' && arguments[0].length == 24) {
-          this.timestamp = Number('0x' + arguments[0].substr(0, 8)),
-              this.machine = Number('0x' + arguments[0].substr(8, 6)),
-              this.pid = Number('0x' + arguments[0].substr(14, 4)),
-              this.increment = Number('0x' + arguments[0].substr(18, 6))
+        else if (typeof (arguments[0]) == 'string' && arguments[0].length === 24) {
+            this.timestamp = Number('0x' + arguments[0].substr(0, 8));
+            this.machine = Number('0x' + arguments[0].substr(8, 6));
+            this.pid = Number('0x' + arguments[0].substr(14, 4));
+            this.increment = Number('0x' + arguments[0].substr(18, 6));
         }
-        else if (arguments.length == 4 && arguments[0] != null) {
+        else if (arguments.length === 4 && arguments[0] != null) {
           this.timestamp = arguments[0];
           this.machine = arguments[1];
           this.pid = arguments[2];

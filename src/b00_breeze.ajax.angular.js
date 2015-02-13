@@ -19,8 +19,9 @@
     this.name = "angular";
     this.defaultSettings = { };
     this.requestInterceptor = null;
-    this.$http;
-    this.$rootScope;
+    // Will set:
+    //   this.$http;
+    //   this.$rootScope;
   };
   var proto = ctor.prototype;
 
@@ -133,7 +134,7 @@
 
   function encodeParams(obj) {
     var query = '';
-    var key, subValue, innerObj, fullSubName;
+    var subValue, innerObj, fullSubName;
 
     for (var name in obj) {
       var value = obj[name];

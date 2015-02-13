@@ -4,7 +4,7 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"]) {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
@@ -190,7 +190,7 @@
           if (uriKey) {
             // Strip baseUri to make uriKey a relative uri
             // Todo: why is this necessary when absolute works for every OData source tested?
-            var re = new RegExp('^' + mappingContext.dataService.serviceName, 'i')
+            var re = new RegExp('^' + mappingContext.dataService.serviceName, 'i');
             uriKey = uriKey.replace(re, '');
           }
           result.extraMetadata = {
@@ -377,8 +377,9 @@
     // Examples of servicename -> routePrefix:
     //   'http://localhost:55802/odata/' -> 'odata/'
     //   'http://198.154.121.75/service/odata/' -> 'service/odata/'
+    var parser;
     if (typeof document === 'object') { // browser
-      var parser = document.createElement('a');
+      parser = document.createElement('a');
       parser.href = dataService.serviceName;
     } else { // node
       parser = url.parse(dataService.serviceName);

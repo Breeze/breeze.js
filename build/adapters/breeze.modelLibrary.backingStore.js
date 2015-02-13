@@ -4,7 +4,7 @@
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
     // CommonJS or Node: hard-coded dependency on "breeze"
     factory(require("breeze"));
-  } else if (typeof define === "function" && define["amd"] && !breeze) {
+  } else if (typeof define === "function" && define["amd"]) {
     // AMD anonymous module with hard-coded dependency on "breeze"
     define(["breeze"], factory);
   }
@@ -201,11 +201,12 @@
   }
 
   function getAccessorFn(bs, propName) {
-    return function () {
-      if (arguments.length == 0) {
+    return function() {
+      if (arguments.length === 0) {
         return bs[propName];
       } else {
         bs[propName] = arguments[0];
+        return undefined;
       }
     };
   }
@@ -219,20 +220,21 @@
 
     var propDescr = Object.getOwnPropertyDescriptor(proto, property.name);
     // if not configurable; we can't touch it - so leave.
-    if (!propDescr.configurable) return;
+    if (!propDescr.configurable) return undefined;
     // if a data descriptor - don't change it - this is basically a static property - i.e. defined on every instance of the type with the same value.
-    if (propDescr.value) return;
+    if (propDescr.value) return undefined;
     // if a read only property descriptor - no need to change it.
-    if (!propDescr.set) return;
+    if (!propDescr.set) return undefined;
 
     var localAccessorFn = function (entity) {
       return function () {
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
           return propDescr.get.bind(entity)();
         } else {
           var set = propDescr.set;
           var rawSet = set.rawSet || set;
           rawSet.bind(entity)(arguments[0]);
+          return undefined;
         }
       };
     };
