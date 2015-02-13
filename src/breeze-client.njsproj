@@ -1,102 +1,105 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{fcf43ff8-f461-4758-aed4-f0d02a602736}</ProjectGuid>
-        <ProjectHome />
-        <ProjectView>ShowAllFiles</ProjectView>
-        <StartupFile>a01_coreFns.js</StartupFile>
-        <WorkingDirectory>.</WorkingDirectory>
-        <OutputPath>.</OutputPath>
-        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
-    <ItemGroup>
-        <Compile Include="a01_coreFns.js" />
-        <Compile Include="a05_assertParam.js" />
-        <Compile Include="a05_enum.js" />
-        <Compile Include="a10_event.js" />
-        <Compile Include="a20_config.js" />
-        <Compile Include="a25_observableArray.js" />
-        <Compile Include="a25_validate.js" />
-        <Compile Include="a25_validationOptions.js" />
-        <Compile Include="a30_complexArray.js" />
-        <Compile Include="a30_entityAction.js" />
-        <Compile Include="a30_entityAspect.js" />
-        <Compile Include="a30_entityKey.js" />
-        <Compile Include="a30_entityState.js" />
-        <Compile Include="a30_primitiveArray.js" />
-        <Compile Include="a30_relationArray.js" />
-        <Compile Include="a35_defaultPropertyInterceptor.js" />
-        <Compile Include="a37_dataType.js" />
-        <Compile Include="a40_dataService.js" />
-        <Compile Include="a40_entityMetadata.js" />
-        <Compile Include="a40_keyGenerator.js" />
-        <Compile Include="a40_localQueryComparisionOptions.js" />
-        <Compile Include="a40_namingConvention.js" />
-        <Compile Include="a45_entityQuery.js" />
-        <Compile Include="a45_queryOptions.js" />
-        <Compile Include="a46.altPredicate.js" />
-        <Compile Include="a50_entityGroup.js" />
-        <Compile Include="a50_entityManager.js" />
-        <Compile Include="a55_mappingContext.js" />
-        <Compile Include="a55_saveOptions.js" />
-        <Compile Include="a60_abstractDataServiceAdapter.js" />
-        <Compile Include="b00_breeze.ajax.angular.js" />
-        <Compile Include="b00_breeze.ajax.jQuery.js" />
-        <Compile Include="b00_breeze.dataService.odata.js" />
-        <Compile Include="b00_breeze.dataService.webApi.js" />
-        <Compile Include="b00_breeze.modelLibrary.backingStore.js" />
-        <Compile Include="b00_breeze.modelLibrary.ko.js" />
-        <Compile Include="breeze.dataService.mongo.js" />
-        <Compile Include="breeze.modelLibrary.backbone.js" />
-        <Compile Include="iface.ajaxInterface.js" />
-        <Compile Include="iface.keyGeneratorInterface.js" />
-        <Compile Include="iface.promise.js" />
-    </ItemGroup>
-    <ItemGroup />
-    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
-    <ProjectExtensions>
-        <VisualStudio>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-            <WebProjectProperties>
-              <UseIIS>False</UseIIS>
-              <AutoAssignPort>True</AutoAssignPort>
-              <DevelopmentServerPort>0</DevelopmentServerPort>
-              <DevelopmentServerVPath>/</DevelopmentServerVPath>
-              <IISUrl>http://localhost:48022/</IISUrl>
-              <NTLMAuthentication>False</NTLMAuthentication>
-              <UseCustomServer>True</UseCustomServer>
-              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
-              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-            </WebProjectProperties>
-          </FlavorProperties>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
-            <WebProjectProperties>
-              <StartPageUrl>
-              </StartPageUrl>
-              <StartAction>CurrentPage</StartAction>
-              <AspNetDebugging>True</AspNetDebugging>
-              <SilverlightDebugging>False</SilverlightDebugging>
-              <NativeDebugging>False</NativeDebugging>
-              <SQLDebugging>False</SQLDebugging>
-              <ExternalProgram>
-              </ExternalProgram>
-              <StartExternalURL>
-              </StartExternalURL>
-              <StartCmdLineArguments>
-              </StartCmdLineArguments>
-              <StartWorkingDirectory>
-              </StartWorkingDirectory>
-              <EnableENC>False</EnableENC>
-              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
-            </WebProjectProperties>
-          </FlavorProperties>
-        </VisualStudio>
-    </ProjectExtensions>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{fcf43ff8-f461-4758-aed4-f0d02a602736}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>a01_coreFns.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Compile Include="a01_coreFns.js" />
+    <Compile Include="a05_assertParam.js" />
+    <Compile Include="a05_enum.js" />
+    <Compile Include="a10_event.js" />
+    <Compile Include="a20_config.js" />
+    <Compile Include="a25_observableArray.js" />
+    <Compile Include="a25_validate.js" />
+    <Compile Include="a25_validationOptions.js" />
+    <Compile Include="a30_complexArray.js" />
+    <Compile Include="a30_entityAction.js" />
+    <Compile Include="a30_entityAspect.js" />
+    <Compile Include="a30_entityKey.js" />
+    <Compile Include="a30_entityState.js" />
+    <Compile Include="a30_primitiveArray.js" />
+    <Compile Include="a30_relationArray.js" />
+    <Compile Include="a35_defaultPropertyInterceptor.js" />
+    <Compile Include="a37_dataType.js" />
+    <Compile Include="a40_dataService.js" />
+    <Compile Include="a40_entityMetadata.js" />
+    <Compile Include="a40_keyGenerator.js" />
+    <Compile Include="a40_localQueryComparisionOptions.js" />
+    <Compile Include="a40_namingConvention.js" />
+    <Compile Include="a44_predicate.js" />
+    <Compile Include="a45_entityQuery.js" />
+    <Compile Include="a45_queryOptions.js" />
+    <Compile Include="a50_entityGroup.js" />
+    <Compile Include="a50_entityManager.js" />
+    <Compile Include="a55_mappingContext.js" />
+    <Compile Include="a55_saveOptions.js" />
+    <Compile Include="a60_abstractDataServiceAdapter.js" />
+    <Compile Include="b00_breeze.ajax.angular.js" />
+    <Compile Include="b00_breeze.ajax.jQuery.js" />
+    <Compile Include="b00_breeze.dataService.odata.js" />
+    <Compile Include="b00_breeze.dataService.webApi.js" />
+    <Compile Include="b00_breeze.modelLibrary.backingStore.js" />
+    <Compile Include="b00_breeze.modelLibrary.ko.js" />
+    <Compile Include="b00_breeze.uriBuilder.json.js" />
+    <Compile Include="b00_breeze.uriBuilder.odata.js" />
+    <Compile Include="breeze.bridge.angular.js" />
+    <Compile Include="breeze.dataService.mongo.js" />
+    <Compile Include="breeze.modelLibrary.backbone.js" />
+    <Compile Include="iface.ajaxInterface.js" />
+    <Compile Include="iface.keyGeneratorInterface.js" />
+    <Compile Include="iface.promise.js" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
