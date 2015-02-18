@@ -497,7 +497,7 @@ var EntityManager = (function () {
         Array.prototype.push.apply(entitiesToLink, entities);
       });
       entitiesToLink.forEach(function (entity) {
-        if (!entity.entityAspect.entityState.isDeleted()) {
+        if (!entity.entityAspect.entityState.isDeleted() && !entity.entityAspect.entityState.isDetached()) {
           that._linkRelatedEntities(entity);
         }
       });
