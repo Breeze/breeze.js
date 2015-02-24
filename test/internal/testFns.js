@@ -139,6 +139,7 @@ breezeTestFns = (function (breeze) {
     testFns.DEBUG_ODATA = value === "odata" || value === "odata4";
     testFns.DEBUG_MONGO = value === "mongo";
     testFns.DEBUG_SEQUELIZE = value === "sequelize";
+    testFns.DEBUG_HIBERNATE = value == "hibernate";
     testFns.DEBUG_ODATA_VERSION = version || "wcf";
     if (testFns.DEBUG_WEBAPI) {
       testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
@@ -187,6 +188,11 @@ breezeTestFns = (function (breeze) {
       testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
       testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
       testFns.defaultServiceName = "breeze/NorthwindIBModel";
+    } else if (testFns.DEBUG_HIBERNATE) {
+      testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
+      testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
+      testFns.defaultServiceName = "http://localhost:8080/breeze-intest/northwind"
+
     }
     updateTitle();
     setWellKnownData();
@@ -425,25 +431,27 @@ breezeTestFns = (function (breeze) {
   }
 
   testFns.newMs = function () {
-    var namingConv = new NamingConvention({
-      name: "camelCase2",
-      serverPropertyNameToClient: function (serverPropertyName, prop) {
-        if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
-          return "is" + serverPropertyName;
-        } else {
-          return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+    if (!testFns.DEBUG_HIBERNATE) {
+      var namingConv = new NamingConvention({
+        name: "camelCase2",
+        serverPropertyNameToClient: function (serverPropertyName, prop) {
+          if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
+            return "is" + serverPropertyName;
+          } else {
+            return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+          }
+        },
+        clientPropertyNameToServer: function (clientPropertyName, prop) {
+          if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
+            return clientPropertyName.substr(2);
+          } else {
+            return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+          }
         }
-      },
-      clientPropertyNameToServer: function (clientPropertyName, prop) {
-        if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
-          return clientPropertyName.substr(2);
-        } else {
-          return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-        }
-      }
-    });
-    var altNamingConv = NamingConvention.camelCase;
-    namingConv.setAsDefault();
+      });
+      var altNamingConv = NamingConvention.camelCase;
+      namingConv.setAsDefault();
+    }
     // var ms = new MetadataStore({ namingConvention: namingConv });
     var ms = new MetadataStore();
     ms.metadataFetched.subscribe(testFns.configureMetadata);

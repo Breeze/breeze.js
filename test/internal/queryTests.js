@@ -27,9 +27,27 @@
     }
   });
 
-  test("can specify datatype ", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "Mongo (eventually) and Sequelize new do NOT use OData syntax");
+  function checkIfDeleted(entityManager, entities) {
+    origEntities = entities.slice(0);
+    var q = EntityQuery.fromEntities(entities)
+    entityManager.executeQuery(q).then(function (data) {
+      var foundEntities = data.entities;
+      foundEntities.forEach(function (e, ix) {
+        if (entities.indexOf(e)) {
+          origEntities.splice(ix, 1)
+        }
+      });
+      if (origEntities.length > 0) {
+        origEntities.forEach(function (e) {
+          entityManager.removeEntity(e);
+        });
+      }
+    });
+  }
+
+  test("check if correct OData datatype ", function () {
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "Mongo (eventually), Hibernate and Sequelize new do NOT use OData syntax");
       return;
     }
     var em = newEm();
@@ -413,6 +431,8 @@
       ok(true, "Mongo does not yet support the 'year' OData predicate");
       return;
     }
+
+
     var manager = newEm();
     var query = new breeze.EntityQuery()
         .from("Employees")
@@ -448,8 +468,8 @@
   });
 
   test("OData predicate - add ", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "Neither Mongo nor Sequelize supports the 'add' OData predicate");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "Neither Mongo, Hibernate nor Sequelize supports the 'add' OData predicate");
       return;
     }
     var manager = newEm();
@@ -469,8 +489,8 @@
   });
 
   test("OData predicate - add combined with regular predicate", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "Neither Mongo nor Sequelize supports the 'add' OData predicate");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "Neither Mongo, Hibernate nor Sequelize supports the 'add' OData predicate");
       return;
     }
     var manager = newEm();
@@ -675,6 +695,11 @@
   test("raw OData query string", function () {
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Breeze-Sequelize does not support OData syntax");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Breeze-Hibernate does not support OData syntax");
       return;
     }
 
@@ -2840,7 +2865,8 @@
       return;
     }
     stop();
-    $.getJSON("breeze/NorthwindIBModel/Metadata", function (data, status) {
+    var metadataPath = testFns.defaultServiceName + "/Metadata";
+    $.getJSON(metadataPath, function (data, status) {
       // On success, 'data' contains the model metadata.
       //                console.log(data);
       ok(data);
