@@ -571,6 +571,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE - no enum support ... yet.");
+      return;
+    }
+
     var em = newEm();
     var em2 = newEm();
     var roleType = em.metadataStore.getEntityType("Role");
@@ -980,6 +985,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Skipped test - Hibernate/MySQL does not support computed properties");
+      return;
+    }
+
     var em = newEm();
     var q = EntityQuery.from("Employees").take(3);
     stop();
@@ -1008,6 +1018,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Skipped test - Sequelize does not YET support computed properties");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Skipped test - Hibernate/MySQL does not support computed properties");
       return;
     }
 
@@ -1040,6 +1055,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Skipped test - Sequelize does not YET support computed properties");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Skipped test - Hibernate/MySQL does not support computed properties");
       return;
     }
 
@@ -1596,6 +1616,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Skipped test - Hibernate/MySQL does not support millisecond resolution");
+      return;
+    }
+
     var em = newEm();
     var dt = new Date(Date.parse("2012-12-17T13:35:15.690Z"));
     var offset = dt.getTimezoneOffset() * 60000;
@@ -1631,6 +1656,12 @@
       ok(true, "Skipped test - SEQUELIZE/MySQL does not support millisecond resolution");
       return;
     }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "Skipped test - Hibernate/MySQL does not support millisecond resolution");
+      return;
+    }
+
 
     var em = newEm();
     // Date.parse("2012-12-17T13:35:15.690");

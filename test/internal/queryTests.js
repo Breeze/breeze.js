@@ -686,6 +686,8 @@
         ok(error.message.indexOf("Not Found") >= 0, "Bad error message");
       } else if (testFns.DEBUG_SEQUELIZE) {
         ok(error.message.indexOf("Cannot find an entityType" > 0, "Bad error message"));
+      } else if (testFns.DEBUG_HIBERNATE) {
+        ok(error.message.indexOf("no entityType name registered" > 0, "Bad error message"));
       } else {
         ok(error.message.indexOf("No HTTP resource was found") >= 0, "Bad error message");
       }
@@ -924,6 +926,31 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
+  var jsonResultsAdapter = new breeze.JsonResultsAdapter({
+    name: "eventAdapter",
+    extractResults: function (json) {
+      return json.results;
+    },
+    visitNode: function (node, mappingContext, nodeContext) {
+      var entityTypeName = 'OrderDetail';
+      var entityType = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
+      var propertyName = nodeContext.propertyName;
+      var ignore = propertyName && propertyName.substr(0, 1) === "$";
+      if (entityType) {
+        if (testFns.DEBUG_HIBERNATE) {
+          node.rowVersion = 77;
+        } else {
+          node.RowVersion = 77;
+        }
+      }
+      return {
+        entityType: entityType,
+        nodeId: node.$id,
+        nodeRefId: node.$ref,
+        ignore: ignore
+      };
+    }
+  });
 
   test("query using jsonResultsAdapter", function () {
     if (testFns.DEBUG_ODATA) {
@@ -937,27 +964,7 @@
     }
 
     var em = newEm();
-    var jsonResultsAdapter = new breeze.JsonResultsAdapter({
-      name: "eventAdapter",
-      extractResults: function (json) {
-        return json.results;
-      },
-      visitNode: function (node, mappingContext, nodeContext) {
-        var entityTypeName = 'OrderDetail';
-        var entityType = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
-        var propertyName = nodeContext.propertyName;
-        var ignore = propertyName && propertyName.substr(0, 1) === "$";
-        if (entityType) {
-          node.RowVersion = 77;
-        }
-        return {
-          entityType: entityType,
-          nodeId: node.$id,
-          nodeRefId: node.$ref,
-          ignore: ignore
-        };
-      }
-    });
+
     var query = EntityQuery.from("OrderDetails").take(5).using(jsonResultsAdapter);
     stop();
     em.executeQuery(query).then(function (data) {
@@ -981,27 +988,7 @@
 
     var em = newEm();
 
-    var jsonResultsAdapter = new breeze.JsonResultsAdapter({
-      name: "eventAdapter",
-      extractResults: function (json) {
-        return json.results;
-      },
-      visitNode: function (node, mappingContext, nodeContext) {
-        var entityTypeName = 'OrderDetail';
-        var entityType = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
-        var propertyName = nodeContext.propertyName;
-        var ignore = propertyName && propertyName.substr(0, 1) === "$";
-        if (entityType) {
-          node.RowVersion = 77;
-        }
-        return {
-          entityType: entityType,
-          nodeId: node.$id,
-          nodeRefId: node.$ref,
-          ignore: ignore
-        };
-      }
-    });
+
     var oldDs = em.dataService;
     var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
     var query = EntityQuery.from("OrderDetails").take(5).using(newDs);
@@ -1027,27 +1014,6 @@
 
     var em = newEm();
 
-    var jsonResultsAdapter = new breeze.JsonResultsAdapter({
-      name: "eventAdapter",
-      extractResults: function (json) {
-        return json.results;
-      },
-      visitNode: function (node, mappingContext, nodeContext) {
-        var entityTypeName = 'OrderDetail';
-        var entityType = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
-        var propertyName = nodeContext.propertyName;
-        var ignore = propertyName && propertyName.substr(0, 1) === "$";
-        if (entityType) {
-          node.RowVersion = 77;
-        }
-        return {
-          entityType: entityType,
-          nodeId: node.$id,
-          nodeRefId: node.$ref,
-          ignore: ignore
-        };
-      }
-    });
     var oldDs = em.dataService;
     var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
     var em2 = new EntityManager({ dataService: newDs });
