@@ -464,7 +464,7 @@
     var em = newEm();
 
     var query = EntityQuery.from("CustomersWithBigOrders")
-        .where("customer.companyName", "startsWith", "A")
+        .where("companyName", "startsWith", "A")
         .using(em);
     stop();
     query.execute().then(function (data) {
