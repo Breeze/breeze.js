@@ -580,6 +580,7 @@
       var orderKeys = orders.map(function (o) {
         return o.entityAspect.getKey();
       });
+      orderKeys.sort(entityKeyCompare);
       var custQuery = EntityQuery.fromEntities(cust);
 
       var ordersQuery = EntityQuery.fromEntities(orders);
@@ -598,12 +599,24 @@
         var order3Keys = orders3.map(function (o) {
           return o.entityAspect.getKey();
         });
+        orderKeys.sort(entityKeyCompare);
         ok(core.arrayEquals(orderKeys, order3Keys, EntityKey.equals), "orders query do not return the correct entities");
       });
       return Q.all([p1, p2]);
     }).fail(testFns.handleFail).fin(start);
   });
 
+  function entityKeyCompare(ek1, ek2) {
+    var value1 = ek1["_keyInGroup"];
+    var value2 = ek2["_keyInGroup"];
+    if (value1 == value2) {
+      return 0;
+    } else if (value1 > value2 || value2 === undefined) {
+      return 1;
+    } else {
+      return  -1;
+    }
+  }
   test("server side include, followed by local query", function () {
     if (testFns.DEBUG_MONGO) {
       ok(true, "NA for Mongo - no support for expands YET");

@@ -89,8 +89,8 @@
 
 
   test("Query Involving Multiple Entities on Server", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_ODATA || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "N/A for MONGO/ODATA/SEQUELIZE - EF specific test.");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_ODATA || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for MONGO/ODATA/SEQUELIZE/HIBERNATE - EF specific test.");
       return;
     }
 
@@ -171,6 +171,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE - datatype does not exist.");
+      return;
+    }
+
     if (testFns.DEBUG_ODATA) {
       ok(true, "NA for OData - This table not yet exposed");
       return;
@@ -214,6 +219,12 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE - datatype does not exist.");
+      return;
+    }
+
+
     if (testFns.DEBUG_ODATA) {
       ok(true, "NA for OData - This table not yet exposed");
       return;
@@ -239,6 +250,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "N/A for SEQUELIZE - datatype does not exist.");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE - datatype does not exist.");
       return;
     }
 
@@ -277,6 +293,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE/MySql - datatype does not exist.");
       return;
     }
 
@@ -344,6 +365,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE/MySql - datatype does not exist.");
+      return;
+    }
+
     var em = newEm();
     var query = new EntityQuery("TimeLimits").where("maxTime", ">", "PT4H").take(10);
     var fourHrs = core.durationToSeconds("PT4H");
@@ -367,6 +393,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE/MySql - datatype does not exist.");
       return;
     }
 
@@ -396,6 +427,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE/MySql - datatype does not exist.");
+      return;
+    }
+
     var em = newEm();
     var tlimitType = em.metadataStore.getEntityType("TimeLimit");
     var tlimit = tlimitType.createEntity();
@@ -418,6 +454,11 @@
 
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "Ok for SEQUELIZE - table with Time datatype has not yet been created");
+      return;
+    }
+
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for HIBERNATE/MySql - datatype does not exist.");
       return;
     }
 
