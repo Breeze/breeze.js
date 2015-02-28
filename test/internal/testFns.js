@@ -191,7 +191,7 @@ breezeTestFns = (function (breeze) {
     } else if (testFns.DEBUG_HIBERNATE) {
       testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
       testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
-      testFns.defaultServiceName = "http://localhost:8080/breeze-intest/northwind"
+      testFns.defaultServiceName = "http://localhost:8080/breeze-webtest/northwind"
 
     }
     updateTitle();

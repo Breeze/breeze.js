@@ -208,8 +208,8 @@
   });
 
   test("with parameter and count", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "NA for Mongo/Sequelize - this endpoint not yet implemented");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Sequelize/Hibernate - this endpoint not yet implemented");
       return;
     }
     var em = newEm();
@@ -321,7 +321,7 @@
     em.executeQuery(q).then(function (data) {
       ok(false, "should not get here");
     }).fail(function (e) {
-      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO) {
+      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
         ok(e.message.indexOf("companyName") >= 0, "companyName should have been in message");
       } else {
         ok(e.message.indexOf("foo") >= 0, "foo should have been in message");
@@ -355,7 +355,7 @@
     query.execute().then(function (data) {
       var names = data.results;
       ok(names.length > 0);
-      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO) {
+      if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
         var cname = names[0].companyName;
         ok(typeof cname === "string", "companyName should be a string");
       } else {
@@ -396,8 +396,8 @@
 
 
   test("project enumerables", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "NA for Mongo/Sequelize - .NET specific test");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Sequelize/Hibernate - .NET specific test");
       return;
     }
 
@@ -416,8 +416,8 @@
   });
 
   test("project enumerables with filter", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "NA for Mongo/Sequelize - .NET specific test");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Sequelize/Hibernate - .NET specific test");
       return;
     }
     var em = newEm();
