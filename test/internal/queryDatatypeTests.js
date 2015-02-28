@@ -500,6 +500,11 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for Hibernate - no enum support yet");
+      return;
+    }
+
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for MONGO - no enum support.");
       return;
@@ -549,6 +554,10 @@
       return;
     }
 
+    if (testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for Hibernate - no enum support yet");
+      return;
+    }
 
     if (testFns.DEBUG_MONGO) {
       ok(true, "N/A for MONGO - no enum support.");

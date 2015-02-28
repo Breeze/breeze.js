@@ -1,8 +1,8 @@
 (function (testFns) {
 
-  if (testFns.MONGO || testFns.DEBUG_SEQUELIZE) {
+  if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("inheritBilling", {});
-    test("Skipping tests for Mongo/Sequelize", function () {
+    test("Skipping tests for Mongo/Sequelize/Hibernate", function () {
       ok(true, "Skipped tests");
     });
     return;

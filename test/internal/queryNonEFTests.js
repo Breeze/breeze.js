@@ -1,7 +1,7 @@
 (function (testFns) {
-  if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
+  if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("queryNonEF", {});
-    test("Skipping tests for OData/Mongo/Sequelize", function () {
+    test("Skipping tests for OData/Mongo/Sequelize/Hibernate", function () {
       ok(true, "Skipped tests");
     });
     return;

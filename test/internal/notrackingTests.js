@@ -41,7 +41,7 @@
     var q = EntityQuery
         .from("Employees")
         .where(predicate1);
-    if (testFns.DEBUG_NHIBERNATE) {
+    if (testFns.DEBUG_NHIBERNATE || testFns.DEBUG_HIBERNATE) {
       q = q.expand("directReports");
     } else if (testFns.DEBUG_SEQUELIZE) {
        q = q.expand(["manager", "directReports"]);

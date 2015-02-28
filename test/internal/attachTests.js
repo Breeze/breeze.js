@@ -283,8 +283,8 @@
       return;
     }
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - TimeList and Timegroup not yet added");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
       return;
     }
     var em = newEm();
@@ -302,8 +302,8 @@
   });
 
   test("unidirectional attach - 1->n - part 2", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - TimeList and Timegroup not yet added");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
       return;
     }
 

@@ -83,8 +83,8 @@
       return;
     }
 
-    if (testFns.DEBUG_SEQUELIZE) {
-      ok(true, "NA for Sequelize - no server side unmapped properties implemented yet on server");
+    if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Sequelize/Hibernate - no server side unmapped properties implemented yet on server");
       return;
     }
 

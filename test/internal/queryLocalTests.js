@@ -97,8 +97,8 @@
   });
 
   test("timespan", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - datatypes do not exist.");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for Mongo/Hibernate - datatypes do not exist.");
       return;
     }
     var em = newEm();
@@ -114,8 +114,8 @@
   });
 
   test("compare timespans", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - datatypes do not exist.");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for Mongo/Hibernate - datatypes do not exist.");
       return;
     }
     var em = newEm();
@@ -131,8 +131,8 @@
   });
 
   test("null timespans", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - datatypes do not exist.");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "N/A for Mongo/Hibernate - datatypes do not exist.");
       return;
     }
     var em = newEm();

@@ -1,8 +1,8 @@
 (function (testFns) {
 
-  if (testFns.DEBUG_SEQUELIZE) {
+  if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("raw odata query",  {});
-    test("Skipping tests for Sequelize", function () {
+    test("Skipping tests for Sequelize/Hibernate", function () {
       ok(true, "Skipped tests");
     });
     return;

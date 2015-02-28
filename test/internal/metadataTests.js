@@ -13,22 +13,6 @@
 
   var newEm = testFns.newEm;
 
-  function newAltEm() {
-    var altServiceName = "breeze/MetadataTest";
-
-    var dataService = new DataService({
-      serviceName: altServiceName
-    });
-    var altMs = new MetadataStore({
-      // namingConvention: NamingConvention.camelCase
-    });
-
-    return new EntityManager({
-      dataService: dataService,
-      metadataStore: altMs
-    });
-  }
-
 
   module("metadata", {
     setup: function () {
@@ -195,8 +179,8 @@
     //    return;
     //}
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - TimeList and Timegroup not yet added");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
       return;
     }
     ;
@@ -229,11 +213,11 @@
     //    return;
     //};
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - TimeList and Timegroup not yet added");
+    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
+      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
       return;
     }
-    ;
+
 
     var em0 = createEmWithTimeGroupMetadata();
 
@@ -498,23 +482,6 @@
 
   }
 
-  test("external customer metadata", function () {
-    if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE) {
-      ok(true, "Skipped tests - not applicable to OData/Mongo/Sequelize");
-      return;
-    }
-
-
-
-    var em = newAltEm();
-    stop();
-    em.fetchMetadata().then(function (rawMetadata) {
-      var ms = em.metadataStore;
-      var ets = ms.getEntityTypes();
-      ok(ets.length > 0, "should be some entityTypes");
-    }).fail(testFns.handleFail).fin(start);
-  });
-
   test("default interface impl", function () {
     var store = new MetadataStore();
     stop();
@@ -549,11 +516,6 @@
 
   test("initialization", function () {
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - Current impl provides camelCase naming convention on the server");
-      return;
-    }
-
     if (testFns.DEBUG_SEQUELIZE) {
       ok(true, "N/A for Sequelize - Current impl uses a server side json metadata file");
       return;
@@ -573,8 +535,9 @@
         ok(props.length > 0);
         var keys = custType.keyProperties;
         ok(keys.length > 0);
-        var prop = custType.getProperty("CompanyName");
-        ok(prop, "fails if default naming convention is camelCase and metadata provides nameOnServer");
+        // some servers (hibernate) may use lower case prop names.
+        var prop = custType.getProperty("CompanyName") || custType.getProperty("companyName");
+        ok(prop );
         ok(prop.isDataProperty);
         var navProp = custType.navigationProperties[0];
         ok(navProp.isNavigationProperty);
@@ -871,6 +834,8 @@
   makeCustomMetadata = function (namespace) {
     if (testFns.DEBUG_MONGO) {
       var custKeyName = "_id";
+    } else if (testFns.DEBUG_HIBERNATE) {
+      var custKeyName = "customerID"; // server is lower case.
     }
     return {
       "structuralTypes": [
