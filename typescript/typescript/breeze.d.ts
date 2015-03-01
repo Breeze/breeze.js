@@ -1,4 +1,4 @@
-// Type definitions for Breeze 1.4
+// Type definitions for Breeze 1.5.x
 // Project: http://www.breezejs.com/
 // Definitions by: Boris Yankov <https://github.com/borisyankov/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
