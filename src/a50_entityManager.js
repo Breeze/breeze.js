@@ -1442,8 +1442,7 @@ var EntityManager = (function () {
   **/
   proto.getChanges = function (entityTypes) {
     entityTypes = checkEntityTypes(this, entityTypes);
-    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-    return getEntitiesCore(this, entityTypes, entityStates);
+    return getChangesCore(this, entityTypes);
   };
 
   /**
@@ -1459,8 +1458,7 @@ var EntityManager = (function () {
   **/
   proto.rejectChanges = function () {
     if (!this._hasChanges) return [];
-    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-    var changes = getEntitiesCore(this, null, entityStates);
+    var changes = getChangesCore(this, null);
     // next line stops individual reject changes from each calling _hasChangesCore
     var aspects = changes.map(function(e) {
       return e.entityAspect._checkOperation("rejectChanges");
@@ -1688,6 +1686,24 @@ var EntityManager = (function () {
       });
     }
     return entityTypes;
+  }
+
+  function getChangesCore(em, entityTypes) {
+    var entityGroups = getEntityGroups(em, entityTypes);
+
+    // TODO: think about writing a core.mapMany method if we see more of these.
+    var selected;
+    entityGroups.forEach(function (eg) {
+      // eg may be undefined or null
+      if (!eg) return;
+      var entities = eg.getChanges();
+      if (selected) {
+        selected.push.apply(selected, entities);
+      } else {
+        selected = entities;
+      }
+    });
+    return selected || [];
   }
 
   function getEntitiesCore(em, entityTypes, entityStates) {

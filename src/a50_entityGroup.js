@@ -4,8 +4,6 @@
 
 var EntityGroup = (function () {
 
-  var __changedFilter = getFilter([EntityState.Added, EntityState.Modified, EntityState.Deleted]);
-
   var ctor = function EntityGroup(entityManager, entityType) {
     this.entityManager = entityManager;
     this.entityType = entityType;
@@ -90,7 +88,28 @@ var EntityGroup = (function () {
   };
 
   proto.hasChanges = function () {
-    return this._entities.some(__changedFilter);
+    var entities = this._entities;
+    var unchanged = EntityState.Unchanged;
+    for (var i = 0, len = entities.length; i < len; i++){
+      var e = entities[i];
+      if (e && e.entityAspect.entityState !== unchanged){
+        return true;
+      }
+    }
+    return false;
+  };
+
+  proto.getChanges = function () {
+    var entities = this._entities;
+    var unchanged = EntityState.Unchanged;
+    var changes = [];
+    for (var i = 0, len = entities.length; i < len; i++){
+      var e = entities[i];
+      if (e && e.entityAspect.entityState !== unchanged){
+        changes.push(e);
+      }
+    }
+    return changes;
   };
 
   proto.getEntities = function (entityStates) {
@@ -160,15 +179,11 @@ var EntityGroup = (function () {
     } else if (entityStates.length === 1) {
       var entityState = entityStates[0];
       return function (e) {
-        if (!e) return false;
-        return e.entityAspect.entityState === entityState;
+        return !!e && e.entityAspect.entityState === entityState;
       };
     } else {
       return function (e) {
-        if (!e) return false;
-        return entityStates.some(function (es) {
-          return e.entityAspect.entityState === es;
-        });
+        return !!e && -1 !== entityStates.indexOf(e.entityAspect.entityState);
       };
     }
   }
