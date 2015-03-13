@@ -834,16 +834,20 @@ var EntityManager = (function () {
   @return  {Array of Entity}  Array of entities from cache that satisfy the query
   **/
   proto.executeQueryLocally = function (query) {
+    return executeQueryLocallyCore(this, query).results;
+  }
+
+  function executeQueryLocallyCore(em, query) {
     assertParam(query, "query").isInstanceOf(EntityQuery).check();
 
-    var metadataStore = this.metadataStore;
+    var metadataStore = em.metadataStore;
     var entityType = query._getFromEntityType(metadataStore, true);
     // there may be multiple groups is this is a base entity type.
-    var groups = findOrCreateEntityGroups(this, entityType);
+    var groups = findOrCreateEntityGroups(em, entityType);
     // filter then order then skip then take
     var filterFunc = query.wherePredicate && query.wherePredicate.toFunction({ entityType: entityType});
 
-    var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
+    var queryOptions = QueryOptions.resolve([ query.queryOptions, em.queryOptions, QueryOptions.defaultInstance]);
     var includeDeleted = queryOptions.includeDeleted === true;
 
     var newFilterFunc = function (entity) {
@@ -860,6 +864,11 @@ var EntityManager = (function () {
     if (orderByComparer) {
       result.sort(orderByComparer);
     }
+
+    if (query.inlineCountEnabled) {
+      var inlineCount = result.length;
+    }
+
     var skipCount = query.skipCount;
     if (skipCount) {
       result = result.slice(skipCount);
@@ -874,7 +883,7 @@ var EntityManager = (function () {
       var selectFn = selectClause.toFunction();
       result = result.map(selectFn);
     }
-    return result;
+    return {results: result, inlineCount: inlineCount};
   };
 
   /**
@@ -2082,8 +2091,8 @@ var EntityManager = (function () {
 
       if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
         try {
-          results = em.executeQueryLocally(query);
-          return Q.resolve({ results: results, query: query });
+          var qr = executeQueryLocallyCore(em, query);
+          return Q.resolve({ results: qr.results, entityManager: em, inlineCount: qr.inlineCount, query: query });
         } catch (e) {
           return Q.reject(e);
         }
