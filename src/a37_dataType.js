@@ -58,6 +58,13 @@ var DataType = (function () {
     return (source == null) ? source : source.toString();
   };
 
+  var coerceToGuid = function (source, sourceTypeName) {
+    if (sourceTypeName === "string") {
+      return source.trim().toLowerCase();
+    }
+    return source;
+  };
+
   var coerceToInt = function (source, sourceTypeName) {
     if (sourceTypeName === "string") {
       var src = source.trim();
@@ -313,6 +320,7 @@ var DataType = (function () {
   **/
   DataType.Guid = DataType.addSymbol({
   defaultValue: "00000000-0000-0000-0000-000000000000",
+  parse: coerceToGuid,
   fmtOData: fmtGuid,
   getNext: getNextGuid
   });
@@ -413,11 +421,18 @@ var DataType = (function () {
     if (typeof source === 'string') {
       // convert to UTC string if no time zone specifier.
       var isLocalTime = _localTimeRegex.test(source);
+      // var isLocalTime = !hasTimeZone(source);
       source = isLocalTime ? source + 'Z' : source;
     }
     source = new Date(Date.parse(source));
     return source;
   };
+
+  //function hasTimeZone(source) {
+  //  var ix = source.indexOf("T");
+  //  var timePart = source.substring(ix+1);
+  //  return  timePart.indexOf("-") >= 0 || timePart.indexOf("+") >= 0 || timePart.indexOf("Z");
+  //}
 
   // NOT YET NEEDED --------------------------------------------------
   // var _utcOffsetMs = (new Date()).getTimezoneOffset() * 60000;
@@ -447,6 +462,8 @@ var DataType = (function () {
       }
     } else if (dataType === DataType.Time) {
       val = DataType.parseTimeFromServer(val);
+    } else if (val && dataType === DataType.Guid) {
+      val = val.toLowerCase();
     }
     return val;
   }

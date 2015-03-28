@@ -264,7 +264,7 @@ var Param = (function () {
     return addContext(this, {
       fn: isTypeOf,
       typeName: typeName,
-      msg: __formatString(&quot;must be a &#x27;%1&#x27;&quot;, typeName)
+       msg: &quot;must be a &#x27;&quot; + typeName + &quot;&#x27;&quot;
     });
   };
 
@@ -280,7 +280,7 @@ var Param = (function () {
       fn: isInstanceOf,
       type: type,
       typeName: typeName,
-      msg: __formatString(&quot;must be an instance of &#x27;%1&#x27;&quot;, typeName)
+      msg: &quot;must be an instance of &#x27;&quot; + typeName + &quot;&#x27;&quot;
     });
   };
 
@@ -293,7 +293,7 @@ var Param = (function () {
     return addContext(this, {
       fn: hasProperty,
       propertyName: propertyName,
-      msg: __formatString(&quot;must have a &#x27;%1&#x27; property &quot;, propertyName)
+      msg: &quot;must have a &#x27;&quot; + propertyName + &quot;&#x27; property&quot;
     });
   };
 
@@ -306,7 +306,7 @@ var Param = (function () {
     return addContext(this, {
       fn: isEnumOf,
       enumType: enumType,
-      msg: __formatString(&quot;must be an instance of the &#x27;%1&#x27; enumeration&quot;, enumType.name)
+      msg: &quot;must be an instance of the &#x27;&quot; + enumType.name + &quot;&#x27; enumeration&quot;
     });
   };
 

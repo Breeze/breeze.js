@@ -2358,7 +2358,7 @@ em2.importEntities(bundle);</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1213"><code>..\src\a50_entityManager.js:1213</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1222"><code>..\src\a50_entityManager.js:1222</code></a>
         
         </p>
 
@@ -2528,7 +2528,7 @@ em1.fetchEntityByKey(&quot;Employee&quot;, 1).then(function(result) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1237"><code>..\src\a50_entityManager.js:1237</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1246"><code>..\src\a50_entityManager.js:1246</code></a>
         
         </p>
 
@@ -2877,7 +2877,7 @@ em1.fetchMetadata()
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1300"><code>..\src\a50_entityManager.js:1300</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1309"><code>..\src\a50_entityManager.js:1309</code></a>
         
         </p>
 
@@ -2999,7 +2999,7 @@ var employee = em1.findEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1317"><code>..\src\a50_entityManager.js:1317</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1326"><code>..\src\a50_entityManager.js:1326</code></a>
         
         </p>
 
@@ -3014,7 +3014,7 @@ var employee = em1.findEntityByKey(employeeKey);
 created entities have unique keys and to register that these keys are temporary and
 need to be automatically replaced with &#39;real&#39; key values once these entities are saved.</p>
 <p>The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
-the keys - See the  ~keyGenerator-interface interface description to see
+the keys - See the  _keyGenerator_interface interface description to see
 how a custom key generator can be plugged in.</p>
 
     </div>
@@ -3068,8 +3068,8 @@ how a custom key generator can be plugged in.</p>
             <div class="example-content">
                 <pre class="code prettyprint"><code>// assume em1 is an EntityManager containing a number of preexisting entities.
 var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-var custumer = custType.createEntity();
-var customerId = em.generateTempKeyValue(custumer);
+var customer = custType.createEntity();
+var customerId = em.generateTempKeyValue(customer);
 // The &#39;customer&#39; entity &#39;CustomerID&#39; property is now set to a newly generated unique id value
 // This property will change again after a successful save of the &#39;customer&#39; entity.
 
@@ -3134,7 +3134,7 @@ em1.saveChanges().then( function( data) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1419"><code>..\src\a50_entityManager.js:1419</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1428"><code>..\src\a50_entityManager.js:1428</code></a>
         
         </p>
 
@@ -3270,7 +3270,7 @@ var changedCustomersAndOrders = em1.getChanges([custType, orderType]);</code></p
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1476"><code>..\src\a50_entityManager.js:1476</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1483"><code>..\src\a50_entityManager.js:1483</code></a>
         
         </p>
 
@@ -3428,7 +3428,7 @@ var addedCustomersAndOrders = em1.getEntities([custType, orderType], EntityState
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1175"><code>..\src\a50_entityManager.js:1175</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1184"><code>..\src\a50_entityManager.js:1184</code></a>
         
         </p>
 
@@ -3562,7 +3562,7 @@ var employee = em1.getEntityByKey(&quot;Employee&quot;, 1);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1187"><code>..\src\a50_entityManager.js:1187</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1196"><code>..\src\a50_entityManager.js:1196</code></a>
         
         </p>
 
@@ -3682,7 +3682,7 @@ var employee = em1.getEntityByKey(employeeKey);
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1357"><code>..\src\a50_entityManager.js:1357</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1366"><code>..\src\a50_entityManager.js:1366</code></a>
         
         </p>
 
@@ -4204,7 +4204,7 @@ em2.importEntities(bundle, { mergeStrategy: MergeStrategy.PreserveChanges} );
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1449"><code>..\src\a50_entityManager.js:1449</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1457"><code>..\src\a50_entityManager.js:1457</code></a>
         
         </p>
 
@@ -4319,7 +4319,7 @@ var entities = em1.rejectChanges();</code></pre>
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l880"><code>..\src\a50_entityManager.js:880</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l889"><code>..\src\a50_entityManager.js:889</code></a>
         
         </p>
 
@@ -4644,7 +4644,7 @@ function(saveResult) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1061"><code>..\src\a50_entityManager.js:1061</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1070"><code>..\src\a50_entityManager.js:1070</code></a>
         
         </p>
 
@@ -5379,7 +5379,7 @@ em.entityChanged.subscribe(function(changeArgs) {
             
         
         
-        <a href="../files/.._src_a50_entityManager.js.html#l1393"><code>..\src\a50_entityManager.js:1393</code></a>
+        <a href="../files/.._src_a50_entityManager.js.html#l1402"><code>..\src\a50_entityManager.js:1402</code></a>
         
         </p>
 
