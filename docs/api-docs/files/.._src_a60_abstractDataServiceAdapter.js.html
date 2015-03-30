@@ -271,7 +271,7 @@
   };
 
   proto.executeQuery = function (mappingContext) {
-
+    var adapter = mappingContext.adapter = this;
     var deferred = Q.defer();
     var url = mappingContext.getUrl();
 
@@ -371,7 +371,7 @@
             return request;
         };
         this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
+            // alter the array of requests representing the entire change-set
             // based on the saveContext and saveBundle
         };
     }
@@ -420,7 +420,7 @@
      Returned value is ignored.
      @example
      this.done = function (requests) {
-            // alter the array of requests representing the entire change-set 
+            // alter the array of requests representing the entire change-set
             // based on the saveContext and saveBundle
         };
      @method done
@@ -432,12 +432,13 @@
 
   proto._createChangeRequestInterceptor = function (saveContext, saveBundle) {
     var adapter = saveContext.adapter;
+    var cri = adapter.changeRequestInterceptor;
     var isFn = __isFunction;
-    var CRI = adapter.changeRequestInterceptor;
-    var pre = adapter.name + &quot; DataServiceAdapter&#x27;s ChangeRequestInterceptor&quot;;
-    var post = &quot; is missing or not a function.&quot;;
-    if (isFn(CRI)) {
-      var interceptor = new CRI(saveContext, saveBundle);
+
+    if (isFn(cri)) {
+      var pre = adapter.name + &quot; DataServiceAdapter&#x27;s ChangeRequestInterceptor&quot;;
+      var post = &quot; is missing or not a function.&quot;;
+      var interceptor = new cri(saveContext, saveBundle);
       if (!isFn(interceptor.getRequest)) {
         throw new Error(pre + &#x27;.getRequest&#x27; + post);
       }

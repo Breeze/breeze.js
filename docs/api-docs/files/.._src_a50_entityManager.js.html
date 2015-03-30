@@ -1041,16 +1041,20 @@ var EntityManager = (function () {
   @return  {Array of Entity}  Array of entities from cache that satisfy the query
   **/
   proto.executeQueryLocally = function (query) {
+    return executeQueryLocallyCore(this, query).results;
+  }
+
+  function executeQueryLocallyCore(em, query) {
     assertParam(query, &quot;query&quot;).isInstanceOf(EntityQuery).check();
 
-    var metadataStore = this.metadataStore;
+    var metadataStore = em.metadataStore;
     var entityType = query._getFromEntityType(metadataStore, true);
     // there may be multiple groups is this is a base entity type.
-    var groups = findOrCreateEntityGroups(this, entityType);
+    var groups = findOrCreateEntityGroups(em, entityType);
     // filter then order then skip then take
     var filterFunc = query.wherePredicate &amp;&amp; query.wherePredicate.toFunction({ entityType: entityType});
 
-    var queryOptions = QueryOptions.resolve([ query.queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
+    var queryOptions = QueryOptions.resolve([ query.queryOptions, em.queryOptions, QueryOptions.defaultInstance]);
     var includeDeleted = queryOptions.includeDeleted === true;
 
     var newFilterFunc = function (entity) {
@@ -1067,6 +1071,11 @@ var EntityManager = (function () {
     if (orderByComparer) {
       result.sort(orderByComparer);
     }
+
+    if (query.inlineCountEnabled) {
+      var inlineCount = result.length;
+    }
+
     var skipCount = query.skipCount;
     if (skipCount) {
       result = result.slice(skipCount);
@@ -1081,7 +1090,7 @@ var EntityManager = (function () {
       var selectFn = selectClause.toFunction();
       result = result.map(selectFn);
     }
-    return result;
+    return {results: result, inlineCount: inlineCount};
   };
 
   /**
@@ -1527,13 +1536,13 @@ var EntityManager = (function () {
   need to be automatically replaced with &#x27;real&#x27; key values once these entities are saved.
 
   The EntityManager.keyGeneratorCtor property is used internally by this method to actually generate
-  the keys - See the  {{#crossLink &quot;~keyGenerator-interface&quot;}}{{/crossLink}} interface description to see
+  the keys - See the  {{#crossLink &quot;_keyGenerator_interface&quot;}}{{/crossLink}} interface description to see
   how a custom key generator can be plugged in.
   @example
       // assume em1 is an EntityManager containing a number of preexisting entities.
       var custType = em1.metadataStore.getEntityType(&quot;Customer&quot;);
-      var custumer = custType.createEntity();
-      var customerId = em.generateTempKeyValue(custumer);
+      var customer = custType.createEntity();
+      var customerId = em.generateTempKeyValue(customer);
       // The &#x27;customer&#x27; entity &#x27;CustomerID&#x27; property is now set to a newly generated unique id value
       // This property will change again after a successful save of the &#x27;customer&#x27; entity.
 
@@ -1649,8 +1658,7 @@ var EntityManager = (function () {
   **/
   proto.getChanges = function (entityTypes) {
     entityTypes = checkEntityTypes(this, entityTypes);
-    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-    return getEntitiesCore(this, entityTypes, entityStates);
+    return getChangesCore(this, entityTypes);
   };
 
   /**
@@ -1666,8 +1674,7 @@ var EntityManager = (function () {
   **/
   proto.rejectChanges = function () {
     if (!this._hasChanges) return [];
-    var entityStates = [EntityState.Added, EntityState.Modified, EntityState.Deleted];
-    var changes = getEntitiesCore(this, null, entityStates);
+    var changes = getChangesCore(this, null);
     // next line stops individual reject changes from each calling _hasChangesCore
     var aspects = changes.map(function(e) {
       return e.entityAspect._checkOperation(&quot;rejectChanges&quot;);
@@ -1895,6 +1902,24 @@ var EntityManager = (function () {
       });
     }
     return entityTypes;
+  }
+
+  function getChangesCore(em, entityTypes) {
+    var entityGroups = getEntityGroups(em, entityTypes);
+
+    // TODO: think about writing a core.mapMany method if we see more of these.
+    var selected;
+    entityGroups.forEach(function (eg) {
+      // eg may be undefined or null
+      if (!eg) return;
+      var entities = eg.getChanges();
+      if (selected) {
+        selected.push.apply(selected, entities);
+      } else {
+        selected = entities;
+      }
+    });
+    return selected || [];
   }
 
   function getEntitiesCore(em, entityTypes, entityStates) {
@@ -2273,8 +2298,8 @@ var EntityManager = (function () {
 
       if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
         try {
-          results = em.executeQueryLocally(query);
-          return Q.resolve({ results: results, query: query });
+          var qr = executeQueryLocallyCore(em, query);
+          return Q.resolve({ results: qr.results, entityManager: em, inlineCount: qr.inlineCount, query: query });
         } catch (e) {
           return Q.reject(e);
         }
