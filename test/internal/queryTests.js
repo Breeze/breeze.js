@@ -2260,10 +2260,10 @@
           dataType: breeze.DataType.Int32
       }));
       employeeType.addProperty(new breeze.NavigationProperty({
-          name: "manager",
+          name: "boss",
           entityTypeName: "Employee:#Foo",
           isScalar: true,
-          associationName: "Employee_Manager",
+          associationName: "Employee_Boss",
           foreignKeyNames: ["reportsToEmployeeID"]
       }));
 
@@ -2283,6 +2283,7 @@
           emps.forEach(function(emp) {
               ok(emp.employeeId && map[emp.employeeId] === emp.reportsToEmployeeId, "reportsToEmployeeID should match");
           });
+          var em = newEm(ms);
           var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderByDesc("employeeID");
           query.using(em).execute().then(function(data2) {
               var emps = data2.results;
