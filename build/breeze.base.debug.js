@@ -5206,9 +5206,9 @@ function setDpValueSimple(context, rawAccessorFn) {
 
       if (fkNames.length === 0) return;
       var npValue = parent.getProperty(np.name);
+      if (!npValue) return;
       var fkName = fkNames[propertyIx];
       if (np.isScalar) {
-        if (!npValue) return;
         npValue.setProperty(fkName, newValue);
       } else {
         npValue.forEach(function (iv) {
@@ -7690,6 +7690,13 @@ var EntityType = (function () {
     if (ms && !(property.name && property.nameOnServer)) {
       updateClientServerNames(ms.namingConvention, property, "name");
     }
+    // props can be added after entity prototype has already been wrapped.
+    if (ms && this._extra) {
+      if (this._extra.alreadyWrappedProps) {
+        var proto = this._ctor.prototype;
+        __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(proto);
+      }
+    }
     return this;
   };
 
@@ -7846,7 +7853,6 @@ var EntityType = (function () {
     // defaultPropertyInterceptor is a 'global' (but internal to breeze) function;
     instanceProto._$interceptor = interceptor || defaultPropertyInterceptor;
     __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(instanceProto);
-
     this._ctor = aCtor;
   };
 
@@ -14271,26 +14277,22 @@ var EntityManager = (function () {
             }
           } else {
             // unidirectional
-            if (np.parentType === entity.entityType) {
-
-              parentToChildNp = np;
-              if (parentToChildNp.isScalar) {
-                // 1 -> 1 eg parent: Order child: InternationalOrder
-                entity.setProperty(parentToChildNp.name, unattachedChildren[0]);
-              } else {
-                // 1 -> n  eg: parent: Region child: Terr
-                var currentChildren = entity.getProperty(parentToChildNp.name);
-                unattachedChildren.forEach(function (child) {
-                  // we know if can't already be there.
-                  currentChildren._push(child);
-                });
-              }
-            } else {
-              // n -> 1  eg: parent: child: OrderDetail parent: Product
+            // if (np.isScalar || np.parentType !== entity.entityType) {
+            if (np.isScalar) {
+              // n -> 1  eg: child: OrderDetail parent: Product
+              // 1 -> 1 eg child: Employee parent: Employee ( only Manager, no DirectReports property)
               childToParentNp = np;
-
               unattachedChildren.forEach(function (child) {
                 child.setProperty(childToParentNp.name, entity);
+              });
+            } else {
+              // 1 -> n  eg: parent: Region child: Terr
+              // TODO: need to remove unattached children from the map after this; only a perf issue.
+              parentToChildNp = np;
+              var currentChildren = entity.getProperty(parentToChildNp.name);
+              unattachedChildren.forEach(function (child) {
+                // we know if can't already be there.
+                currentChildren._push(child);
               });
             }
           }

@@ -1598,26 +1598,22 @@ var EntityManager = (function () {
             }
           } else {
             // unidirectional
-            if (np.parentType === entity.entityType) {
-
-              parentToChildNp = np;
-              if (parentToChildNp.isScalar) {
-                // 1 -> 1 eg parent: Order child: InternationalOrder
-                entity.setProperty(parentToChildNp.name, unattachedChildren[0]);
-              } else {
-                // 1 -> n  eg: parent: Region child: Terr
-                var currentChildren = entity.getProperty(parentToChildNp.name);
-                unattachedChildren.forEach(function (child) {
-                  // we know if can't already be there.
-                  currentChildren._push(child);
-                });
-              }
-            } else {
-              // n -> 1  eg: parent: child: OrderDetail parent: Product
+            // if (np.isScalar || np.parentType !== entity.entityType) {
+            if (np.isScalar) {
+              // n -> 1  eg: child: OrderDetail parent: Product
+              // 1 -> 1 eg child: Employee parent: Employee ( only Manager, no DirectReports property)
               childToParentNp = np;
-
               unattachedChildren.forEach(function (child) {
                 child.setProperty(childToParentNp.name, entity);
+              });
+            } else {
+              // 1 -> n  eg: parent: Region child: Terr
+              // TODO: need to remove unattached children from the map after this; only a perf issue.
+              parentToChildNp = np;
+              var currentChildren = entity.getProperty(parentToChildNp.name);
+              unattachedChildren.forEach(function (child) {
+                // we know if can't already be there.
+                currentChildren._push(child);
               });
             }
           }

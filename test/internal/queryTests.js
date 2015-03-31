@@ -2227,7 +2227,50 @@
       }).fail(testFns.handleFail).fin(start);
   });
 
-  test("unidirectional navigation of same entity type", function() {
+  test("unidirectional navigation of different type (1-n)", function() {
+
+    if (testFns.DEBUG_MONGO) {
+      ok(true, "NA for Mongo");
+      return;
+    }
+    
+    var em = newEm();
+
+    var query = EntityQuery.from("Territories").where("regionID", "!=", null);
+    var query2 = EntityQuery.from("Regions");
+    stop();
+    var territories, regions;
+    query.using(em).execute().then(function (data) {
+      territories = data.results;
+      return query2.using(em).execute();
+    }).then(function (data2) {
+      var regions = data2.results;
+      regions.forEach(function (region) {
+        var terrs = region.getProperty("territories");
+        var isOk= terrs.every(function(terr) {
+          return terr.getProperty("regionID") == region.getProperty("regionID");
+        });
+        ok(isOk, "issue with terr then regions")
+      });
+      em = newEm();
+      return query2.using(em).execute()
+    }).then(function(data3) {
+      regions = data3.results;
+      return query.using(em).execute();
+    }).then(function(data4) {
+      var territories = data4.results;
+      regions.forEach(function (region) {
+        var terrs = region.getProperty("territories");
+        var isOk = terrs.every(function (terr) {
+          return terr.getProperty("regionID") == region.getProperty("regionID");
+        });
+        ok(isOk, "issue with regions then terrs")
+      });
+      
+    }).fail(testFns.handleFail).fin(start);
+  });
+
+  test("unidirectional navigation of same entity type (1-1)", function() {
       if (testFns.DEBUG_MONGO) {
           ok(true, "NA for Mongo");
           return;
@@ -2259,40 +2302,143 @@
           name: "reportsToEmployeeID",
           dataType: breeze.DataType.Int32
       }));
+
       employeeType.addProperty(new breeze.NavigationProperty({
           name: "boss",
           entityTypeName: "Employee:#Foo",
           isScalar: true,
           associationName: "Employee_Boss",
           foreignKeyNames: ["reportsToEmployeeID"]
+         
       }));
 
-      ms.setEntityTypeForResourceName('Employee', 'Employee');
+      ms.setEntityTypeForResourceName('Employees', 'Employee');
       var em = newEm(ms);
       ms.addDataService(em.dataService);
 
       // check using well-known data.  Map of employeeId : reportsToEmployeeID
       var map = {
-          1: 2, 3: 2, 4: 3, 5: 8, 6: 2, 8: 3, 9: 6, 10: 6
+        1: 2,
+        3: 2,
+        4: 3,
+        5: 8,
+        6: 2,
+        8: 3,
+        9: 6,
+        10: 6
       };
 
-      var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
+      // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
+      var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
+        .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
       stop();
       query.using(em).execute().then(function(data) {
-          var emps = data.results;
-          emps.forEach(function(emp) {
-              ok(emp.employeeId && map[emp.employeeId] === emp.reportsToEmployeeId, "reportsToEmployeeID should match");
-          });
-          var em = newEm(ms);
-          var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderByDesc("employeeID");
-          query.using(em).execute().then(function(data2) {
-              var emps = data2.results;
-              emps.forEach(function(emp) {
-                  ok(emp.employeeId && map[emp.employeeId] === emp.reportsToEmployeeId, "reportsToEmployeeID should match");
-              });
-          });
+        var emps = data.results;
+        emps.forEach(function(emp) {
+          ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+          emp.reportsToEmployeeID && ok( emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
+        });
+        var em = newEm(ms);
+        var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
+            .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+        return  query2.using(em).execute();
+      }).then(function(data2) {
+        var emps = data2.results;
+        emps.forEach(function(emp) {
+          ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+          emp.reportsToEmployeeID && ok(emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
+        });
+        var foo = "foo";
       }).fail(testFns.handleFail).fin(start);
   });
+
+  test("unidirectional navigation of same entity type (1-n)", function () {
+    if (testFns.DEBUG_MONGO) {
+      ok(true, "NA for Mongo");
+      return;
+    }
+
+    // create metadata manually so we don't have the bidirectional directReports navigation
+    var ms = testFns.newMs();
+
+    ms.addEntityType({
+      shortName: "Employee",
+      namespace: "Foo",
+      autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
+      dataProperties: [
+          new breeze.DataProperty({
+            name: "employeeID",
+            dataType: breeze.DataType.Int32,
+            isNullable: false,
+            isPartOfKey: true
+          })
+      ]
+    });
+    var employeeType = ms.getEntityType("Employee");
+
+    employeeType.addProperty(new breeze.DataProperty({
+      name: "firstName",
+      dataType: breeze.DataType.String
+    }));
+    employeeType.addProperty(new breeze.DataProperty({
+      name: "reportsToEmployeeID",
+      dataType: breeze.DataType.Int32
+    }));
+
+    employeeType.addProperty(new breeze.NavigationProperty({
+      name: "directReports",
+      entityTypeName: "Employee:#Foo",
+      isScalar: false,
+      associationName: "Employee_DirectReports",
+      invForeignKeyNames: ["reportsToEmployeeID"]
+
+    }));
+
+    ms.setEntityTypeForResourceName('Employees', 'Employee');
+    var em = newEm(ms);
+    ms.addDataService(em.dataService);
+
+    // check using well-known data.  Map of employeeId : reportsToEmployeeID
+    var map = {
+      1: 2,
+      3: 2,
+      4: 3,
+      5: 8,
+      6: 2,
+      8: 3,
+      9: 6,
+      10: 6
+    };
+
+    // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
+    var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
+      .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+    stop();
+    query.using(em).execute().then(function (data) {
+      var emps = data.results;
+      emps.forEach(function (emp) {
+        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+        emp.directReports.forEach(function(dr) {
+          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+        });
+        
+      });
+      var em = newEm(ms);
+      var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
+          .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+      return query2.using(em).execute();
+    }).then(function (data2) {
+      var emps = data2.results;
+      emps.forEach(function (emp) {
+        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+        emp.directReports.forEach(function (dr) {
+          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+        });
+      });
+      var foo = "foo";
+    }).fail(testFns.handleFail).fin(start);
+  });
+
 
 
   test("fromEntities", function () {

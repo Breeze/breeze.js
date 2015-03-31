@@ -220,9 +220,9 @@ function setDpValueSimple(context, rawAccessorFn) {
 
       if (fkNames.length === 0) return;
       var npValue = parent.getProperty(np.name);
+      if (!npValue) return;
       var fkName = fkNames[propertyIx];
       if (np.isScalar) {
-        if (!npValue) return;
         npValue.setProperty(fkName, newValue);
       } else {
         npValue.forEach(function (iv) {

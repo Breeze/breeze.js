@@ -1676,6 +1676,13 @@ var EntityType = (function () {
     if (ms &amp;&amp; !(property.name &amp;&amp; property.nameOnServer)) {
       updateClientServerNames(ms.namingConvention, property, &quot;name&quot;);
     }
+    // props can be added after entity prototype has already been wrapped.
+    if (ms &amp;&amp; this._extra) {
+      if (this._extra.alreadyWrappedProps) {
+        var proto = this._ctor.prototype;
+        __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(proto);
+      }
+    }
     return this;
   };
 
@@ -1832,7 +1839,6 @@ var EntityType = (function () {
     // defaultPropertyInterceptor is a &#x27;global&#x27; (but internal to breeze) function;
     instanceProto._$interceptor = interceptor || defaultPropertyInterceptor;
     __modelLibraryDef.getDefaultInstance().initializeEntityPrototype(instanceProto);
-
     this._ctor = aCtor;
   };
 
