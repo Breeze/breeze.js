@@ -11,6 +11,7 @@
     "gulp-rimraf": "^0.1.0",
     "gulp-shell": "^0.2.9",
     "gulp-uglify": "^1.0.1",
+    "handlebars" : "^3.0.1",
     "through": "2.3.6 ",
     "yuidocjs": "^0.3.50"
   }
