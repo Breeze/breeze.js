@@ -1,13 +1,5 @@
 (function (testFns) {
 
-//  if (testFns.DEBUG_SEQUELIZE) {
-//    module("save", {});
-//    test("Skipping tests for Sequelize", function () {
-//      ok(true, "Skipped tests");
-//    });
-//    return;
-//  };
-
   var breeze = testFns.breeze;
   var core = breeze.core;
   var Enum = core.Enum;
@@ -22,6 +14,7 @@
   var handleFail = testFns.handleFail;
 
   var newEm = testFns.newEm;
+  var testIfNot = testFns.testIfNot;
 
   var wellKnownData = testFns.wellKnownData;
 
@@ -450,12 +443,8 @@
 
   });
 
-  test("pk update", function () {
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "TODO for Mongo - needs to be written specifically for Mongo - should succeed in Mongo");
-      return;
-    }
+  testIfNot("pk update",
+    "mongo", " does not : This test needs to be rewritten", function() {
 
     var em = newEm();
 
@@ -478,19 +467,17 @@
     }).fail(handleFail).fin(start);
   });
 
-  test("product update active", function () {
+  testIfNot("product update active",
+    "mongo", "would require this test to be rewritten", function() { 
     updateProduct(4);
-  });
-  test("product update discontinued", function () {
+    });
+
+  testIfNot("product update discontinued",
+    "mongo", "would require this test to be rewritten", function() { 
     updateProduct(5);
   });
 
   function updateProduct(productId) {
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "TODO for Mongo - needs to be written specifically for Mongo - should succeed in Mongo");
-      return;
-    }
 
     var em = newEm();
 

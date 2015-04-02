@@ -47,12 +47,12 @@ breezeTestFns = (function (breeze) {
   }
 
   function getSkipMsg(s) {
-    if ((testFns.DEBUG_MONGO && s.indexof("mongo",0) === 0) ||
-       (testFns.DEBUG_SEQUELIZE && s.indexof("sequel",0) === 0) ||
-       (testFns.DEBUG_NHIBERNATE && s.indexof("nhib",0) === 0) ||
-       (testFns.DEBUG_HIBERNATE && s.indexof("hib",0) == 0) ||
-       (testFns.DEBUG_ODATA && s.indexof("odata", 0) === 0) ||
-       (testFns.DEBUG_EF_CODEFIRST && s.indexof("efcodefirst", 0) === 0)
+    if ((testFns.DEBUG_MONGO && s.indexOf("mongo",0) === 0) ||
+       (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel",0) === 0) ||
+       (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib",0) === 0) ||
+       (testFns.DEBUG_HIBERNATE && s.indexOf("hib",0) == 0) ||
+       (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
+       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0)
       ) {
       return s;
     } else {
