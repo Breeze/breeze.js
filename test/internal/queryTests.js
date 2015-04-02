@@ -28,13 +28,23 @@
   });
 
   testIfNot("check if correct OData datatype",
-    "mongo,sequelize,hibernate", "does not use OData syntax", function() {
-      
+    "mongo,sequelize,hibernate", "does not use OData syntax", function () {
+
       var em = newEm();
-      var query = EntityQuery.from('Products').using(em).where({ 'unitPrice': { '>=': { value: 100, dataType: breeze.DataType.Decimal } } });
+      var query = EntityQuery.from('Products').using(em).where({
+        'unitPrice': {
+          '>=': {
+            value: 100,
+            dataType: breeze.DataType.Decimal
+          }
+        }
+      });
       var url = query._toUri(em);
       ok(url.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal")
-      var query2 = EntityQuery.from('Products').using(em).where('unitPrice', '>=', { value: 100, dataType: breeze.DataType.Decimal });
+      var query2 = EntityQuery.from('Products').using(em).where('unitPrice', '>=', {
+        value: 100,
+        dataType: breeze.DataType.Decimal
+      });
       var url2 = query2._toUri(em);
       ok(url2.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal - again")
 
@@ -43,7 +53,7 @@
   test("can handle simple json query syntax ", function (assert) {
     var done = assert.async();
     var em = newEm();
-    var query = EntityQuery.from('Customers').using(em).where({ 'city': { '==': 'London' } });
+    var query = EntityQuery.from('Customers').using(em).where({'city': {'==': 'London'}});
     var url = query._toUri(em);
 
     em.executeQuery(query).then(function (data) {
@@ -82,7 +92,7 @@
     var q2 = query.where('city', 'eq', 'London');
 
     ok(true, "should get here");
-    
+
     em.executeQuery(q2).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should have gotten some results");
@@ -95,8 +105,8 @@
 
     var countries = ['Austria', 'Italy', 'Norway']
     var query = EntityQuery.from("Customers")
-        .where("country", 'in', countries);
-    
+      .where("country", 'in', countries);
+
     em1.executeQuery(query).then(function (data) {
       var r = data.results;
       var isOk = r.every(function (cust) {
@@ -118,12 +128,12 @@
     var em2 = newEm();
     var p = Predicate.create("freight", ">", 100).and("customerID", "!=", null);
     var query = new breeze.EntityQuery()
-        .from("Orders")
-        .where(p)
-        .orderBy("orderID")
-        .expand("customer")
-        .take(1);
-    
+      .from("Orders")
+      .where(p)
+      .orderBy("orderID")
+      .expand("customer")
+      .take(1);
+
     var oldCust, newCust1a, newCust1b, order1, order1a, order1b;
     em1.executeQuery(query).then(function (data) {
       order1 = data.results[0];
@@ -160,7 +170,7 @@
   test("query by entity key without preexisting metadata", function (assert) {
     var done = assert.async();
     var manager = new breeze.EntityManager(testFns.serviceName);
-    
+
     manager.fetchMetadata().then(function () {
       var empType = manager.metadataStore.getEntityType("Employee");
       var entityKey = new EntityKey(empType, 1);
@@ -179,9 +189,9 @@
     var p = Predicate.create("freight", ">", 100).and("freight", "<", 200);
 
     var query = new breeze.EntityQuery()
-        .from("Orders")
-        .where(p);
-    
+      .from("Orders")
+      .where(p);
+
     manager.executeQuery(query).then(function (data) {
       var orders = data.results;
       ok(orders.length > 0, "should be some results");
@@ -200,9 +210,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Orders")
-        .where("internationalOrder", "==", null);
-    
+      .from("Orders")
+      .where("internationalOrder", "==", null);
+
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
     }).fail(function (e) {
@@ -215,9 +225,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where("badPropName", "==", "7");
-    
+      .from("Employees")
+      .where("badPropName", "==", "7");
+
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
     }).fail(function (e) {
@@ -230,9 +240,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("AltCustomers")
-        .where("xxxx", "<", 7);
-    
+      .from("AltCustomers")
+      .where("xxxx", "<", 7);
+
     manager.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
     }).fail(function (e) {
@@ -245,61 +255,61 @@
     var done = assert.async();
     var manager = newEm();
     var predicate = Predicate.create(testFns.orderKeyName, "<", 10500);
-    
+
     var query = new breeze.EntityQuery()
-        .from("Orders")
-        .expand("orderDetails, orderDetails.product")
-        .where(predicate)
-        .inlineCount()
-        .orderBy("orderDate")
-        .take(2)
-        .skip(1)
-        .using(manager)
-        .execute()
-        .then(function (data) {
-          ok(data.inlineCount > 0, "should have an inlinecount");
+      .from("Orders")
+      .expand("orderDetails, orderDetails.product")
+      .where(predicate)
+      .inlineCount()
+      .orderBy("orderDate")
+      .take(2)
+      .skip(1)
+      .using(manager)
+      .execute()
+      .then(function (data) {
+        ok(data.inlineCount > 0, "should have an inlinecount");
 
-          var localQuery = breeze.EntityQuery
-              .from('OrderDetails');
+        var localQuery = breeze.EntityQuery
+          .from('OrderDetails');
 
-          // For ODATA this is a known bug: https://aspnetwebstack.codeplex.com/workitem/1037
-          // having to do with mixing expand and inlineCount 
-          // it sounds like it might already be fixed in the next major release but not yet avail.
+        // For ODATA this is a known bug: https://aspnetwebstack.codeplex.com/workitem/1037
+        // having to do with mixing expand and inlineCount
+        // it sounds like it might already be fixed in the next major release but not yet avail.
 
-          var orderDetails = manager.executeQueryLocally(localQuery);
-          ok(orderDetails.length > 0, "should not be empty");
+        var orderDetails = manager.executeQueryLocally(localQuery);
+        ok(orderDetails.length > 0, "should not be empty");
 
-          var localQuery2 = breeze.EntityQuery
-              .from('Products');
+        var localQuery2 = breeze.EntityQuery
+          .from('Products');
 
-          var products = manager.executeQueryLocally(localQuery2);
-          ok(products.length > 0, "should not be empty");
-        }).fail(testFns.handleFail).fin(done);
+        var products = manager.executeQueryLocally(localQuery2);
+        ok(products.length > 0, "should not be empty");
+      }).fail(testFns.handleFail).fin(done);
   });
 
   test("test date in projection", function (assert) {
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Orders")
-        .where("orderDate", "!=", null)
-        .orderBy("orderDate")
-        .take(3);
+      .from("Orders")
+      .where("orderDate", "!=", null)
+      .orderBy("orderDate")
+      .take(3);
 
     var orderDate;
     var orderDate2;
-    
+
     manager.executeQuery(query).then(function (data) {
       var result = data.results[0];
       orderDate = result.getProperty("orderDate");
       ok(core.isDate(orderDate), "orderDate should be of 'Date type'");
       var manager2 = newEm();
       var query = new breeze.EntityQuery()
-          .from("Orders")
-          .where("orderDate", "!=", null)
-          .orderBy("orderDate")
-          .take(3)
-          .select("orderDate");
+        .from("Orders")
+        .where("orderDate", "!=", null)
+        .orderBy("orderDate")
+        .take(3)
+        .select("orderDate");
       return manager2.executeQuery(query);
     }).then(function (data2) {
       orderDate2 = data2.results[0].orderDate;
@@ -323,9 +333,9 @@
     var predicate2 = Predicate.create("firstName", "startsWith", "A");
     var predicates = Predicate.or([undefined, predicate1, null, predicate2, null]);
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(predicates);
-    
+      .from("Employees")
+      .where(predicates);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 0, "there should be records returned");
       data.results.forEach(function (e) {
@@ -348,9 +358,9 @@
 
     var predicates = Predicate.and([]);
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(predicates);
-    
+      .from("Employees")
+      .where(predicates);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 6, "there should be records returned");
     }).fail(testFns.handleFail).fin(done);
@@ -363,9 +373,9 @@
     var predicate1 = Predicate.create("lastName", "startsWith", "D").or("firstName", "startsWith", "A");
     var predicates = Predicate.and([null, undefined, predicate1]);
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(predicates);
-    
+      .from("Employees")
+      .where(predicates);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 0, "there should be records returned");
       var empId = data.results[0].getProperty(testFns.employeeKeyName);
@@ -381,9 +391,9 @@
     var manager = newEm();
     var predicates = Predicate.and([undefined, null, null]);
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(predicates);
-    
+      .from("Employees")
+      .where(predicates);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 6, "there should be records returned");
     }).fail(testFns.handleFail).fin(done);
@@ -395,9 +405,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where().orderBy().select().expand().take().skip();
-    
+      .from("Employees")
+      .where().orderBy().select().expand().take().skip();
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 0, "there should be records returned");
     }).fail(testFns.handleFail).fin(done);
@@ -408,9 +418,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(null).orderBy(null).select(null).expand(null).take(null).skip(null);
-    
+      .from("Employees")
+      .where(null).orderBy(null).select(null).expand(null).take(null).skip(null);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length > 0, "there should be records returned");
     }).fail(testFns.handleFail).fin(done);
@@ -422,9 +432,9 @@
       var done = assert.async();
       var manager = newEm();
       var query = new breeze.EntityQuery()
-          .from("Employees")
-          .where("year(hireDate)", ">", 1993);
-      
+        .from("Employees")
+        .where("year(hireDate)", ">", 1993);
+
       manager.executeQuery(query).then(function (data) {
         var emps = data.results;
         ok(emps.length > 0, "there should be records returned");
@@ -440,9 +450,9 @@
       var manager = newEm();
       var p = Predicate.create("month(hireDate)", ">", 6).and("month(hireDate)", "<", 11);
       var query = new breeze.EntityQuery()
-          .from("Employees")
-          .where(p);
-      
+        .from("Employees")
+        .where(p);
+
       manager.executeQuery(query).then(function (data) {
         var emps = data.results;
         ok(emps.length > 0, "there should be records returned");
@@ -457,9 +467,9 @@
       var done = assert.async();
       var manager = newEm();
       var query = new breeze.EntityQuery()
-          .from("Employees")
-          .where("EmployeeID add ReportsToEmployeeID gt 3");
-      
+        .from("Employees")
+        .where("EmployeeID add ReportsToEmployeeID gt 3");
+
       manager.executeQuery(query).then(function (data) {
         ok(data.results.length > 0, "there should be records returned");
         try {
@@ -478,9 +488,9 @@
       var predicate = Predicate.create("EmployeeID add ReportsToEmployeeID gt 3").and("employeeID", "<", 9999);
 
       var query = new breeze.EntityQuery()
-          .from("Employees")
-          .where(predicate);
-      
+        .from("Employees")
+        .where(predicate);
+
       manager.executeQuery(query).then(function (data) {
         ok(data.results.length > 0, "there should be records returned");
         try {
@@ -497,9 +507,9 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .take(0);
-    
+      .from("Customers")
+      .take(0);
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length === 0, "should be no records returned");
     }).fail(testFns.handleFail).fin(done);
@@ -509,10 +519,10 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .take(0)
-        .inlineCount();
-    
+      .from("Customers")
+      .take(0)
+      .inlineCount();
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length === 0, "should be no records returned");
       ok(data.inlineCount > 0, "should have an inlinecount");
@@ -523,10 +533,10 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .select("companyName, region, city")
-        .inlineCount();
-    
+      .from("Customers")
+      .select("companyName, region, city")
+      .inlineCount();
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length == data.inlineCount, "inlineCount should match return count");
 
@@ -537,11 +547,11 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .select("companyName, region, city")
-        .take(5)
-        .inlineCount();
-    
+      .from("Customers")
+      .select("companyName, region, city")
+      .take(5)
+      .inlineCount();
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length == 5, "should be 5 records returned");
       ok(data.inlineCount > 5, "should have an inlinecount > 5");
@@ -552,12 +562,12 @@
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .select("companyName, region, city")
-        .orderBy("city, region")
-        .take(5)
-        .inlineCount();
-    
+      .from("Customers")
+      .select("companyName, region, city")
+      .orderBy("city, region")
+      .take(5)
+      .inlineCount();
+
     manager.executeQuery(query).then(function (data) {
       ok(data.results.length == 5, "should be 5 records returned");
       ok(data.inlineCount > 5, "should have an inlinecount > 5");
@@ -565,12 +575,12 @@
   });
 
 
-  test("check getEntityByKey", function(assert) {
+  test("check getEntityByKey", function (assert) {
     var done = assert.async();
     var manager = newEm();
     var query = new breeze.EntityQuery()
-        .from("Customers");
-    
+      .from("Customers");
+
     manager.executeQuery(query).then(function (data) {
       var cust1 = data.results[0];
       var key = cust1.getProperty(testFns.customerKeyName);
@@ -581,41 +591,41 @@
     }).fin(done);
   });
 
-  test("local cache query for all Suppliers in fax 'Papa'", function(assert) {
+  test("local cache query for all Suppliers in fax 'Papa'", function (assert) {
     var done = assert.async();
     var query = new breeze.EntityQuery("Suppliers");
     var em = newEm(); // creates a new EntityManager configured with metadata
-    
+
     em.executeQuery(query)
-        .then(function (data) {
-          var count = data.results.length;
-          ok(count > 0, "supplier query returned " + count);
+      .then(function (data) {
+        var count = data.results.length;
+        ok(count > 0, "supplier query returned " + count);
 
-          var predicate = breeze.Predicate.create(testFns.supplierKeyName, '==', 0)
-              .or('fax', '==', 'Papa');
+        var predicate = breeze.Predicate.create(testFns.supplierKeyName, '==', 0)
+          .or('fax', '==', 'Papa');
 
-          var localQuery = breeze.EntityQuery
-              .from('Suppliers')
-              .where(predicate)
-              .toType('Supplier');
+        var localQuery = breeze.EntityQuery
+          .from('Suppliers')
+          .where(predicate)
+          .toType('Supplier');
 
-          var suppliers = em.executeQueryLocally(localQuery);
-          // Defect #2486 Fails with "Invalid ISO8601 duration 'Papa'"
-          equal(suppliers.length, 0, "local query should succeed with no results");
-        }).fail(testFns.handleFail).fin(done);
+        var suppliers = em.executeQueryLocally(localQuery);
+        // Defect #2486 Fails with "Invalid ISO8601 duration 'Papa'"
+        equal(suppliers.length, 0, "local query should succeed with no results");
+      }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("inlineCount when ordering results by simple navigation path", function(assert) {
+  test("inlineCount when ordering results by simple navigation path", function (assert) {
     var done = assert.async();
     var em = newEm();
     // var pred = new Predicate("employeeID", ">", 1).and("employeeID", "<", 6);
     var pred = new Predicate("shipCity", "startsWith", "A");
     var query = new breeze.EntityQuery.from("Orders")
-        .where(pred)
-        .orderBy("customerID");
+      .where(pred)
+      .orderBy("customerID");
     // .orderBy("customer.companyName")
-    
+
     var totalCount;
     em.executeQuery(query).then(function (data) {
       totalCount = data.results.length;
@@ -628,16 +638,16 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("inlineCount when ordering results by nested navigation path", function(assert) {
+  test("inlineCount when ordering results by nested navigation path", function (assert) {
     var done = assert.async();
     var em = newEm();
     // var pred = new Predicate("employeeID", ">", 1).and("employeeID", "<", 6);
     var pred = new Predicate("shipCity", "startsWith", "A");
     var query = new breeze.EntityQuery.from("Orders")
-        .where(pred)
+      .where(pred)
       // .orderBy("customerID");
-        .orderBy("customer.companyName")
-    
+      .orderBy("customer.companyName");
+
     var totalCount;
     em.executeQuery(query).then(function (data) {
       totalCount = data.results.length;
@@ -650,11 +660,11 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("getAlfred", function(assert) {
+  test("getAlfred", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
-    
+
     em.executeQuery(q).then(function (data) {
       var alfred = data.results[0];
       var alfredsID = alfred.getProperty(testFns.customerKeyName).toLowerCase();
@@ -662,12 +672,12 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query URL malformed with bad resource name combined with 'startsWith P'", function(assert) {
+  test("query URL malformed with bad resource name combined with 'startsWith P'", function (assert) {
     var done = assert.async();
     var em = newEm();
     // we intentionally mispelled the resource name to cause the query to fail
     var q = EntityQuery.from("Customer").where("companyName", "startsWith", "P");
-    
+
     em.executeQuery(q).then(function (data) {
       ok(true);
     }).fail(function (error) {
@@ -686,12 +696,12 @@
   });
 
   testIfNot("raw OData query string",
-    "sequelize,hibernate,mongo", "does not support OData query syntax", function(assert) {
+    "sequelize,hibernate,mongo", "does not support OData query syntax", function (assert) {
 
       var done = assert.async();
       var em = newEm();
       var q = ""
-      
+
       em.executeQuery("Customers?&$top=3").then(function (data) {
         var custs = data.results;
         ok(custs.length === 3, "should be 3 custs");
@@ -703,13 +713,13 @@
     });
 
   testIfNot("query with take, orderby and expand",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var q1 = EntityQuery.from("Products")
-          .expand("category")
-          .orderBy("category.categoryName desc, productName");
-      
+        .expand("category")
+        .orderBy("category.categoryName desc, productName");
+
       var topTen;
       em.executeQuery(q1).then(function (data) {
         topTen = data.results.slice(0, 10);
@@ -726,13 +736,13 @@
 
 
   testIfNot("query with take, skip, orderby and expand",
-    "mongo", "does not support 'expand' syntax", function(assert) {
+    "mongo", "does not support 'expand' syntax", function (assert) {
       var done = assert.async();
       var em = newEm();
       var q1 = EntityQuery.from("Products")
-          .expand("category")
-          .orderBy("category.categoryName, productName");
-      
+        .expand("category")
+        .orderBy("category.categoryName, productName");
+
       var nextTen;
       em.executeQuery(q1).then(function (data) {
         nextTen = data.results.slice(10, 20);
@@ -752,14 +762,14 @@
     return cat && cat.getProperty("categoryName") + ":" + product.getProperty("productName");
   }
 
-  test("query with quotes", function(assert) {
+  test("query with quotes", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var q = EntityQuery.from("Customers")
-        .where("companyName", 'contains', "'")
-        .using(em);
-    
+      .where("companyName", 'contains', "'")
+      .using(em);
+
 
     q.execute().then(function (data) {
       ok(data.results.length > 0);
@@ -769,13 +779,12 @@
 
   });
 
-  test("bad query test", function(assert) {
+  test("bad query test", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var q = EntityQuery.from("EntityThatDoesnotExist")
-        .using(em);
-    
+      .using(em);
 
     q.execute().then(function (data) {
       ok(false, "should not get here");
@@ -785,18 +794,15 @@
       } else {
         ok(e.message && e.message.toLowerCase().indexOf("entitythatdoesnotexist") >= 0, e.message);
       }
-    }).fin(function (x) {
-      start();
-    });
+    }).fin(done);
   });
 
   testIfNot("nested expand",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
       var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
-      
 
       em.executeQuery(query).then(function (data) {
         var details = data.results;
@@ -808,12 +814,12 @@
     });
 
   testIfNot("nested expand 3 level",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
       var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
-      
+
 
       em.executeQuery(query).then(function (data) {
         var orders = data.results;
@@ -827,69 +833,67 @@
     });
 
   testIfNot("retrievedEntities - nested expand 2 level",
-      "mongo", "does not support 'expand'", function(assert) {
-        var done = assert.async();
-        var em = newEm();
-        var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
-        
+    "mongo", "does not support 'expand'", function (assert) {
+      var done = assert.async();
+      var em = newEm();
+      var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
 
-        em.executeQuery(query).then(function (data) {
-          var entities = data.retrievedEntities;
-          ok(entities);
-          ok(entities.length == 9, "Should have 9 entities, but had " + entities.length);
+      em.executeQuery(query).then(function (data) {
+        var entities = data.retrievedEntities;
+        ok(entities);
+        ok(entities.length == 9, "Should have 9 entities, but had " + entities.length);
 
-          var details = data.results;
-          ok(entities.indexOf(details[0]) >= 0, "entities should have the orderDetail");
-          ok(entities.indexOf(details[1]) >= 0, "entities should have the orderDetail");
-          ok(entities.indexOf(details[2]) >= 0, "entities should have the orderDetail");
-          ok(entities.indexOf(details[3]) >= 0, "entities should have the orderDetail");
-          ok(entities.indexOf(details[4]) >= 0, "entities should have the orderDetail");
+        var details = data.results;
+        ok(entities.indexOf(details[0]) >= 0, "entities should have the orderDetail");
+        ok(entities.indexOf(details[1]) >= 0, "entities should have the orderDetail");
+        ok(entities.indexOf(details[2]) >= 0, "entities should have the orderDetail");
+        ok(entities.indexOf(details[3]) >= 0, "entities should have the orderDetail");
+        ok(entities.indexOf(details[4]) >= 0, "entities should have the orderDetail");
 
-          ok(entities.indexOf(details[0].getProperty("order")) >= 0, "entities should have the order");
-          ok(entities.indexOf(details[1].getProperty("order")) >= 0, "entities should have the order");
-          ok(entities.indexOf(details[2].getProperty("order")) >= 0, "entities should have the order");
-          ok(entities.indexOf(details[3].getProperty("order")) >= 0, "entities should have the order");
-          ok(entities.indexOf(details[4].getProperty("order")) >= 0, "entities should have the order");
+        ok(entities.indexOf(details[0].getProperty("order")) >= 0, "entities should have the order");
+        ok(entities.indexOf(details[1].getProperty("order")) >= 0, "entities should have the order");
+        ok(entities.indexOf(details[2].getProperty("order")) >= 0, "entities should have the order");
+        ok(entities.indexOf(details[3].getProperty("order")) >= 0, "entities should have the order");
+        ok(entities.indexOf(details[4].getProperty("order")) >= 0, "entities should have the order");
 
-          ok(entities.indexOf(details[0].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-          ok(entities.indexOf(details[1].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-          ok(entities.indexOf(details[2].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-          ok(entities.indexOf(details[3].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-          ok(entities.indexOf(details[4].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+        ok(entities.indexOf(details[0].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+        ok(entities.indexOf(details[1].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+        ok(entities.indexOf(details[2].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+        ok(entities.indexOf(details[3].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+        ok(entities.indexOf(details[4].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
 
-        }).fail(testFns.handleFail).fin(done);
-      });
+      }).fail(testFns.handleFail).fin(done);
+    });
 
   testIfNot("retrievedEntities - nested expand 3 level",
-      "mongo", "does not support 'expand'", function(assert) {
-        var done = assert.async();
+    "mongo", "does not support 'expand'", function (assert) {
+      var done = assert.async();
 
-        var em = newEm();
-        var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
-        
+      var em = newEm();
+      var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
 
-        em.executeQuery(query).then(function (data) {
-          var entities = data.retrievedEntities;
-          ok(entities);
-          // removed because may change with structure of db.
-          // ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
+      em.executeQuery(query).then(function (data) {
+        var entities = data.retrievedEntities;
+        ok(entities);
+        // removed because may change with structure of db.
+        // ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
 
-          var orders = data.results;
-          for (var i = 0, ilen = orders.length; i < ilen; i++) {
-            ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
-            var orderDetails = orders[i].getProperty("orderDetails");
+        var orders = data.results;
+        for (var i = 0, ilen = orders.length; i < ilen; i++) {
+          ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
+          var orderDetails = orders[i].getProperty("orderDetails");
 
-            for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
-              ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
-              ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
-              ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
-            }
+          for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
+            ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
+            ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
+            ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
           }
-          var allEntities = em.getEntities();
-          ok(allEntities.length == entities.length, "should have filled the cache with the same number of entities - i.e. no dups")
+        }
+        var allEntities = em.getEntities();
+        ok(allEntities.length == entities.length, "should have filled the cache with the same number of entities - i.e. no dups")
 
-        }).fail(testFns.handleFail).fin(done);
-      });
+      }).fail(testFns.handleFail).fin(done);
+    });
 
   var jsonResultsAdapter = new breeze.JsonResultsAdapter({
     name: "eventAdapter",
@@ -918,12 +922,12 @@
   });
 
   testIfNot("query using jsonResultsAdapter",
-    "mongo,odata", "does not work with this test's jsonResultsAdapter", function(assert) {
+    "mongo,odata", "does not work with this test's jsonResultsAdapter", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery.from("OrderDetails").take(5).using(jsonResultsAdapter);
-      
+
       em.executeQuery(query).then(function (data) {
         ok(data.results.length === 5, "should be 5 recs");
         var rv = data.results[0].getProperty("rowVersion");
@@ -933,15 +937,15 @@
     });
 
   testIfNot("query using dataService with jsonResultsAdapter",
-    "mongo,odata", "does not work with this test's jsonResultsAdapter", function(assert) {
+    "mongo,odata", "does not work with this test's jsonResultsAdapter", function (assert) {
       var done = assert.async();
       var em = newEm();
 
 
       var oldDs = em.dataService;
-      var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
+      var newDs = new DataService({serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter});
       var query = EntityQuery.from("OrderDetails").take(5).using(newDs);
-      
+
       em.executeQuery(query).then(function (data) {
         ok(data.results.length === 5, "should be 5 recs");
         var rv = data.results[0].getProperty("rowVersion");
@@ -951,15 +955,15 @@
     });
 
   testIfNot("query using em with dataService with jsonResultsAdapter",
-    "mongo,odata", "does not work with this test's jsonResultsAdapter", function(assert) {
+    "mongo,odata", "does not work with this test's jsonResultsAdapter", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var oldDs = em.dataService;
-      var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
-      var em2 = new EntityManager({ dataService: newDs });
+      var newDs = new DataService({serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter});
+      var em2 = new EntityManager({dataService: newDs});
       var query = EntityQuery.from("OrderDetails").take(5);
-           
+
       em2.executeQuery(query).then(function (data) {
         ok(data.results.length === 5, "should be 5 recs");
         var rv = data.results[0].getProperty("rowVersion");
@@ -969,12 +973,12 @@
     });
 
   testIfNot("size test",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
       var query = EntityQuery.from("Customers").take(5).expand("orders");
-      
+
       var s1, s2, s3, s4, s5, s6;
       var difObj;
       em.executeQuery(query).then(function (data) {
@@ -1006,12 +1010,12 @@
     });
 
   testIfNot("sizeof config",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
       var query = EntityQuery.from("Customers").take(5).expand("orders");
-      
+
       var s1, s2, s3, s4, s5, s6;
       var sizeDif;
       em.executeQuery(query).then(function (data) {
@@ -1036,12 +1040,12 @@
     });
 
   testIfNot("size test property change",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
       var query = EntityQuery.from("Customers").take(5).expand("orders");
-      
+
       var s1, s2, s3, s4, s5, s6;
       var sizeDif, difObj;
       var hasChanges = em.hasChanges();
@@ -1093,21 +1097,21 @@
     });
 
   testIfNot("detached unresolved children",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var realEm = newEm();
       var metadataStore = realEm.metadataStore;
       var orderType = metadataStore.getEntityType("Order");
 
       var query = EntityQuery.from("Customers")
-          .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
-          .expand("orders");
+        .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
+        .expand("orders");
       var newOrder = orderType.createEntity(); // call the factory function for the Customer type
       realEm.addEntity(newOrder);
       newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
 
       var items = realEm.rejectChanges();
-      
+
       realEm.executeQuery(query).then(function (data) {
         var orders = data.results[0].getProperty("orders");
         // the bug was that this included the previously detached order above. ( making a length of 11).
@@ -1128,13 +1132,13 @@
     });
 
   testIfNot("query with two nested expands",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery.from("OrderDetails")
-          .where("orderID", "==", 11069)
-          .expand(["order.customer", "order.employee"]);
-      
+        .where("orderID", "==", 11069)
+        .expand(["order.customer", "order.employee"]);
+
       em.executeQuery(query).then(function (data) {
         var r = data.results[0];
         var c = r.getProperty("order").getProperty("customer");
@@ -1144,13 +1148,13 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("query with two fields", function(assert) {
+  test("query with two fields", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Orders")
-        .where("requiredDate", "<", "shippedDate")
-        .take(20);
-    
+      .where("requiredDate", "<", "shippedDate")
+      .take(20);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -1162,13 +1166,13 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with two fields & contains", function(assert) {
+  test("query with two fields & contains", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Employees")
-        .where("notes", "contains", "firstName")
-        .take(20);
-    
+      .where("notes", "contains", "firstName")
+      .take(20);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should be at least one record where notes contains firstName");
@@ -1180,14 +1184,14 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with two fields & startsWith literal", function(assert) {
+  test("query with two fields & startsWith literal", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Employees")
       // .where("lastName", "startsWith", "Dav")
-        .where({ lastName: { "startsWith": "Dav" } })
-        .take(20);
-    
+      .where({lastName: {"startsWith": "Dav"}})
+      .take(20);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should be some employees named 'Dav'");
@@ -1198,14 +1202,14 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with two fields & startsWith literal forced", function(assert) {
+  test("query with two fields & startsWith literal forced", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Employees")
-        .where("lastName", "startsWith", { value: "firstName", isLiteral: true })
+      .where("lastName", "startsWith", {value: "firstName", isLiteral: true})
       // .where("lastName", "startsWith", "firstName", true)
-        .take(20);
-    
+      .take(20);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length === 0, "should be no recs returned");
@@ -1213,13 +1217,13 @@
   });
 
 
-  test("query with inlineCount", function(assert) {
+  test("query with inlineCount", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Customers")
-        .take(20)
-        .inlineCount(true);
-    
+      .take(20)
+      .inlineCount(true);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       var count = data.inlineCount;
@@ -1227,12 +1231,12 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query without inlineCount", function(assert) {
+  test("query without inlineCount", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Customers")
-        .take(5);
-    
+      .take(5);
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       var inlineCount = data.inlineCount;
@@ -1241,14 +1245,14 @@
   });
 
   testIfNot("query with inlineCount 2",
-    "mongo", "does not support nested navigation thru joins", function(assert) {
+    "mongo", "does not support nested navigation thru joins", function (assert) {
       var done = assert.async();
       var em = newEm();
       var q = EntityQuery.from("Orders")
-          .where("customer.companyName", "startsWith", "C")
-          .take(5)
-          .inlineCount(true);
-      
+        .where("customer.companyName", "startsWith", "C")
+        .take(5)
+        .inlineCount(true);
+
       em.executeQuery(q).then(function (data) {
         var r = data.results;
         var count = data.inlineCount;
@@ -1256,11 +1260,11 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("fetchEntityByKey", function(assert) {
+  test("fetchEntityByKey", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = wellKnownData.alfredsID;
-    
+
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID).then(function (data) {
       alfred = data.entity;
@@ -1280,11 +1284,11 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("fetchEntityByKey without metadata", function(assert) {
+  test("fetchEntityByKey without metadata", function (assert) {
     var done = assert.async();
     var emX = new breeze.EntityManager(testFns.serviceName);
     var alfredsID = wellKnownData.alfredsID;
-    
+
     var alfred;
     emX.fetchEntityByKey("Customer", alfredsID, true).then(function (data) {
       alfred = data.entity;
@@ -1294,11 +1298,11 @@
 
   });
 
-  test("fetchEntityByKey - deleted", function(assert) {
+  test("fetchEntityByKey - deleted", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = wellKnownData.alfredsID;
-    
+
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID).then(function (data) {
       alfred = data.entity;
@@ -1316,7 +1320,7 @@
       ok(alfred3 === null, "alfred3 should = alfred");
       ok(data3.fromCache === true, "should not have been from cache");
 
-      em.setProperties({ queryOptions: em.queryOptions.using(MergeStrategy.OverwriteChanges) });
+      em.setProperties({queryOptions: em.queryOptions.using(MergeStrategy.OverwriteChanges)});
       return em.fetchEntityByKey(data3.entityKey, true);
     }).then(function (data4) {
       var alfred4 = data4.entity;
@@ -1326,11 +1330,11 @@
   });
 
 
-  test("fetchEntityByKey - cache first not found", function(assert) {
+  test("fetchEntityByKey - cache first not found", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = wellKnownData.alfredsID;
-    
+
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID, true).then(function (data) {
       alfred = data.entity;
@@ -1339,11 +1343,11 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("fetchEntityByKey - missing key", function(assert) {
+  test("fetchEntityByKey - missing key", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = '885efa04-cbf2-4dd7-a7de-083ee17b6ad7'; // not a valid key
-    
+
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID, true).then(function (data) {
       alfred = data.entity;
@@ -1353,10 +1357,10 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("fetchEntityByKey - bad args", function(assert) {
+  test("fetchEntityByKey - bad args", function (assert) {
     var done = assert.async();
     var em = newEm();
-    
+
     try {
       em.fetchEntityByKey("Customer").then(function (data) {
         ok(false, "should not have gotten here");
@@ -1368,11 +1372,11 @@
   });
 
 
-  test("hasChanges after query", function(assert) {
+  test("hasChanges after query", function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Customers").take(20);
-    
+
     em.executeQuery(query).then(function (data) {
       var r = data.results;
       ok(r.length === 20);
@@ -1381,11 +1385,11 @@
 
   });
 
-  test("hasChanges after query 2", function(assert) {
+  test("hasChanges after query 2", function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2);
-    
+
     var entity;
     em.executeQuery(query).then(function (data) {
       var r = data.results;
@@ -1414,11 +1418,11 @@
   });
 
   testIfNot("hasChanges after query 3",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery.from("Customers").take(20);
-      
+
       em.executeQuery(query).then(function (data) {
         var r = data.results;
         ok(r.length === 20);
@@ -1438,11 +1442,11 @@
     });
 
   testIfNot("isNavigationPropertyLoaded on expand",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2).expand("orders.orderDetails");
-      
+
 
       em.executeQuery(query).then(function (data) {
         var r = data.results;
@@ -1461,12 +1465,12 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("can run two queries in parallel for fresh EM w/ empty metadataStore", 1, function(assert) {
+  test("can run two queries in parallel for fresh EM w/ empty metadataStore", 1, function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = breeze.EntityQuery.from("Customers");
     var successCount = 0;
-    
+
     var prom1 = em.executeQuery(query).then(function () {
       return successCount++;
     }).fail(queryFailed);
@@ -1480,26 +1484,26 @@
 
     function queryFailed(error) {
       ok(false, "query failed when successCount is " + successCount +
-          " with error message = " + error.message);
+      " with error message = " + error.message);
     }
   });
 
 
-  test("numeric/string  query ", function(assert) {
+  test("numeric/string  query ", function (assert) {
     var done = assert.async();
     var em = newEm();
-    
+
     var r;
     EntityQuery.from("Products").take(5).using(em).execute().then(function (data) {
       var id = data.results[0].getProperty(testFns.productKeyName).toString();
 
       var query = new breeze.EntityQuery()
-          .from("Products").where(testFns.productKeyName, '==', id).take(5);
+        .from("Products").where(testFns.productKeyName, '==', id).take(5);
       query.using(em).execute().then(function (data2) {
         r = data2.results;
         ok(r.length == 1);
         query = new breeze.EntityQuery()
-            .from("Products").where(testFns.productKeyName, '!=', id);
+          .from("Products").where(testFns.productKeyName, '!=', id);
         return query.using(em).execute();
       }).then(function (data3) {
         r = data3.results;
@@ -1513,14 +1517,14 @@
   });
 
 
-  test("query results notification", function(assert) {
+  test("query results notification", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers")
-        .where(testFns.customerKeyName, "==", alfredsID)
-        .using(em);
-    
+      .where(testFns.customerKeyName, "==", alfredsID)
+      .using(em);
+
     var arrayChangedCount = 0;
     var adds;
     var orders;
@@ -1546,14 +1550,14 @@
   });
 
   testIfNot("query results notification suppressed",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
       var query = EntityQuery.from("Customers")
-          .where(testFns.customerKeyName, "==", alfredsID)
-          .using(em);
-      
+        .where(testFns.customerKeyName, "==", alfredsID)
+        .using(em);
+
       var arrayChangedCount = 0;
       var orders;
 
@@ -1576,11 +1580,11 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("getEntities after query", function(assert) {
+  test("getEntities after query", function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = breeze.EntityQuery.from("Categories");
-    
+
     em.executeQuery(query).then(function (data) {
       ok(data.results.length > 0); //this returns 45 results
       var ents = em.getEntities();
@@ -1590,14 +1594,14 @@
   });
 
 
-  test("navigation results notification", function(assert) {
+  test("navigation results notification", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers")
-        .where(testFns.customerKeyName, "==", alfredsID)
-        .using(em);
-    
+      .where(testFns.customerKeyName, "==", alfredsID)
+      .using(em);
+
     var arrayChangedCount = 0;
     var adds;
     var orders;
@@ -1620,14 +1624,14 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query results include query", function(assert) {
+  test("query results include query", function (assert) {
     var done = assert.async();
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers")
-        .where(testFns.customerKeyName, "==", alfredsID)
-        .using(em);
-    
+      .where(testFns.customerKeyName, "==", alfredsID)
+      .using(em);
+
     query.execute().then(function (data) {
       var customer = data.results[0];
       var sameQuery = data.query;
@@ -1637,22 +1641,22 @@
 
 
   testIfNot("duplicates after relation query",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
       em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
       var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
       var query = EntityQuery.from("Customers")
-          .where(testFns.customerKeyName, "==", alfredsID);
+        .where(testFns.customerKeyName, "==", alfredsID);
       // bug goes away if you add this.
       // .expand("orders");
       var customer;
-      
+
       query.using(em).execute().then(function (data) {
         customer = data.results[0];
         var q2 = EntityQuery.from("Orders")
-            .where("customerID", "==", alfredsID)
-            .expand("customer"); // bug goes away if you remove this
+          .where("customerID", "==", alfredsID)
+          .expand("customer"); // bug goes away if you remove this
         return q2.using(em).execute();
       }).then(function (data2) {
         ok(!em.hasChanges(), "should not have any changes");
@@ -1677,7 +1681,7 @@
 
   };
 
-  test("post create init after materialization", function(assert) {
+  test("post create init after materialization", function (assert) {
     var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Product = createProductCtor();
@@ -1685,7 +1689,7 @@
     var productType = em.metadataStore.getEntityType("Product");
     em.metadataStore.registerEntityTypeCtor("Product", Product, "init");
     var query = EntityQuery.from("Products").take(3);
-    
+
     em.executeQuery(query).then(function (data) {
       var products = data.results;
       products.forEach(function (p) {
@@ -1695,7 +1699,7 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("post create init using materialized data", 2, function(assert) {
+  test("post create init using materialized data", 2, function (assert) {
     var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Customer = testFns.makeEntityCtor(function () {
@@ -1713,15 +1717,15 @@
 
     var query = EntityQuery.from("Customers").top(1);
 
-     // going async
+    // going async
     em.executeQuery(query).then(function (data) {
       var cust = data.results[0];
       equal(cust.foo, "Foo " + cust.getProperty("companyName"),
-          "'foo' property, created in initializer, performed as expected");
+        "'foo' property, created in initializer, performed as expected");
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("post create init with no ctor", function(assert) {
+  test("post create init with no ctor", function (assert) {
 
     var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
@@ -1738,7 +1742,7 @@
 
     var query = EntityQuery.from("Employees").top(1);
 
-     // going async
+    // going async
     em.executeQuery(query).then(function (data) {
       var emp = data.results[0];
       ok(emp.foo, "foo property should exist");
@@ -1749,19 +1753,19 @@
   });
 
 
-  test("date property is a DateTime", function(assert) {
+  test("date property is a DateTime", function (assert) {
     var done = assert.async();
     // This is what the type of a date should be
     var someDate = new Date();
     ok("object" === typeof someDate,
-            "typeof someDate is " + typeof someDate);
+      "typeof someDate is " + typeof someDate);
 
     var firstOrderQuery = new EntityQuery("Orders")
-        .where("orderDate", ">", new Date(1998, 3, 1))
-        .take(1);
+      .where("orderDate", ">", new Date(1998, 3, 1))
+      .take(1);
 
     var em = newEm();
-    
+
     em.executeQuery(firstOrderQuery).then(function (data) {
       var ents = em.getEntities();
       var order = data.results[0];
@@ -1769,7 +1773,7 @@
 
       // THIS TEST FAILS!
       ok("object" === typeof orderDate,
-              "typeof orderDate is " + typeof orderDate);
+        "typeof orderDate is " + typeof orderDate);
       ok(core.isDate(orderDate), "should be a date");
       done();
     }).fail(testFns.handleFail);
@@ -1783,7 +1787,7 @@
     ok(qo.mergeStrategy === MergeStrategy.PreserveChanges, "mergeStrategy.PreserveChanges");
     qo = qo.using(FetchStrategy.FromLocalCache);
     ok(qo.fetchStrategy === FetchStrategy.FromLocalCache, "fetchStrategy.FromLocalCache");
-    qo = qo.using({ mergeStrategy: MergeStrategy.OverwriteChanges });
+    qo = qo.using({mergeStrategy: MergeStrategy.OverwriteChanges});
     ok(qo.mergeStrategy === MergeStrategy.OverwriteChanges, "mergeStrategy.OverwriteChanges");
 
   });
@@ -1798,14 +1802,14 @@
     }
 
     try {
-      qo.using({ mergeStrategy: 6 });
+      qo.using({mergeStrategy: 6});
       ok(false, "should not get here, bad mergeStrategy");
     } catch (e) {
       ok(e, e.message);
     }
 
     try {
-      qo.using({ mergeStrategy: MergeStrategy.OverwriteChanges, foo: "huh" });
+      qo.using({mergeStrategy: MergeStrategy.OverwriteChanges, foo: "huh"});
       ok(false, "should not get here, unknown property in config");
     } catch (e) {
       ok(e, e.message);
@@ -1826,13 +1830,13 @@
     ok(customer === sameCustomer, "customer should == sameCustomer");
   });
 
-  test("reject change to existing key", function(assert) {
+  test("reject change to existing key", function (assert) {
     var done = assert.async();
     var em = newEm();
     var custType = em.metadataStore.getEntityType("Customer");
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers").where(testFns.customerKeyName, "==", alfredsID);
-    
+
     query.using(em).execute().then(function (data) {
       ok(data.results.length === 1, "should have fetched 1 record");
       var customer = custType.createEntity();
@@ -1847,7 +1851,7 @@
     }).fail(testFns.handleFail);
   });
 
-  test("fill placeholder customer asynchronously", function(assert) {
+  test("fill placeholder customer asynchronously", function (assert) {
     var done = assert.async();
     var em = newEm();
     var custType = em.metadataStore.getEntityType("Customer");
@@ -1867,15 +1871,15 @@
 
     // SHOULD BE THE SAME. EITHER WAY ITS AN ATTACHED UNCHANGED ENTITY
     ok(customer.entityAspect.entityState.isUnchanged(),
-            "Attached entity is in state " + customer.entityAspect.entityState);
+      "Attached entity is in state " + customer.entityAspect.entityState);
 
     ok(em.getEntities().length === 1,
-            "# of entities in cache is " + em.getEntities().length);
+      "# of entities in cache is " + em.getEntities().length);
 
     // this refresh query will fill the customer values from remote storage
     var refreshQuery = breeze.EntityQuery.fromEntities(customer);
 
-     // going async ...
+    // going async ...
 
     refreshQuery.using(em).execute().then(function (data) {
       var results = data.results, count = results.length;
@@ -1888,29 +1892,28 @@
           // DUPLICATE ID DETECTED SHOULD NEVER GET HERE
           var c1 = inCache[0], c2 = inCache[1];
           ok(false,
-              "Two custs in cache with same ID, ({0})-{1} and ({2})-{3}".format(// format is my extension to String
-                  c1.getProperty(testFns.customerKeyName), c1.getProperty("companyName"), c2.getProperty(testFns.customerKeyName), c2.getProperty("companyName")));
+            "Two custs in cache with same ID, ({0})-{1} and ({2})-{3}".format(// format is my extension to String
+              c1.getProperty(testFns.customerKeyName), c1.getProperty("companyName"), c2.getProperty(testFns.customerKeyName), c2.getProperty("companyName")));
         }
 
         // This test should succeed; it fails because of above bug!!!
         ok(results[0] === customer,
-                "refresh query result is the same as the customer in cache" +
-                " whose updated name is " + customer.getProperty("companyName"));
+          "refresh query result is the same as the customer in cache" +
+          " whose updated name is " + customer.getProperty("companyName"));
       }
       done();
     }).fail(testFns.handleFail);
   });
 
 
-  test("query uni (1-n) region and territories", function(assert) {
+  test("query uni (1-n) region and territories", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = new EntityQuery()
-        .from("Regions")
-        .where("regionDescription", "==", "Northern");
+      .from("Regions")
+      .where("regionDescription", "==", "Northern");
 
 
-    
     em.executeQuery(q).then(function (data) {
       ok(!em.hasChanges(), "should not have any changes");
       ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -1925,16 +1928,16 @@
   });
 
 
-  test("starts with op", function(assert) {
+  test("starts with op", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
-        .where("companyName", "startsWith", "C")
-        .orderBy("companyName");
+      .from("Customers")
+      .where("companyName", "startsWith", "C")
+      .orderBy("companyName");
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var customers = data.results;
       testFns.assertIsSorted(customers, "companyName", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
@@ -1949,15 +1952,15 @@
     }).fail(testFns.handleFail);
   });
 
-  test("greater than op", function(assert) {
+  test("greater than op", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = EntityQuery.from("Orders")
-        .where("freight", ">", 100);
+      .where("freight", ">", 100);
 
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var orders = data.results;
       ok(orders.length > 0);
@@ -1966,7 +1969,7 @@
   });
 
 
-  test("predicate", function(assert) {
+  test("predicate", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -1975,14 +1978,14 @@
     var pred2 = new Predicate("orderDate", ">", new Date(1998, 3, 1));
     var query = baseQuery.where(pred1.and(pred2));
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var orders = data.results;
       ok(orders.length > 0);
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("predicate with contains", function(assert) {
+  test("predicate with contains", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -1992,31 +1995,31 @@
     var whereClause = p1.and(p2);
 
     var query = new breeze.EntityQuery()
-        .from("Customers")
-        .where(whereClause);
-    
+      .from("Customers")
+      .where(whereClause);
+
     em.executeQuery(query).then(function (data) {
       var customers = data.results;
       ok(customers.length > 0);
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with contains", function(assert) {
+  test("query with contains", function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Customers")
-        .where("companyName", FilterQueryOp.Contains, 'market');
+      .where("companyName", FilterQueryOp.Contains, 'market');
     //.where("CompanyName", "contains", 'market'); // Alternative to FilterQueryOp
     //.where("substringof(CompanyName,'market')", "eq", true); // becomes in OData
     //.where("indexOf(toLower(CompanyName),'market')", "ne", -1); // equivalent to
-    
+
     em.executeQuery(query).then(function (data) {
       ok(data.results.length > 0);
     }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("predicate 2", function(assert) {
+  test("predicate 2", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -2026,7 +2029,7 @@
     var newPred = Predicate.and([pred1, pred2]);
     var query = baseQuery.where(newPred);
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var orders = data.results;
       ok(orders.length > 0);
@@ -2034,16 +2037,16 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("predicate 3", function(assert) {
+  test("predicate 3", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var baseQuery = EntityQuery.from("Orders");
     var pred = Predicate.create("freight", ">", 100)
-        .and("orderDate", ">", new Date(1998, 3, 1));
+      .and("orderDate", ">", new Date(1998, 3, 1));
     var query = baseQuery.where(pred);
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var orders = data.results;
       ok(orders.length > 0);
@@ -2051,19 +2054,19 @@
   });
 
 
-  test("not predicate with null", function(assert) {
+  test("not predicate with null", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var pred = new Predicate("region", FilterQueryOp.Equals, null);
     pred = pred.not();
     var query = new EntityQuery()
-        .from("Customers")
-        .where(pred)
-        .take(10);
+      .from("Customers")
+      .where(pred)
+      .take(10);
 
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query, function (data) {
       var customers = data.results;
       ok(customers.length > 0);
@@ -2075,12 +2078,12 @@
   });
 
   testIfNot("unidirectional navigation load",
-    "mongo", "OrderDetails is not queryable", function(assert) {
+    "mongo", "OrderDetails is not queryable", function (assert) {
       var done = assert.async();
       var em = newEm();
       var count = 5;
       var query = EntityQuery.from("OrderDetails").take(count);
-      
+
       query.using(em).execute().then(function (data) {
         var orderDetails = data.results;
         ok(orderDetails.length === count);
@@ -2099,13 +2102,13 @@
     });
 
   testIfNot("unidirectional navigation query",
-    "mongo", "OrderDetails is not queryable", function(assert) {
+    "mongo", "OrderDetails is not queryable", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery.from("OrderDetails")
-          .where("product.productID", "==", 1);
-      
+        .where("product.productID", "==", 1);
+
       var orderDetails;
       query.using(em).execute().then(function (data) {
         orderDetails = data.results;
@@ -2114,7 +2117,7 @@
           ok(od.getProperty("productID") === 1, "productID should === 1");
         });
         var q2 = EntityQuery.from("Products")
-            .where("productID", "==", 1);
+          .where("productID", "==", 1);
         return em.executeQuery(q2);
       }).then(function (data) {
         var product = data.results[0];
@@ -2126,15 +2129,15 @@
     });
 
   testIfNot("unidirectional navigation bad query",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery.from("Products")
-          .where("productID", "==", 1)
-          .expand("orderDetails");
+        .where("productID", "==", 1)
+        .expand("orderDetails");
 
-      
+
       query.using(em).execute().then(function (data) {
         ok(false, "should not get here");
 
@@ -2148,13 +2151,13 @@
     });
 
   testIfNot("bidirectional navigation of same entity type",
-    "mongo", "does not support navigation", function(assert) {
+    "mongo", "does not support navigation", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery.from("Employees")
-          .where("reportsToEmployeeID", "!=", null);
-      
+        .where("reportsToEmployeeID", "!=", null);
+
       var orderDetails;
       query.using(em).execute().then(function (data) {
         var emps = data.results;
@@ -2169,13 +2172,13 @@
     });
 
   testIfNot("unidirectional navigation of different type (1-n)",
-    "mongo", "does not support navigation", function(assert) {
+    "mongo", "does not support navigation", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery.from("Territories").where("regionID", "!=", null);
       var query2 = EntityQuery.from("Regions");
-      
+
       var territories, regions;
       query.using(em).execute().then(function (data) {
         territories = data.results;
@@ -2208,7 +2211,7 @@
     });
 
   testIfNot("unidirectional navigation of same entity type (1-1)",
-    "mongo", "does not support navigation", function(assert) {
+    "mongo", "does not support navigation", function (assert) {
       var done = assert.async();
       // create metadata manually so we don't have the bidirectional directReports navigation
       var ms = testFns.newMs();
@@ -2218,12 +2221,12 @@
         namespace: "Foo",
         autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
         dataProperties: [
-            new breeze.DataProperty({
-              name: "employeeID",
-              dataType: breeze.DataType.Int32,
-              isNullable: false,
-              isPartOfKey: true
-            })
+          new breeze.DataProperty({
+            name: "employeeID",
+            dataType: breeze.DataType.Int32,
+            isNullable: false,
+            isPartOfKey: true
+          })
         ]
       });
       var employeeType = ms.getEntityType("Employee");
@@ -2265,7 +2268,7 @@
       // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
       var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
         .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
-      
+
       query.using(em).execute().then(function (data) {
         var emps = data.results;
         emps.forEach(function (emp) {
@@ -2274,7 +2277,7 @@
         });
         var em = newEm(ms);
         var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
-            .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+          .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
         return query2.using(em).execute();
       }).then(function (data2) {
         var emps = data2.results;
@@ -2287,7 +2290,7 @@
     });
 
   testIfNot("unidirectional navigation of same entity type (1-n)",
-    "mongo", "does not support navigation", function(assert) {
+    "mongo", "does not support navigation", function (assert) {
       var done = assert.async();
       // create metadata manually so we don't have the bidirectional directReports navigation
       var ms = testFns.newMs();
@@ -2297,12 +2300,12 @@
         namespace: "Foo",
         autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
         dataProperties: [
-            new breeze.DataProperty({
-              name: "employeeID",
-              dataType: breeze.DataType.Int32,
-              isNullable: false,
-              isPartOfKey: true
-            })
+          new breeze.DataProperty({
+            name: "employeeID",
+            dataType: breeze.DataType.Int32,
+            isNullable: false,
+            isPartOfKey: true
+          })
         ]
       });
       var employeeType = ms.getEntityType("Employee");
@@ -2344,7 +2347,7 @@
       // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
       var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
         .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
-      
+
       query.using(em).execute().then(function (data) {
         var emps = data.results;
         emps.forEach(function (emp) {
@@ -2356,7 +2359,7 @@
         });
         var em = newEm(ms);
         var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
-            .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+          .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
         return query2.using(em).execute();
       }).then(function (data2) {
         var emps = data2.results;
@@ -2371,15 +2374,14 @@
     });
 
 
-
-  test("fromEntities", function(assert) {
+  test("fromEntities", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Orders")
-        .take(2);
-    
+      .from("Orders")
+      .take(2);
+
     em.executeQuery(query).then(function (data) {
       var orders = data.results;
       ok(orders.length === 2, "data.results length should be 2");
@@ -2391,16 +2393,16 @@
   });
 
   testIfNot("where nested property",
-    "mongo", "does not have the nested property Product.category.categoryName", function(assert) {
+    "mongo", "does not have the nested property Product.category.categoryName", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Products")
-          .where("category.categoryName", "startswith", "S")
-          .expand("category");
+        .from("Products")
+        .where("category.categoryName", "startswith", "S")
+        .expand("category");
       var queryUrl = query._toUri(em);
-      
+
       em.executeQuery(query).then(function (data) {
         var products = data.results;
         var cats = products.map(function (product) {
@@ -2414,29 +2416,29 @@
     });
 
   testIfNot("where nested property 2",
-    "mongo", "does not have the nested property Order.customer.region", function(assert) {
+    "mongo", "does not have the nested property Order.customer.region", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Orders")
-          .where("customer.region", "==", "CA");
+        .from("Orders")
+        .where("customer.region", "==", "CA");
       var queryUrl = query._toUri(em);
-      
+
       em.executeQuery(query).then(function (data) {
         var customers = data.results;
         ok(customers.length > 0, "some customers should have been found");
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("orderBy", function(assert) {
+  test("orderBy", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery("Products")
-        .orderBy("productName desc")
-        .take(5);
-    
+      .orderBy("productName desc")
+      .take(5);
+
     em.executeQuery(query).then(function (data) {
       var products = data.results;
       var productName = products[0].getProperty("productName");
@@ -2444,15 +2446,15 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("orderBy 2 fields", function(assert) {
+  test("orderBy 2 fields", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery("Customers")
-        .orderBy("country, city")
-        .where("country", "!=", null).where("city", "!=", null)
-        .take(30);
-    
+      .orderBy("country, city")
+      .where("country", "!=", null).where("city", "!=", null)
+      .take(30);
+
     var custs, custs2;
     em.executeQuery(query).then(function (data) {
       custs = data.results;
@@ -2481,16 +2483,16 @@
   });
 
   testIfNot("expand",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Products");
+        .from("Products");
 
       query = query.expand("category")
-          .take(5);
-      
+        .take(5);
+
       em.executeQuery(query).then(function (data) {
         ok(!em.hasChanges(), "should not have any changes");
         ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -2509,15 +2511,15 @@
     });
 
   testIfNot("expand multiple",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery("Orders");
 
       query = query.expand(["customer", "employee"])
-          .take(20);
-      
+        .take(20);
+
       em.executeQuery(query).then(function (data) {
         ok(!em.hasChanges(), "should not have any changes");
         ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -2537,64 +2539,64 @@
         ok(custs.length === 20, "should have 20 customers");
         ok(emps.length === 20, "should have 20 employees");
 
-        
+
       }).fail(testFns.handleFail).fin(done)
     });
 
   testIfNot("expand nested",
-    "mongo", "does not support 'expand'", function(assert) {
-    var done = assert.async();
-    var em = newEm();
-
-    var query = new EntityQuery()
-        .from("Orders");
-
-    query = query.expand("customer, orderDetails, orderDetails.product")
-        .take(5);
-          
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var orders = data.results;
-      var custs = [];
-      var orderDetails = [];
-      var products = [];
-      orders.map(function (order) {
-        var cust = order.getProperty("customer");
-        if (cust) {
-          custs.push(cust);
-        }
-        var orderDetailItems = order.getProperty("orderDetails");
-        if (orderDetailItems) {
-          Array.prototype.push.apply(orderDetails, orderDetailItems);
-          orderDetailItems.map(function (orderDetail) {
-            var product = orderDetail.getProperty("product");
-            if (product) {
-              products.push(product);
-            }
-          });
-        }
-      });
-      ok(custs.length === 5, "should have 5 customers");
-      ok(orderDetails.length > 5, "should have > 5 orderDetails");
-      ok(products.length > 5, "should have > 5 products");
-    }).fail(testFns.handleFail).fin(done);
-
-
-  });
-
-  testIfNot("expand through null child object",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Orders")
-          .where("employeeID", "eq", null);
+        .from("Orders");
+
+      query = query.expand("customer, orderDetails, orderDetails.product")
+        .take(5);
+
+      em.executeQuery(query).then(function (data) {
+        ok(!em.hasChanges(), "should not have any changes");
+        ok(em.getChanges().length === 0, "getChanges should return 0 results");
+        var orders = data.results;
+        var custs = [];
+        var orderDetails = [];
+        var products = [];
+        orders.map(function (order) {
+          var cust = order.getProperty("customer");
+          if (cust) {
+            custs.push(cust);
+          }
+          var orderDetailItems = order.getProperty("orderDetails");
+          if (orderDetailItems) {
+            Array.prototype.push.apply(orderDetails, orderDetailItems);
+            orderDetailItems.map(function (orderDetail) {
+              var product = orderDetail.getProperty("product");
+              if (product) {
+                products.push(product);
+              }
+            });
+          }
+        });
+        ok(custs.length === 5, "should have 5 customers");
+        ok(orderDetails.length > 5, "should have > 5 orderDetails");
+        ok(products.length > 5, "should have > 5 products");
+      }).fail(testFns.handleFail).fin(done);
+
+
+    });
+
+  testIfNot("expand through null child object",
+    "mongo", "does not support 'expand'", function (assert) {
+      var done = assert.async();
+      var em = newEm();
+
+      var query = new EntityQuery()
+        .from("Orders")
+        .where("employeeID", "eq", null);
 
       query = query.expand("employee, employee.manager, employee.directReports")
-          .take(5);
-          
+        .take(5);
+
       em.executeQuery(query).then(function (data) {
         ok(!em.hasChanges(), "should not have any changes");
         ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -2610,16 +2612,16 @@
     });
 
   testIfNot("orderBy nested",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Products")
-          .orderBy("category.categoryName desc")
-          .expand("category");
+        .from("Products")
+        .orderBy("category.categoryName desc")
+        .expand("category");
 
-          
+
       em.executeQuery(query).then(function (data) {
         ok(!em.hasChanges(), "should not have any changes");
         ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -2633,16 +2635,16 @@
     });
 
   testIfNot("orderBy two part nested",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Products")
-          .orderBy(["category.categoryName desc", "productName"])
-          .expand("category");
+        .from("Products")
+        .orderBy(["category.categoryName desc", "productName"])
+        .expand("category");
 
-          
+
       em.executeQuery(query).then(function (data) {
         ok(!em.hasChanges(), "should not have any changes");
         ok(em.getChanges().length === 0, "getChanges should return 0 results");
@@ -2655,14 +2657,14 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("skiptake", function(assert) {
+  test("skiptake", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Products")
-        .orderBy("productName");
-    
+      .from("Products")
+      .orderBy("productName");
+
     var skipTakeCount = 5;
     em.executeQuery(query).then(function (data) {
       var products = data.results;
@@ -2691,16 +2693,16 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query function expr - toLower", function(assert) {
+  test("query function expr - toLower", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
+      .from("Customers")
       // .where("toLower(companyName)", "startsWith", "c");
-        .where({ "toLower(companyName)": { startsWith: "C" } });
+      .where({"toLower(companyName)": {startsWith: "C"}});
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       ok(custs.length > 0);
@@ -2712,15 +2714,15 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query function expr - toUpper/substring", function(assert) {
+  test("query function expr - toUpper/substring", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
-        .where("toUpper(substring(companyName, 1, 2))", "startsWith", "OM");
+      .from("Customers")
+      .where("toUpper(substring(companyName, 1, 2))", "startsWith", "OM");
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       ok(custs.length > 0);
@@ -2731,15 +2733,15 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query function expr - length", function(assert) {
+  test("query function expr - length", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
-        .where("length(contactTitle)", ">", 17);
+      .from("Customers")
+      .where("length(contactTitle)", ">", 17);
     var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       ok(custs.length > 0);
@@ -2751,16 +2753,16 @@
   });
 
   testIfNot("query function expr - navigation then length",
-    "mongo", "does not support 'expand'", function(assert) {
+    "mongo", "does not support 'expand'", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = new EntityQuery()
-          .from("Orders")
-          .where("length(customer.companyName)", ">", 30)
-          .expand("customer");
+        .from("Orders")
+        .where("length(customer.companyName)", ">", 30)
+        .expand("customer");
       var queryUrl = query._toUri(em);
-      
+
       em.executeQuery(query).then(function (data) {
         var orders = data.results;
         ok(orders.length > 0);
@@ -2772,15 +2774,15 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  test("bad query function expr -  bad property name", function(assert) {
+  test("bad query function expr -  bad property name", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Orders")
-        .where("length(customer.fooName)", ">", 30);
+      .from("Orders")
+      .where("length(customer.fooName)", ">", 30);
     // var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       ok(false, "should not get here");
     }).fail(function (error) {
@@ -2796,8 +2798,8 @@
 
     try {
       var query = new EntityQuery()
-          .from("Customers")
-          .where("companyName", "startsXWith", "C");
+        .from("Customers")
+        .where("companyName", "startsXWith", "C");
       ok(false, "shouldn't get here");
     } catch (error) {
       ok(error instanceof Error);
@@ -2805,15 +2807,15 @@
     }
   });
 
-  test("bad filter property", function(assert) {
+  test("bad filter property", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
-        .where("badCompanyName", "startsWith", "C");
+      .from("Customers")
+      .where("badCompanyName", "startsWith", "C");
     // var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
     }).fail(function (error) {
@@ -2824,16 +2826,16 @@
 
   });
 
-  test("bad orderBy property ", function(assert) {
+  test("bad orderBy property ", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var query = new EntityQuery()
-        .from("Customers")
-        .where("companyName", FilterQueryOp.StartsWith, "C")
-        .orderBy("badCompanyName");
+      .from("Customers")
+      .where("companyName", FilterQueryOp.StartsWith, "C")
+      .orderBy("badCompanyName");
     // var queryUrl = query._toUri(em);
-    
+
     em.executeQuery(query).then(function (data) {
       ok(false, "shouldn't get here");
     }).fail(function (error) {
@@ -2844,14 +2846,14 @@
 
   });
 
-  test("by EntityQuery.fromEntityKey ", function(assert) {
+  test("by EntityQuery.fromEntityKey ", function (assert) {
     var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
     var entityKey = new EntityKey(empType, wellKnownData.nancyID);
     var query = EntityQuery.fromEntityKey(entityKey);
 
-    
+
     em.executeQuery(query).then(function (data) {
       var emp = data.results[0];
       ok(emp.getProperty(testFns.employeeKeyName) === wellKnownData.nancyID);
@@ -2859,7 +2861,7 @@
 
   });
 
-  test("by EntityQuery.fromEntityNavigation  - (-> n) ", function(assert) {
+  test("by EntityQuery.fromEntityNavigation  - (-> n) ", function (assert) {
     var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
@@ -2867,7 +2869,7 @@
     var entityKey = new EntityKey(empType, wellKnownData.nancyID);
     var query = EntityQuery.fromEntityKey(entityKey);
 
-    
+
     var emp;
     em.executeQuery(query).then(function (data) {
       emp = data.results[0];
@@ -2886,14 +2888,14 @@
 
   });
 
-  test("by EntityQuery.fromEntityNavigation - (-> 1) ", function(assert) {
+  test("by EntityQuery.fromEntityNavigation - (-> 1) ", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var pred = Predicate.create("customerID", "!=", null).and("employeeID", "!=", null);
     var query = EntityQuery.from("Orders").where(pred).take(1);
 
-    
+
     em.executeQuery(query).then(function (data) {
       var order = data.results[0];
       ok(order.entityType.shortName === "Order");
@@ -2908,14 +2910,14 @@
 
   });
 
-  test("by entityAspect.loadNavigationProperty - (-> n) ", function(assert) {
+  test("by entityAspect.loadNavigationProperty - (-> n) ", function (assert) {
     var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
     var entityKey = new EntityKey(empType, wellKnownData.nancyID);
     var query = EntityQuery.fromEntityKey(entityKey);
 
-    
+
     var emp;
     em.executeQuery(query).then(function (data) {
       emp = data.results[0];
@@ -2931,14 +2933,14 @@
 
   });
 
-  test("by entityAspect.loadNavigationProperty - (-> 1) ", function(assert) {
+  test("by entityAspect.loadNavigationProperty - (-> 1) ", function (assert) {
     var done = assert.async();
     var em = newEm();
 
     var pred = Predicate.create("customerID", "!=", null).and("employeeID", "!=", null);
     var query = EntityQuery.from("Orders").where(pred).take(1);
     em.tag = "xxxx";
-    
+
     var order;
     em.executeQuery(query).then(function (data) {
       order = data.results[0];
@@ -2958,7 +2960,7 @@
 
   });
 
-  test("load from navigationProperty value.load (-> n)", function(assert) {
+  test("load from navigationProperty value.load (-> n)", function (assert) {
     var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
@@ -2966,7 +2968,7 @@
     var entityKey = new EntityKey(empType, wellKnownData.nancyID);
     var query = EntityQuery.fromEntityKey(entityKey);
 
-    
+
     var orders, emp;
     em.executeQuery(query).then(function (data) {
       emp = data.results[0];
@@ -2985,9 +2987,9 @@
 
 
   testIfNot("WebApi metadata",
-    "odata", "is not applicable for this test", function(assert) {
+    "odata", "is not applicable for this test", function (assert) {
       var done = assert.async();
-      
+
       var metadataPath = testFns.defaultServiceName + "/Metadata";
       $.getJSON(metadataPath, function (data, status) {
         // On success, 'data' contains the model metadata.

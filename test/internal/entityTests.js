@@ -17,6 +17,7 @@
   var newEm = testFns.newEm;
   var newMs = testFns.newMs;
   var wellKnownData = testFns.wellKnownData;
+  var testIfNot = testFns.testIfNot;
 
   module("entity", {
     setup: function () {
@@ -158,7 +159,8 @@
     ok(em.hasChanges());
   });
 
-  test("angular keystroke hack", function () {
+  test("angular keystroke hack", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var productType = em.metadataStore.getEntityType("Product");
     var product = productType.createEntity();
@@ -167,10 +169,10 @@
     ok(product.unitPrice == 3.1);
     product.unitPrice = "3.";
     ok(product.unitPrice == '3.');
-    stop();
+    
     setTimeout(function () {
       ok(product.unitPrice == 3);
-      start();
+      done();
     });
 
   });
@@ -330,11 +332,9 @@
     ok(parentProduct.entityAspect.entityState.isUnchanged(), "parentProduct should be 'unchanged'");
   });
 
-  test("create and init relations 2", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok("n/a for MONGO - OrderDetail is not an entityType");
-      return;
-    }
+  testIfNot("create and init relations 2",
+    "mongo", "does not have an OrderDetail table", function () {
+    
     var em = newEm();
     var newDetail = null;
     // pretend parent entities were queried
@@ -355,14 +355,15 @@
     ok(parentProduct.entityAspect.entityState.isAdded(), "parentProduct should be 'added'");
   });
 
-  test("nullable dateTime", function () {
+  test("nullable dateTime", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var emp = em.createEntity("Employee", { firstName: "Joe", lastName: "Smith" });
     ok(emp.entityAspect.entityState === breeze.EntityState.Added, "entityState should be 'Added'");
     var birthDate = emp.getProperty("birthDate");
     ok(birthDate === null, "birthDate should be null");
     var q = EntityQuery.from("Employees").where("birthDate", "==", null);
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var empsWithNullBirthDates = data.results;
       ok(empsWithNullBirthDates.length > 0, "should be at least 1 employee with a null birthdate");
@@ -370,7 +371,7 @@
         var birthDate = emp.getProperty("birthDate");
         ok(birthDate === null, "queried birthDate should be null");
       });
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
@@ -438,13 +439,14 @@
     ok(true);
   });
 
-  test("rejectChanges on unmapped property", function () {
+  test("rejectChanges on unmapped property", function (assert) {
+    var done = assert.async();
     var em1 = newEm(newMs());
     var Customer = testFns.makeEntityCtor(function () {
       this.miscData = "asdf";
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+
     em1.fetchMetadata().then(function () {
       var custType = em1.metadataStore.getEntityType("Customer");
       var cust = custType.createEntity();
@@ -456,14 +458,15 @@
       cust.entityAspect.rejectChanges();
       var miscData = cust.getProperty("miscData");
       ok(miscData === 'zzz', "miscData should be zzz");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("rejectChanges with ES5 props", function () {
+  test("rejectChanges with ES5 props", function (assert) {
+    var done = assert.async();
     var em1 = newEm(newMs());
     var Customer = testFns.models.CustomerWithES5Props();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     em1.fetchMetadata().then(function () {
       var custType = em1.metadataStore.getEntityType("Customer");
       var cust = custType.createEntity();
@@ -478,18 +481,19 @@
       cust.entityAspect.rejectChanges();
       var companyName = cust.getProperty("companyName");
       ok(companyName === 'FOO2', "comapnyName should be FOO2");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("set foreign key property to null", function () {
+  test("set foreign key property to null", function (assert) {
+    var done = assert.async();
     var productQuery = new EntityQuery("Products").take(1);
 
 
-    stop();
+    
     var em = newEm();
     em.executeQuery(productQuery).then(function (data) {
       return data.results[0].entityAspect.loadNavigationProperty("supplier");
-    }).then(assertProductSetSupplierIDToNull).fail(testFns.handleFail).fin(start);
+    }).then(assertProductSetSupplierIDToNull).fail(testFns.handleFail).fin(done);
   });
 
   function assertProductSetSupplierIDToNull(data) {
@@ -503,7 +507,8 @@
     ok(firstProduct.getProperty(testFns.supplierKeyName) == null, "is SupplierID null?");
   }
 
-  test("null foriegn key", function () {
+  test("null foriegn key", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var productType = em.metadataStore.getEntityType("Product");
     var product = productType.createEntity();
@@ -513,14 +518,14 @@
     var errs = product.entityAspect.getValidationErrors();
     ok(errs.length === 0, "supplierId on product should be nullable");
     var q = EntityQuery.from("Products").take(1);
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var products = data.results;
       product = products[0];
       product.setProperty('supplierID', null);
       errs = product.entityAspect.getValidationErrors();
       ok(errs.length === 0, "supplierId on product should be nullable");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
 
     //Set product's SupplierID value to null
@@ -602,11 +607,9 @@
 
   });
 
-  test("datatype coercion - integer", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - OrderDetail is not an entity");
-      return;
-    }
+  testIfNot("datatype coercion - integer",
+    "mongo", "does not have an OrderDetail table", function () {
+    
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
     // OrderID, UnitPrice, Discount
@@ -623,11 +626,9 @@
 
   });
 
-  test("datatype coercion - decimal", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - OrderDetail is not an entity");
-      return;
-    }
+  testIfNot("datatype coercion - decimal", 
+    "mongo", "does not have an OrderDetail table", function () {
+
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
     // OrderID, UnitPrice, Discount
@@ -647,11 +648,9 @@
 
   });
 
-  test("datatype coercion - float", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - OrderDetail issues");
-      return true;
-    }
+  testIfNot("datatype coercion - float", 
+    "mongo", "does not have an OrderDetail table", function () {
+
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
     // OrderID, UnitPrice, Discount
@@ -703,7 +702,7 @@
   //test("multipart foreign keys", function () {
   //    var em = newEm(); // new empty EntityManager
   //    var bodType = em.metadataStore.getEntityType("BonusOrderDetailItem");
-  //    stop();
+  //    
   //    EntityQuery.from("OrderDetails").take(1).using(em).execute().then(function (data) {
   //        var orderDetail = data.results[0];
   //        var bod = bodType.createEntity();
@@ -713,7 +712,7 @@
   //        ok(orderId === orderDetail.getProperty("orderID"), "orderId's should be the same");
   //        var productId = bod.getProperty("productID");
   //        ok(productId === orderDetail.getProperty("productID"), "productId's should be the same");
-  //    }).fail(testFns.handleFail).fin(start);
+  //    }).fail(testFns.handleFail).fin(done);
 
 
   //});
@@ -795,11 +794,8 @@
 
   });
 
-  test("rejectChanges of a child entity restores it to its parent", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("rejectChanges of a child entity restores it to its parent", 
+    "mongo", "does not have an OrderDetail table", function () {
     var em = newEm();
 
     var orderType = em.metadataStore.getEntityType("Order");
@@ -878,7 +874,8 @@
   });
 
 
-  test("custom Customer type with createEntity", function () {
+  test("custom Customer type with createEntity", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.makeEntityCtor(function () {
@@ -889,7 +886,7 @@
     });
 
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     em.fetchMetadata().then(function () {
       var custType = em.metadataStore.getEntityType("Customer");
       var cust1 = custType.createEntity();
@@ -901,10 +898,11 @@
       ok(cust1.getProperty("miscData") === "asdf");
       cust1.setProperty("companyName", "testxxx");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("custom Customer type with ES5 props and createEntity", function () {
+  test("custom Customer type with ES5 props and createEntity", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.models.CustomerWithES5Props();
@@ -913,7 +911,7 @@
     };
 
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     em.fetchMetadata().then(function () {
       var custType = em.metadataStore.getEntityType("Customer");
       var cust1 = custType.createEntity();
@@ -927,10 +925,11 @@
       var custName = cust1.getProperty("companyName");
       ok(custName === "TESTXXX", "should be all uppercase");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("custom Customer type with new", function () {
+  test("custom Customer type with new", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.makeEntityCtor(function () {
@@ -941,7 +940,7 @@
     });
 
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     em.fetchMetadata().then(function () {
       var custType = em.metadataStore.getEntityType("Customer");
       var cust1 = new Customer();
@@ -954,10 +953,11 @@
       ok(cust1.getProperty("miscData") === "asdf");
       cust1.setProperty("companyName", "testxxx");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("custom Customer type with ES5 props and new", function () {
+  test("custom Customer type with ES5 props and new", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.models.CustomerWithES5Props();
@@ -967,7 +967,7 @@
 
     // register before fetchMetadata
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     em.fetchMetadata().then(function () {
       var custType = em.metadataStore.getEntityType("Customer");
       var cust1 = new Customer();
@@ -982,11 +982,12 @@
       var custName = cust1.getProperty("companyName");
       ok(custName === "TESTXXX", "should be all uppercase");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("custom Customer type with new - v2", function () {
+  test("custom Customer type with new - v2", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.makeEntityCtor(function () {
@@ -996,7 +997,7 @@
       };
     });
 
-    stop();
+    
     // register after fetchMetadata
     em.fetchMetadata().then(function () {
       em.metadataStore.registerEntityTypeCtor("Customer", Customer);
@@ -1011,10 +1012,11 @@
       ok(cust1.getProperty("miscData") === "asdf");
       cust1.setProperty("companyName", "testxxx");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("custom Customer type with ES5 proand and new - v2", function () {
+  test("custom Customer type with ES5 proand and new - v2", function (assert) {
+    var done = assert.async();
     var em = newEm(newMs());
 
     var Customer = testFns.models.CustomerWithES5Props();
@@ -1022,7 +1024,7 @@
       return (this.getProperty("companyName") || "").length;
     };
 
-    stop();
+    
     // register after fetchMetadata
     em.fetchMetadata().then(function () {
       em.metadataStore.registerEntityTypeCtor("Customer", Customer);
@@ -1039,23 +1041,20 @@
       var custName = cust1.getProperty("companyName");
       ok(custName === "TESTXXX", "should be all uppercase");
       ok(cust1.getNameLength() === 7, "getNameLength should be 7");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("entityState", function () {
-    stop();
+  test("entityState", function (assert) {
+    var done = assert.async();
     runQuery(newEm(), function (customers) {
       var c = customers[0];
       testEntityState(c);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("entityType.getProperty nested", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("entityType.getProperty nested", 
+    "mongo", "does not have an OrderDetail table", function () {
     var odType = testFns.metadataStore.getEntityType("OrderDetail");
     var orderType = testFns.metadataStore.getEntityType("Order");
 
@@ -1069,7 +1068,8 @@
     ok(prop1 == prop2, "should be the same prop");
   });
 
-  test("entityCtor materialization with js ctor", function () {
+  test("entityCtor materialization with js ctor", function (assert) {
+    var done = assert.async();
     // use a different metadata store for this em - so we don't polute other tests
     var em1 = newEm(newMs());
     var Customer = testFns.makeEntityCtor(function () {
@@ -1077,21 +1077,22 @@
     });
 
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     runQuery(em1, function (customers) {
       var c = customers[0];
       ok(c.getProperty("miscData") === "asdf", "miscData property should contain 'asdf'");
       testEntityState(c);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("entityCtor materialization with ES5 ctor", function () {
+  test("entityCtor materialization with ES5 ctor", function (assert) {
+    var done = assert.async();
     // use a different metadata store for this em - so we don't polute other tests
     var em1 = newEm(newMs());
     var Customer = testFns.models.CustomerWithES5Props();
 
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    stop();
+    
     runQuery(em1, function (customers) {
       var cust1 = customers[0];
       ok(cust1.getProperty("miscData") === "asdf", "miscData property should contain 'asdf'");
@@ -1099,7 +1100,7 @@
       ok(custName.length > 1, "should have a companyName");
       ok(custName.toUpperCase() === custName, "should be all uppercase");
       testEntityState(cust1, true);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
@@ -1264,23 +1265,17 @@
     });
   });
 
-  test("category default rowversion value", function () {
+  testIfNot("category default rowversion value", 
+    "mongo,efcodefirst,nhibernate", "does not support 'defaultValues'", function () {
 
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_EF_CODEFIRST || testFns.DEBUG_NHIBERNATE) {
-      ok(true, "NA for Mongo, Codefirst, and NHibernate  - no default values");
-      return true;
-    }
     var em = newEm();
     var catType = em.metadataStore.getEntityType("Category");
     var cat = em.createEntity("Category");
     ok(cat.getProperty("rowVersion") === 2, "Expected failure (with CodeFirst) - This test is expected to fail with a CodeFirst model but succeed with DatabaseFirst model");
   });
 
-  test("propertyChanged", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("propertyChanged", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
@@ -1334,7 +1329,8 @@
     ok(lastNewValue === wellKnownData.dummyOrderID);
   });
 
-  test("propertyChanged on query", function () {
+  test("propertyChanged on query", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
     ok(empType);
@@ -1348,14 +1344,15 @@
     // now fetch
     var q = EntityQuery.fromEntities(emp);
     var uri = q._toUri(em);
-    stop();
+    
     em.executeQuery(q, function (data) {
       ok(changes.length === 1, "query merges should only fire a single property change");
       ok(changes[0].propertyName === null, "propertyName should be null on a query merge");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("propertyChanged suppressed on query", function () {
+  test("propertyChanged suppressed on query", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var empType = em.metadataStore.getEntityType("Employee");
     ok(empType);
@@ -1369,17 +1366,14 @@
     em.attachEntity(emp);
     // now fetch
     var q = EntityQuery.fromEntities(emp);
-    stop();
+    
     em.executeQuery(q, function (data) {
       ok(changes.length === 0, "query merges should not fire");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("delete entity - check children", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("delete entity - check children", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1400,11 +1394,8 @@
   });
 
 
-  test("delete entity children then parent - check children", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("delete entity children then parent - check children", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1428,11 +1419,8 @@
     });
   });
 
-  test("delete entity children then parent - check children (guid ids)", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("delete entity children then parent - check children (guid ids)", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var customer = createCustomerAndOrders(em);
@@ -1456,11 +1444,8 @@
   });
 
 
-  test("delete entity - check parent", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("delete entity - check parent", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1482,11 +1467,8 @@
     ok(od.getProperty("orderID") === order.getProperty("orderID"), "orderDetail.orderId should not change as a result of being deleted");
   });
 
-  test("detach entity - check children", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("detach entity - check children", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1506,11 +1488,8 @@
     });
   });
 
-  test("hasChanges", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("hasChanges", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
 
@@ -1554,11 +1533,8 @@
     ok(valid, "should no longer have any changes");
   });
 
-  test("rejectChanges", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for MONGO - OrderDetail issues");
-      return true;
-    }
+  testIfNot("rejectChanges", 
+    "mongo", "does not have an OrderDetail table", function () {
 
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");

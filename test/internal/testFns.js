@@ -51,7 +51,9 @@ breezeTestFns = (function (breeze) {
        (testFns.DEBUG_SEQUELIZE && s.indexof("sequel",0) === 0) ||
        (testFns.DEBUG_NHIBERNATE && s.indexof("nhib",0) === 0) ||
        (testFns.DEBUG_HIBERNATE && s.indexof("hib",0) == 0) ||
-       (testFns.DEBUG_ODATA && s.indexof("odata",0) === 0)) {
+       (testFns.DEBUG_ODATA && s.indexof("odata", 0) === 0) ||
+       (testFns.DEBUG_EF_CODEFIRST && s.indexof("efcodefirst", 0) === 0)
+      ) {
       return s;
     } else {
       return null;
