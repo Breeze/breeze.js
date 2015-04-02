@@ -25,24 +25,26 @@
     }
   });
 
-  test("any and gt", function () {
+  test("any and gt", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Employees")
         .where("orders", "any", "freight", ">", 950);
-    stop();
+    
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any and gt (local)", function () {
+  test("any and gt (local)", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Employees")
         .where("orders", "any", "freight", ">", 950)
         .expand("orders");
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
@@ -50,12 +52,13 @@
 
       var isOk = testFns.haveSameContents(emps, emps2);
       ok(isOk, "arrays should have the same contents");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
 
-  test("all with composite predicates ", function () {
+  test("all with composite predicates ", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var p2 = Predicate.create("freight", ">", 10);
     var p1 = Predicate.create("orders", "all", p2);
@@ -63,7 +66,7 @@
 
     var query = EntityQuery.from("Customers").where(p0).expand("orders");
 
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       custs.forEach(function (cust) {
@@ -79,18 +82,18 @@
       var isOk = testFns.haveSameContents(custs, custs2);
       ok(isOk, "arrays should have the same contents");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any with not", function () {
+  test("any with not", function (assert) {
+    var done = assert.async();
     var em = newEm();
     // customers with no orders
     var p = Predicate.create("orders", "any", "rowVersion", ">=", 0).not();
     var query = EntityQuery.from("Customers").where(p).expand("orders");
 
-    stop();
-    em.executeQuery(query).then(function (data) {
+     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       custs.forEach(function (cust) {
         var orders = cust.getProperty("orders");
@@ -101,17 +104,17 @@
       var isOk = testFns.haveSameContents(custs, custs2);
       ok(isOk, "arrays should have the same contents");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any with != null", function () {
+  test("any with != null", function (assert) {
+    var done = assert.async();
     var em = newEm();
     // customers with no orders
     var p = Predicate.create("orders", "any", "rowVersion", "!=", null).not();
     var query = EntityQuery.from("Customers").where(p).expand("orders");
-
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var custs = data.results;
       custs.forEach(function (cust) {
@@ -123,16 +126,17 @@
       var isOk = testFns.haveSameContents(custs, custs2);
       ok(isOk, "arrays should have the same contents");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any and gt with expand", function () {
+  test("any and gt with expand", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Employees")
         .where("orders", "any", "freight", ">", 950)
         .expand("orders");
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
@@ -147,16 +151,17 @@
       var emps2 = em.executeQueryLocally(query);
       var isOk = testFns.haveSameContents(emps, emps2);
       ok(isOk, "arrays should have the same contents");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any and nested property", function () {
+  test("any and nested property", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from("Employees")
         .where("orders", "any", "customer.companyName", "startsWith", "Lazy")
         .expand("orders.customer");
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length === 2, "should be only 2 emps with orders with companys named 'Lazy...' ");
@@ -172,18 +177,19 @@
       var emps2 = em.executeQueryLocally(query);
       var isOk = testFns.haveSameContents(emps, emps2);
       ok(isOk, "arrays should have the same contents");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("any with composite predicate and expand", function () {
+  test("any with composite predicate and expand", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var p = Predicate.create("freight", ">", 950).and("shipCountry", "startsWith", "G");
     var query = EntityQuery.from("Employees")
         .where("orders", "any", p)
         .expand("orders");
     var queryUrl = query._toUri(em);
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length === 1, "should be only 1 emps with orders (with freight > 950 and shipCountry starting with 'G')");
@@ -199,11 +205,11 @@
       var isOk = testFns.haveSameContents(emps, emps2);
       ok(isOk, "arrays should have the same contents");
 
-    }).fail(testFns.handleFail).fin(start);
-
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("two anys and an expand", function () {
+  test("two anys and an expand", function (assert) {
+    var done = assert.async();
     // different query than one above.
     var em = newEm();
     var p = Predicate.create("orders", "any", "freight", ">", 950)
@@ -212,7 +218,7 @@
         .where(p)
         .expand("orders");
     var queryUrl = query._toUri(em);
-    stop();
+ 
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length >= 1, "should be at least 1 emp with (orders with freight > 950) and (orders with shipCountry starting with 'G'");
@@ -231,11 +237,11 @@
       var emps2 = em.executeQueryLocally(query);
       var isOk = testFns.haveSameContents(emps, emps2);
       ok(isOk, "arrays should have the same contents");
-    }).fail(testFns.handleFail).fin(start);
-
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("nested any", function () {
+  test("nested any", function (assert) {
+    var done = assert.async();
     // different query than one above.
     var em = newEm();
     var q1 = EntityQuery.from("Customers")
@@ -247,7 +253,7 @@
         .expand("orders.orderDetails");
 
     var queryUrl = q2._toUri(em);
-    stop();
+ 
     var custs, l0, l2;
     em.executeQuery(q1).then(function (data) {
       custs = data.results;
@@ -263,11 +269,11 @@
       var isOk = testFns.haveSameContents(custs, custs2);
       ok(isOk, "arrays should have the same contents");
 
-    }).fail(testFns.handleFail).fin(start);
-
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("nested any predicate toString", function () {
+    
     var em = newEm()
     var p2 = new Predicate("unitPrice", ">", 200).and("quantity", ">", 50);
     var p1 = new Predicate("orders", "some", "orderDetails", "any", p2);

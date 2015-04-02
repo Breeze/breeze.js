@@ -1,19 +1,17 @@
 (function (testFns) {
   var breeze = testFns.breeze;
   var core = breeze.core;
-
-
+  
   var EntityType = breeze.EntityType;
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;
   var NamingConvention = breeze.NamingConvention;
   var EntityQuery = breeze.EntityQuery;
   var DataService = breeze.DataService;
-
-
+  
   var newEm = testFns.newEm;
-
-
+  var testIfNot = testFns.testIfNot;
+  
   module("metadata", {
     setup: function () {
       testFns.setup();
@@ -173,18 +171,9 @@
 
   });
 
-  test("create metadata and use it for save - CodeFirst only", function () {
-    //if (testFns.DEBUG_ODATA) {
-    //    ok(true, "NA for OData - TimeList and Timegroup not yet added");
-    //    return;
-    //}
-
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
-      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
-      return;
-    }
-    ;
-
+  testIfNot("create metadata and use it for save - CodeFirst only",
+    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function () {
+    
     var em = createEmWithTimeGroupMetadata();
 
     var timeGroupType = em.metadataStore.getEntityType("TimeGroup");
@@ -196,31 +185,17 @@
 
     stop();
     em.saveChanges().then(function (data) {
-
       var timeGroupId = timeGroup.getProperty("Id");
-
       ok(timeGroupId > 0, "the timeGroup Id is " + timeGroupId + ", indicating it has been saved");
-
     }).fail(testFns.handleFail).fin(start);
 
 
   });
 
-  test("create metadata and insert using existing entity re-attached - CodeFirst only", function () {
-
-    //if (testFns.DEBUG_ODATA) {
-    //    ok(true, "Skipped tests - not applicable to OData");
-    //    return;
-    //};
-
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_HIBERNATE) {
-      ok(true, "NA for Mongo/Hibernate - TimeList and Timegroup not yet added");
-      return;
-    }
-
+  testIfNot("create metadata and insert using existing entity re-attached - CodeFirst only",
+    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function () {
 
     var em0 = createEmWithTimeGroupMetadata();
-
     var em = createEmWithTimeGroupMetadata();
 
     var timeGroupType = em.metadataStore.getEntityType("TimeGroup");
@@ -514,12 +489,8 @@
     }
   });
 
-  test("initialization", function () {
-
-    if (testFns.DEBUG_SEQUELIZE) {
-      ok(true, "N/A for Sequelize - Current impl uses a server side json metadata file");
-      return;
-    }
+  testIfNot("initialization",
+    "sequelize", "uses a server side json metadata file", function() {
 
     var store = new MetadataStore({ namingConvention: NamingConvention.none });
     stop();

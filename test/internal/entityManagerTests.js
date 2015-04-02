@@ -19,6 +19,7 @@
   var FetchStrategy = breeze.FetchStrategy;
 
   var newEm = testFns.newEm;
+  var testIfNot = testFns.testIfNot;
 
   module("entityManager", {
     setup: function () {
@@ -76,17 +77,8 @@
     metadataStore.setEntityTypeForResourceName('Employee', 'Employee');
   }
 
-  test("querying server unmapped property", function () {
-
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "NA for ODATA - Not sure how to expose a server side unmapped property with OData");
-      return;
-    }
-
-    if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-      ok(true, "NA for Sequelize/Hibernate - no server side unmapped properties implemented yet on server");
-      return;
-    }
+  testIfNot("querying server unmapped property", 
+    "odata,sequelize,hibernate", "does not have any server unmapped properties", function() {
 
     var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 
@@ -196,12 +188,9 @@
 
   });
 
-  test("relationship not resolved after import", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not YET supported");
-      return;
-    }
-
+  testIfNot("relationship not resolved after import",
+    "mongo", "does not support 'expand'", function () {
+    
     var ds = new breeze.DataService({
       serviceName: "none",
       hasServerMetadata: false
@@ -564,11 +553,8 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("Detaching the parent modifies the in-cache children - D2460", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not YET supported");
-      return;
-    }
+  testIfNot("Detaching the parent modifies the in-cache children - D2460",
+    "mongo", "does not support 'expand'", function () {
 
     var em = newEm();
     var q = EntityQuery.from("Employees").where("employeeID", "==", 1)
@@ -772,11 +758,8 @@
 
   });
 
-  test("mergeStrategy.overwriteChanges and change events", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("mergeStrategy.overwriteChanges and change events",
+    "mongo", "does not support 'expand'", function () {
 
     var em = newEm();
     em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
@@ -1032,11 +1015,8 @@
 
   });
 
-  test("import results notification", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand");
-      return;
-    }
+  testIfNot("import results notification",
+    "mongo", "does not support 'expand'", function () {
     var em = newEm();
     var em2 = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';

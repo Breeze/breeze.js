@@ -26,15 +26,6 @@
   });
 
   test("self referential type query", function () {
-
-//    if (testFns.DEBUG_SEQUELIZE) {
-//      // TODO: the issue is that with a noTracking query the server needs to resolve nonscalar navigation properties
-//      // that are the result of an expand.  This is not needed for a regular query because the client performs this task.
-//      // So for now Sequelize will return
-//      ok(true, "Sequelize does NOT yet support nested reference resolution for noTracking entities.  ");
-//      return;
-//    }
-
     var em = newEm();
     var predicate1 = Predicate.create("lastName", "startsWith", "D").or("firstName", "startsWith", "A");
 
