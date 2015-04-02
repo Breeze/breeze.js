@@ -3,7 +3,6 @@
   var core = breeze.core;
   var Event = core.Event;
 
-
   var EntityQuery = breeze.EntityQuery;
   var DataService = breeze.DataService;
   var MetadataStore = breeze.MetadataStore;
@@ -16,6 +15,7 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   var newEm = testFns.newEm;
+  var testIfNot = testFns.testIfNot;
 
   var wellKnownData = testFns.wellKnownData;
 
@@ -27,51 +27,33 @@
     }
   });
 
-  function checkIfDeleted(entityManager, entities) {
-    origEntities = entities.slice(0);
-    var q = EntityQuery.fromEntities(entities)
-    entityManager.executeQuery(q).then(function (data) {
-      var foundEntities = data.entities;
-      foundEntities.forEach(function (e, ix) {
-        if (entities.indexOf(e)) {
-          origEntities.splice(ix, 1)
-        }
-      });
-      if (origEntities.length > 0) {
-        origEntities.forEach(function (e) {
-          entityManager.removeEntity(e);
-        });
-      }
+  testIfNot("check if correct OData datatype",
+    "mongo,sequelize,hibernate", "does not use OData syntax", function () {
+
+      var em = newEm();
+      var query = EntityQuery.from('Products').using(em).where({ 'unitPrice': { '>=': { value: 100, dataType: breeze.DataType.Decimal } } });
+      var url = query._toUri(em);
+      ok(url.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal")
+      var query2 = EntityQuery.from('Products').using(em).where('unitPrice', '>=', { value: 100, dataType: breeze.DataType.Decimal });
+      var url2 = query2._toUri(em);
+      ok(url2.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal - again")
+
     });
-  }
 
-  test("check if correct OData datatype ", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-      ok(true, "Mongo (eventually), Hibernate and Sequelize new do NOT use OData syntax");
-      return;
-    }
-    var em = newEm();
-    var query = EntityQuery.from('Products').using(em).where({ 'unitPrice': { '>=': { value: 100, dataType: breeze.DataType.Decimal } } });
-    var url = query._toUri(em);
-    ok(url.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal")
-    var query2 = EntityQuery.from('Products').using(em).where( 'unitPrice', '>=', { value: 100, dataType: breeze.DataType.Decimal }) ;
-    var url2 = query2._toUri(em);
-    ok(url2.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal - again")
-
-  });
-
-  test("can handle simple json query syntax ", function () {
+  test("can handle simple json query syntax ", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = EntityQuery.from('Customers').using(em).where({ 'city': { '==': 'London' } });
     var url = query._toUri(em);
-    stop();
+
     em.executeQuery(query).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should have gotten some results");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("can handle parens in right hand side of predicate", function () {
+  test("can handle parens in right hand side of predicate", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("Customers");
 
@@ -79,15 +61,15 @@
     var q2 = query.where('city', 'startsWith', 'Lon (don )');
 
     ok(true, "should get here");
-    stop();
     em.executeQuery(q2).then(function (data) {
       var r = data.results;
       ok(r.length == 0, "should have gotten 0 results");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("should not throw when add where clause to query with a `.fromEntityType` value", function () {
+  test("should not throw when add where clause to query with a `.fromEntityType` value", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("Customers");
 
@@ -100,35 +82,36 @@
     var q2 = query.where('city', 'eq', 'London');
 
     ok(true, "should get here");
-    stop();
+    
     em.executeQuery(q2).then(function (data) {
       var r = data.results;
       ok(r.length > 0, "should have gotten some results");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with 'in'", function () {
-      var em1 = newEm();
-      
-      var countries = ['Austria', 'Italy', 'Norway']
-      var query = EntityQuery.from("Customers")
-          .where("country", 'in', countries);
-      stop();
-      em1.executeQuery(query).then(function (data) {
-        var r = data.results;
-        var isOk = r.every(function (cust) {
-            return countries.indexOf(cust.getProperty("country")) >= 0;
-        })
-        ok(isOk, "should be able to verify in test");
-        var r2 = em1.executeQueryLocally(query);
-        ok(r2.length === r.length);
-      }).fail(testFns.handleFail).fin(start);
+  test("query with 'in'", function (assert) {
+    var done = assert.async();
+    var em1 = newEm();
+
+    var countries = ['Austria', 'Italy', 'Norway']
+    var query = EntityQuery.from("Customers")
+        .where("country", 'in', countries);
+    
+    em1.executeQuery(query).then(function (data) {
+      var r = data.results;
+      var isOk = r.every(function (cust) {
+        return countries.indexOf(cust.getProperty("country")) >= 0;
+      })
+      ok(isOk, "should be able to verify in test");
+      var r2 = em1.executeQueryLocally(query);
+      ok(r2.length === r.length);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-    //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
-    //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
-    //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
-    //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
+  //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
+  //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
+  //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
+  //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
   test("query nav prop change and expand", function () {
     var em1 = newEm();
     var em2 = newEm();
@@ -426,90 +409,80 @@
 
   });
 
-  test("query function expr - date(year) function", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Mongo does not yet support the 'year' OData predicate");
-      return;
-    }
+  testIfNot("query function expr - date(year) function",
+    "mongo", "does not yet support 'year' function", function () {
 
+      var manager = newEm();
+      var query = new breeze.EntityQuery()
+          .from("Employees")
+          .where("year(hireDate)", ">", 1993);
+      stop();
+      manager.executeQuery(query).then(function (data) {
+        var emps = data.results;
+        ok(emps.length > 0, "there should be records returned");
+        var emps2 = manager.executeQueryLocally(query);
+        ok(emps2.length == emps.length, "should be the same recs");
 
-    var manager = newEm();
-    var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where("year(hireDate)", ">", 1993);
-    stop();
-    manager.executeQuery(query).then(function (data) {
-      var emps = data.results;
-      ok(emps.length > 0, "there should be records returned");
-      var emps2 = manager.executeQueryLocally(query);
-      ok(emps2.length == emps.length, "should be the same recs");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+  testIfNot("query function expr - date(month) function",
+    "mongo", "does not support 'year' odata predicate", function () {
 
-  test("query function expr - date(month) function", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Mongo does not yet support the 'year' OData predicate");
-      return;
-    }
-    var manager = newEm();
-    var p = Predicate.create("month(hireDate)", ">", 6).and("month(hireDate)", "<", 11);
-    var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(p);
-    stop();
-    manager.executeQuery(query).then(function (data) {
-      var emps = data.results;
-      ok(emps.length > 0, "there should be records returned");
-      var emps2 = manager.executeQueryLocally(query);
-      ok(emps2.length == emps.length, "should be the same recs");
+      var manager = newEm();
+      var p = Predicate.create("month(hireDate)", ">", 6).and("month(hireDate)", "<", 11);
+      var query = new breeze.EntityQuery()
+          .from("Employees")
+          .where(p);
+      stop();
+      manager.executeQuery(query).then(function (data) {
+        var emps = data.results;
+        ok(emps.length > 0, "there should be records returned");
+        var emps2 = manager.executeQueryLocally(query);
+        ok(emps2.length == emps.length, "should be the same recs");
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-  test("OData predicate - add ", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-      ok(true, "Neither Mongo, Hibernate nor Sequelize supports the 'add' OData predicate");
-      return;
-    }
-    var manager = newEm();
-    var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where("EmployeeID add ReportsToEmployeeID gt 3");
-    stop();
-    manager.executeQuery(query).then(function (data) {
-      ok(data.results.length > 0, "there should be records returned");
-      try {
-        manager.executeQueryLocally(query);
-        ok(false, "shouldn't get here");
-      } catch (e) {
-        ok(e, "should throw an exception");
-      }
-    }).fail(testFns.handleFail).fin(start);
-  });
+  testIfNot("OData predicate - add ",
+    "mongo,sequelize,hibernate", "does not support the 'add' OData predicate", function () {
 
-  test("OData predicate - add combined with regular predicate", function () {
-    if (testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-      ok(true, "Neither Mongo, Hibernate nor Sequelize supports the 'add' OData predicate");
-      return;
-    }
-    var manager = newEm();
-    var predicate = Predicate.create("EmployeeID add ReportsToEmployeeID gt 3").and("employeeID", "<", 9999);
+      var manager = newEm();
+      var query = new breeze.EntityQuery()
+          .from("Employees")
+          .where("EmployeeID add ReportsToEmployeeID gt 3");
+      stop();
+      manager.executeQuery(query).then(function (data) {
+        ok(data.results.length > 0, "there should be records returned");
+        try {
+          manager.executeQueryLocally(query);
+          ok(false, "shouldn't get here");
+        } catch (e) {
+          ok(e, "should throw an exception");
+        }
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-    var query = new breeze.EntityQuery()
-        .from("Employees")
-        .where(predicate);
-    stop();
-    manager.executeQuery(query).then(function (data) {
-      ok(data.results.length > 0, "there should be records returned");
-      try {
-        manager.executeQueryLocally(query);
-        ok(false, "shouldn't get here");
-      } catch (e) {
-        ok(e, "should throw an exception");
-      }
-    }).fail(testFns.handleFail).fin(start);
-  });
+  testIfNot("OData predicate - add combined with regular predicate",
+    "mongo,sequelize,hibernate", "does not support the 'add' OData predicate", function () {
+
+      var manager = newEm();
+      var predicate = Predicate.create("EmployeeID add ReportsToEmployeeID gt 3").and("employeeID", "<", 9999);
+
+      var query = new breeze.EntityQuery()
+          .from("Employees")
+          .where(predicate);
+      stop();
+      manager.executeQuery(query).then(function (data) {
+        ok(data.results.length > 0, "there should be records returned");
+        try {
+          manager.executeQueryLocally(query);
+          ok(false, "shouldn't get here");
+        } catch (e) {
+          ok(e, "should throw an exception");
+        }
+      }).fail(testFns.handleFail).fin(start);
+    });
 
 
   test("take(0)", function () {
@@ -694,84 +667,67 @@
     }).fin(start);
   });
 
-  test("raw OData query string", function () {
-    if (testFns.DEBUG_SEQUELIZE) {
-      ok(true, "Breeze-Sequelize does not support OData syntax");
-      return;
-    }
-
-    if (testFns.DEBUG_HIBERNATE) {
-      ok(true, "Breeze-Hibernate does not support OData syntax");
-      return;
-    }
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - needs a toType for MONGO");
-      return;
-    }
-
-    var em = newEm();
-    var q = ""
-    stop();
-    em.executeQuery("Customers?&$top=3").then(function (data) {
-      var custs = data.results;
-      ok(custs.length === 3, "should be 3 custs");
-      var isOk = custs.every(function (c) {
-        return c.entityType.shortName === "Customer";
-      });
-      ok(isOk, "all results should be customers");
-    }).fail(testFns.handleFail).fin(start);
-  });
-
-  test("query with take, orderby and expand", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
-    var em = newEm();
-    var q1 = EntityQuery.from("Products")
-        .expand("category")
-        .orderBy("category.categoryName desc, productName");
-    stop();
-    var topTen;
-    em.executeQuery(q1).then(function (data) {
-      topTen = data.results.slice(0, 10);
-      var q2 = q1.take(10);
-      return em.executeQuery(q2);
-    }).then(function (data2) {
-      var topTenAgain = data2.results;
-      for (var i = 0; i < 10; i++) {
-        ok(topTen[i] === topTenAgain[i]);
-      }
-    }).fail(testFns.handleFail).fin(start);
-
-  });
+  testIfNot("raw OData query string",
+    "sequelize,hibernate,mongo", "does not support OData query syntax", function () {
 
 
-  test("query with take, skip, orderby and expand", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+      var em = newEm();
+      var q = ""
+      stop();
+      em.executeQuery("Customers?&$top=3").then(function (data) {
+        var custs = data.results;
+        ok(custs.length === 3, "should be 3 custs");
+        var isOk = custs.every(function (c) {
+          return c.entityType.shortName === "Customer";
+        });
+        ok(isOk, "all results should be customers");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-    var em = newEm();
-    var q1 = EntityQuery.from("Products")
-        .expand("category")
-        .orderBy("category.categoryName, productName");
-    stop();
-    var nextTen;
-    em.executeQuery(q1).then(function (data) {
-      nextTen = data.results.slice(10, 20);
-      var q2 = q1.skip(10).take(10);
-      return em.executeQuery(q2);
-    }).then(function (data2) {
-      var nextTenAgain = data2.results;
-      for (var i = 0; i < 10; i++) {
-        ok(nextTen[i] === nextTenAgain[i], extractDescr(nextTen[i]) + " -- " + extractDescr(nextTenAgain[i]));
-      }
-    }).fail(testFns.handleFail).fin(start);
+  testIfNot("query with take, orderby and expand",
+    "mongo", "does not support 'expand'", function () {
 
-  });
+      var em = newEm();
+      var q1 = EntityQuery.from("Products")
+          .expand("category")
+          .orderBy("category.categoryName desc, productName");
+      stop();
+      var topTen;
+      em.executeQuery(q1).then(function (data) {
+        topTen = data.results.slice(0, 10);
+        var q2 = q1.take(10);
+        return em.executeQuery(q2);
+      }).then(function (data2) {
+        var topTenAgain = data2.results;
+        for (var i = 0; i < 10; i++) {
+          ok(topTen[i] === topTenAgain[i]);
+        }
+      }).fail(testFns.handleFail).fin(start);
+
+    });
+
+
+  testIfNot("query with take, skip, orderby and expand",
+    "mongo", "does not support 'expand' syntax", function () {
+
+      var em = newEm();
+      var q1 = EntityQuery.from("Products")
+          .expand("category")
+          .orderBy("category.categoryName, productName");
+      stop();
+      var nextTen;
+      em.executeQuery(q1).then(function (data) {
+        nextTen = data.results.slice(10, 20);
+        var q2 = q1.skip(10).take(10);
+        return em.executeQuery(q2);
+      }).then(function (data2) {
+        var nextTenAgain = data2.results;
+        for (var i = 0; i < 10; i++) {
+          ok(nextTen[i] === nextTenAgain[i], extractDescr(nextTen[i]) + " -- " + extractDescr(nextTenAgain[i]));
+        }
+      }).fail(testFns.handleFail).fin(start);
+
+    });
 
   function extractDescr(product) {
     var cat = product.getProperty("category");
@@ -814,117 +770,106 @@
     });
   });
 
-  test("nested expand", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("nested expand",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var em2 = newEm();
-    var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
-    stop();
+      var em = newEm();
+      var em2 = newEm();
+      var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
+      stop();
 
-    em.executeQuery(query).then(function (data) {
-      var details = data.results;
-      var order = details[0].getProperty("order");
-      ok(order, "should have found an order");
-      var customer = order.getProperty("customer");
-      ok(customer, "should have found a customer");
-    }).fail(testFns.handleFail).fin(start);
-  });
+      em.executeQuery(query).then(function (data) {
+        var details = data.results;
+        var order = details[0].getProperty("order");
+        ok(order, "should have found an order");
+        var customer = order.getProperty("customer");
+        ok(customer, "should have found a customer");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-  test("nested expand 3 level", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("nested expand 3 level",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var em2 = newEm();
-    var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
-    stop();
+      var em = newEm();
+      var em2 = newEm();
+      var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
+      stop();
 
-    em.executeQuery(query).then(function (data) {
-      var orders = data.results;
-      var orderDetails = orders[0].getProperty("orderDetails");
-      ok(orderDetails.length, "should have found order details");
-      var product = orderDetails[0].getProperty("product");
-      ok(product, "should have found a product");
-      var category = product.getProperty("category");
-      ok(category, "should have found a category");
-    }).fail(testFns.handleFail).fin(start);
-  });
+      em.executeQuery(query).then(function (data) {
+        var orders = data.results;
+        var orderDetails = orders[0].getProperty("orderDetails");
+        ok(orderDetails.length, "should have found order details");
+        var product = orderDetails[0].getProperty("product");
+        ok(product, "should have found a product");
+        var category = product.getProperty("category");
+        ok(category, "should have found a category");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-  test("retrievedEntities - nested expand 2 level", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("retrievedEntities - nested expand 2 level",
+      "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
-    stop();
+        var em = newEm();
+        var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
+        stop();
 
-    em.executeQuery(query).then(function (data) {
-      var entities = data.retrievedEntities;
-      ok(entities);
-      ok(entities.length == 9, "Should have 9 entities, but had " + entities.length);
+        em.executeQuery(query).then(function (data) {
+          var entities = data.retrievedEntities;
+          ok(entities);
+          ok(entities.length == 9, "Should have 9 entities, but had " + entities.length);
 
-      var details = data.results;
-      ok(entities.indexOf(details[0]) >= 0, "entities should have the orderDetail");
-      ok(entities.indexOf(details[1]) >= 0, "entities should have the orderDetail");
-      ok(entities.indexOf(details[2]) >= 0, "entities should have the orderDetail");
-      ok(entities.indexOf(details[3]) >= 0, "entities should have the orderDetail");
-      ok(entities.indexOf(details[4]) >= 0, "entities should have the orderDetail");
+          var details = data.results;
+          ok(entities.indexOf(details[0]) >= 0, "entities should have the orderDetail");
+          ok(entities.indexOf(details[1]) >= 0, "entities should have the orderDetail");
+          ok(entities.indexOf(details[2]) >= 0, "entities should have the orderDetail");
+          ok(entities.indexOf(details[3]) >= 0, "entities should have the orderDetail");
+          ok(entities.indexOf(details[4]) >= 0, "entities should have the orderDetail");
 
-      ok(entities.indexOf(details[0].getProperty("order")) >= 0, "entities should have the order");
-      ok(entities.indexOf(details[1].getProperty("order")) >= 0, "entities should have the order");
-      ok(entities.indexOf(details[2].getProperty("order")) >= 0, "entities should have the order");
-      ok(entities.indexOf(details[3].getProperty("order")) >= 0, "entities should have the order");
-      ok(entities.indexOf(details[4].getProperty("order")) >= 0, "entities should have the order");
+          ok(entities.indexOf(details[0].getProperty("order")) >= 0, "entities should have the order");
+          ok(entities.indexOf(details[1].getProperty("order")) >= 0, "entities should have the order");
+          ok(entities.indexOf(details[2].getProperty("order")) >= 0, "entities should have the order");
+          ok(entities.indexOf(details[3].getProperty("order")) >= 0, "entities should have the order");
+          ok(entities.indexOf(details[4].getProperty("order")) >= 0, "entities should have the order");
 
-      ok(entities.indexOf(details[0].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-      ok(entities.indexOf(details[1].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-      ok(entities.indexOf(details[2].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-      ok(entities.indexOf(details[3].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
-      ok(entities.indexOf(details[4].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+          ok(entities.indexOf(details[0].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+          ok(entities.indexOf(details[1].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+          ok(entities.indexOf(details[2].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+          ok(entities.indexOf(details[3].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
+          ok(entities.indexOf(details[4].getProperty("order").getProperty("customer")) >= 0, "entities should have the customer");
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+        }).fail(testFns.handleFail).fin(start);
+      });
 
-  test("retrievedEntities - nested expand 3 level", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("retrievedEntities - nested expand 3 level",
+      "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
-    stop();
 
-    em.executeQuery(query).then(function (data) {
-      var entities = data.retrievedEntities;
-      ok(entities);
-      // removed because may change with structure of db.
-      // ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
+        var em = newEm();
+        var query = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
+        stop();
 
-      var orders = data.results;
-      for (var i = 0, ilen = orders.length; i < ilen; i++) {
-        ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
-        var orderDetails = orders[i].getProperty("orderDetails");
+        em.executeQuery(query).then(function (data) {
+          var entities = data.retrievedEntities;
+          ok(entities);
+          // removed because may change with structure of db.
+          // ok(entities.length == 37, "Should have 37 entities, but had " + entities.length);
 
-        for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
-          ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
-          ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
-          ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
-        }
-      }
-      var allEntities = em.getEntities();
-      ok(allEntities.length == entities.length, "should have filled the cache with the same number of entities - i.e. no dups")
+          var orders = data.results;
+          for (var i = 0, ilen = orders.length; i < ilen; i++) {
+            ok(entities.indexOf(orders[i]) >= 0, "entities should have the order");
+            var orderDetails = orders[i].getProperty("orderDetails");
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+            for (var j = 0, jlen = orderDetails.length; j < jlen; j++) {
+              ok(entities.indexOf(orderDetails[j]) >= 0, "entities should have the orderDetail");
+              ok(entities.indexOf(orderDetails[j].getProperty("product")) >= 0, "entities should have the product");
+              ok(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0, "entities should have the category");
+            }
+          }
+          var allEntities = em.getEntities();
+          ok(allEntities.length == entities.length, "should have filled the cache with the same number of entities - i.e. no dups")
+
+        }).fail(testFns.handleFail).fin(start);
+      });
 
   var jsonResultsAdapter = new breeze.JsonResultsAdapter({
     name: "eventAdapter",
@@ -952,270 +897,232 @@
     }
   });
 
-  test("query using jsonResultsAdapter", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped tests - OData with jsonResultsAdapter");
-      return;
-    }
+  testIfNot("query using jsonResultsAdapter",
+    "mongo,odata", "does not work with this test's jsonResultsAdapter", function () {
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Skipped tests - Mongo with jsonResultsAdapter");
-      return;
-    }
+      var em = newEm();
 
-    var em = newEm();
+      var query = EntityQuery.from("OrderDetails").take(5).using(jsonResultsAdapter);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        ok(data.results.length === 5, "should be 5 recs");
+        var rv = data.results[0].getProperty("rowVersion");
+        ok(rv === 77, "rowVersion should be 77");
+      }).fail(testFns.handleFail).fin(start);
 
-    var query = EntityQuery.from("OrderDetails").take(5).using(jsonResultsAdapter);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(data.results.length === 5, "should be 5 recs");
-      var rv = data.results[0].getProperty("rowVersion");
-      ok(rv === 77, "rowVersion should be 77");
-    }).fail(testFns.handleFail).fin(start);
-
-  });
-
-  test("query using dataService with jsonResultsAdapter", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped tests - OData with jsonResultsAdapter");
-      return;
-    }
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Skipped tests - Mongo with jsonResultsAdapter");
-      return;
-    }
-
-    var em = newEm();
-
-
-    var oldDs = em.dataService;
-    var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
-    var query = EntityQuery.from("OrderDetails").take(5).using(newDs);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(data.results.length === 5, "should be 5 recs");
-      var rv = data.results[0].getProperty("rowVersion");
-      ok(rv === 77, "rowVersion should be 77");
-    }).fail(testFns.handleFail).fin(start);
-
-  });
-
-  test("query using em with dataService with jsonResultsAdapter", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "Skipped tests - OData with jsonResultsAdapter");
-      return;
-    }
-
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "Skipped tests - Mongo with jsonResultsAdapter");
-      return;
-    }
-
-    var em = newEm();
-
-    var oldDs = em.dataService;
-    var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
-    var em2 = new EntityManager({ dataService: newDs });
-    var query = EntityQuery.from("OrderDetails").take(5);
-    stop();
-    em2.executeQuery(query).then(function (data) {
-      ok(data.results.length === 5, "should be 5 recs");
-      var rv = data.results[0].getProperty("rowVersion");
-      ok(rv === 77, "rowVersion should be 77");
-    }).fail(testFns.handleFail).fin(start);
-
-  });
-
-  test("size test", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - uses expand");
-      return;
-    }
-    var em = newEm();
-    var em2 = newEm();
-    var query = EntityQuery.from("Customers").take(5).expand("orders");
-    stop();
-    var s1, s2, s3, s4, s5, s6;
-    var difObj;
-    em.executeQuery(query).then(function (data) {
-      s1 = testFns.sizeOf(em);
-      return em.executeQuery(query);
-    }).then(function (data2) {
-      s2 = testFns.sizeOf(em);
-      em.clear();
-      s3 = testFns.sizeOf(em);
-      difObj = testFns.sizeOfDif(s2, s3);
-      ok(difObj.dif, "should be a sizeDif");
-      return em.executeQuery(query);
-    }).then(function (data3) {
-      s4 = testFns.sizeOf(em);
-      ok(s1.size === s4.size, "sizes should be equal");
-      em2 = newEm();
-      return em2.executeQuery(query);
-    }).then(function (data4) {
-      s5 = testFns.sizeOf(em2);
-      difObj = testFns.sizeOfDif(s1, s5);
-      ok(difObj.dif == 0, "sizes should be equal but dif was: " + difObj.dif);
-
-      em2.clear();
-      s6 = testFns.sizeOf(em2);
-      difObj = testFns.sizeOfDif(s3, s6);
-      ok(difObj.dif == 0, "empty sizes should be equal but dif was: " + difObj.dif);
-
-    }).fail(testFns.handleFail).fin(start);
-  });
-
-  test("sizeof config", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "N/A for Mongo - uses expand");
-      return;
-    }
-
-    var em = newEm();
-    var em2 = newEm();
-    var query = EntityQuery.from("Customers").take(5).expand("orders");
-    stop();
-    var s1, s2, s3, s4, s5, s6;
-    var sizeDif;
-    em.executeQuery(query).then(function (data) {
-      s1 = testFns.sizeOf(breeze.config);
-      return em.executeQuery(query);
-    }).then(function (data2) {
-      s2 = testFns.sizeOf(breeze.config);
-      em.clear();
-      s3 = testFns.sizeOf(breeze.config);
-      return em.executeQuery(query);
-    }).then(function (data3) {
-      s4 = testFns.sizeOf(breeze.config);
-      ok(s1.size === s4.size, "sizes should be equal");
-      em2 = newEm();
-      s5 = testFns.sizeOf(breeze.config);
-      return em2.executeQuery(query);
-    }).then(function (data4) {
-      s6 = testFns.sizeOf(breeze.config);
-      ok(s5.size === s6.size, "sizes should be equal");
-
-    }).fail(testFns.handleFail).fin(start);
-  });
-
-  test("size test property change", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
-
-    var em = newEm();
-    var em2 = newEm();
-    var query = EntityQuery.from("Customers").take(5).expand("orders");
-    stop();
-    var s1, s2, s3, s4, s5, s6;
-    var sizeDif, difObj;
-    var hasChanges = em.hasChanges();
-
-    em.entityChanged.subscribe(function (x) {
-      var y = x;
-    });
-    em2.entityChanged.subscribe(function (x) {
-      var y = x;
     });
 
-    em.executeQuery(query).then(function (data) {
-      s1 = testFns.sizeOf(em);
-      return em.executeQuery(query);
-    }).then(function (data2) {
-      var custs = data2.results;
-      custs.forEach(function (c) {
-        var rv = c.getProperty("rowVersion");
-        c.setProperty("rowVersion", rv + 1);
+  testIfNot("query using dataService with jsonResultsAdapter",
+    "mongo,odata", "does not work with this test's jsonResultsAdapter", function () {
+
+      var em = newEm();
+
+
+      var oldDs = em.dataService;
+      var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
+      var query = EntityQuery.from("OrderDetails").take(5).using(newDs);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        ok(data.results.length === 5, "should be 5 recs");
+        var rv = data.results[0].getProperty("rowVersion");
+        ok(rv === 77, "rowVersion should be 77");
+      }).fail(testFns.handleFail).fin(start);
+
+    });
+
+  testIfNot("query using em with dataService with jsonResultsAdapter",
+         "mongo,odata", "does not work with this test's jsonResultsAdapter", function () {
+
+           var em = newEm();
+
+           var oldDs = em.dataService;
+           var newDs = new DataService({ serviceName: oldDs.serviceName, jsonResultsAdapter: jsonResultsAdapter });
+           var em2 = new EntityManager({ dataService: newDs });
+           var query = EntityQuery.from("OrderDetails").take(5);
+           stop();
+           em2.executeQuery(query).then(function (data) {
+             ok(data.results.length === 5, "should be 5 recs");
+             var rv = data.results[0].getProperty("rowVersion");
+             ok(rv === 77, "rowVersion should be 77");
+           }).fail(testFns.handleFail).fin(start);
+
+         });
+
+  testIfNot("size test",
+    "mongo", "does not support 'expand'", function () {
+
+      var em = newEm();
+      var em2 = newEm();
+      var query = EntityQuery.from("Customers").take(5).expand("orders");
+      stop();
+      var s1, s2, s3, s4, s5, s6;
+      var difObj;
+      em.executeQuery(query).then(function (data) {
+        s1 = testFns.sizeOf(em);
+        return em.executeQuery(query);
+      }).then(function (data2) {
+        s2 = testFns.sizeOf(em);
+        em.clear();
+        s3 = testFns.sizeOf(em);
+        difObj = testFns.sizeOfDif(s2, s3);
+        ok(difObj.dif, "should be a sizeDif");
+        return em.executeQuery(query);
+      }).then(function (data3) {
+        s4 = testFns.sizeOf(em);
+        ok(s1.size === s4.size, "sizes should be equal");
+        em2 = newEm();
+        return em2.executeQuery(query);
+      }).then(function (data4) {
+        s5 = testFns.sizeOf(em2);
+        difObj = testFns.sizeOfDif(s1, s5);
+        ok(difObj.dif == 0, "sizes should be equal but dif was: " + difObj.dif);
+
+        em2.clear();
+        s6 = testFns.sizeOf(em2);
+        difObj = testFns.sizeOfDif(s3, s6);
+        ok(difObj.dif == 0, "empty sizes should be equal but dif was: " + difObj.dif);
+
+      }).fail(testFns.handleFail).fin(start);
+    });
+
+  testIfNot("sizeof config",
+    "mongo", "does not support 'expand'", function () {
+
+      var em = newEm();
+      var em2 = newEm();
+      var query = EntityQuery.from("Customers").take(5).expand("orders");
+      stop();
+      var s1, s2, s3, s4, s5, s6;
+      var sizeDif;
+      em.executeQuery(query).then(function (data) {
+        s1 = testFns.sizeOf(breeze.config);
+        return em.executeQuery(query);
+      }).then(function (data2) {
+        s2 = testFns.sizeOf(breeze.config);
+        em.clear();
+        s3 = testFns.sizeOf(breeze.config);
+        return em.executeQuery(query);
+      }).then(function (data3) {
+        s4 = testFns.sizeOf(breeze.config);
+        ok(s1.size === s4.size, "sizes should be equal");
+        em2 = newEm();
+        s5 = testFns.sizeOf(breeze.config);
+        return em2.executeQuery(query);
+      }).then(function (data4) {
+        s6 = testFns.sizeOf(breeze.config);
+        ok(s5.size === s6.size, "sizes should be equal");
+
+      }).fail(testFns.handleFail).fin(start);
+    });
+
+  testIfNot("size test property change",
+    "mongo", "does not support 'expand'", function () {
+
+      var em = newEm();
+      var em2 = newEm();
+      var query = EntityQuery.from("Customers").take(5).expand("orders");
+      stop();
+      var s1, s2, s3, s4, s5, s6;
+      var sizeDif, difObj;
+      var hasChanges = em.hasChanges();
+
+      em.entityChanged.subscribe(function (x) {
+        var y = x;
       });
-      em.rejectChanges();
-      s2 = testFns.sizeOf(em);
-      difObj = testFns.sizeOfDif(s1, s2);
-      sizeDif = Math.abs(difObj.dif);
-      ok(sizeDif < 20, "s12 dif should be very small: " + sizeDif);
-      em.clear();
-      s3 = testFns.sizeOf(em);
-      difObj = testFns.sizeOfDif(s2, s3);
-      ok(difObj.dif, "should be a sizeDif result");
-      return em.executeQuery(query);
-    }).then(function (data3) {
-      s4 = testFns.sizeOf(em);
-      sizeDif = Math.abs(s1.size - s4.size);
-      ok(sizeDif < 20, "sizes should be equal: " + sizeDif);
-      return em2.executeQuery(query);
-    }).then(function (data4) {
-      s5 = testFns.sizeOf(em2);
-      difObj = testFns.sizeOfDif(s1, s5);
-      sizeDif = Math.abs(difObj.dif);
-      ok(sizeDif < 20, "sizes should be almost equal: " + sizeDif);
+      em2.entityChanged.subscribe(function (x) {
+        var y = x;
+      });
 
-      em2.clear();
-      s6 = testFns.sizeOf(em2);
-      difObj = testFns.sizeOfDif(s3, s6);
-      sizeDif = Math.abs(difObj.dif);
-      ok(sizeDif < 20, "empty sizes should be almost equal: " + sizeDif);
+      em.executeQuery(query).then(function (data) {
+        s1 = testFns.sizeOf(em);
+        return em.executeQuery(query);
+      }).then(function (data2) {
+        var custs = data2.results;
+        custs.forEach(function (c) {
+          var rv = c.getProperty("rowVersion");
+          c.setProperty("rowVersion", rv + 1);
+        });
+        em.rejectChanges();
+        s2 = testFns.sizeOf(em);
+        difObj = testFns.sizeOfDif(s1, s2);
+        sizeDif = Math.abs(difObj.dif);
+        ok(sizeDif < 20, "s12 dif should be very small: " + sizeDif);
+        em.clear();
+        s3 = testFns.sizeOf(em);
+        difObj = testFns.sizeOfDif(s2, s3);
+        ok(difObj.dif, "should be a sizeDif result");
+        return em.executeQuery(query);
+      }).then(function (data3) {
+        s4 = testFns.sizeOf(em);
+        sizeDif = Math.abs(s1.size - s4.size);
+        ok(sizeDif < 20, "sizes should be equal: " + sizeDif);
+        return em2.executeQuery(query);
+      }).then(function (data4) {
+        s5 = testFns.sizeOf(em2);
+        difObj = testFns.sizeOfDif(s1, s5);
+        sizeDif = Math.abs(difObj.dif);
+        ok(sizeDif < 20, "sizes should be almost equal: " + sizeDif);
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+        em2.clear();
+        s6 = testFns.sizeOf(em2);
+        difObj = testFns.sizeOfDif(s3, s6);
+        sizeDif = Math.abs(difObj.dif);
+        ok(sizeDif < 20, "empty sizes should be almost equal: " + sizeDif);
 
-  test("detached unresolved children", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-    var realEm = newEm();
-    var metadataStore = realEm.metadataStore;
-    var orderType = metadataStore.getEntityType("Order");
+  testIfNot("detached unresolved children",
+    "mongo", "does not support 'expand'", function () {
 
-    var query = EntityQuery.from("Customers")
-        .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
-        .expand("orders");
-    var newOrder = orderType.createEntity(); // call the factory function for the Customer type
-    realEm.addEntity(newOrder);
-    newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
+      var realEm = newEm();
+      var metadataStore = realEm.metadataStore;
+      var orderType = metadataStore.getEntityType("Order");
 
-    var items = realEm.rejectChanges();
-    stop();
-    realEm.executeQuery(query).then(function (data) {
-      var orders = data.results[0].getProperty("orders");
-      // the bug was that this included the previously detached order above. ( making a length of 11).
-      ok(orders.length === 10, "This customer must have 10 Orders");
-
+      var query = EntityQuery.from("Customers")
+          .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
+          .expand("orders");
       var newOrder = orderType.createEntity(); // call the factory function for the Customer type
       realEm.addEntity(newOrder);
       newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
 
       var items = realEm.rejectChanges();
-      return realEm.executeQuery(query);
+      stop();
+      realEm.executeQuery(query).then(function (data) {
+        var orders = data.results[0].getProperty("orders");
+        // the bug was that this included the previously detached order above. ( making a length of 11).
+        ok(orders.length === 10, "This customer must have 10 Orders");
 
-    }).then(function (data2) {
-      var orders = data2.results[0].getProperty("orders");
-      ok(orders.length === 10, "The customers must have 10 Orders");
-    }).fail(testFns.handleFail).fin(start);
+        var newOrder = orderType.createEntity(); // call the factory function for the Customer type
+        realEm.addEntity(newOrder);
+        newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
 
-  });
+        var items = realEm.rejectChanges();
+        return realEm.executeQuery(query);
 
-  test("query with two nested expands", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+      }).then(function (data2) {
+        var orders = data2.results[0].getProperty("orders");
+        ok(orders.length === 10, "The customers must have 10 Orders");
+      }).fail(testFns.handleFail).fin(start);
 
-    var em = newEm();
-    var query = EntityQuery.from("OrderDetails")
-        .where("orderID", "==", 11069)
-        .expand(["order.customer", "order.employee"]);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      var r = data.results[0];
-      var c = r.getProperty("order").getProperty("customer");
-      ok(c, "c should not be null");
-      var e = r.getProperty("order").getProperty("employee");
-      ok(e, "e should not be null");
-    }).fail(testFns.handleFail).fin(start);
-  });
+    });
+
+  testIfNot("query with two nested expands",
+    "mongo", "does not support 'expand'", function () {
+
+      var em = newEm();
+      var query = EntityQuery.from("OrderDetails")
+          .where("orderID", "==", 11069)
+          .expand(["order.customer", "order.employee"]);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        var r = data.results[0];
+        var c = r.getProperty("order").getProperty("customer");
+        ok(c, "c should not be null");
+        var e = r.getProperty("order").getProperty("employee");
+        ok(e, "e should not be null");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("query with two fields", function () {
     var em = newEm();
@@ -1307,24 +1214,21 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query with inlineCount 2", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - nested navigation thru joins not yet supported");
-      return;
-    }
+  testIfNot("query with inlineCount 2",
+    "mongo", "does not support nested navigation thru joins", function () {
 
-    var em = newEm();
-    var q = EntityQuery.from("Orders")
-        .where("customer.companyName", "startsWith", "C")
-        .take(5)
-        .inlineCount(true);
-    stop();
-    em.executeQuery(q).then(function (data) {
-      var r = data.results;
-      var count = data.inlineCount;
-      ok(count > r.length);
-    }).fail(testFns.handleFail).fin(start);
-  });
+      var em = newEm();
+      var q = EntityQuery.from("Orders")
+          .where("customer.companyName", "startsWith", "C")
+          .take(5)
+          .inlineCount(true);
+      stop();
+      em.executeQuery(q).then(function (data) {
+        var r = data.results;
+        var count = data.inlineCount;
+        ok(count > r.length);
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("fetchEntityByKey", function () {
     var em = newEm();
@@ -1475,54 +1379,52 @@
     }
   });
 
-  test("hasChanges after query 3", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("hasChanges after query 3",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var query = EntityQuery.from("Customers").take(20);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      var r = data.results;
-      ok(r.length === 20);
-      ok(!em.hasChanges());
-      return query.expand("orders").using(em).execute();
-    }).then(function (data2) {
-      var r2 = data2.results;
-      ok(r2.length === 20);
-      ok(!em.hasChanges(), "should not have changes after nav prop load");
-      var changes = em.getChanges();
-      ok(changes.length === 0, "getChanges should return 0 results");
-    }).fail(queryFailed).fin(start);
+      var em = newEm();
+      var query = EntityQuery.from("Customers").take(20);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        var r = data.results;
+        ok(r.length === 20);
+        ok(!em.hasChanges());
+        return query.expand("orders").using(em).execute();
+      }).then(function (data2) {
+        var r2 = data2.results;
+        ok(r2.length === 20);
+        ok(!em.hasChanges(), "should not have changes after nav prop load");
+        var changes = em.getChanges();
+        ok(changes.length === 0, "getChanges should return 0 results");
+      }).fail(queryFailed).fin(start);
 
-    function queryFailed(error) {
-      ok(false, "query failed with error message = " + error.message);
-    }
-  });
+      function queryFailed(error) {
+        ok(false, "query failed with error message = " + error.message);
+      }
+    });
 
-  test("isNavigationPropertyLoaded on expand", function () {
-    var em = newEm();
-    var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2).expand("orders.orderDetails");
-    stop();
+  testIfNot("isNavigationPropertyLoaded on expand",
+    "mongo", "does not support 'expand'", function () {
+      var em = newEm();
+      var query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2).expand("orders.orderDetails");
+      stop();
 
-    em.executeQuery(query).then(function (data) {
-      var r = data.results;
+      em.executeQuery(query).then(function (data) {
+        var r = data.results;
 
-      ok(r.length === 2);
-      r.forEach(function (cust) {
-        var ordersLoaded = cust.entityAspect.isNavigationPropertyLoaded("orders");
-        ok(ordersLoaded, "orders should all be marked as loaded");
-        var orders = cust.getProperty("orders");
-        ok(orders.length > 0, "should have so orders");
-        orders.forEach(function (order) {
-          var detailsLoaded = order.entityAspect.isNavigationPropertyLoaded("orderDetails");
-          ok(detailsLoaded, "orders should all be marked as loaded");
+        ok(r.length === 2);
+        r.forEach(function (cust) {
+          var ordersLoaded = cust.entityAspect.isNavigationPropertyLoaded("orders");
+          ok(ordersLoaded, "orders should all be marked as loaded");
+          var orders = cust.getProperty("orders");
+          ok(orders.length > 0, "should have so orders");
+          orders.forEach(function (order) {
+            var detailsLoaded = order.entityAspect.isNavigationPropertyLoaded("orderDetails");
+            ok(detailsLoaded, "orders should all be marked as loaded");
+          });
         });
-      });
-    }).fail(testFns.handleFail).fin(start);
-  });
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("can run two queries in parallel for fresh EM w/ empty metadataStore", 1, function () {
     var em = newEm();
@@ -1605,39 +1507,36 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query results notification suppressed", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("query results notification suppressed",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
-    var query = EntityQuery.from("Customers")
-        .where(testFns.customerKeyName, "==", alfredsID)
-        .using(em);
-    stop();
-    var arrayChangedCount = 0;
-    var orders;
+      var em = newEm();
+      var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
+      var query = EntityQuery.from("Customers")
+          .where(testFns.customerKeyName, "==", alfredsID)
+          .using(em);
+      stop();
+      var arrayChangedCount = 0;
+      var orders;
 
-    query.execute().then(function (data) {
-      var customer = data.results[0];
-      orders = customer.getProperty("orders");
-      orders.arrayChanged.subscribe(function (args) {
-        arrayChangedCount++;
-      });
-      //             Event.enable("arrayChanged", customer.entityAspect, false);
-      Event.enable("arrayChanged", em, false);
-      return query.expand("orders").execute();
-    }).then(function (data2) {
-      ok(arrayChangedCount === 0, "should be no arrayChanged events fired");
-      var orderType = em.metadataStore.getEntityType("Order");
-      var newOrder = orderType.createEntity();
-      orders.push(newOrder);
-      ok(arrayChangedCount === 0, "should be no arrayChanged events fired");
+      query.execute().then(function (data) {
+        var customer = data.results[0];
+        orders = customer.getProperty("orders");
+        orders.arrayChanged.subscribe(function (args) {
+          arrayChangedCount++;
+        });
+        //             Event.enable("arrayChanged", customer.entityAspect, false);
+        Event.enable("arrayChanged", em, false);
+        return query.expand("orders").execute();
+      }).then(function (data2) {
+        ok(arrayChangedCount === 0, "should be no arrayChanged events fired");
+        var orderType = em.metadataStore.getEntityType("Order");
+        var newOrder = orderType.createEntity();
+        orders.push(newOrder);
+        ok(arrayChangedCount === 0, "should be no arrayChanged events fired");
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("getEntities after query", function () {
     var em = newEm();
@@ -1696,36 +1595,33 @@
   });
 
 
-  test("duplicates after relation query", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("duplicates after relation query",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
-    em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
-    var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
-    var query = EntityQuery.from("Customers")
-        .where(testFns.customerKeyName, "==", alfredsID);
-    // bug goes away if you add this.
-    // .expand("orders");
-    var customer;
-    stop();
-    query.using(em).execute().then(function (data) {
-      customer = data.results[0];
-      var q2 = EntityQuery.from("Orders")
-          .where("customerID", "==", alfredsID)
-          .expand("customer"); // bug goes away if you remove this
-      return q2.using(em).execute();
-    }).then(function (data2) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 records");
-      var details = customer.getProperty("orders");
-      var dups = testFns.getDups(details);
-      ok(dups.length === 0, "should be no dups");
-    }).fail(testFns.handleFail).fin(start);
+      var em = newEm();
+      em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
+      var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
+      var query = EntityQuery.from("Customers")
+          .where(testFns.customerKeyName, "==", alfredsID);
+      // bug goes away if you add this.
+      // .expand("orders");
+      var customer;
+      stop();
+      query.using(em).execute().then(function (data) {
+        customer = data.results[0];
+        var q2 = EntityQuery.from("Orders")
+            .where("customerID", "==", alfredsID)
+            .expand("customer"); // bug goes away if you remove this
+        return q2.using(em).execute();
+      }).then(function (data2) {
+        ok(!em.hasChanges(), "should not have any changes");
+        ok(em.getChanges().length === 0, "getChanges should return 0 records");
+        var details = customer.getProperty("orders");
+        var dups = testFns.getDups(details);
+        ok(dups.length === 0, "should be no dups");
+      }).fail(testFns.handleFail).fin(start);
 
-  });
+    });
 
   function createProductCtor() {
     var init = function (entity) {
@@ -2124,192 +2020,174 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("unidirectional navigation load", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - OrderDetails is not queryable");
-      return;
-    }
+  testIfNot("unidirectional navigation load",
+    "mongo", "OrderDetails is not queryable", function () {
 
-    var em = newEm();
-    var count = 5;
-    var query = EntityQuery.from("OrderDetails").take(count);
-    stop();
-    query.using(em).execute().then(function (data) {
-      var orderDetails = data.results;
-      ok(orderDetails.length === count);
-      var promises = orderDetails.map(function (od) {
-        return od.entityAspect.loadNavigationProperty("product").then(function (data2) {
-          var products = data2.results;
-          ok(products.length === 1, "should only return a single product");
-          var product = products[0];
+      var em = newEm();
+      var count = 5;
+      var query = EntityQuery.from("OrderDetails").take(count);
+      stop();
+      query.using(em).execute().then(function (data) {
+        var orderDetails = data.results;
+        ok(orderDetails.length === count);
+        var promises = orderDetails.map(function (od) {
+          return od.entityAspect.loadNavigationProperty("product").then(function (data2) {
+            var products = data2.results;
+            ok(products.length === 1, "should only return a single product");
+            var product = products[0];
+            ok(od.getProperty("product") === product, "product should be set");
+          });
+        });
+        return Q.all(promises);
+      }).then(function () {
+        ok(true, "all promises completed");
+      }).fail(testFns.handleFail).fin(start);
+    });
+
+  testIfNot("unidirectional navigation query",
+    "mongo", "OrderDetails is not queryable", function () {
+      var em = newEm();
+
+      var query = EntityQuery.from("OrderDetails")
+          .where("product.productID", "==", 1);
+      stop();
+      var orderDetails;
+      query.using(em).execute().then(function (data) {
+        orderDetails = data.results;
+        ok(orderDetails.length > 0);
+        orderDetails.forEach(function (od) {
+          ok(od.getProperty("productID") === 1, "productID should === 1");
+        });
+        var q2 = EntityQuery.from("Products")
+            .where("productID", "==", 1);
+        return em.executeQuery(q2);
+      }).then(function (data) {
+        var product = data.results[0];
+        orderDetails.forEach(function (od) {
           ok(od.getProperty("product") === product, "product should be set");
         });
-      });
-      return Q.all(promises);
-    }).then(function () {
-      ok(true, "all promises completed");
-    }).fail(testFns.handleFail).fin(start);
-  });
 
-  test("unidirectional navigation query", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - OrderDetails is not queryable");
-      return;
-    }
-    var em = newEm();
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-    var query = EntityQuery.from("OrderDetails")
-        .where("product.productID", "==", 1);
-    stop();
-    var orderDetails;
-    query.using(em).execute().then(function (data) {
-      orderDetails = data.results;
-      ok(orderDetails.length > 0);
-      orderDetails.forEach(function (od) {
-        ok(od.getProperty("productID") === 1, "productID should === 1");
-      });
-      var q2 = EntityQuery.from("Products")
-          .where("productID", "==", 1);
-      return em.executeQuery(q2);
-    }).then(function (data) {
-      var product = data.results[0];
-      orderDetails.forEach(function (od) {
-        ok(od.getProperty("product") === product, "product should be set");
-      });
+  testIfNot("unidirectional navigation bad query",
+    "mongo", "does not support 'expand'", function () {
+      var em = newEm();
 
-    }).fail(testFns.handleFail).fin(start);
-  });
+      var query = EntityQuery.from("Products")
+          .where("productID", "==", 1)
+          .expand("orderDetails");
 
-  test("unidirectional navigation bad query", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
-    var em = newEm();
+      stop();
+      query.using(em).execute().then(function (data) {
+        ok(false, "should not get here");
 
-    var query = EntityQuery.from("Products")
-        .where("productID", "==", 1)
-        .expand("orderDetails");
+      }).fail(function (err) {
+        if (testFns.DEBUG_ODATA) {
+          ok(err.message.indexOf("Product") >= 1, "should be an error message about the Product query");
+        } else {
+          ok(err.message.indexOf("orderDetails") >= 1, " message should be about missing OrderDetails property");
+        }
+      }).fin(start);
+    });
 
-    stop();
-    query.using(em).execute().then(function (data) {
-      ok(false, "should not get here");
+  testIfNot("bidirectional navigation of same entity type",
+    "mongo", "does not support navigation", function () {
 
-    }).fail(function (err) {
-      if (testFns.DEBUG_ODATA) {
-        ok(err.message.indexOf("Product") >= 1, "should be an error message about the Product query");
-      } else {
-        ok(err.message.indexOf("orderDetails") >= 1, " message should be about missing OrderDetails property");
-      }
-    }).fin(start);
-  });
-
-  test("bidirectional navigation of same entity type", function() {
-      if (testFns.DEBUG_MONGO) {
-          ok(true, "NA for Mongo");
-          return;
-      }
       var em = newEm();
 
       var query = EntityQuery.from("Employees")
           .where("reportsToEmployeeID", "!=", null);
       stop();
       var orderDetails;
-      query.using(em).execute().then(function(data) {
-          var emps = data.results;
-          // check using well-known data.  Map of employeeId : reportsToEmployeeID
-          var map = {
-              1: 2, 3: 2, 4: 3, 5: 8, 6: 2, 8: 3, 9: 6, 10: 6
-          };
-          emps.forEach(function(emp) {
-              ok(map[emp.employeeId] == emp.reportsToEmployeeId, "reportsToEmployeeID should match");
-          });
+      query.using(em).execute().then(function (data) {
+        var emps = data.results;
+        // check using well-known data.  Map of employeeId : reportsToEmployeeID
+        var map = {
+          1: 2, 3: 2, 4: 3, 5: 8, 6: 2, 8: 3, 9: 6, 10: 6
+        };
+        emps.forEach(function (emp) {
+          ok(map[emp.employeeId] == emp.reportsToEmployeeId, "reportsToEmployeeID should match");
+        });
       }).fail(testFns.handleFail).fin(start);
-  });
+    });
 
-  test("unidirectional navigation of different type (1-n)", function() {
+  testIfNot("unidirectional navigation of different type (1-n)",
+    "mongo", "does not support navigation", function () {
 
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo");
-      return;
-    }
-    
-    var em = newEm();
+      var em = newEm();
 
-    var query = EntityQuery.from("Territories").where("regionID", "!=", null);
-    var query2 = EntityQuery.from("Regions");
-    stop();
-    var territories, regions;
-    query.using(em).execute().then(function (data) {
-      territories = data.results;
-      return query2.using(em).execute();
-    }).then(function (data2) {
-      var regions = data2.results;
-      regions.forEach(function (region) {
-        var terrs = region.getProperty("territories");
-        var isOk= terrs.every(function(terr) {
-          return terr.getProperty("regionID") == region.getProperty("regionID");
+      var query = EntityQuery.from("Territories").where("regionID", "!=", null);
+      var query2 = EntityQuery.from("Regions");
+      stop();
+      var territories, regions;
+      query.using(em).execute().then(function (data) {
+        territories = data.results;
+        return query2.using(em).execute();
+      }).then(function (data2) {
+        var regions = data2.results;
+        regions.forEach(function (region) {
+          var terrs = region.getProperty("territories");
+          var isOk = terrs.every(function (terr) {
+            return terr.getProperty("regionID") == region.getProperty("regionID");
+          });
+          ok(isOk, "issue with terr then regions")
         });
-        ok(isOk, "issue with terr then regions")
-      });
-      em = newEm();
-      return query2.using(em).execute()
-    }).then(function(data3) {
-      regions = data3.results;
-      return query.using(em).execute();
-    }).then(function(data4) {
-      var territories = data4.results;
-      regions.forEach(function (region) {
-        var terrs = region.getProperty("territories");
-        var isOk = terrs.every(function (terr) {
-          return terr.getProperty("regionID") == region.getProperty("regionID");
+        em = newEm();
+        return query2.using(em).execute()
+      }).then(function (data3) {
+        regions = data3.results;
+        return query.using(em).execute();
+      }).then(function (data4) {
+        var territories = data4.results;
+        regions.forEach(function (region) {
+          var terrs = region.getProperty("territories");
+          var isOk = terrs.every(function (terr) {
+            return terr.getProperty("regionID") == region.getProperty("regionID");
+          });
+          ok(isOk, "issue with regions then terrs")
         });
-        ok(isOk, "issue with regions then terrs")
-      });
-      
-    }).fail(testFns.handleFail).fin(start);
-  });
 
-  test("unidirectional navigation of same entity type (1-1)", function() {
-      if (testFns.DEBUG_MONGO) {
-          ok(true, "NA for Mongo");
-          return;
-      }
+      }).fail(testFns.handleFail).fin(start);
+    });
+
+  testIfNot("unidirectional navigation of same entity type (1-1)",
+    "mongo", "does not support navigation", function () {
 
       // create metadata manually so we don't have the bidirectional directReports navigation
       var ms = testFns.newMs();
 
       ms.addEntityType({
-          shortName: "Employee",
-          namespace: "Foo",
-          autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
-          dataProperties: [
-              new breeze.DataProperty({
-                  name: "employeeID",
-                  dataType: breeze.DataType.Int32,
-                  isNullable: false,
-                  isPartOfKey: true
-              })
-          ]
+        shortName: "Employee",
+        namespace: "Foo",
+        autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
+        dataProperties: [
+            new breeze.DataProperty({
+              name: "employeeID",
+              dataType: breeze.DataType.Int32,
+              isNullable: false,
+              isPartOfKey: true
+            })
+        ]
       });
       var employeeType = ms.getEntityType("Employee");
 
       employeeType.addProperty(new breeze.DataProperty({
-          name: "firstName",
-          dataType: breeze.DataType.String
+        name: "firstName",
+        dataType: breeze.DataType.String
       }));
       employeeType.addProperty(new breeze.DataProperty({
-          name: "reportsToEmployeeID",
-          dataType: breeze.DataType.Int32
+        name: "reportsToEmployeeID",
+        dataType: breeze.DataType.Int32
       }));
 
       employeeType.addProperty(new breeze.NavigationProperty({
-          name: "boss",
-          entityTypeName: "Employee:#Foo",
-          isScalar: true,
-          associationName: "Employee_Boss",
-          foreignKeyNames: ["reportsToEmployeeID"]
-         
+        name: "boss",
+        entityTypeName: "Employee:#Foo",
+        isScalar: true,
+        associationName: "Employee_Boss",
+        foreignKeyNames: ["reportsToEmployeeID"]
+
       }));
 
       ms.setEntityTypeForResourceName('Employees', 'Employee');
@@ -2332,112 +2210,109 @@
       var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
         .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
       stop();
-      query.using(em).execute().then(function(data) {
+      query.using(em).execute().then(function (data) {
         var emps = data.results;
-        emps.forEach(function(emp) {
+        emps.forEach(function (emp) {
           ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
-          emp.reportsToEmployeeID && ok( emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
+          emp.reportsToEmployeeID && ok(emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
         });
         var em = newEm(ms);
         var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
             .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
-        return  query2.using(em).execute();
-      }).then(function(data2) {
+        return query2.using(em).execute();
+      }).then(function (data2) {
         var emps = data2.results;
-        emps.forEach(function(emp) {
+        emps.forEach(function (emp) {
           ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
           emp.reportsToEmployeeID && ok(emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
         });
         var foo = "foo";
       }).fail(testFns.handleFail).fin(start);
-  });
-
-  test("unidirectional navigation of same entity type (1-n)", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo");
-      return;
-    }
-
-    // create metadata manually so we don't have the bidirectional directReports navigation
-    var ms = testFns.newMs();
-
-    ms.addEntityType({
-      shortName: "Employee",
-      namespace: "Foo",
-      autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
-      dataProperties: [
-          new breeze.DataProperty({
-            name: "employeeID",
-            dataType: breeze.DataType.Int32,
-            isNullable: false,
-            isPartOfKey: true
-          })
-      ]
     });
-    var employeeType = ms.getEntityType("Employee");
 
-    employeeType.addProperty(new breeze.DataProperty({
-      name: "firstName",
-      dataType: breeze.DataType.String
-    }));
-    employeeType.addProperty(new breeze.DataProperty({
-      name: "reportsToEmployeeID",
-      dataType: breeze.DataType.Int32
-    }));
+  testIfNot("unidirectional navigation of same entity type (1-n)",
+    "mongo", "does not support navigation", function () {
 
-    employeeType.addProperty(new breeze.NavigationProperty({
-      name: "directReports",
-      entityTypeName: "Employee:#Foo",
-      isScalar: false,
-      associationName: "Employee_DirectReports",
-      invForeignKeyNames: ["reportsToEmployeeID"]
+      // create metadata manually so we don't have the bidirectional directReports navigation
+      var ms = testFns.newMs();
 
-    }));
-
-    ms.setEntityTypeForResourceName('Employees', 'Employee');
-    var em = newEm(ms);
-    ms.addDataService(em.dataService);
-
-    // check using well-known data.  Map of employeeId : reportsToEmployeeID
-    var map = {
-      1: 2,
-      3: 2,
-      4: 3,
-      5: 8,
-      6: 2,
-      8: 3,
-      9: 6,
-      10: 6
-    };
-
-    // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
-    var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
-      .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
-    stop();
-    query.using(em).execute().then(function (data) {
-      var emps = data.results;
-      emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
-        emp.directReports.forEach(function(dr) {
-          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
-        });
-        
+      ms.addEntityType({
+        shortName: "Employee",
+        namespace: "Foo",
+        autoGeneratedKeyType: breeze.AutoGeneratedKeyType.Identity,
+        dataProperties: [
+            new breeze.DataProperty({
+              name: "employeeID",
+              dataType: breeze.DataType.Int32,
+              isNullable: false,
+              isPartOfKey: true
+            })
+        ]
       });
+      var employeeType = ms.getEntityType("Employee");
+
+      employeeType.addProperty(new breeze.DataProperty({
+        name: "firstName",
+        dataType: breeze.DataType.String
+      }));
+      employeeType.addProperty(new breeze.DataProperty({
+        name: "reportsToEmployeeID",
+        dataType: breeze.DataType.Int32
+      }));
+
+      employeeType.addProperty(new breeze.NavigationProperty({
+        name: "directReports",
+        entityTypeName: "Employee:#Foo",
+        isScalar: false,
+        associationName: "Employee_DirectReports",
+        invForeignKeyNames: ["reportsToEmployeeID"]
+
+      }));
+
+      ms.setEntityTypeForResourceName('Employees', 'Employee');
       var em = newEm(ms);
-      var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
-          .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
-      return query2.using(em).execute();
-    }).then(function (data2) {
-      var emps = data2.results;
-      emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
-        emp.directReports.forEach(function (dr) {
-          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+      ms.addDataService(em.dataService);
+
+      // check using well-known data.  Map of employeeId : reportsToEmployeeID
+      var map = {
+        1: 2,
+        3: 2,
+        4: 3,
+        5: 8,
+        6: 2,
+        8: 3,
+        9: 6,
+        10: 6
+      };
+
+      // var query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
+      var query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
+        .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+      stop();
+      query.using(em).execute().then(function (data) {
+        var emps = data.results;
+        emps.forEach(function (emp) {
+          ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+          emp.directReports.forEach(function (dr) {
+            ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+          });
+
         });
-      });
-      var foo = "foo";
-    }).fail(testFns.handleFail).fin(start);
-  });
+        var em = newEm(ms);
+        var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
+            .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
+        return query2.using(em).execute();
+      }).then(function (data2) {
+        var emps = data2.results;
+        emps.forEach(function (emp) {
+          ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+          emp.directReports.forEach(function (dr) {
+            ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+          });
+        });
+        var foo = "foo";
+      }).fail(testFns.handleFail).fin(start);
+    });
 
 
 
@@ -2458,48 +2333,43 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("where nested property", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - Product.category.categoryName is not a nested property in mongo");
-      return;
-    }
-    var em = newEm();
+  testIfNot("where nested property",
+    "mongo", "does not have the nested property Product.category.categoryName", function () {
+      var em = newEm();
 
-    var query = new EntityQuery()
-        .from("Products")
-        .where("category.categoryName", "startswith", "S")
-        .expand("category");
-    var queryUrl = query._toUri(em);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      var products = data.results;
-      var cats = products.map(function (product) {
-        return product.getProperty("category");
-      });
-      cats.forEach(function (cat) {
-        var catName = cat.getProperty("categoryName");
-        ok(core.stringStartsWith(catName, "S"));
-      });
-    }).fail(testFns.handleFail).fin(start);
-  });
+      var query = new EntityQuery()
+          .from("Products")
+          .where("category.categoryName", "startswith", "S")
+          .expand("category");
+      var queryUrl = query._toUri(em);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        var products = data.results;
+        var cats = products.map(function (product) {
+          return product.getProperty("category");
+        });
+        cats.forEach(function (cat) {
+          var catName = cat.getProperty("categoryName");
+          ok(core.stringStartsWith(catName, "S"));
+        });
+      }).fail(testFns.handleFail).fin(start);
+    });
 
-  test("where nested property 2", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - Order.customer.region is not a nested property in mongo");
-      return;
-    }
-    var em = newEm();
+  testIfNot("where nested property 2",
+    "mongo", "does not have the nested property Order.customer.region", function () {
 
-    var query = new EntityQuery()
-        .from("Orders")
-        .where("customer.region", "==", "CA");
-    var queryUrl = query._toUri(em);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      var customers = data.results;
-      ok(customers.length > 0, "some customers should have been found");
-    }).fail(testFns.handleFail).fin(start);
-  });
+      var em = newEm();
+
+      var query = new EntityQuery()
+          .from("Orders")
+          .where("customer.region", "==", "CA");
+      var queryUrl = query._toUri(em);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        var customers = data.results;
+        ok(customers.length > 0, "some customers should have been found");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("orderBy", function () {
     var em = newEm();
@@ -2527,222 +2397,202 @@
     em.executeQuery(query).then(function (data) {
       custs = data.results;
       var countryCities = custs.map(function (p) {
-        var countryCity = testFns.removeAccents( p.getProperty("country") + ":" + p.getProperty("city"));
+        var countryCity = testFns.removeAccents(p.getProperty("country") + ":" + p.getProperty("city"));
         p.countryCity = countryCity;
         return countryCity;
       });
-      
+
       testFns.assertIsSorted(countryCities, null, breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
       var q2 = query.orderBy(null);
       var q3 = q2.orderBy("country").orderBy("city");
       return em.executeQuery(q3);
-    }).then(function(data2) {
+    }).then(function (data2) {
       custs2 = data2.results;
       custs2.forEach(function (p) {
         p.countryCity = testFns.removeAccents(p.getProperty("country") + ":" + p.getProperty("city"));
       });
-      var isOk = breeze.core.arrayZip(custs, custs2, function(c1, c2) {
+      var isOk = breeze.core.arrayZip(custs, custs2, function (c1, c2) {
         return c1.countryCity == c2.countryCity;
-      }).every(function(v) {
+      }).every(function (v) {
         return v;
       });
       ok(isOk, "ordering should be the same");
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("expand", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
-    var em = newEm();
+  testIfNot("expand",
+    "mongo", "does not support 'expand'", function () {
 
-    var query = new EntityQuery()
-        .from("Products");
+      var em = newEm();
 
-    query = query.expand("category")
-        .take(5);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var products = data.results;
-      var cats = [];
-      products.map(function (product) {
-        var cat = product.getProperty("category");
-        if (cat) {
-          cats.push(cats);
-        }
-      });
-      ok(cats.length === 5, "should have 5 categories");
+      var query = new EntityQuery()
+          .from("Products");
 
-      start();
-    }).fail(testFns.handleFail);
-  });
+      query = query.expand("category")
+          .take(5);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        ok(!em.hasChanges(), "should not have any changes");
+        ok(em.getChanges().length === 0, "getChanges should return 0 results");
+        var products = data.results;
+        var cats = [];
+        products.map(function (product) {
+          var cat = product.getProperty("category");
+          if (cat) {
+            cats.push(cats);
+          }
+        });
+        ok(cats.length === 5, "should have 5 categories");
 
-  test("expand multiple", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
+        start();
+      }).fail(testFns.handleFail);
+    });
 
-    var em = newEm();
+  testIfNot("expand multiple",
+    "mongo", "does not support 'expand'", function () {
 
-    var query = new EntityQuery("Orders");
+      var em = newEm();
 
-    query = query.expand(["customer", "employee"])
-        .take(20);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var orders = data.results;
-      var custs = [];
-      var emps = [];
-      orders.map(function (order) {
-        var cust = order.getProperty("customer");
-        if (cust) {
-          custs.push(cust);
-        }
-        var emp = order.getProperty("employee");
-        if (emp) {
-          emps.push(emp);
-        }
-      });
-      ok(custs.length === 20, "should have 20 customers");
-      ok(emps.length === 20, "should have 20 employees");
+      var query = new EntityQuery("Orders");
 
-      start();
-    }).fail(testFns.handleFail);
-  });
+      query = query.expand(["customer", "employee"])
+          .take(20);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        ok(!em.hasChanges(), "should not have any changes");
+        ok(em.getChanges().length === 0, "getChanges should return 0 results");
+        var orders = data.results;
+        var custs = [];
+        var emps = [];
+        orders.map(function (order) {
+          var cust = order.getProperty("customer");
+          if (cust) {
+            custs.push(cust);
+          }
+          var emp = order.getProperty("employee");
+          if (emp) {
+            emps.push(emp);
+          }
+        });
+        ok(custs.length === 20, "should have 20 customers");
+        ok(emps.length === 20, "should have 20 employees");
 
-  test("expand nested", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
+        start();
+      }).fail(testFns.handleFail);
+    });
 
-    var em = newEm();
+  testIfNot("expand nested",
+        "mongo", "does not support 'expand'", function () {
 
-    var query = new EntityQuery()
-        .from("Orders");
+          var em = newEm();
 
-    query = query.expand("customer, orderDetails, orderDetails.product")
-        .take(5);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var orders = data.results;
-      var custs = [];
-      var orderDetails = [];
-      var products = [];
-      orders.map(function (order) {
-        var cust = order.getProperty("customer");
-        if (cust) {
-          custs.push(cust);
-        }
-        var orderDetailItems = order.getProperty("orderDetails");
-        if (orderDetailItems) {
-          Array.prototype.push.apply(orderDetails, orderDetailItems);
-          orderDetailItems.map(function (orderDetail) {
-            var product = orderDetail.getProperty("product");
-            if (product) {
-              products.push(product);
-            }
-          });
-        }
-      });
-      ok(custs.length === 5, "should have 5 customers");
-      ok(orderDetails.length > 5, "should have > 5 orderDetails");
-      ok(products.length > 5, "should have > 5 products");
-    }).fail(testFns.handleFail).fin(start);
+          var query = new EntityQuery()
+              .from("Orders");
+
+          query = query.expand("customer, orderDetails, orderDetails.product")
+              .take(5);
+          stop();
+          em.executeQuery(query).then(function (data) {
+            ok(!em.hasChanges(), "should not have any changes");
+            ok(em.getChanges().length === 0, "getChanges should return 0 results");
+            var orders = data.results;
+            var custs = [];
+            var orderDetails = [];
+            var products = [];
+            orders.map(function (order) {
+              var cust = order.getProperty("customer");
+              if (cust) {
+                custs.push(cust);
+              }
+              var orderDetailItems = order.getProperty("orderDetails");
+              if (orderDetailItems) {
+                Array.prototype.push.apply(orderDetails, orderDetailItems);
+                orderDetailItems.map(function (orderDetail) {
+                  var product = orderDetail.getProperty("product");
+                  if (product) {
+                    products.push(product);
+                  }
+                });
+              }
+            });
+            ok(custs.length === 5, "should have 5 customers");
+            ok(orderDetails.length > 5, "should have > 5 orderDetails");
+            ok(products.length > 5, "should have > 5 products");
+          }).fail(testFns.handleFail).fin(start);
 
 
-  });
+        });
 
-  test("expand through null child object", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
+  testIfNot("expand through null child object",
+        "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
+          var em = newEm();
 
-    var query = new EntityQuery()
-        .from("Orders")
-        .where("employeeID", "eq", null);
+          var query = new EntityQuery()
+              .from("Orders")
+              .where("employeeID", "eq", null);
 
-    query = query.expand("employee, employee.manager, employee.directReports")
-        .take(5);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var orders = data.results;
-      ok(orders.length > 0, "should have at least 1 order with no employeeID - check the db this may be a test bug");
-      orders.map(function (order) {
-        var emp = order.getProperty("employee");
-        ok(emp == null, "employee should be null");
-      });
-    }).fail(testFns.handleFail).fin(start);
+          query = query.expand("employee, employee.manager, employee.directReports")
+              .take(5);
+          stop();
+          em.executeQuery(query).then(function (data) {
+            ok(!em.hasChanges(), "should not have any changes");
+            ok(em.getChanges().length === 0, "getChanges should return 0 results");
+            var orders = data.results;
+            ok(orders.length > 0, "should have at least 1 order with no employeeID - check the db this may be a test bug");
+            orders.map(function (order) {
+              var emp = order.getProperty("employee");
+              ok(emp == null, "employee should be null");
+            });
+          }).fail(testFns.handleFail).fin(start);
 
 
-  });
+        });
 
+  testIfNot("orderBy nested",
+        "mongo", "does not support 'expand'", function () {
+          var em = newEm();
 
+          var query = new EntityQuery()
+              .from("Products")
+              .orderBy("category.categoryName desc")
+              .expand("category");
 
+          stop();
+          em.executeQuery(query).then(function (data) {
+            ok(!em.hasChanges(), "should not have any changes");
+            ok(em.getChanges().length === 0, "getChanges should return 0 results");
+            var products = data.results;
+            var cats = products.map(function (product) {
+              return product.getProperty("category");
+            });
 
-  test("orderBy nested", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
-    var em = newEm();
+            testFns.assertIsSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+          }).fail(testFns.handleFail).fin(start);
+        });
 
-    var query = new EntityQuery()
-        .from("Products")
-        .orderBy("category.categoryName desc")
-        .expand("category");
+  testIfNot("orderBy two part nested",
+        "mongo", "does not support 'expand'", function () {
 
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var products = data.results;
-      var cats = products.map(function (product) {
-        return product.getProperty("category");
-      });
+          var em = newEm();
 
-      testFns.assertIsSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
-    }).fail(testFns.handleFail).fin(start);
-  });
+          var query = new EntityQuery()
+              .from("Products")
+              .orderBy(["category.categoryName desc", "productName"])
+              .expand("category");
 
-  test("orderBy two part nested", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
+          stop();
+          em.executeQuery(query).then(function (data) {
+            ok(!em.hasChanges(), "should not have any changes");
+            ok(em.getChanges().length === 0, "getChanges should return 0 results");
+            var products = data.results;
+            var cats = products.map(function (product) {
+              return product.getProperty("category");
+            });
 
-    var em = newEm();
-
-    var query = new EntityQuery()
-        .from("Products")
-        .orderBy(["category.categoryName desc", "productName"])
-        .expand("category");
-
-    stop();
-    em.executeQuery(query).then(function (data) {
-      ok(!em.hasChanges(), "should not have any changes");
-      ok(em.getChanges().length === 0, "getChanges should return 0 results");
-      var products = data.results;
-      var cats = products.map(function (product) {
-        return product.getProperty("category");
-      });
-
-      testFns.assertIsSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
-    }).fail(testFns.handleFail).fin(start);
-  });
+            testFns.assertIsSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+          }).fail(testFns.handleFail).fin(start);
+        });
 
   test("skiptake", function () {
     var em = newEm();
@@ -2835,30 +2685,27 @@
     }).fail(testFns.handleFail).fin(start);
   });
 
-  test("query function expr - navigation then length", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand is not yet supported");
-      return;
-    }
+  testIfNot("query function expr - navigation then length",
+    "mongo", "does not support 'expand'", function () {
 
-    var em = newEm();
+      var em = newEm();
 
-    var query = new EntityQuery()
-        .from("Orders")
-        .where("length(customer.companyName)", ">", 30)
-        .expand("customer");
-    var queryUrl = query._toUri(em);
-    stop();
-    em.executeQuery(query).then(function (data) {
-      var orders = data.results;
-      ok(orders.length > 0);
-      ok(orders.every(function (order) {
-        var cust = order.getProperty("customer");
-        var val = cust.getProperty("companyName");
-        return val.length > 30;
-      }), "every order must have a cust with a name longer than 30 chars");
-    }).fail(testFns.handleFail).fin(start);
-  });
+      var query = new EntityQuery()
+          .from("Orders")
+          .where("length(customer.companyName)", ">", 30)
+          .expand("customer");
+      var queryUrl = query._toUri(em);
+      stop();
+      em.executeQuery(query).then(function (data) {
+        var orders = data.results;
+        ok(orders.length > 0);
+        ok(orders.every(function (order) {
+          var cust = order.getProperty("customer");
+          var val = cust.getProperty("companyName");
+          return val.length > 30;
+        }), "every order must have a cust with a name longer than 30 chars");
+      }).fail(testFns.handleFail).fin(start);
+    });
 
   test("bad query function expr -  bad property name", function () {
     var em = newEm();
@@ -3063,23 +2910,39 @@
   });
 
 
-  test("WebApi metadata", function () {
-    if (testFns.DEBUG_ODATA) {
-      ok(true, "NA for OData impl");
-      return;
-    }
-    stop();
-    var metadataPath = testFns.defaultServiceName + "/Metadata";
-    $.getJSON(metadataPath, function (data, status) {
-      // On success, 'data' contains the model metadata.
-      //                console.log(data);
-      ok(data);
-      var metadata = typeof (data) === "string" ? JSON.parse(data) : data;
-      var str = JSON.stringify(metadata, undefined, 4);
-      testFns.output("Metadata");
-      testFns.output(str);
-      start();
-    }).fail(testFns.handleFail);
-  });
+  testIfNot("WebApi metadata",
+    "odata", "is not applicable for this test", function () {
+
+      stop();
+      var metadataPath = testFns.defaultServiceName + "/Metadata";
+      $.getJSON(metadataPath, function (data, status) {
+        // On success, 'data' contains the model metadata.
+        //                console.log(data);
+        ok(data);
+        var metadata = typeof (data) === "string" ? JSON.parse(data) : data;
+        var str = JSON.stringify(metadata, undefined, 4);
+        testFns.output("Metadata");
+        testFns.output(str);
+        start();
+      }).fail(testFns.handleFail);
+    });
+
+  function checkIfDeleted(entityManager, entities) {
+    origEntities = entities.slice(0);
+    var q = EntityQuery.fromEntities(entities)
+    entityManager.executeQuery(q).then(function (data) {
+      var foundEntities = data.entities;
+      foundEntities.forEach(function (e, ix) {
+        if (entities.indexOf(e)) {
+          origEntities.splice(ix, 1)
+        }
+      });
+      if (origEntities.length > 0) {
+        origEntities.forEach(function (e) {
+          entityManager.removeEntity(e);
+        });
+      }
+    });
+  }
 
 })(breezeTestFns);

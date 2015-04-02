@@ -25,46 +25,47 @@ breezeTestFns = (function (breeze) {
   var Validator = breeze.Validator;
 
   var testFns = {
-      inheritancePurge: inheritancePurge, // empty the Inheritance Model db completely
-      inheritanceReset: inheritanceReset, // reset to known state
-      inheritanceServiceName: "breeze/inheritance",
-      teardown_inheritanceReset: teardown_inheritanceReset
+    inheritancePurge: inheritancePurge, // empty the Inheritance Model db completely
+    inheritanceReset: inheritanceReset, // reset to known state
+    inheritanceServiceName: "breeze/inheritance",
+    teardown_inheritanceReset: teardown_inheritanceReset
   };
 
-  // Uncomment to test EntityQuery JSON serialization support.
-  // proxyQueries();
+  testFns.testIfNot = function(testName, delimString, msg, fn) {
+    var tokens = delimString.split(",").map(function(s) {
+      return s.trim().toLowerCase();
+    });
+    var skipMsg = _.find(tokens, function(t) {
+      return getSkipMsg(t) != null;
+    });
 
-  function proxyQueries() {
-    var proto = EntityManager.prototype;
-    proto.executeQuery = wrapExecuteQuery(proto.executeQuery);
-    proto.executeQueryLocally = wrapExecuteQuery(proto.executeQueryLocally);
-  }
-
-  function wrapExecuteQuery(fn) {
-    return function (query) {
-      var qString = JSON.stringify(query);
-      var qJson = JSON.parse(qString);
-      var newQuery = new EntityQuery(qJson);
-      if (query.entityManager) {
-        newQuery = newQuery.using(query.entityManager);
-      }
-      if (query.dataService || query.jsonResultsAdapter) {
-        newQuery = newQuery.using(query.dataService);
-      }
-      // need to accomodate executeQuery called with callbacks
-      var args = Array.prototype.slice.call(arguments, 0);
-      args[0] = newQuery;
-      return fn.apply(this, args);
+    if (skipMsg) {
+      return QUnit.skip("[" + skipMsg + " " + msg + "]: " + testName, fn);
+    } else {
+      return test(testName, fn);
     }
   }
 
+  function getSkipMsg(s) {
+    if ((testFns.DEBUG_MONGO && s.indexof("mongo",0) === 0) ||
+       (testFns.DEBUG_SEQUELIZE && s.indexof("sequel",0) === 0) ||
+       (testFns.DEBUG_NHIBERNATE && s.indexof("nhib",0) === 0) ||
+       (testFns.DEBUG_HIBERNATE && s.indexof("hib",0) == 0) ||
+       (testFns.DEBUG_ODATA && s.indexof("odata",0) === 0)) {
+      return s;
+    } else {
+      return null;
+    }
+  }
+
+  
 
   testFns.TEST_RECOMPOSITION = true;
   configQunit();
 
   function configQunit() {
+    
     QUnit.config.autostart = false;
-
     // global timeout of 20 secs
     // No test should take that long but first time db build can.
     QUnit.config.testTimeout = 20000;
@@ -81,15 +82,28 @@ breezeTestFns = (function (breeze) {
       tooltip: "Allows a user to set options before tests start."
     });
 
+
+    if (!QUnit.urlParams.canStart) {
+      // insures that no tests run.
+      QUnit.config.testId = ["none"];
+      // Doesn't actually work.
+      // QUnit.config.moduleFilter = "none";
+    }
+    
+
+    // QUnit.start();
+  
   }
 
+
+
   function updateTitle() {
-      testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
-      var maintitle = "Breeze Test Suite -> " + testFns.title;
-      var el = document.getElementById("title");
-      if (el) el.innerHTML = maintitle;
-      el = document.getElementById("qunit-header");
-      if (el) el.innerHTML = maintitle;
+    testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
+    var maintitle = "Breeze Test Suite -> " + testFns.title;
+    var el = document.getElementById("title");
+    if (el) el.innerHTML = maintitle;
+    el = document.getElementById("qunit-header");
+    if (el) el.innerHTML = maintitle;
   }
 
   testFns.setSampleNamespace = function (value) {
@@ -97,39 +111,39 @@ breezeTestFns = (function (breeze) {
   };
 
   testFns.queryServerVersion = function (url) {
-      url = url || "/testconfig";
-      var ajaxImpl = core.config.getAdapterInstance("ajax");
-
-      ajaxImpl.ajax({
-          type: "GET",
-          url: url,
-          dataType: 'json',
-          success: function (httpResponse) {
-              var data = httpResponse.data;
-              testFns.setServerVersion(data.value, data.version);
-              testFns.northwindIBMetadata = JSON.parse(data.metadata);
-              if (QUnit.urlParams.canStart) {
-                  QUnit.start(); // run tests
-              }
-          },
-          error: function (httpResponse) {
-              alert("error getting server version data: " + httpResponse.status);
-          }
-      });
+    url = url || "/testconfig";
+    var ajaxImpl = core.config.getAdapterInstance("ajax");
+    
+    ajaxImpl.ajax({
+      type: "GET",
+      url: url,
+      dataType: 'json',
+      success: function (httpResponse) {
+        var data = httpResponse.data;
+        testFns.setServerVersion(data.value, data.version);
+        testFns.northwindIBMetadata = JSON.parse(data.metadata);
+        QUnit.start();
+          
+      },
+      error: function (httpResponse) {
+        alert("error getting server version data: " + httpResponse.status);
+      }
+    });
+    
   }
 
   testFns.setServerVersion = function (value, version) {
-      value = value.toLowerCase();
-      version = (version || "").toLowerCase();
-      testFns.serverVersion = value + '/' + version;
+    value = value.toLowerCase();
+    version = (version || "").toLowerCase();
+    testFns.serverVersion = value + '/' + version;
 
-      testFns.DEBUG_NHIBERNATE = version === "nhibernate";
-      testFns.DEBUG_EF_CODEFIRST = version === "codefirst_provider";
-      testFns.DEBUG_EF_DBFIRST = version === "databasefirst_new";
-      testFns.DEBUG_EF_DBFIRST_OLD = version === "databasefirst_old";
-      testFns.DEBUG_EF_ORACLE = version === "oracle_edmx";
+    testFns.DEBUG_NHIBERNATE = version === "nhibernate";
+    testFns.DEBUG_EF_CODEFIRST = version === "codefirst_provider";
+    testFns.DEBUG_EF_DBFIRST = version === "databasefirst_new";
+    testFns.DEBUG_EF_DBFIRST_OLD = version === "databasefirst_old";
+    testFns.DEBUG_EF_ORACLE = version === "oracle_edmx";
 
-      updateTitle();
+    updateTitle();
   }
 
   testFns.setDataService = function (value, version) {
@@ -518,14 +532,14 @@ breezeTestFns = (function (breeze) {
     if (!str) {
       return "_X";
     }
-    if (str.length > 1 && ( core.stringEndsWith(str, "_X") || core.stringEndsWith(str, "__"))) {
+    if (str.length > 1 && (core.stringEndsWith(str, "_X") || core.stringEndsWith(str, "__"))) {
       return str.substr(0, str.length - 2);
     } else {
       return str + "_X";
     }
   };
 
-  testFns.removeAccents =function(s) {
+  testFns.removeAccents = function (s) {
     var r = s.toLowerCase();
     r = r.replace(new RegExp(/[àáâãäå]/g), "a");
     r = r.replace(new RegExp(/æ/g), "ae");
@@ -543,7 +557,7 @@ breezeTestFns = (function (breeze) {
   testFns.assertIsSorted = function (collection, propertyName, dataType, isDescending, isCaseSensitive) {
     var extractFn = null;
     if (propertyName) {
-      extractFn = function(obj) { return obj && obj.getProperty(propertyName); }
+      extractFn = function (obj) { return obj && obj.getProperty(propertyName); }
     }
     isCaseSensitive = isCaseSensitive == null ? true : isCaseSensitive;
     var compareFn = function (a, b) {
@@ -594,7 +608,7 @@ breezeTestFns = (function (breeze) {
   }
 
   function compare(a, b, extractValueFn, dataType, isDescending, isCaseSensitive) {
-    extractValueFn = extractValueFn || function(x) { return x; }
+    extractValueFn = extractValueFn || function (x) { return x; }
     var value1 = extractValueFn(a);
     var value2 = extractValueFn(b);
     value1 = value1 === undefined ? null : value1;
@@ -727,7 +741,7 @@ breezeTestFns = (function (breeze) {
     });
     Object.defineProperty(target, "idAndName", {
       get: function () {
-        return this.customerID + ":" + ( this._companyName || "" );
+        return this.customerID + ":" + (this._companyName || "");
       },
       enumerable: true,
       configurable: true
@@ -867,6 +881,33 @@ breezeTestFns = (function (breeze) {
     }
   }
 
+  // Uncomment to test EntityQuery JSON serialization support.
+  // proxyQueries();
+
+  function proxyQueries() {
+    var proto = EntityManager.prototype;
+    proto.executeQuery = wrapExecuteQuery(proto.executeQuery);
+    proto.executeQueryLocally = wrapExecuteQuery(proto.executeQueryLocally);
+  }
+
+  function wrapExecuteQuery(fn) {
+    return function (query) {
+      var qString = JSON.stringify(query);
+      var qJson = JSON.parse(qString);
+      var newQuery = new EntityQuery(qJson);
+      if (query.entityManager) {
+        newQuery = newQuery.using(query.entityManager);
+      }
+      if (query.dataService || query.jsonResultsAdapter) {
+        newQuery = newQuery.using(query.dataService);
+      }
+      // need to accomodate executeQuery called with callbacks
+      var args = Array.prototype.slice.call(arguments, 0);
+      args[0] = newQuery;
+      return fn.apply(this, args);
+    }
+  }
+
   //////////////
   /*********************************************************
   * Teardown for a module that saves to the Inheritance database
@@ -874,16 +915,16 @@ breezeTestFns = (function (breeze) {
   // should call this during test teardown to restore
   // the database to a known, populated state.
   function teardown_inheritanceReset() {
-      stop();
-      inheritanceReset() // jQuery promise
-        .fail(testFns.handleFail).always(start);
+    stop();
+    inheritanceReset() // jQuery promise
+      .fail(testFns.handleFail).always(start);
   }
 
   function inheritanceReset() {
-      return webApiCommand(testFns.inheritanceServiceName, 'reset');
+    return webApiCommand(testFns.inheritanceServiceName, 'reset');
   }
   function inheritancePurge() {
-      return webApiCommand(testFns.inheritanceServiceName, 'purge');
+    return webApiCommand(testFns.inheritanceServiceName, 'purge');
   }
 
   /**************************************************
@@ -915,21 +956,24 @@ breezeTestFns = (function (breeze) {
       });
   }
 
+
+
+
   /*********************************************************
   * Make a good error message from jQuery Ajax failure
   *********************************************************/
   function getjQueryError(xhr, textStatus, errorThrown) {
-      if (!xhr) {
-          return errorThrown;
-      }
-      var message = xhr.status + "-" + xhr.statusText;
-      try {
-          var reason = JSON.parse(xhr.responseText).Message;
-          message += "\n" + reason;
-      } catch (ex) {
-          message += "\n" + xhr.responseText;
-      }
-      return message;
+    if (!xhr) {
+      return errorThrown;
+    }
+    var message = xhr.status + "-" + xhr.statusText;
+    try {
+      var reason = JSON.parse(xhr.responseText).Message;
+      message += "\n" + reason;
+    } catch (ex) {
+      message += "\n" + xhr.responseText;
+    }
+    return message;
   }
   /////////////////////////
 
