@@ -65,19 +65,25 @@ gulp.task('yuidoc', function() {
   return gulp.src( mapPath(srcDir, fileNames))
       .pipe(newer(yuidocDestDir + 'data.json'))
       .pipe(concat('foo')) // eat the stream but yield one to trigger yuidoc to run once
-      
+
       /* Clever alternative
       .pipe(through(function(file) {
         // pass first file through (don't care what it is; it's just a trigger)
         this.queue(file);
         // then end this stream by passing null to queue, ignoring all additional files
         this.queue(null);
-      }))  
+      }))
       */
       .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));
 });
 
-gulp.task('default', ['minify', 'minify.base', 'copyBreezeExtns', 'copyForTests', 'yuidoc'], function() {
+gulp.task('intellisense', ['yuidoc'], function() {
+  var gen = require('./intellisense/intellisenseGenerator');
+  gen(yuidocDestDir);
+  return gulp.src(''); // hack to allow gulp chaining.
+});
+
+gulp.task('default', ['minify', 'minify.base', 'copyBreezeExtns', 'copyForTests', 'yuidoc', 'intellisense'], function() {
 
 });
 
