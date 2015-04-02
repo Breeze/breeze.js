@@ -16,6 +16,7 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   var newEm = testFns.newEm;
+  var testIfNot = testFns.testIfNot;
 
   module("no tracking", {
     setup: function () {
@@ -25,7 +26,8 @@
     }
   });
 
-  test("self referential type query", function () {
+  test("self referential type query", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var predicate1 = Predicate.create("lastName", "startsWith", "D").or("firstName", "startsWith", "A");
 
@@ -40,7 +42,7 @@
       // q = q.expand("directReports");
     }
     q = q.noTracking();
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -62,7 +64,7 @@
       ok(count >= 2, "should be at least 1 bidirectional relation");
       var r2 = em.executeQueryLocally(q);
       ok(r2.length == 0);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   function checkUniqEmp(umap, emp) {
@@ -74,16 +76,16 @@
     umap[empId] = emp;
   }
 
-  test("query with expand", function () {
+  test("query with expand", function (assert) {
+    var done = assert.async();
     var em = newEm();
-
 
     var q = EntityQuery
         .from("Orders")
         .where("customer.companyName", "startsWith", "C")
         .expand("customer")
         .noTracking();
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -99,15 +101,13 @@
       ok(uniqCustomers.length < customers.length, "should be some dup customers");
       var r2 = em.executeQueryLocally(q);
       ok(r2.length == 0);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with complex type", function () {
-    if (testFns.DEBUG_SEQUELIZE) {
-      ok(true, "NA for Sequelize - complex types not yet supported");
-      return;
-    }
-
+  testIfNot("query with complex type",
+    "sequelize", "does not yet support complex types", function (assert) {
+    var done = assert.async();
+    
     var em = newEm();
 
     var query = new EntityQuery()
@@ -115,7 +115,7 @@
         .take(3)
         .noTracking();
     var queryUrl = query._toUri(em);
-    stop();
+    
     em.executeQuery(query).then(function (data) {
       var suppliers = data.results;
       ok(suppliers.length > 0, "empty data");
@@ -126,12 +126,12 @@
       });
       var r2 = em.executeQueryLocally(query);
       ok(r2.length == 0);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query with reattach", function () {
-
+  test("query with reattach", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var predicate1 = Predicate.create("lastName", "startsWith", "D").or("firstName", "startsWith", "A");
 
@@ -139,7 +139,7 @@
         .from("Employees")
         .where(predicate1)
         .noTracking();
-    stop();
+    
     var empType = em.metadataStore.getEntityType("Employee");
     var emps;
     em.executeQuery(q).then(function (data) {
@@ -168,13 +168,13 @@
         ok(emps.indexOf(emp) >= 0, "queried emps should be the same");
       });
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
 
-  test("query with reattach - using em.createEntity", function () {
-
+  test("query with reattach - using em.createEntity", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var predicate1 = Predicate.create("lastName", "startsWith", "D").or("firstName", "startsWith", "A");
 
@@ -182,7 +182,7 @@
         .from("Employees")
         .where(predicate1)
         .noTracking();
-    stop();
+    
     var empType = em.metadataStore.getEntityType("Employee");
     var emps;
     em.executeQuery(q).then(function (data) {
@@ -210,13 +210,13 @@
         ok(emps.indexOf(emp) >= 0, "queried emps should be the same");
       });
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
 
-  test("query with expand and reattach ", function () {
-
+  test("query with expand and reattach ", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var predicate1 = Predicate.create("firstName", "startsWith", "A");
 
@@ -225,7 +225,7 @@
         .where(predicate1)
         .expand("orders")
         .noTracking();
-    stop();
+    
     var empType = em.metadataStore.getEntityType("Employee");
     var orderType = em.metadataStore.getEntityType("Order");
     var emps;
@@ -261,12 +261,12 @@
         ok(emps.indexOf(emp) >= 0, "queried emps should be the same");
       });
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query with expand and noTrackingFn ", function () {
-
+  test("query with expand and noTrackingFn ", function (assert) {
+    var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var predicate1 = Predicate.create("firstName", "startsWith", "A");
     var noTrackingFn = function (e, entityType) {
@@ -277,7 +277,7 @@
         .where(predicate1)
         .expand("orders")
         .noTracking();
-    stop();
+    
     var empType = em.metadataStore.getEntityType("Employee");
     em.metadataStore.registerEntityTypeCtor("Employee", null, null, noTrackingFn);
     em.metadataStore.registerEntityTypeCtor("Order", null, null, noTrackingFn);
@@ -314,7 +314,7 @@
         ok(emps.indexOf(emp) >= 0, "queried emps should be the same");
       });
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 

@@ -287,8 +287,8 @@
     ok(true);
   });
 
-  test("mock metaDataService", function () {
-
+  test("mock metaDataService", function (assert) {
+    var done = assert.async();
     if (testFns.modelLibrary == "backbone") {
       ok(true, "NOT APPLICABLE");
       return;
@@ -343,13 +343,13 @@
     var newTag = etType.createEntity({ id: 1, name: "tag" });
     entityManager.addEntity(newTag);
     // 4th step
-    stop();
+    
     breeze.EntityQuery.from("Tag").using(entityManager).execute().then(function (data) {
       var r = data.results;
       ok(r.length > 0, "Should have returned some results");
     }).fail(function (err) {
       ok(false, "should not get here");
-    }).fin(start);
+    }).fin(done);
 
   });
   ;

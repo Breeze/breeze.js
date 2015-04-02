@@ -78,8 +78,8 @@
   }
 
   testIfNot("querying server unmapped property", 
-    "odata,sequelize,hibernate", "does not have any server unmapped properties", function() {
-
+    "odata,sequelize,hibernate", "does not have any server unmapped properties", function(assert) {
+    var done = assert.async();
     var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 
     var Customer = testFns.makeEntityCtor(function () {
@@ -98,7 +98,7 @@
     ok(extraDouble1 === 0, "should be 0");
     var query = new breeze.EntityQuery()
         .from("Customers").take(1);
-    stop();
+    
     em.executeQuery(query).then(function (data) {
       var r = data.results;
       ok(r.length == 1, "should have returned 1 record");
@@ -114,11 +114,11 @@
       ok(r2.length == 1, "should have returned 1 record");
       ok(r2[0].extraString === "fromServer", "should also be 'fromServer'");
       ok(r2[0].extraDouble === 3.14159, "should also be 3.14159");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("reject changes reverts an unmapped property - only unmapped property changed", 1, function () {
+  QUnit.skip("reject changes reverts an unmapped property - only unmapped property changed", 1, function () {
     ok(false, "Expected failure - for now at least one mapped property must be changed for rejectChanges to work.")
     return true;
     var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
@@ -150,7 +150,8 @@
   });
 
 
-  test("export/import with nulls", function () {
+  test("export/import with nulls", function (assert) {
+    var done = assert.async();
     var queryOptions = new QueryOptions({
       mergeStrategy: MergeStrategy.OverwriteChanges,
       fetchStrategy: FetchStrategy.FromServer
@@ -160,7 +161,7 @@
     var q = EntityQuery.from("Customers").where(pred).take(2)
         .using(MergeStrategy.OverwriteChanges);
     var val = Date.now().toString();
-    stop();
+    
     var exported;
     em.executeQuery(q).then(function (data) {
       var custs = data.results;
@@ -183,14 +184,12 @@
       ok(cust0x.getProperty("companyName") === null, "2nd import company should be null");
       ok(cust1x.getProperty("city") === null, "2nd import city should be null");
 
-    }).fail(testFns.handleFail).fin(start);
-
-
+    }).fail(testFns.handleFail).fin(done);
   });
 
   testIfNot("relationship not resolved after import",
-    "mongo", "does not support 'expand'", function () {
-    
+    "mongo", "does not support 'expand'", function (assert) {
+    var done = assert.async();
     var ds = new breeze.DataService({
       serviceName: "none",
       hasServerMetadata: false
@@ -542,7 +541,7 @@
     var q2 = new breeze.EntityQuery("OrderHeaders")
         .using(breeze.FetchStrategy.FromLocalCache);
 
-    stop();
+    
     manager.executeQuery(q2).then(function (data2) {
       var order = data2.results[0];
       //uncomment line below and the relationship is resolved
@@ -550,16 +549,16 @@
 
       var orderShipments = order.getProperty("orderShipments");
       ok(orderShipments.length > 0, "relationship not resolved - should have 1 order shipment");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   testIfNot("Detaching the parent modifies the in-cache children - D2460",
-    "mongo", "does not support 'expand'", function () {
-
+    "mongo", "does not support 'expand'", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Employees").where("employeeID", "==", 1)
         .expand("orders");
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var employee = data.results[0];
       var q2 = new EntityQuery("Orders");
@@ -567,7 +566,7 @@
       var order = orders[0];
       employee.entityAspect.setDetached();
       ok(!em.hasChanges());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("initialization", function () {
@@ -581,18 +580,19 @@
     ok(em);
   });
 
-  test("createEmptyCopy", function () {
+  test("createEmptyCopy", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var em2 = em.createEmptyCopy();
     var q = EntityQuery.from("Customers").take(1);
-    stop();
+    
     em2.executeQuery(q).then(function (data) {
       ok(data.results.length === 1);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("export/import deleted", function () {
-
+  test("export/import deleted", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var custType = em.metadataStore.getEntityType("Customer");
     var cust1 = custType.createEntity();
@@ -608,7 +608,7 @@
     cust2.setProperty("fax", "510 999-9999");
     em.addEntity(cust2);
 
-    stop();
+    
     em.saveChanges().then(function (sr) {
       var custs = sr.entities;
       ok(custs.length == 2);
@@ -623,7 +623,7 @@
       em2.importEntities(exported);
     }).fail(function (e) {
       var x = e;
-    }).fin(start);
+    }).fin(done);
 
 
   });
@@ -685,13 +685,13 @@
 
   });
 
-  test("export/import complexTypes", function () {
-
+  test("export/import complexTypes", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var em2 = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
-    stop();
+    
     em.executeQuery(q).then(function (data) {
 
       var suppliers = data.results;
@@ -730,10 +730,11 @@
       var emp1x = order1x.getProperty("employee");
       ok(emp1x, "should have found an employee");
       ok(emp1x.getProperty("lastName") === "bar", "LastName should be 'bar'");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("mergeStrategy.overwrite", function () {
+  test("mergeStrategy.overwrite", function (assert) {
+    var done = assert.async();
     var queryOptions = new QueryOptions({
       mergeStrategy: MergeStrategy.OverwriteChanges,
       fetchStrategy: FetchStrategy.FromServer
@@ -742,7 +743,7 @@
     var em = new EntityManager({ serviceName: testFns.serviceName, metadataStore: testFns.metadataStore, queryOptions: queryOptions });
     var q = EntityQuery.from("Customers").take(2).using(em);
     var val = Date.now().toString();
-    stop();
+    
     q.execute().then(function (data) {
       var custs = data.results;
       custs[0].setProperty("companyName", val);
@@ -754,13 +755,13 @@
       var city = custs2[1].getProperty("city");
       ok(companyName != val);
       ok(city != val);
-    }).fin(start);
+    }).fin(done);
 
   });
 
   testIfNot("mergeStrategy.overwriteChanges and change events",
-    "mongo", "does not support 'expand'", function () {
-
+    "mongo", "does not support 'expand'", function (assert) {
+    var done = assert.async();
     var em = newEm();
     em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
@@ -779,7 +780,7 @@
       hasChangesChangedArgs.push(args);
     });
     var customer;
-    stop();
+    
     query.using(em).execute().then(function (data) {
       ok(!em.hasChanges(), "should not have any changes");
       customer = data.results[0];
@@ -794,7 +795,7 @@
       ok(hasChangesChangedArgs.length == 1, "hasChangeschanged should have been fired");
       // entityStateChange and propertyChange
       ok(entityChangedArgs.length == 2, "entityChanged should have been fired twice");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
@@ -912,7 +913,8 @@
     ok(!em.hasChanges(), "should not be any changes");
   });
 
-  test("hasChanges with query mods", function () {
+  test("hasChanges with query mods", function (assert) {
+    var done = assert.async();
     var em = newEm();
 
     var hasChanges = false;
@@ -923,7 +925,7 @@
     });
     ok(count === 0, "count should be 0");
     ok(!em.hasChanges(), "should be no changes");
-    stop();
+    
     EntityQuery.from("Customers").take(3).using(em).execute().then(function (data) {
       var custs = data.results;
       custs[0].setProperty("companyName", "xxx");
@@ -936,23 +938,24 @@
       ok(count === 2, "count should be 2");
       ok(!em.hasChanges(), "should be no changes");
       ok(!hasChanges, " should not have changes");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("initialization error on first query", function () {
+  test("initialization error on first query", function (assert) {
+    var done = assert.async();
     var em = new EntityManager("foo");
-    stop();
+    
     em.executeQuery("xxx").then(function (x) {
       ok(false, "shouldn't get here");
     }).fail(function (e) {
       ok(e.message.indexOf("foo") >= 0, "error message should mention 'foo'");
-    }).fin(start);
+    }).fin(done);
 
   });
 
-  test("store-gen keys are always set by key generator on add to manager if they have default values", function () {
-
+  test("store-gen keys are always set by key generator on add to manager if they have default values", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var orderEntityType = em.metadataStore.getEntityType("Order");
     var o1 = orderEntityType.createEntity();
@@ -965,7 +968,7 @@
     var isTempKey = em.keyGenerator.isTempKey(o1.entityAspect.getKey())
     ok(isTempKey, "should be a tempKey");
 
-    stop();
+    
     em.saveChanges().then(function (saveResult) {
       var orderId = o1.getProperty(testFns.orderKeyName);
       ok(orderId !== tempOrderId);
@@ -974,11 +977,11 @@
       var mapping = keyMappings[0];
       ok(mapping.tempValue === tempOrderId);
       ok(mapping.realValue === orderId);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("store-gen keys are not re-set by key generator upon add to manager", function () {
-
+  test("store-gen keys are not re-set by key generator upon add to manager", function (assert) {
+    var done = assert.async();
     var dummyOrderID = testFns.wellKnownData.dummyOrderID;
     var em = newEm();
     var orderEntityType = em.metadataStore.getEntityType("Order");
@@ -992,7 +995,7 @@
     em.addEntity(o1);
     orderId = o1.getProperty(testFns.orderKeyName);
     ok(orderId === dummyOrderID);
-    stop();
+    
     em.saveChanges().then(function (saveResult) {
       orderId = o1.getProperty(testFns.orderKeyName);
       ok(orderId !== 42);
@@ -1001,7 +1004,7 @@
       var mapping = keyMappings[0];
       ok(mapping.tempValue === dummyOrderID);
       ok(mapping.realValue === orderId);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("key generator reset", function () {
@@ -1016,7 +1019,8 @@
   });
 
   testIfNot("import results notification",
-    "mongo", "does not support 'expand'", function () {
+    "mongo", "does not support 'expand'", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var em2 = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
@@ -1024,7 +1028,7 @@
         .where(testFns.customerKeyName, "==", alfredsID)
         .expand("orders")
         .using(em);
-    stop();
+    
     var exportedEm;
     var exportedCustomer;
     var arrayChangedCount = 0;
@@ -1046,7 +1050,7 @@
       ok(r.tempKeyMapping, "should have a 'tempKeyMapping' property")
       ok(arrayChangedCount == 1, "should only see a single arrayChanged event fired");
       ok(adds && adds.length > 1, "should have been multiple entities shown as added");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("getChanges", function () {
@@ -1130,7 +1134,8 @@
   });
 
 
-  test("entityChanged event - 2", function () {
+  test("entityChanged event - 2", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var changedArgs = [];
     var lastArgs, lastAction, lastEntity;
@@ -1144,7 +1149,7 @@
         .from("Employees")
         .orderBy("lastName")
         .take(2);
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       ok(changedArgs.length == 2);
       changedArgs.forEach(function (arg) {
@@ -1176,8 +1181,7 @@
         }
       });
       ok(moqCount == 2 && esCount == 1, "change args should be correct");
-      start();
-    }).fail(testFns.handleFail);
+    }).fail(testFns.handleFail).fin(done)
   });
 
   test("can determine if 'entityChanged' event is enabled", function(){
@@ -1243,7 +1247,8 @@
   });
 
 
-  test("wasLoaded", function () {
+  test("wasLoaded", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
     var empType = em.metadataStore.getEntityType("Employee");
@@ -1253,14 +1258,13 @@
     var emp1 = em.attachEntity(empType.createEntity());
     ok(!emp1.entityAspect.wasLoaded);
     var q = new EntityQuery().from("Employees").take(2);
-    stop();
+    
     em.executeQuery(q, function (data) {
       ok(data.results.length == 2, "results.length should be 2");
       data.results.forEach(function (r) {
         ok(r.entityAspect.wasLoaded === true);
       });
-      start();
-    }).fail(testFns.handleFail);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("persist entityMetadata", function () {
@@ -1301,7 +1305,8 @@
   });
 
 
-  test("persist entityManager", function () {
+  test("persist entityManager", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
     // we want to have our reconsituted em to have different ids than our current em.
@@ -1320,7 +1325,7 @@
     order1.setProperty("employee", emp1);
     order1.setProperty("customer", cust1);
     var q = new EntityQuery().from("Employees").take(2);
-    stop();
+    
     var em2;
     em.executeQuery(q, function (data) {
       ok(data.results.length == 2, "results.length should be 2");
@@ -1344,10 +1349,11 @@
       var emp1x = order1x.getProperty("employee");
       ok(emp1x, "should have found an employee");
       ok(emp1x.getProperty("lastName") === "bar", "LastName should be 'bar'");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("persist entityManager partial", function () {
+  test("persist entityManager partial", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
     // we want to have our reconsituted em to have different ids than our current em.
@@ -1365,7 +1371,7 @@
     // order1.setProperty("Employee", emp1);
     order1.setProperty("customer", cust1);
     var q = new EntityQuery().from("Customers").take(2);
-    stop();
+    
     var em2;
     em.executeQuery(q, function (data) {
       ok(data.results.length == 2, "results.length should be 2");
@@ -1384,7 +1390,7 @@
       var cust1x = order1x.getProperty("customer");
       ok(cust1x, "should have found a customer");
       ok(cust1x.getProperty("companyName") === "foo", "CompanyName should be 'foo'");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("importEntities  can safely merge and preserve or overwrite pending changes", 4, function () {
@@ -1713,7 +1719,7 @@
   //    test("persist entityManager - large data", function () {
   //        var em1 = newEm();
   //        var q = new EntityQuery().from("CustomersAndOrders");
-  //        stop();
+  //        
   //        em1.executeQuery(q).then(function (data) {
   //            var entities1 = em1.getEntities();
   //            var exportedMs = em1.metadataStore.exportMetadata();
