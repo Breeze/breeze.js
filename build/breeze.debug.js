@@ -2921,7 +2921,10 @@ var Validator = (function () {
   }
 
   function intRangeValidatorCtor(validatorName, minValue, maxValue, context) {
-    var templateExists = (context && context.messageTemplate) || ctor.messageTemplates[validatorName];
+    context = context || {};
+    if (minValue !== undefined) { context.min = minValue; }
+    if (maxValue !== undefined) { context.max = maxValue; }
+    var templateExists = context.messageTemplate || ctor.messageTemplates[validatorName];
     if (!templateExists) {
       ctor.messageTemplates[validatorName] = __formatString("'%displayName%' must be an integer between the values of %1 and %2",
           minValue, maxValue);
