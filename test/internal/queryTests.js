@@ -802,14 +802,19 @@
       var done = assert.async();
       var em = newEm();
       var em2 = newEm();
-      var query = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
+      var query = EntityQuery.from("OrderDetails").where("orderID", "<", 10255).expand("order.customer");
 
       em.executeQuery(query).then(function (data) {
         var details = data.results;
-        var order = details[0].getProperty("order");
-        ok(order, "should have found an order");
-        var customer = order.getProperty("customer");
-        ok(customer, "should have found a customer");
+        details.forEach(function(od) {
+          var order = od.getProperty("order");
+          ok(order, "should have found an order");
+          if (order.getProperty("customerID")) {
+            var customer = order.getProperty("customer");
+            ok(customer, "should have found a customer");
+          }
+        })
+
       }).fail(testFns.handleFail).fin(done);
     });
 
@@ -2515,7 +2520,7 @@
       var done = assert.async();
       var em = newEm();
 
-      var query = new EntityQuery("Orders");
+      var query = new EntityQuery("Orders").where("customerID", "!=", null);
 
       query = query.expand(["customer", "employee"])
         .take(20);
