@@ -19,7 +19,7 @@
 
   var wellKnownData = testFns.wellKnownData;
 
-  module("query", {
+  module("query - basic", {
     setup: function () {
       testFns.setup();
     },

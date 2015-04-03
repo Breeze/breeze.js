@@ -16,7 +16,7 @@
   var newEm = testFns.newEm;
   var testIfNot = testFns.testIfNot;
 
-  module("queryDatatype", {
+  module("query - datatype", {
     setup: function () {
       testFns.setup();
     },

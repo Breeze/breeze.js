@@ -7,7 +7,7 @@
   var MetadataStore = breeze.MetadataStore;
   var EntityType = breeze.EntityType;
 
-  module("entityQuery ctor", {
+  module("query - ctor", {
     setup: function () {
       this.entities = [
         { id: 0, OrderDate: new Date(88, 1, 12), ShipCity: "Los Angeles", Size: 100 },

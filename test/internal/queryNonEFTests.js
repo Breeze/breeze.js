@@ -1,8 +1,8 @@
 (function (testFns) {
   if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-    module("queryNonEF", {});
-    test("Skipping tests for OData/Mongo/Sequelize/Hibernate", function () {
-      ok(true, "Skipped tests");
+    module("query - Non EF", {});
+    skip("Skipping tests for OData/Mongo/Sequelize/Hibernate", function () {
+      
     });
     return;
   };
@@ -26,7 +26,7 @@
   var FetchStrategy = breeze.FetchStrategy;
   var MergeStrategy = breeze.MergeStrategy;
 
-  module("queryNonEF", {
+  module("query - non EF", {
     setup: function () {
       testFns.setup();
     },

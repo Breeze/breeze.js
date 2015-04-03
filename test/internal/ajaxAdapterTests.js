@@ -21,7 +21,8 @@
    * Because Breeze bug "2590 dataserviceadapter throws if ajax call throws",
    * the exception bubbles out synchronously and the test fails
    *********************************************************/
-  asyncTest("exception in ajax adapter should be caught in promise", 2, function () {
+  test("exception in ajax adapter should be caught in promise", 2, function (assert) {
+    var done = assert.async();
     var em = new breeze.EntityManager('/bad/address/');
     var wasCaught = false;
 
@@ -41,45 +42,45 @@
     } catch (err) {
       ok(false, "the attempt to query with bad adapter threw sync exception");
       ajaxStub.restore();
-      start();
+      done();
     }
 
     function fin() {
       ajaxStub.restore();
-      start();
+      done();
     }
   });
 
   /*********************************************************
    * jQuery ajax adapter default settings are inherited
    *********************************************************/
-  asyncTest("jQuery ajax adapter default settings are inherited", 3, function () {
-
+  test("jQuery ajax adapter default settings are inherited", 3, function (assert) {
+    var done = assert.async();
     // get jQuery ajax adapter and ensure it is the default adapter for this test
     var adapter = breeze.config.getAdapterInstance('ajax', 'jQuery');
     breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
 
     var ajaxStub = sinon.stub(jQuery, 'ajax').throws(expectedError);
 
-    inheritedDefaultSettingsTest(adapter, ajaxStub);
+    inheritedDefaultSettingsTest(adapter, ajaxStub, done);
   });
 
   /*********************************************************
    * Angular ajax adapter default settings are inherited
    *********************************************************/
-  asyncTest("Angular ajax adapter default settings are inherited", 3, function () {
-
+  test("Angular ajax adapter default settings are inherited", 3, function (assert) {
+    var done = assert.async();
     // get Angular ajax adapter and ensure it is the default adapter for this test
     var adapter = breeze.config.getAdapterInstance('ajax', 'angular');
     breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
 
     var ajaxStub = sinon.stub(adapter, '$http').throws(expectedError);
 
-    inheritedDefaultSettingsTest(adapter, ajaxStub);
+    inheritedDefaultSettingsTest(adapter, ajaxStub, done);
 
   });
 
-  function inheritedDefaultSettingsTest(adapter, ajaxStub) {
+  function inheritedDefaultSettingsTest(adapter, ajaxStub, done) {
     // copy the original default settings so can restore at end of test
     var defSettings = adapter.defaultSettings;
     var originalDefaultSettings = core.extend({}, defSettings);
@@ -105,7 +106,7 @@
       // restore
       adapter.defaultSettings = originalDefaultSettings;
       ajaxStub.restore();
-      start();
+      done();
     }
   }
 

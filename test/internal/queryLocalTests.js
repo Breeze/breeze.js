@@ -16,7 +16,7 @@
 
   var newEm = testFns.newEm;
 
-  module("local query", {
+  module("query - local", {
     setup: function () {
       testFns.setup();
     },

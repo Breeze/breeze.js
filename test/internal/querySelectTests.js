@@ -16,7 +16,7 @@
 
   var newEm = testFns.newEm;
 
-  module("query select", {
+  module("query - select", {
     setup: function () {
       testFns.setup();
     },

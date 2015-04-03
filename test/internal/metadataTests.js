@@ -172,8 +172,8 @@
   });
 
   testIfNot("create metadata and use it for save - CodeFirst only",
-    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function () {
-    
+    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function (assert) {
+    var done = assert.async();
     var em = createEmWithTimeGroupMetadata();
 
     var timeGroupType = em.metadataStore.getEntityType("TimeGroup");
@@ -183,18 +183,18 @@
       Comment: "This was added for a test"
     });
 
-    stop();
+    
     em.saveChanges().then(function (data) {
       var timeGroupId = timeGroup.getProperty("Id");
       ok(timeGroupId > 0, "the timeGroup Id is " + timeGroupId + ", indicating it has been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
 
   });
 
   testIfNot("create metadata and insert using existing entity re-attached - CodeFirst only",
-    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function () {
-
+    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function (assert) {
+    var done = assert.async();
     var em0 = createEmWithTimeGroupMetadata();
     var em = createEmWithTimeGroupMetadata();
 
@@ -205,7 +205,7 @@
         .from("TimeGroups")
         .take(2);
     var timeGroup;
-    stop();
+
     em.executeQuery(q).then(function (data) {
       timeGroup = data.results[0];
       em.detachEntity(timeGroup);
@@ -217,7 +217,7 @@
       var timeGroupId = timeGroup.getProperty("Id");
 
       ok(timeGroupId > 0, "the timeGroup Id is " + timeGroupId + ", indicating it has been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
@@ -457,12 +457,13 @@
 
   }
 
-  test("default interface impl", function () {
+  test("default interface impl", function (assert) {
+    var done = assert.async();
     var store = new MetadataStore();
-    stop();
+    
     store.fetchMetadata(testFns.serviceName).then(function () {
       ok(!store.isEmpty());
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("getEntityType informative error message1", function () {
@@ -490,10 +491,10 @@
   });
 
   testIfNot("initialization",
-    "sequelize", "uses a server side json metadata file", function() {
-
+    "sequelize", "uses a server side json metadata file", function(assert) {
+    var done = assert.async();
     var store = new MetadataStore({ namingConvention: NamingConvention.none });
-    stop();
+
     var dataServiceAdapter = core.config.getAdapterInstance("dataService");
     var dataService = new breeze.DataService({ serviceName: testFns.serviceName });
     dataServiceAdapter.fetchMetadata(store, dataService).then(function () {
@@ -519,25 +520,26 @@
       } catch (e) {
         ok(false, "shouldn't fail except if using server side json metadata file.");
       }
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("initialize only once", function () {
+  test("initialize only once", function (assert) {
+    var done = assert.async();
     var store = new MetadataStore();
     var em = new EntityManager({ serviceName: testFns.serviceName, metadataStore: store });
-    stop();
+
     store.fetchMetadata(testFns.serviceName).then(function () {
       ok(!store.isEmpty());
       ok(store.hasMetadataFor(testFns.serviceName));
       ok(em.metadataStore.hasMetadataFor(em.serviceName), "manager serviceName is not the same as the metadataStore name");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("initialization concurrent", 2, function () {
-
+  test("initialization concurrent", 2, function (assert) {
+    var done = assert.async();
     var store = new MetadataStore();
-    stop();
+    
     var typeMap;
     var errFn = function (e) {
       ok(false, e);
@@ -555,7 +557,7 @@
       ok(true, "should also get here");
 
     });
-    Q.all([p1, p2]).fail(errFn).fin(start);
+    Q.all([p1, p2]).fail(errFn).fin(done);
   });
 
   function importMetadataWithInheritance(metadataJson) {
