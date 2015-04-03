@@ -33,6 +33,29 @@
     }
   });
 
+  test("update order", function(assert) {
+    var done = assert.async();
+    var em = newEm();
+    var q = new EntityQuery("Orders").where("customerID", "!=", null).take(1);
+    var order;
+    var customerId;
+    em.executeQuery(q).then(function(data) {
+      var orders = data.results;
+      ok(orders.length == 1);
+      order = orders[0];
+      customerId = order.getProperty("customerID");
+      var freight = order.getProperty("freight");
+      var offset = (Math.random() * 2 | 0) ? .01 : -.01;
+      order.setProperty("freight", freight + offset);
+      return em.saveChanges();
+    }).then(function(sr) {
+      var entities = sr.entities;
+      ok(entities.length == 1,"should have saved only 1");
+      ok(entities[0] == order, "should be the same entity");
+      ok(order.getProperty("customerID") != null, "customerID foreign key should not change on an update");
+
+    }).fail(testFns.handleFail).fin(done);
+  });
 
   test("insert multipart entity", function (assert) {
     var done = assert.async();

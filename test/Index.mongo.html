@@ -17,24 +17,25 @@
         <div id="test-dev"></div>
     </body>
     
+    <!-- TODO: Make these paths match the other breeze test loaders -->
     <!-- load 3rd party libs -->
-    <script src="breeze.js.tests/libs/qunit-1.11.0.js"></script>
+    <script src="breeze.js.tests/libs/qunit-1.17.1.js"></script>
     <script src="breeze.js.tests/libs/q.min.js"></script>
     <script src="breeze.js.tests/libs/knockout-2.3.0.debug.js"></script>
-    <script src="breeze.js.tests/libs/underscore.js"></script>
+    <script src="breeze.js.tests/libs/lodash.js"></script>
     <script src="breeze.js.tests/libs/backbone.js"></script>
     <script src="breeze.js.tests/libs/jquery-2.0.3.js"></script>
     <script src="breeze.js.tests/libs/angular.js"></script>
-    <script src="breeze.js.tests/breeze/breeze.debug.js"></script>
-    <script src="breeze.js.tests/breeze/breeze.dataService.mongo.js"></script> 
 
     <!-- Test helper scripts  --> 
     <!-- These must come first -->    
+    <script src="breeze.js.tests/breeze/breeze.debug.js"></script>
+    <script src="breeze.js.tests/breeze/breeze.dataService.mongo.js"></script> 
+    <script src="breeze.js.tests/breeze/breeze.modelLibrary.backbone.js"></script>
     <script src="testFns.js"></script>
     
     <script>
         // -- Initialize Test vars
-        // breezeTestFns.DEBUG_MONGO = true;
         breezeTestFns.setDataService("mongo");
     </script>
 
@@ -66,13 +67,7 @@
     <script src="breeze.js.tests/tests/koSpecificTests.js"></script>
 
     <!-- Tests are loaded; let's go! -->
-    <script>
-    
-        document.getElementById("title").innerHTML += " -> " + breezeTestFns.title;
-
-        if (QUnit.urlParams.canStart) {
-            QUnit.start(); // run tests
-        }
-
+    <script>  
+        QUnit.start(); // run tests
     </script>
 </html>
