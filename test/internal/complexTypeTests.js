@@ -44,13 +44,14 @@
   //  make changes to the same string property of the complex type. "testED"
   //  Call manager.RevertChanges()..
 
-  test("rejectChanges after save of new entity", function () {
+  test("rejectChanges after save of new entity", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var supplier = em.createEntity("Supplier", { companyName: "Test1" });
     var location = supplier.getProperty("location");
     location.setProperty("city", "LA")
-    stop();
+    
     em.saveChanges().then(function (sr) {
       var saved = sr.entities;
       ok(saved.length === 1, "should have saved one record");
@@ -64,7 +65,7 @@
       location.setProperty("city", "FOOO");
       supplier.entityAspect.rejectChanges();
       ok(location.getProperty("city") === "LA", "location.city should be 'LA'");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("create entity with complexType property", function () {
@@ -107,7 +108,8 @@
 
   });
 
-  test("initializer on complexType during query", function () {
+  test("initializer on complexType during query", function (assert) {
+    var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Supplier = testFns.makeEntityCtor(function () {
     });
@@ -124,7 +126,7 @@
         .where("companyName", "startsWith", "P");
 
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
 
       var r = data.results;
@@ -135,16 +137,17 @@
       var city = location.getProperty("city");
       ok(city.indexOf("Z") === 0, "city should start with 'Z'");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("query complex", function () {
+  test("query complex", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
 
       var r = data.results;
@@ -163,15 +166,16 @@
       ok(locationType instanceof ComplexType, "locationType should be instanceof ComplexType");
       ok(location.complexType === locationType);
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("modify complex property", function () {
+  test("modify complex property", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -180,15 +184,16 @@
       location.setProperty("city", "foo");
       ok(supplier0.entityAspect.entityState.isModified(), "supplier should be modified");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("assign complex property", function () {
+  test("assign complex property", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -203,15 +208,16 @@
       ok(supplier0.entityAspect.entityState.isModified(), "supplier0 should be modified");
       ok(location1.getProperty("city") !== "foo", "location1.city should not == 'foo'");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("assign complex property with null", function () {
+  test("assign complex property with null", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -225,10 +231,11 @@
       }
 
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("create an instance and assign it", function () {
+  test("create an instance and assign it", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var newLocation = locationType.createInstance();
@@ -237,7 +244,7 @@
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -247,7 +254,7 @@
       ok(location0.getProperty("city") === "bar", "city should have value 'bar'");
       ok(location0 != newLocation, "locations should not be the same object");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   function createLocationCtor() {
@@ -261,7 +268,8 @@
     });
   }
 
-  test("create an instance with custom ctor and unmapped prop", function () {
+  test("create an instance with custom ctor and unmapped prop", function (assert) {
+    var done = assert.async();
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Location = createLocationCtor();
 
@@ -275,7 +283,7 @@
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -286,10 +294,11 @@
       ok(location0.getProperty("extraName") === "newValue", "extraName should have value 'newValue'");
       ok(location0 != newLocation, "locations should not be the same object");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("create an entity instance with a populated complex type", function () {
+    
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Location = createLocationCtor();
     var locationType = em.metadataStore.getEntityType("Location");
@@ -338,12 +347,13 @@
   //});
 
 
-  test("rejectChanges", function () {
+  test("rejectChanges", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -356,11 +366,12 @@
       ok(origCity === sameCity, 'cities should be the same');
 
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
 
-  test("property change event tracking", function () {
+  test("property change event tracking", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var newLocation = locationType.createInstance();
@@ -372,7 +383,7 @@
     var q = EntityQuery.from("Suppliers").where(pred);
 
 
-    stop();
+    
     var lastEcArgs;
     var entityChangedArgs = [];
 
@@ -417,16 +428,17 @@
       ok(entityChangedArgs.length === nonnullCount + 3, "should have been  " + (nonnullCount + 3) + " echange events");
       ok(lastEcArgs.entity === supplier0, "lastPcArgs.entity === supplier0");
       ok(lastEcArgs.args.propertyName === "location.city");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("save changes - modified - only cp", function () {
+  test("save changes - modified - only cp", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     var val = "foo-" + Date.now().toString().substr(5);
     var oldVal;
     var companyName;
@@ -455,16 +467,17 @@
       var val2 = supplier2.getProperty("location").getProperty("city");
       ok(val2 == val, "values should be the same");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("save changes - modified - both cp and non-cp", function () {
+  test("save changes - modified - both cp and non-cp", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     var newCity = "foo-" + Date.now().toString().substr(5);
 
     var newCompanyName;
@@ -496,16 +509,17 @@
       var city2 = supplier2.getProperty("location").getProperty("city");
       ok(city2 == newCity, "values should be the same");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("save changes - modified - no cp", function () {
+  test("save changes - modified - no cp", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var locationType = em.metadataStore.getEntityType("Location");
     var q = EntityQuery.from("Suppliers")
         .where("companyName", "startsWith", "P");
 
-    stop();
+    
     var newCompanyName;
     em.executeQuery(q).then(function (data) {
       var r = data.results;
@@ -529,10 +543,11 @@
       var supplier2 = results[0];
       ok(supplier2.getProperty("companyName") == newCompanyName, "companyNames should match");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("save changes - added", function () {
+  test("save changes - added", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var supplierType = em.metadataStore.getEntityType("Supplier");
     var locationType = em.metadataStore.getEntityType("Location");
@@ -546,7 +561,7 @@
     location.setProperty("city", "anywhere");
     em.addEntity(supplier);
 
-    stop();
+    
 
     em.saveChanges().then(function (sr) {
       var saved = sr.entities;
@@ -565,10 +580,11 @@
       ok(city2 == "anywhere", "cities should be the same");
       var location2 = supplier2.getProperty("location");
       ok(location2.getProperty("address") === "123 Main St.", "address should have been saved");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("validationErrorsChanged event", function () {
+    
     var em = newEm();
     var supplierType = em.metadataStore.getEntityType("Supplier");
     var supplier1 = supplierType.createEntity();
@@ -609,6 +625,7 @@
   });
 
   test("validate Entity", function () {
+    
     var em = newEm();
     var supplierType = em.metadataStore.getEntityType("Supplier");
     var supplier1 = supplierType.createEntity();
@@ -629,6 +646,7 @@
   });
 
   test("validate property", function () {
+    
     var em = newEm();
     var supplierType = em.metadataStore.getEntityType("Supplier");
     var supplier1 = supplierType.createEntity();
