@@ -20,10 +20,10 @@
   var wellKnownData = testFns.wellKnownData;
 
   module("query - basic", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
     }
   });
 

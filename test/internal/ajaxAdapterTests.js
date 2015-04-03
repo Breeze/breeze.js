@@ -6,11 +6,11 @@
   var originalAjaxAdapter;
 
   module("ajaxAdapter", {
-    setup: function () {
+    beforeEach: function () {
       //testFns.setup();
       originalAjaxAdapter = breeze.config.getAdapterInstance('ajax');
     },
-    teardown: function () {
+    afterEach: function () {
       // restore pre-test default adapter instance in case we changed it in a test
       breeze.config.initializeAdapterInstance('ajax', originalAjaxAdapter.name, true);
     }

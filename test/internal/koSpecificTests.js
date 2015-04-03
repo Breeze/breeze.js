@@ -1,10 +1,17 @@
 (function (testFns) {
+
+  if (testFns.modelLibrary !== "ko") {
+    module("knockout specific", {});
+    QUnit.skip("Knockout is not the current model library", function () {
+
+    });
+    return;
+  };
+
   var breeze = testFns.breeze;
   var core = breeze.core;
 
-
   var Enum = core.Enum;
-
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;
   var EntityQuery = breeze.EntityQuery;
@@ -13,26 +20,19 @@
 
 
   var newEm = testFns.newEm;
+  var testIfNot = testFns.testIfNot;
 
 
   module("ko specific", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
 
     }
   });
 
-  if (testFns.modelLibrary !== "ko") {
-    test("Skipping KO specific tests", function () {
-      ok(true, "Skipped tests - ko specfic");
-    });
-    return;
-  }
-  ;
-
-
+  
   test("reject changes reverts an unmapped property", 2, function () {
     var manager = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
 
@@ -106,8 +106,8 @@
 
   });
 
-  test("registerEntityType", function () {
-
+  test("registerEntityType", function (assert) {
+    var done = assert.async();
     // use a different metadata store for this em - so we don't polute other tests
     var em1 = newEm(testFns.newMs());
 
@@ -117,7 +117,7 @@
       entity.bar = "bar";
     });
     var q = EntityQuery.from("Regions").take(1);
-    stop();
+    
     em1.executeQuery(q).then(function (data) {
       ok(data.results.length === 1);
       var region = data.results[0];
@@ -126,11 +126,11 @@
       var regionType = em1.metadataStore.getEntityType("Region");
       var region2 = regionType.createEntity();
       ok(region2.entityType.dataProperties.length === 4, "should only have 4 properties");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("registerEntityType 2", function () {
-
+  test("registerEntityType 2", function (assert) {
+    var done = assert.async();
     // use a different metadata store for this em - so we don't polute other tests
     var em1 = newEm(testFns.newMs());
 
@@ -140,7 +140,7 @@
       entity.bar = "bar";
     });
     var q = EntityQuery.from("Regions").take(2);
-    stop();
+    
     em1.executeQuery(q).then(function (data) {
       ok(data.results.length === 2);
       var region = data.results[0];
@@ -162,7 +162,7 @@
         ok(ent.entityType.dataProperties.length === 4, "should only have 4 properties");
         ok(ent.bar === "bar", "bar property should = 'bar'");
       });
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("add knockout computed property based on collection navigation via constructor", 2, function () {
@@ -221,17 +221,15 @@
     }
   });
 
-  test("query results notification", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
+  testIfNot("query results notification",
+    "mongo", "does not support 'expand'", function (assert) {
+      var done = assert.async();
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers")
         .where(testFns.customerKeyName, "==", alfredsID)
         .using(em);
-    stop();
+    
     var arrayChangedCount = 0;
     var koArrayChangedCount = 0;
     var adds;
@@ -252,7 +250,7 @@
       ok(koArrayChangedCount == 1, "should only see a single arrayChanged event fired");
       ok(adds && adds.length > 0, "should have been multiple entities shown as added");
       deepEqual(adds, koAdds, "adds and koAdds should be the same");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
   test("chaining on write", function () {
@@ -269,12 +267,9 @@
     ok(cust1.contactName() == "Bar");
   });
 
-  test("observable array", function () {
-    if (testFns.DEBUG_MONGO) {
-      ok(true, "NA for Mongo - expand not yet supported");
-      return;
-    }
-
+  testIfNot("observable array",
+    "mongo", "does not support 'expand'", function (assert) {
+      var done = assert.async();
     var items = [];
     var oa = ko.observableArray(items);
     var changeCount = 0;
@@ -289,7 +284,7 @@
         .where(testFns.customerKeyName, "==", alfredsID)
         .expand("orders");
     var customer;
-    stop();
+    
     query.using(em).execute().then(function (data) {
       customer = data.results[0];
       var orderType = em.metadataStore.getEntityType("Order");
@@ -302,18 +297,19 @@
       customer.orders.push(order);
       var count2 = customer.orders().length;
       ok(count2 == count + 1);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("observable array mutate on change", function () {
+  test("observable array mutate on change", function (assert) {
+    var done = assert.async();
     var em = newEm();
 
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
     var query = EntityQuery.from("Customers")
         .where(testFns.customerKeyName, "==", alfredsID);
     var customer;
-    stop();
+    
     var orders;
     var koOrders;
     var arrayChangeCount = 0;
@@ -332,7 +328,7 @@
     }).then(function (orders2) {
       var x = orders2;
       ok(arrayChangeCount === koChangeCount);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 

@@ -17,10 +17,11 @@
   var newEm = testFns.newEm;
 
   module("query - local", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
+
     }
   });
 

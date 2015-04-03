@@ -18,10 +18,11 @@
   var wellKnownData = testFns.wellKnownData;
 
   module("query - any/all", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
+
     }
   });
 

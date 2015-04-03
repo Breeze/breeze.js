@@ -97,8 +97,6 @@ breezeTestFns = (function (breeze) {
   
   }
 
-
-
   function updateTitle() {
     testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
     var maintitle = "Breeze Test Suite -> " + testFns.title;
@@ -254,15 +252,15 @@ breezeTestFns = (function (breeze) {
 
   }
 
-  function updateWellKnownData() {
+  function updateWellKnownData(assert) {
     if (testFns.wellKnownData.nancyID) return;
     var em = testFns.newEm();
-    stop();
+    var done = assert.async();
     breeze.EntityQuery.from("Employees").where("lastName", "startsWith", "Davo")
         .using(em).execute().then(function (data) {
           var nancy = data.results[0];
           testFns.wellKnownData.nancyID = nancy.getProperty(testFns.employeeKeyName);
-        }).fail(testFns.handleFail).fin(start);
+        }).fail(testFns.handleFail).fin(done);
   };
 
   testFns.configure = function () {
@@ -295,7 +293,7 @@ breezeTestFns = (function (breeze) {
     updateTitle();
   };
 
-  testFns.setup = function (config) {
+  testFns.setup = function (assert, config) {
     config = config || {};
     // config.serviceName - default = testFns.defaultServiceName
     // config.serviceHasMetadata - default = true
@@ -318,23 +316,22 @@ breezeTestFns = (function (breeze) {
     if (!testFns.metadataStore) {
       testFns.metadataStore = testFns.newMs();
     }
-
-    updateWellKnownData();
+    
+    updateWellKnownData(assert);
 
     if (!testFns.metadataStore.isEmpty()) {
       if (config.metadataFn) config.metadataFn();
       return;
     }
-
-
+    
     var em = testFns.newEm();
     if (serviceHasMetadata) {
-      stop();
+      var done = assert.async();
       em.fetchMetadata(function (rawMetadata) {
         // testFns.configureMetadata();
         if (config.metadataFn) config.metadataFn();
 
-      }).fail(testFns.handleFail).fin(start);
+      }).fail(testFns.handleFail).fin(done);
     }
   };
 
@@ -916,10 +913,10 @@ breezeTestFns = (function (breeze) {
   *********************************************************/
   // should call this during test teardown to restore
   // the database to a known, populated state.
-  function teardown_inheritanceReset() {
-    stop();
+  function teardown_inheritanceReset(assert) {
+    var done = assert.async();
     inheritanceReset() // jQuery promise
-      .fail(testFns.handleFail).always(start);
+      .fail(testFns.handleFail).always(done);
   }
 
   function inheritanceReset() {

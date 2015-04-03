@@ -18,7 +18,7 @@
   } // don't bother with these tests
 
   module("misc - ES5 Property tests", {
-    setup: setup
+    beforeEach: setup
   });
   var obj, proto;
 
@@ -157,10 +157,10 @@
   var newEm = testFns.newEm;
 
   module("misc", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
 
     }
   });

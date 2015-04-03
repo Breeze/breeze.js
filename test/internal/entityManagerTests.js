@@ -22,10 +22,10 @@
   var testIfNot = testFns.testIfNot;
 
   module("entityManager", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
 
     }
   });

@@ -20,11 +20,11 @@
   var testIfNot = testFns.testIfNot;
 
   module("entity", {
-    setup: function () {
+    beforeEach: function (assert) {
       breeze.DataType.DateTime.defaultValue = new Date(2000, 0, 1);
-      testFns.setup();
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
 
     }
   });

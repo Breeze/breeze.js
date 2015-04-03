@@ -8,7 +8,7 @@
   var EntityType = breeze.EntityType;
 
   module("query - ctor", {
-    setup: function () {
+    beforeEach: function () {
       this.entities = [
         { id: 0, OrderDate: new Date(88, 1, 12), ShipCity: "Los Angeles", Size: 100 },
         { id: 1, OrderDate: new Date(88, 2, 12), ShipCity: "Chicago" },
@@ -26,7 +26,7 @@
         };
       });
     },
-    teardown: function () {
+    afterEach: function () {
     }
   });
 

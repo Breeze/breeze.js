@@ -18,10 +18,11 @@
   var testIfNot = testFns.testIfNot;
 
   module("query - select", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
+
     }
   });
 

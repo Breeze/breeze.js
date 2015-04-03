@@ -35,10 +35,12 @@
   var newEmX = testFns.newEmX;
 
   module("inheritProduce", {
-    setup: function () {
-      testFns.setup({ serviceName: altServiceName });
+    beforeEach: function (assert) {
+      testFns.setup(assert, { serviceName: altServiceName });
     },
-    teardown: testFns.teardown_inheritanceReset
+    afterEach: function (assert) {
+      testFns.teardown_inheritanceReset(assert);
+    }
   });
 
   test("getEntityByKey failing 1", function () {

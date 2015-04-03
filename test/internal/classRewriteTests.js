@@ -5,7 +5,7 @@
   var MetadataStore = breeze.MetadataStore;
 
   module("classRewrite", {
-    setup: function () {
+    beforeEach: function () {
       this.interceptor = function (property, newValue, accessorFn) {
         var prevValues = this.prevValues;
         if (!prevValues) {
@@ -21,7 +21,7 @@
 
 
     },
-    teardown: function () {
+    afterEach: function () {
 
     }
   });

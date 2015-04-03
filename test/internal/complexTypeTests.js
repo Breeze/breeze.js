@@ -28,10 +28,11 @@
   var newEm = testFns.newEm;
 
   module("complexTypes", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
+
     }
   });
 

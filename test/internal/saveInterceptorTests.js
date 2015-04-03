@@ -1,6 +1,5 @@
 (function (testFns) {
 
-
   var breeze = testFns.breeze;
   var dsAdapter;
   var handleFail = testFns.handleFail;
@@ -8,14 +7,10 @@
 
   var wellKnownData = testFns.wellKnownData;
 
-  var xasyncTest = function () {
-  }; // easy way to disable a test is to put 'x' in front
-  var xtest = function () {
-  }; // easy way to disable a test is to put 'x' in front of 'test'
-
+  
   module("save interceptor", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
       // get active dataService adapter
       // removing any lingering, instance-level ChangeRequestInterceptor
       // left behind by some outside test that forgot to cleanup.
@@ -23,12 +18,13 @@
       dsAdapter = breeze.config.getAdapterInstance('dataService');
       delete dsAdapter.changeRequestInterceptor;
     },
-    teardown: function () {
+    afterEach: function () {
       delete dsAdapter.changeRequestInterceptor;
     }
   });
 
-  asyncTest('Default interceptor, no harm', function () {
+  test('Default interceptor, no harm', function (assert) {
+    var done = assert.async();
     var em = newEm();
     getNancy(em).then(function (nancy) {
       tweakEmp(nancy);
@@ -37,9 +33,11 @@
         .then(function (result) {
           equal(result.entities.length, 1, "should have saved Nancy");
         })
-        .catch(handleFail).finally(start);
+        .catch(handleFail).finally(done);
   });
-  asyncTest('NULL interceptor, no harm', function () {
+
+  test('NULL interceptor, no harm', function (assert) {
+    var done = assert.async();
     dsAdapter.changeRequestInterceptor = null;
     var em = newEm();
     getNancy(em).then(function (nancy) {
@@ -49,9 +47,11 @@
         .then(function (result) {
           equal(result.entities.length, 1, "should have saved Nancy");
         })
-        .catch(handleFail).finally(start);
+        .catch(handleFail).finally(done);
   });
-  asyncTest('interceptor members called with expected values', function () {
+
+  test('interceptor members called with expected values', function (assert) {
+    var done = assert.async();
     var em = newEm();
     var nancy;
     var wasCalled = false;
@@ -98,16 +98,17 @@
         .finally(function () {
           // poison this adapter's interceptor to prove test module always clears it
           dsAdapter.changeRequestInterceptor = PoisonInterceptor;
-          start();
+          done();
         });
   });
 
   // A future test when we want to explore intercepting multiple requests
-  xtest("insert multipart entity", function () {
+  QUnit.skip("insert multipart entity", function (assert) {
+    var done = assert.async();
     var em = newEm();
     var product = createProduct(em);
     var order = createOrder(em);
-    stop();
+    
     em.saveChanges()
         .then(function (result) {
           equal(result.entities.length, 2, "should have saved 2 entities");
@@ -119,7 +120,7 @@
         .then(function (/*result*/) {
           ok(true, "removed the 2 added entities");
         })
-        .fail(testFns.handleFail).fin(start);
+        .fail(testFns.handleFail).fin(done);
   });
 
   ////// helpers ///////

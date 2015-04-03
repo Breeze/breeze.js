@@ -27,10 +27,11 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   module("query - non EF", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
+
     }
   });
 
@@ -168,12 +169,12 @@
   });
 
 
-  test("getSimple - anonymous - Persons", function () {
+  test("getSimple - anonymous - Persons", function (assert) {
+    var done = assert.async();
     var em = newAltEm();
 
     var query = breeze.EntityQuery.from("Persons");
-    stop();
-
+    
     em.executeQuery(query).then(function (data) {
       ok(data.results.length > 0);
       var person = data.results[0];
@@ -183,16 +184,16 @@
       // ok(person.meals[0].person === person, "check internal consistency");
       var ents = em.getEntities();
       ok(ents.length === 0, "should return 0 - not yet entities");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("getSimple - typed - Persons", function () {
+  test("getSimple - typed - Persons", function (assert) {
+    var done = assert.async();
     var em = newAltEm();
 
     initMsForPersonMeal(em.metadataStore);
     var query = breeze.EntityQuery.from("Persons");
-    stop();
 
     em.executeQuery(query).then(function (data) {
       ok(!em.hasChanges(), "should not have any changes");
@@ -203,16 +204,16 @@
       ok(meals[0].getProperty("person") === person, "check internal consistency");
       var ents = em.getEntities();
       ok(ents.length > 0, "should return some entities");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("getSimple - typed - Persons - long form metadata", function () {
+  test("getSimple - typed - Persons - long form metadata", function (assert) {
+    var done = assert.async();
     var em = newAltEm();
 
     initMsForPersonMeal_long(em.metadataStore);
     var query = breeze.EntityQuery.from("Persons");
-    stop();
 
     em.executeQuery(query).then(function (data) {
       ok(!em.hasChanges(), "should not have any changes");
@@ -223,7 +224,7 @@
       ok(meals[0].getProperty("person") === person, "check internal consistency");
       var ents = em.getEntities();
       ok(ents.length > 0, "should return some entities");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
