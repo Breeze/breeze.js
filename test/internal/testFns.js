@@ -92,8 +92,8 @@ breezeTestFns = (function (breeze) {
       // QUnit.config.moduleFilter = "none";
     }
     
-
-    // QUnit.start();
+    // Will be called after all of the tests have been loaded
+    // QUnit.start(); 
   
   }
 
