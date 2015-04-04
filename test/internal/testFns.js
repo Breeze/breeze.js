@@ -46,6 +46,37 @@ breezeTestFns = (function (breeze) {
     }
   }
 
+  testFns.skipIf = function(debugVars, msg) {
+    var tokens = debugVars.split(",").map(function (s) {
+      return s.trim().toLowerCase();
+    });
+    var skipMsg = _.find(tokens, function (t) {
+      return getSkipMsg(t) != null;
+    });
+
+    if (skipMsg) {
+      return {
+        test: function (testName, fn) {
+          QUnit.skip("[" + skipMsg + " " + msg + "]: " + testName, fn);
+        },
+        skipIf: function (a, b) {
+          return testFns.skipIf(debugVars, msg);
+        }
+      }
+    } else {
+      return {
+        test: function (testName, fn) {
+          QUnit.test(testName, fn);
+        },
+        skipIf: function(debugVars, msg) {
+          return testFns.skipIf(debugVars, msg);
+        }
+      }
+    }
+  }
+
+
+
   function getSkipMsg(s) {
     if ((testFns.DEBUG_MONGO && s.indexOf("mongo",0) === 0) ||
        (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel",0) === 0) ||
