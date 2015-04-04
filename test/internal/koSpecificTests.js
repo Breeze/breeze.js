@@ -10,7 +10,6 @@
 
   var breeze = testFns.breeze;
   var core = breeze.core;
-
   var Enum = core.Enum;
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;
@@ -18,17 +17,14 @@
   var EntityKey = breeze.EntityKey;
   var EntityState = breeze.EntityState;
 
-
   var newEm = testFns.newEm;
   var testIfNot = testFns.testIfNot;
-
 
   module("ko specific", {
     beforeEach: function (assert) {
       testFns.setup(assert);
     },
     afterEach: function (assert) {
-
     }
   });
 

@@ -1,7 +1,7 @@
 (function (testFns) {
   if (testFns.DEBUG_ODATA || testFns.DEBUG_MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("query - Non EF", {});
-    skip("Skipping tests for OData/Mongo/Sequelize/Hibernate", function () {
+    QUnit.skip("Skipping tests for OData/Mongo/Sequelize/Hibernate", function () {
       
     });
     return;
