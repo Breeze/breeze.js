@@ -158,6 +158,7 @@
     testFns.DEBUG_MONGO = value === "mongo";
     testFns.DEBUG_SEQUELIZE = value === "sequelize";
     testFns.DEBUG_HIBERNATE = value == "hibernate";
+    testFns.serverVersion = value + "/" + (version || "");
 
     var dataServiceAdapterName;
     // defaults
