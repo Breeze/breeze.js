@@ -19,7 +19,6 @@
   var FetchStrategy = breeze.FetchStrategy;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
 
   module("entityManager", {
     beforeEach: function (assert) {
@@ -77,8 +76,8 @@
     metadataStore.setEntityTypeForResourceName('Employee', 'Employee');
   }
 
-  testIfNot("querying server unmapped property", 
-    "odata,sequelize,hibernate", "does not have any server unmapped properties", function(assert) {
+  testFns.skipIf("odata,sequelize,hibernate", "does not have any server unmapped properties").
+  test("querying server unmapped property", function(assert) {
     var done = assert.async();
     var store = MetadataStore.importMetadata(newEm().metadataStore.exportMetadata());
 
@@ -187,8 +186,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("relationship not resolved after import",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("relationship not resolved after import", function (assert) {
     var done = assert.async();
     var ds = new breeze.DataService({
       serviceName: "none",
@@ -552,8 +551,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("Detaching the parent modifies the in-cache children - D2460",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("Detaching the parent modifies the in-cache children - D2460", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Employees").where("employeeID", "==", 1)
@@ -759,8 +758,8 @@
 
   });
 
-  testIfNot("mergeStrategy.overwriteChanges and change events",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("mergeStrategy.overwriteChanges and change events", function (assert) {
     var done = assert.async();
     var em = newEm();
     em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
@@ -1018,8 +1017,8 @@
 
   });
 
-  testIfNot("import results notification",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("import results notification", function (assert) {
     var done = assert.async();
     var em = newEm();
     var em2 = newEm();

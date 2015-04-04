@@ -75,8 +75,6 @@ breezeTestFns = (function (breeze) {
     }
   }
 
-
-
   function getSkipMsg(s) {
     if ((testFns.DEBUG_MONGO && s.indexOf("mongo",0) === 0) ||
        (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel",0) === 0) ||
@@ -90,8 +88,7 @@ breezeTestFns = (function (breeze) {
       return null;
     }
   }
-
-  
+ 
 
   testFns.TEST_RECOMPOSITION = true;
   configQunit();

@@ -13,7 +13,7 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
+  var skipMongoEndpoint = testFns.skipIf("mongo", " endpoint has not yet been implemented");
 
   if (testFns.DEBUG_ODATA) {
     module("query - named", {});
@@ -23,7 +23,7 @@
     return;
   };
 
-  module("named query", {
+  module("query - named", {
     beforeEach: function (assert) {
       testFns.setup(assert);
     },
@@ -32,9 +32,8 @@
     }
   });
 
-
-  testIfNot("enumerable query",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("enumerable query", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -48,8 +47,8 @@
 
     });
 
-  testIfNot("first or default",
-    "mongo", "endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("first or default", function (assert) {
       var done = assert.async();
 
       var em = newEm();
@@ -62,8 +61,8 @@
 
     });
 
-  testIfNot("withParameters using an array",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("withParameters using an array", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -78,8 +77,8 @@
 
     });
 
-  testIfNot("withParameters using an object",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("withParameters using an object", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -94,8 +93,8 @@
 
     });
 
-  testIfNot("withParameters using a array of objects",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("withParameters using a array of objects", function (assert) {
       var done = assert.async();
       var em = newEm();
       var qbeArray = [
@@ -114,8 +113,8 @@
 
     });
 
-  testIfNot("not returning results in same order as in server",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("not returning results in same order as in server", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -134,8 +133,8 @@
 
     });
 
-  testIfNot("with 0 value parameter",
-    "mongo", " endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("with 0 value parameter", function (assert) {
       var done = assert.async();
       var em = newEm();
       var q = EntityQuery.from("EmployeesMultipleParams")
@@ -200,14 +199,12 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("with parameter and count",
-    "mongo,sequelize,hibernate", " endpoint has not yet been implemented", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", " endpoint has not yet been implemented").
+  test("with parameter and count", function (assert) {
       var done = assert.async();
       var em = newEm();
       var q = EntityQuery.from("CustomerCountsByCountry")
           .withParameters({ companyName: "C" });
-
-
       var r;
       em.executeQuery(q).then(function (data) {
         r = data.results;
@@ -394,9 +391,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-
-  testIfNot("project enumerables",
-    "mongo,sequelize,hibernate", "is not applicable to this .NET only test", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "is not applicable to this .NET only test").
+  test("project enumerables", function(assert)   {
       var done = assert.async();
 
       var em = newEm();
@@ -413,8 +409,8 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  testIfNot("project enumerables with filter",
-    "mongo,sequelize,hibernate", "is not applicable to this .NET only test", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "is not applicable to this .NET only test").
+  test("project enumerables with filter", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery.from("TypeEnvelopes")
@@ -453,8 +449,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("project filtered collection",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("project filtered collection", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -473,9 +469,8 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-
-  testIfNot("project objects containing entities",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("project objects containing entities", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -511,8 +506,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("server side include many with filter - customers and orders",
-    "mongo", "endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("server side include many with filter - customers and orders", function (assert) {
       var done = assert.async();
 
       var em = newEm();
@@ -545,8 +540,8 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  testIfNot("server side include many with take - customers and orders",
-    "mongo", "endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("server side include many with take - customers and orders", function (assert) {
       var done = assert.async();
       expect(5);
       var em = newEm();
@@ -605,8 +600,8 @@
     }
   }
 
-  testIfNot("server side include, followed by local query",
-    "mongo", "endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("server side include, followed by local query", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -639,8 +634,8 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-  testIfNot("select scalar anon with two collection props",
-    "mongo", "endpoint has not yet been implemented", function (assert) {
+  skipMongoEndpoint.
+  test("select scalar anon with two collection props", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery
@@ -652,9 +647,8 @@
       }).fail(testFns.handleFail).fin(done);
     });
 
-
-  testIfNot("server returns HttpResponseMessage containing Customers",
-    "mongo", "not implemented because endpoint is .NET WebApi specific", function (assert) {
+  testFns.skipIf("mongo", "not implemented because endpoint is .NET WebApi specific").
+  test("server returns HttpResponseMessage containing Customers", function (assert) {
       var done = assert.async();
       var em = newEm();
 

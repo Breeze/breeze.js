@@ -17,8 +17,7 @@
   var newEm = testFns.newEm;
   var newMs = testFns.newMs;
   var wellKnownData = testFns.wellKnownData;
-  var testIfNot = testFns.testIfNot;
-
+  
   module("entity", {
     beforeEach: function (assert) {
       breeze.DataType.DateTime.defaultValue = new Date(2000, 0, 1);
@@ -332,8 +331,8 @@
     ok(parentProduct.entityAspect.entityState.isUnchanged(), "parentProduct should be 'unchanged'");
   });
 
-  testIfNot("create and init relations 2",
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("create and init relations 2", function() {
     
     var em = newEm();
     var newDetail = null;
@@ -607,8 +606,8 @@
 
   });
 
-  testIfNot("datatype coercion - integer",
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("datatype coercion - integer", function () {
     
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
@@ -626,8 +625,8 @@
 
   });
 
-  testIfNot("datatype coercion - decimal", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("datatype coercion - decimal",  function () {
 
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
@@ -648,8 +647,8 @@
 
   });
 
-  testIfNot("datatype coercion - float", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("datatype coercion - float",  function () {
 
     var em = newEm(); // new empty EntityManager
     var odType = em.metadataStore.getEntityType("OrderDetail");
@@ -794,8 +793,8 @@
 
   });
 
-  testIfNot("rejectChanges of a child entity restores it to its parent", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("rejectChanges of a child entity restores it to its parent", function () {
     var em = newEm();
 
     var orderType = em.metadataStore.getEntityType("Order");
@@ -1052,9 +1051,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-
-  testIfNot("entityType.getProperty nested", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("entityType.getProperty nested",  function () {
     var odType = testFns.metadataStore.getEntityType("OrderDetail");
     var orderType = testFns.metadataStore.getEntityType("Order");
 
@@ -1265,17 +1263,17 @@
     });
   });
 
-  testIfNot("category default rowversion value", 
-    "mongo,efcodefirst,nhibernate", "does not support 'defaultValues'", function () {
-
+  testFns.skipIf("mongo,efcodefirst,nhibernate", "does not support 'defaultValues'").
+  test("category default rowversion value",  function () {
     var em = newEm();
     var catType = em.metadataStore.getEntityType("Category");
     var cat = em.createEntity("Category");
     ok(cat.getProperty("rowVersion") === 2, "Expected failure (with CodeFirst) - This test is expected to fail with a CodeFirst model but succeed with DatabaseFirst model");
   });
 
-  testIfNot("propertyChanged", 
-    "mongo", "does not have an OrderDetail table", function () {
+  
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("propertyChanged",  function () {
 
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");
@@ -1372,8 +1370,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("delete entity - check children", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("delete entity - check children",  function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1393,9 +1391,8 @@
     });
   });
 
-
-  testIfNot("delete entity children then parent - check children", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("delete entity children then parent - check children", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1419,8 +1416,8 @@
     });
   });
 
-  testIfNot("delete entity children then parent - check children (guid ids)", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("delete entity children then parent - check children (guid ids)",  function () {
 
     var em = newEm();
     var customer = createCustomerAndOrders(em);
@@ -1443,9 +1440,8 @@
     });
   });
 
-
-  testIfNot("delete entity - check parent", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("delete entity - check parent",  function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1467,8 +1463,8 @@
     ok(od.getProperty("orderID") === order.getProperty("orderID"), "orderDetail.orderId should not change as a result of being deleted");
   });
 
-  testIfNot("detach entity - check children", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("detach entity - check children", function () {
 
     var em = newEm();
     var order = createOrderAndDetails(em);
@@ -1488,8 +1484,8 @@
     });
   });
 
-  testIfNot("hasChanges", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("hasChanges", function () {
 
     var em = newEm();
 
@@ -1533,8 +1529,8 @@
     ok(valid, "should no longer have any changes");
   });
 
-  testIfNot("rejectChanges", 
-    "mongo", "does not have an OrderDetail table", function () {
+  testFns.skipIf("mongo", "does not have an OrderDetail table").
+  test("rejectChanges",  function () {
 
     var em = newEm();
     var orderType = em.metadataStore.getEntityType("Order");

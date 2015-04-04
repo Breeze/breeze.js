@@ -14,7 +14,6 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
 
   module("query - datatype", {
     beforeEach: function (assert) {
@@ -57,8 +56,8 @@
     }
   });
 
-  testIfNot("Insure that this is Not a duration query even without type mapping",
-    "odata,mongo", "has not yet implemented server side interception", function (assert) {
+  testFns.skipIf("odata,mongo", "has not yet implemented server side interception").
+  test("Insure that this is Not a duration query even without type mapping", function (assert) {
     var done = assert.async();
 
     var em = newEm();
@@ -72,9 +71,8 @@
     }).fin(done);
   });
 
-
-  testIfNot("Query Involving Multiple Entities on Server",
-    "mongo,odata,sequelize,hibernate", "is N/A for this EF specific test", function (assert) {
+  testFns.skipIf("mongo,odata,sequelize,hibernate", "is N/A for this EF specific test").
+  test("Query Involving Multiple Entities on Server", function (assert) {
       var done = assert.async();
 
       var em = newEm();
@@ -143,9 +141,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-
-  testIfNot("dateTimeOffset & dateTime2 w/save",
-    "mongo,sequelize,hibernate,odata", "does not have these datatypes", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
+  test("dateTimeOffset & dateTime2 w/save", function(assert) {
       var done = assert.async();
       var em = newEm();
       var query = new EntityQuery("UnusualDates").take(10);
@@ -174,8 +171,8 @@
 
     });
 
-  testIfNot("where dateTimeOffset & dateTime2",
-    "mongo,sequelize,hibernate,odata", "does not have these datatypes", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
+  test("where dateTimeOffset & dateTime2", function(assert) {
     var done = assert.async();
     var em = newEm();
     var dt1 = new Date(1950, 1, 1, 1, 1, 1);
@@ -189,8 +186,8 @@
 
   });
 
-  testIfNot("export/import dateTimeOffset with nulls",
-    "mongo,sequelize,hibernate,odata", "does not have these datatypes", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
+  test("export/import dateTimeOffset with nulls", function(assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -213,9 +210,8 @@
 
   });
 
-
-  testIfNot("time w/save",
-    "mongo,sequelize,hibernate", "does not have a 'Time' datatype", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  test("time w/save", function (assert) {
     var done = assert.async();
     var newMs = MetadataStore.importMetadata(testFns.metadataStore.exportMetadata());
     var tlimitType = newMs.getEntityType("TimeLimit");
@@ -269,9 +265,8 @@
 
   });
 
-
-  testIfNot("time 2",
-    "mongo,sequelize,hibernate", "does not have a 'Time' datatype", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  test("time 2",  function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("TimeLimits").where("maxTime", ">", "PT4H").take(10);
@@ -288,8 +283,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("time not null",
-    "mongo,sequelize,hibernate", "does not have this datatype", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  test("time not null", function(assert) {
     var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("TimeLimits").where("minTime", "!=", null).take(10);
@@ -306,8 +301,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("bad time",
-    "mongo,sequelize,hibernate", "does not have this datatype", function() {
+  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  test("bad time", function() {
     
     var em = newEm();
     var tlimitType = em.metadataStore.getEntityType("TimeLimit");
@@ -323,8 +318,8 @@
     ok(valErrs.length == 0, "should be no more errors");
   });
 
-  testIfNot("timestamp w/save",
-    "mongo,sequelize,hibernate", "does not have this datatype", function (assert) {
+  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  test("timestamp w/save", function (assert) {
     var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("Roles").take(10);
@@ -348,9 +343,8 @@
 
   });
 
-
-  testIfNot("enums w/save",
-    "mongo,sequelize,hibernate,odata", "does not have enum support", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have enum support").
+  test("enums w/save", function(assert) {
     var done = assert.async();
     var em = newEm();
     var query = new EntityQuery("Roles").where("roleType", "==", 'Restricted');
@@ -385,8 +379,8 @@
 
   });
 
-  testIfNot("enums null - w/save",
-    "mongo,sequelize,hibernate,odata", "does not have enum support", function(assert) {
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have enum support").
+  test("enums null - w/save", function(assert) {
     var done = assert.async();
     var em = newEm();
     var roleType = em.metadataStore.getEntityType("Role");
