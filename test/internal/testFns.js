@@ -73,23 +73,27 @@
     QUnit.config.testTimeout = 20000;
 
     QUnit.config.urlConfig.push({
-      id: "next",
-      label: "Next tracking lib.",
-      tooltip: "Next tracking lib."
-    });
-
-    QUnit.config.urlConfig.push({
       id: "canStart",
       label: "Start the tests",
       tooltip: "Allows a user to set options before tests start."
     });
 
+    QUnit.config.urlConfig.push({
+      id: "modelLibrary",
+      value: ["backingStore", "knockout", "backbone"],
+      label: "Model library",
+      tooltip: "Model library"
+    });
 
     if (!QUnit.urlParams.canStart) {
       // insures that no tests run.
       QUnit.config.testId = ["none"];
       // Doesn't actually work.
       // QUnit.config.moduleFilter = "none";
+    }
+
+    if (!QUnit.urlParams.modelLibrary) {
+      QUnit.urlParams.modelLibrary = "backingStore";
     }
     
     // Should be called after all of the tests have been loaded in the index.xxx.html file
@@ -265,31 +269,20 @@
   };
 
   testFns.configure = function () {
-
-    var modelLibrary = window.localStorage.getItem("modelLibrary") || "ko";
-    var oldNext = !!window.localStorage.getItem("qunit.next");
-
-    var curNext = !!QUnit.urlParams.next;
-
-    if (curNext) {
-      window.localStorage.setItem("qunit.next", true);
+    var modelLibrary;
+    var mlParam = QUnit.urlParams.modelLibrary;
+    if (mlParam === "knockout") {
+      modelLibrary = "ko";
+    } else if (mlParam === "backbone") {
+      modelLibrary = "backbone";
     } else {
-      window.localStorage.removeItem("qunit.next");
+      modelLibrary = "backingStore";
     }
-    var doNext = oldNext != curNext;
-    if (doNext) {
-      if (modelLibrary === "ko") {
-        modelLibrary = "backbone";
-      } else if (modelLibrary === "backbone") {
-        modelLibrary = "backingStore";
-      } else {
-        modelLibrary = "ko";
-      }
-    }
-    var ajaxLibrary = modelLibrary === "backingStore" ? "angular" : "jQuery";
-    window.localStorage.setItem("modelLibrary", modelLibrary);
+    
     core.config.initializeAdapterInstance("modelLibrary", modelLibrary, true);
     testFns.modelLibrary = core.config.getAdapterInstance("modelLibrary").name;
+
+    var ajaxLibrary = modelLibrary === "backingStore" ? "angular" : "jQuery";
     core.config.initializeAdapterInstance("ajax", ajaxLibrary, true);
     updateTitle();
   };
@@ -329,9 +322,7 @@
     if (serviceHasMetadata) {
       var done = assert.async();
       em.fetchMetadata(function (rawMetadata) {
-        // testFns.configureMetadata();
         if (config.metadataFn) config.metadataFn();
-
       }).fail(testFns.handleFail).fin(done);
     }
   };
