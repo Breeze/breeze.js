@@ -1,16 +1,4 @@
-﻿// Uncomment these lines to run against base + individual plugins.
-//define(["breeze.base",
-//        "breeze.ajax.jQuery",
-//        "breeze.modelLibrary.ko", "breeze.modelLibrary.backbone", "breeze.modelLibrary.backingStore",
-//        "breeze.dataService.webApi", "breeze.dataService.odata"
-//    ], function (breeze) {
-
-
-// Uncomment this line to run against base + individual plugins (minified)
-// define(["breeze.min"], function(breeze) {
-
-// Uncomment this to run against a version of base and all plugins
-breezeTestFns = (function (breeze) {
+﻿breezeTestFns = (function (breeze) {
 
   "use strict";
 
@@ -30,21 +18,6 @@ breezeTestFns = (function (breeze) {
     inheritanceServiceName: "breeze/inheritance",
     teardown_inheritanceReset: teardown_inheritanceReset
   };
-
-  testFns.testIfNot = function(testName, delimString, msg, fn) {
-    var tokens = delimString.split(",").map(function(s) {
-      return s.trim().toLowerCase();
-    });
-    var skipMsg = _.find(tokens, function(t) {
-      return getSkipMsg(t) != null;
-    });
-
-    if (skipMsg) {
-      return QUnit.skip("[" + skipMsg + " " + msg + "]: " + testName, fn);
-    } else {
-      return test(testName, fn);
-    }
-  }
 
   testFns.skipIf = function(debugVars, msg) {
     var tokens = debugVars.split(",").map(function (s) {
@@ -88,7 +61,6 @@ breezeTestFns = (function (breeze) {
       return null;
     }
   }
- 
 
   testFns.TEST_RECOMPOSITION = true;
   configQunit();
@@ -120,7 +92,7 @@ breezeTestFns = (function (breeze) {
       // QUnit.config.moduleFilter = "none";
     }
     
-    // Will be called after all of the tests have been loaded
+    // Should be called after all of the tests have been loaded in the index.xxx.html file
     // QUnit.start(); 
   
   }
@@ -151,7 +123,6 @@ breezeTestFns = (function (breeze) {
         testFns.setServerVersion(data.value, data.version);
         testFns.northwindIBMetadata = JSON.parse(data.metadata);
         QUnit.start();
-          
       },
       error: function (httpResponse) {
         alert("error getting server version data: " + httpResponse.status);
@@ -177,65 +148,69 @@ breezeTestFns = (function (breeze) {
   testFns.setDataService = function (value, version) {
     value = value.toLowerCase();
     version = (version || "").toLowerCase();
-    testFns.DEBUG_WEBAPI = value === "webapi";
+    
+    testFns.DEBUG_DOTNET_WEBAPI = value === 'dotnetwebapi'; // version will eventually be either EF or NHIBERNATE
     testFns.DEBUG_ODATA = value === "odata" || value === "odata4";
     testFns.DEBUG_MONGO = value === "mongo";
     testFns.DEBUG_SEQUELIZE = value === "sequelize";
     testFns.DEBUG_HIBERNATE = value == "hibernate";
-    testFns.DEBUG_ODATA_VERSION = version || "wcf";
-    if (testFns.DEBUG_WEBAPI) {
-      testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
 
-      if (testFns.TEST_RECOMPOSITION) {
-        var oldAjaxCtor = core.config.getAdapter("ajax");
-        var newAjaxCtor = function () {
-          this.name = "newAjax";
-          this.defaultSettings = {
-            headers: { "X-Test-Header": "foo1" },
-            beforeSend: function (jqXHR, settings) {
-              jqXHR.setRequestHeader("X-Test-Before-Send-Header", "foo1");
-            }
-          };
-        };
-        newAjaxCtor.prototype = new oldAjaxCtor();
-        core.config.registerAdapter("ajax", newAjaxCtor);
-        core.config.initializeAdapterInstance("ajax", "newAjax", true);
-      } else {
-        var ajaxImpl = core.config.getAdapterInstance("ajax");
-        ajaxImpl.defaultSettings = {
-          headers: { "X-Test-Header": "foo2" },
-          beforeSend: function (jqXHR, settings) {
-            jqXHR.setRequestHeader("X-Test-Before-Send-Header", "foo2");
-          }
-        };
-      }
-      // test recomposition
+    var dataServiceAdapterName;
+    // defaults
+    if (testFns.DEBUG_DOTNET_WEBAPI) {
+      dataServiceAdapterName = "webApi";
       testFns.defaultServiceName = "breeze/NorthwindIBModel";
-
     } else if (testFns.DEBUG_ODATA) {
+      testFns.DEBUG_ODATA_VERSION = version || "wcf";
       if (testFns.DEBUG_ODATA_VERSION == "wcf") {
-        testFns.dataService = core.config.initializeAdapterInstance("dataService", "OData").name;
+        dataServiceAdapterName = "OData";
         testFns.defaultServiceName = "http://localhost:9009/ODataService.svc";
       } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata") {
-        testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApiOData").name;
+        dataServiceAdapterName = "webApiOData";
         testFns.defaultServiceName = "http://localhost:9011/NorthwindIB_odata";
       } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata4") {
-        testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApiOData4").name;
+        dataServiceAdapterName = "webApiOData4";
         testFns.defaultServiceName = "http://localhost:9017/NorthwindIB_odata";
       }
     } else if (testFns.DEBUG_MONGO) {
-      testFns.dataService = core.config.initializeAdapterInstance("dataService", "mongo").name;
+      dataServiceAdapterName = "mongo";
       testFns.defaultServiceName = "breeze/NorthwindIBModel";
     } else if (testFns.DEBUG_SEQUELIZE) {
-      testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
+      dataServiceAdapterName = "webApi";
       testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
       testFns.defaultServiceName = "breeze/NorthwindIBModel";
     } else if (testFns.DEBUG_HIBERNATE) {
-      testFns.dataService = core.config.initializeAdapterInstance("dataService", "webApi").name;
+      dataServiceAdapterName = "webApi";
       testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
       testFns.defaultServiceName = "http://localhost:8080/breeze-webtest/northwind"
-
     }
+
+    testFns.dataService = core.config.initializeAdapterInstance("dataService", dataServiceAdapterName).name;
+
+    if (testFns.TEST_RECOMPOSITION && testFns.DEBUG_DOTNET_WEBAPI) {
+      var oldAjaxCtor = core.config.getAdapter("ajax");
+      var newAjaxCtor = function () {
+        this.name = "newAjax";
+        this.defaultSettings = {
+          headers: { "X-Test-Header": "foo1" },
+          beforeSend: function (jqXHR, settings) {
+            jqXHR.setRequestHeader("X-Test-Before-Send-Header", "foo1");
+          }
+        };
+      };
+      newAjaxCtor.prototype = new oldAjaxCtor();
+      core.config.registerAdapter("ajax", newAjaxCtor);
+      core.config.initializeAdapterInstance("ajax", "newAjax", true);
+    } else {
+      var ajaxImpl = core.config.getAdapterInstance("ajax");
+      ajaxImpl.defaultSettings = {
+        headers: { "X-Test-Header": "foo2" },
+        beforeSend: function (jqXHR, settings) {
+          jqXHR.setRequestHeader("X-Test-Before-Send-Header", "foo2");
+        }
+      };
+    }
+    // test recomposition
     updateTitle();
     setWellKnownData();
   };
@@ -276,8 +251,6 @@ breezeTestFns = (function (breeze) {
     wellKnownData.alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
 
     testFns.wellKnownData = wellKnownData;
-
-
   }
 
   function updateWellKnownData(assert) {

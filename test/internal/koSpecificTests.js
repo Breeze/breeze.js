@@ -18,7 +18,6 @@
   var EntityState = breeze.EntityState;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
 
   module("ko specific", {
     beforeEach: function (assert) {
@@ -217,8 +216,8 @@
     }
   });
 
-  testIfNot("query results notification",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("query results notification", function (assert) {
       var done = assert.async();
     var em = newEm();
     var alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
@@ -263,8 +262,8 @@
     ok(cust1.contactName() == "Bar");
   });
 
-  testIfNot("observable array",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("observable array", function (assert) {
       var done = assert.async();
     var items = [];
     var oa = ko.observableArray(items);

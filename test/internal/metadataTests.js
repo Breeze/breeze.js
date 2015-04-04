@@ -1,17 +1,16 @@
 (function (testFns) {
   var breeze = testFns.breeze;
   var core = breeze.core;
-  
+
   var EntityType = breeze.EntityType;
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;
   var NamingConvention = breeze.NamingConvention;
   var EntityQuery = breeze.EntityQuery;
   var DataService = breeze.DataService;
-  
+
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
-  
+
   module("metadata", {
     beforeEach: function (assert) {
       testFns.setup(assert);
@@ -171,8 +170,8 @@
 
   });
 
-  testIfNot("create metadata and use it for save - CodeFirst only",
-    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function (assert) {
+  testFns.skipIf("mongo,hibernate", "do not yet have TimeList and TimeGroup tables").
+  test("create metadata and use it for save - CodeFirst only", function (assert) {
     var done = assert.async();
     var em = createEmWithTimeGroupMetadata();
 
@@ -183,7 +182,7 @@
       Comment: "This was added for a test"
     });
 
-    
+
     em.saveChanges().then(function (data) {
       var timeGroupId = timeGroup.getProperty("Id");
       ok(timeGroupId > 0, "the timeGroup Id is " + timeGroupId + ", indicating it has been saved");
@@ -192,8 +191,8 @@
 
   });
 
-  testIfNot("create metadata and insert using existing entity re-attached - CodeFirst only",
-    "mongo,hibernate", "do not yet have TimeList and TimeGroup tables", function (assert) {
+  testFns.skipIf("mongo,hibernate", "do not yet have TimeList and TimeGroup tables").
+  test("create metadata and insert using existing entity re-attached - CodeFirst only", function (assert) {
     var done = assert.async();
     var em0 = createEmWithTimeGroupMetadata();
     var em = createEmWithTimeGroupMetadata();
@@ -460,7 +459,7 @@
   test("default interface impl", function (assert) {
     var done = assert.async();
     var store = new MetadataStore();
-    
+
     store.fetchMetadata(testFns.serviceName).then(function () {
       ok(!store.isEmpty());
     }).fail(testFns.handleFail).fin(done);
@@ -490,8 +489,8 @@
     }
   });
 
-  testIfNot("initialization",
-    "sequelize", "uses a server side json metadata file", function(assert) {
+  testFns.skipIf("sequelize", "uses a server side json metadata file").
+  test("initialization", function (assert) {
     var done = assert.async();
     var store = new MetadataStore({ namingConvention: NamingConvention.none });
 
@@ -509,7 +508,7 @@
         ok(keys.length > 0);
         // some servers (hibernate) may use lower case prop names.
         var prop = custType.getProperty("CompanyName") || custType.getProperty("companyName");
-        ok(prop );
+        ok(prop);
         ok(prop.isDataProperty);
         var navProp = custType.navigationProperties[0];
         ok(navProp.isNavigationProperty);
@@ -539,7 +538,7 @@
   test("initialization concurrent", 2, function (assert) {
     var done = assert.async();
     var store = new MetadataStore();
-    
+
     var typeMap;
     var errFn = function (e) {
       ok(false, e);
@@ -667,7 +666,7 @@
   }
 
   function makeCustomPropAnnot(propName) {
-    return  {
+    return {
       "fooDp": 7,
       "barDp": propName,
       "fooBarDp": {
@@ -794,7 +793,7 @@
   };
   var metadataAppleFruitItem = {
     "localQueryComparisonOptions": "caseInsensitiveSQL",
-    "structuralTypes": [ appleType, fruitType, itemOfProduceType ],
+    "structuralTypes": [appleType, fruitType, itemOfProduceType],
     "resourceEntityTypeMap": resourceEntityTypeMap
   };
   var metadataFruitAppleItem = {

@@ -16,7 +16,6 @@
   var MergeStrategy = breeze.MergeStrategy;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
 
   module("no tracking", {
     beforeEach: function (assert) {
@@ -38,18 +37,18 @@
     if (testFns.DEBUG_NHIBERNATE || testFns.DEBUG_HIBERNATE) {
       q = q.expand("directReports");
     } else if (testFns.DEBUG_SEQUELIZE) {
-       q = q.expand(["manager", "directReports"]);
+      q = q.expand(["manager", "directReports"]);
     } else {
       // q = q.expand("directReports");
     }
     q = q.noTracking();
-    
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
       var count = 0;
       var umap = {};
-      r.forEach(function(emp) {
+      r.forEach(function (emp) {
         checkUniqEmp(umap, emp);
         if (emp.manager) {
           checkUniqEmp(umap, emp.manager)
@@ -72,7 +71,7 @@
     var empId = emp["employeeID"];
     var sameEmp = umap[empId];
     if (sameEmp != null) {
-      ok(emp === sameEmp, "entity uniqueness in query not working" )
+      ok(emp === sameEmp, "entity uniqueness in query not working")
     }
     umap[empId] = emp;
   }
@@ -86,7 +85,7 @@
         .where("customer.companyName", "startsWith", "C")
         .expand("customer")
         .noTracking();
-    
+
     em.executeQuery(q).then(function (data) {
       var r = data.results;
       ok(r.length > 0);
@@ -105,31 +104,31 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("query with complex type",
-    "sequelize", "does not yet support complex types", function (assert) {
-    var done = assert.async();
-    
-    var em = newEm();
+  testFns.skipIf("sequelize", "does not yet support complex types").
+  test("query with complex type", function (assert) {
+      var done = assert.async();
 
-    var query = new EntityQuery()
-        .from("Suppliers")
-        .take(3)
-        .noTracking();
-    var queryUrl = query._toUri(em);
-    
-    em.executeQuery(query).then(function (data) {
-      var suppliers = data.results;
-      ok(suppliers.length > 0, "empty data");
+      var em = newEm();
 
-      suppliers.forEach(function (s) {
-        ok(s.location, "every supplier should have a location property");
-        ok("city" in s.location, "should have found s.location.city")
-      });
-      var r2 = em.executeQueryLocally(query);
-      ok(r2.length == 0);
-    }).fail(testFns.handleFail).fin(done);
+      var query = new EntityQuery()
+          .from("Suppliers")
+          .take(3)
+          .noTracking();
+      var queryUrl = query._toUri(em);
 
-  });
+      em.executeQuery(query).then(function (data) {
+        var suppliers = data.results;
+        ok(suppliers.length > 0, "empty data");
+
+        suppliers.forEach(function (s) {
+          ok(s.location, "every supplier should have a location property");
+          ok("city" in s.location, "should have found s.location.city")
+        });
+        var r2 = em.executeQueryLocally(query);
+        ok(r2.length == 0);
+      }).fail(testFns.handleFail).fin(done);
+
+    });
 
   test("query with reattach", function (assert) {
     var done = assert.async();
@@ -140,7 +139,7 @@
         .from("Employees")
         .where(predicate1)
         .noTracking();
-    
+
     var empType = em.metadataStore.getEntityType("Employee");
     var emps;
     em.executeQuery(q).then(function (data) {
@@ -183,7 +182,7 @@
         .from("Employees")
         .where(predicate1)
         .noTracking();
-    
+
     var empType = em.metadataStore.getEntityType("Employee");
     var emps;
     em.executeQuery(q).then(function (data) {
@@ -226,7 +225,7 @@
         .where(predicate1)
         .expand("orders")
         .noTracking();
-    
+
     var empType = em.metadataStore.getEntityType("Employee");
     var orderType = em.metadataStore.getEntityType("Order");
     var emps;
@@ -278,7 +277,7 @@
         .where(predicate1)
         .expand("orders")
         .noTracking();
-    
+
     var empType = em.metadataStore.getEntityType("Employee");
     em.metadataStore.registerEntityTypeCtor("Employee", null, null, noTrackingFn);
     em.metadataStore.registerEntityTypeCtor("Order", null, null, noTrackingFn);

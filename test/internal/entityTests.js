@@ -1263,8 +1263,15 @@
     });
   });
 
+  // TODO: skipIf will not work with efcodefirst and nhibernate ...
+  // testFns.DEBUG_EF_CODEFIRST and DEBUG_NHIBERNATE are not known until inside the test because they are set by testFns.setup asynchronously
   testFns.skipIf("mongo,efcodefirst,nhibernate", "does not support 'defaultValues'").
-  test("category default rowversion value",  function () {
+  test("category default rowversion value", function () {
+    // testFns.DEBUG_EF_CODEFIRST and DEBUG_NHIBERNATE are not known until inside the test because they are set by testFns.setup asynchronously
+    if (testFns.DEBUG_EF_CODEFIRST || testFns.DEBUG_NHIBERNATE) {
+      ok(true, "default values not supported in this env");
+      return;
+    }
     var em = newEm();
     var catType = em.metadataStore.getEntityType("Category");
     var cat = em.createEntity("Category");

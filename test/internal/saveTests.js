@@ -14,8 +14,6 @@
   var handleFail = testFns.handleFail;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
-
   var wellKnownData = testFns.wellKnownData;
 
   module("save", {
@@ -47,17 +45,17 @@
     }).then(function (sr) {
       var ents = sr.entities;
       ok(ents.length === 1, "1 record should have been saved");
-      ok(cust.getProperty("rowVersion") == rowVersion+1);
+      ok(cust.getProperty("rowVersion") == rowVersion + 1);
     }).fail(handleFail).fin(done);
   });
 
-  test("update order", function(assert) {
+  test("update order", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = new EntityQuery("Orders").where("customerID", "!=", null).take(1);
     var order;
     var customerId;
-    em.executeQuery(q).then(function(data) {
+    em.executeQuery(q).then(function (data) {
       var orders = data.results;
       ok(orders.length == 1);
       order = orders[0];
@@ -66,9 +64,9 @@
       var offset = (Math.random() * 2 | 0) ? .01 : -.01;
       order.setProperty("freight", freight + offset);
       return em.saveChanges();
-    }).then(function(sr) {
+    }).then(function (sr) {
       var entities = sr.entities;
-      ok(entities.length == 1,"should have saved only 1");
+      ok(entities.length == 1, "should have saved only 1");
       ok(entities[0] == order, "should be the same entity");
       ok(order.getProperty("customerID") != null, "customerID foreign key should not change on an update");
 
@@ -80,7 +78,7 @@
     var em = newEm();
     var product = createProduct(em);
     var order = createOrder(em);
-    
+
     var orderID, orderDetail, productID, odOrderID, odProductID;
     em.saveChanges().then(function (sr0) {
       ok(sr0.entities.length == 2, "should have saved 2 entities");
@@ -134,7 +132,7 @@
     var odProductID = orderDetail.getProperty("productID");
     ok(orderID == odOrderID, "orderID's should be the same");
     ok(productID == odProductID, "productID's should be the same");
-    
+
     em.saveChanges().then(function (sr) {
       ok(sr.entities.length == 3, "should have saved 3 entities");
       var orderIDx = order.getProperty("orderID");
@@ -171,7 +169,7 @@
     emp.setProperty("lastName", "Test ln");
     emp.setProperty("fullName", "foo");
 
-    
+
     em.saveChanges()
       .then(function () {
         equal(hasChangesChangedRaised.length, 2,
@@ -474,7 +472,7 @@
     emp.setProperty("lastName", "Test ln");
     emp.setProperty("fullName", "foo");
     em.addEntity(emp);
-    
+
     em.saveChanges().then(function (sr) {
       var savedEnts = sr.entities;
       ok(savedEnts.length === 1, "should have saved 1 entity");
@@ -498,54 +496,54 @@
 
   });
 
-  testIfNot("pk update",
-    "mongo", " does not : This test needs to be rewritten", function (assert) {
-      var done = assert.async();
+  testFns.skipIf("mongo", " can not handle this test as written").
+  test("pk update", function (assert) {
+    var done = assert.async();
 
-      var em = newEm();
+    var em = newEm();
 
-      var q = new EntityQuery("Territories").orderBy("territoryID desc").take(1);
-      
-      var order;
-      var freight;
-      q.using(em).execute().then(function (data) {
-        ok(data.results.length === 1, "should be one result");
-        var terr = data.results[0];
-        var id = terr.getProperty("territoryID");
-        terr.setProperty("territoryID", id + 1);
+    var q = new EntityQuery("Territories").orderBy("territoryID desc").take(1);
 
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(false, "should not get here");
-      }).fail(function (e) {
-        var isOk;
-        if (testFns.DEBUG_HIBERNATE) {
-          isOk = e.message.toLowerCase().indexOf("row was updated or deleted by another") >= 0;
-        } else {
-          isOk = e.message.indexOf("part of the entity's key") > 0;
-        }
-        ok(isOk, "error message should mention why it failed");
-      }).fail(handleFail).fin(done);
-    });
+    var order;
+    var freight;
+    q.using(em).execute().then(function (data) {
+      ok(data.results.length === 1, "should be one result");
+      var terr = data.results[0];
+      var id = terr.getProperty("territoryID");
+      terr.setProperty("territoryID", id + 1);
 
-  testIfNot("product update active",
-    "mongo", "would require this test to be rewritten", function (assert) {
-      var done = assert.async();
-      updateProduct(4, done);
-    });
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(false, "should not get here");
+    }).fail(function (e) {
+      var isOk;
+      if (testFns.DEBUG_HIBERNATE) {
+        isOk = e.message.toLowerCase().indexOf("row was updated or deleted by another") >= 0;
+      } else {
+        isOk = e.message.indexOf("part of the entity's key") > 0;
+      }
+      ok(isOk, "error message should mention why it failed");
+    }).fail(handleFail).fin(done);
+  });
 
-  testIfNot("product update discontinued",
-    "mongo", "would require this test to be rewritten", function (assert) {
-      var done = assert.async();
-      updateProduct(5, done);
-    });
+  testFns.skipIf("mongo", " can not handle this test as written").
+  test("product update active", function (assert) {
+    var done = assert.async();
+    updateProduct(4, done);
+  });
+
+  testFns.skipIf("mongo", " can not handle this test as written").
+  test("product update discontinued", function (assert) {
+    var done = assert.async();
+    updateProduct(5, done);
+  });
 
   function updateProduct(productId, done) {
 
     var em = newEm();
 
     var q = new EntityQuery("Products").where("productID", "eq", productId);
-    
+
     var order;
     var freight;
     q.using(em).execute().then(function (data) {
@@ -561,142 +559,142 @@
     }).fail(handleFail).fin(done);
   }
 
-  testIfNot("add UserRole",
-    "mongo", "would require this test to be rewritten", function (assert) {
-      var done = assert.async();
+  testFns.skipIf("mongo", " can not handle this test as written").
+  test("add UserRole", function (assert) {
+    var done = assert.async();
 
-      var em = newEm();
-      var roleId;
-      var userId = 6;
-      var p2 = breeze.Predicate.create("userId", "ne", userId);
-      var p1 = breeze.Predicate.create("userRoles", "all", p2);
+    var em = newEm();
+    var roleId;
+    var userId = 6;
+    var p2 = breeze.Predicate.create("userId", "ne", userId);
+    var p1 = breeze.Predicate.create("userRoles", "all", p2);
 
-      var q = new EntityQuery("Roles").where(p1).take(1);
-      
-      q.using(em).execute().then(function (data) {
-        ok(data.results.length === 1, "should be one result");
-        var role = data.results[0];
-        roleId = role.getProperty("id");
+    var q = new EntityQuery("Roles").where(p1).take(1);
 
-        var newUserRole = em.createEntity('UserRole', {
-          userId: userId,
-          roleId: roleId
-        });
+    q.using(em).execute().then(function (data) {
+      ok(data.results.length === 1, "should be one result");
+      var role = data.results[0];
+      roleId = role.getProperty("id");
 
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(true, "save succeeded");
-        var resultRole = sr.entities[0];
-        var roleId2 = resultRole.getProperty("roleId");
-        ok(roleId2 === roleId, "roleIds match");
-        var userId2 = resultRole.getProperty("userId");
-        ok(userId2 === userId, "userIds match");
+      var newUserRole = em.createEntity('UserRole', {
+        userId: userId,
+        roleId: roleId
+      });
 
-        // delete entity
-        resultRole.entityAspect.setDeleted();
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(true, "delete succeeded");
-      }).fail(function (e) {
-        ok(false, "error on save: " + e.message);
-      }).fail(handleFail).fin(done);
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(true, "save succeeded");
+      var resultRole = sr.entities[0];
+      var roleId2 = resultRole.getProperty("roleId");
+      ok(roleId2 === roleId, "roleIds match");
+      var userId2 = resultRole.getProperty("userId");
+      ok(userId2 === userId, "userIds match");
 
-    });
+      // delete entity
+      resultRole.entityAspect.setDeleted();
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(true, "delete succeeded");
+    }).fail(function (e) {
+      ok(false, "error on save: " + e.message);
+    }).fail(handleFail).fin(done);
 
-  testIfNot("new entity with enum",
-    "mongo,odata,sequelize,hibernate", " does not yet support enums", function (assert) {
-      var done = assert.async();
+  });
 
-      var em = newEm();
-      var em2 = newEm();
-      var roleType = em.metadataStore.getEntityType("Role");
-      
+  testFns.skipIf("mongo,odata,sequelize,hibernate", " does not yet support enums").
+  test("new entity with enum", function (assert) {
+    var done = assert.async();
 
-      var aRole = em.createEntity("Role");
-      var aRole2;
-      aRole.setProperty("roleType", "Restricted");
-      aRole.setProperty("name", "TEMP" + testFns.makeTempString(5));
-      var ves = aRole.entityAspect.validateEntity();
-      em.saveChanges().then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved (added) one entity");
-        aRole.setProperty("roleType", "Guest");
-        return em.saveChanges();
-      }).then(function (sr2) {
-        ok(sr2.entities.length == 1, "should have saved (modified) one entity");
-        var q2 = EntityQuery.fromEntities(aRole);
-        return em2.executeQuery(q2);
-      }).then(function (data) {
-        var roles = data.results;
-        ok(roles.length == 1, "should have queried one entity");
+    var em = newEm();
+    var em2 = newEm();
+    var roleType = em.metadataStore.getEntityType("Role");
 
-        aRole2 = roles[0];
-        var rt = aRole2.getProperty("roleType");
-        ok(rt == "Guest", "value should be 'Guest'");
-        // throw away 'set' because the object is going to be deleted anyway.
-        aRole2.setProperty("roleType", "Restricted");
-        aRole2.entityAspect.setDeleted();
-        return em2.saveChanges();
-      }).then(function (sr3) {
-        ok(sr3.entities.length == 1, "should have deleted one entity");
-        ok(aRole2.entityAspect.entityState.isDetached(), "should be detached");
-      }).fail(handleFail).fin(done);
-    });
 
-  testIfNot("exceptions thrown on server",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
+    var aRole = em.createEntity("Role");
+    var aRole2;
+    aRole.setProperty("roleType", "Restricted");
+    aRole.setProperty("name", "TEMP" + testFns.makeTempString(5));
+    var ves = aRole.entityAspect.validateEntity();
+    em.saveChanges().then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved (added) one entity");
+      aRole.setProperty("roleType", "Guest");
+      return em.saveChanges();
+    }).then(function (sr2) {
+      ok(sr2.entities.length == 1, "should have saved (modified) one entity");
+      var q2 = EntityQuery.fromEntities(aRole);
+      return em2.executeQuery(q2);
+    }).then(function (data) {
+      var roles = data.results;
+      ok(roles.length == 1, "should have queried one entity");
 
-      var em = newEm();
+      aRole2 = roles[0];
+      var rt = aRole2.getProperty("roleType");
+      ok(rt == "Guest", "value should be 'Guest'");
+      // throw away 'set' because the object is going to be deleted anyway.
+      aRole2.setProperty("roleType", "Restricted");
+      aRole2.entityAspect.setDeleted();
+      return em2.saveChanges();
+    }).then(function (sr3) {
+      ok(sr3.entities.length == 1, "should have deleted one entity");
+      ok(aRole2.entityAspect.entityState.isDetached(), "should be detached");
+    }).fail(handleFail).fin(done);
+  });
 
-      var q = new EntityQuery("Orders").take(1);
-      
-      var order;
-      var freight;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        freight = order.getProperty("freight") + .5;
-        order.setProperty("freight", freight);
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("exceptions thrown on server", function (assert) {
+    var done = assert.async();
 
-        var so = new SaveOptions({ resourceName: "SaveAndThrow", tag: "SaveAndThrow" });
+    var em = newEm();
 
-        return em.saveChanges(null, so);
-      }).then(function (sr) {
-        ok("should not get here");
-      }).fail(function (e) {
-        ok(e);
-      }).fail(handleFail).fin(done);
-    });
+    var q = new EntityQuery("Orders").take(1);
 
-  testIfNot("delete entity with Int32 property set to null",
-    "mongo", "-employeeId is not an integer in this env", function (assert) {
-      var done = assert.async();
+    var order;
+    var freight;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight") + .5;
+      order.setProperty("freight", freight);
 
-      var em = newEm();
-      var c1 = em.createEntity("Order", { employeeID: 1 });
-      
-      //save entity with non-null value on Int32 field
-      em.saveChanges().then(function (sr) {
-        var order = sr.entities[0];
-        var empID0 = order.getProperty(testFns.employeeKeyName);
-        ok(empID0 != null, "empID0 should not be null");
+      var so = new SaveOptions({ resourceName: "SaveAndThrow", tag: "SaveAndThrow" });
 
-        //set the Int32 field to null
-        order.setProperty(testFns.employeeKeyName, null);
-        //resave entity
-        return em.saveChanges();
-      }).then(function (sr) {
-        var order = sr.entities[0];
-        var empID1 = order.getProperty(testFns.employeeKeyName);
-        ok(empID1 === null, "value should be null");
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok("should not get here");
+    }).fail(function (e) {
+      ok(e);
+    }).fail(handleFail).fin(done);
+  });
 
-        //mark entity as deleted
-        order.entityAspect.setDeleted();
-        //resave (i.e. delete) entity - the error should occur past this point
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(true);
-      }).fail(handleFail).fin(done);
-    });
+  testFns.skipIf("mongo", "-employeeId is not an integer in this env").
+  test("delete entity with Int32 property set to null", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var c1 = em.createEntity("Order", { employeeID: 1 });
+
+    //save entity with non-null value on Int32 field
+    em.saveChanges().then(function (sr) {
+      var order = sr.entities[0];
+      var empID0 = order.getProperty(testFns.employeeKeyName);
+      ok(empID0 != null, "empID0 should not be null");
+
+      //set the Int32 field to null
+      order.setProperty(testFns.employeeKeyName, null);
+      //resave entity
+      return em.saveChanges();
+    }).then(function (sr) {
+      var order = sr.entities[0];
+      var empID1 = order.getProperty(testFns.employeeKeyName);
+      ok(empID1 === null, "value should be null");
+
+      //mark entity as deleted
+      order.entityAspect.setDeleted();
+      //resave (i.e. delete) entity - the error should occur past this point
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(true);
+    }).fail(handleFail).fin(done);
+  });
 
   // Breeze does not YET support an option to requery after save.
   // When it does let's resurrect this test.
@@ -710,247 +708,246 @@
   //    }).fail(handleFail).fin(done);
   //});
 
-  testIfNot("check unmapped property on server",
-    "mongo", "does not YET have a SaveCheck implemented on the server", function (assert) {
-      var done = assert.async();
+  testFns.skipIf("mongo", "does not YET have a SaveCheck implemented on the server").
+  test("check unmapped property on server", function (assert) {
+    var done = assert.async();
 
-      var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-      var customerType = em.metadataStore.getEntityType("Customer");
+    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var customerType = em.metadataStore.getEntityType("Customer");
 
-      var Customer = testFns.makeEntityCtor(function () {
-        this.myUnmappedProperty = "anything22";
-      });
-      em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-
-
-      var cust = customerType.createEntity();
-      cust.setProperty("companyName", "Test_compName");
-      em.addEntity(cust);
-
-      var entitiesToSave = new Array(cust);
-      var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedProperty" });
-      
-
-      em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
-        ok(true);
-      }).fail(handleFail).fin(done);
+    var Customer = testFns.makeEntityCtor(function () {
+      this.myUnmappedProperty = "anything22";
     });
+    em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
-  testIfNot("unmapped property serialization on server",
-    "mongo", "does not YET have a SaveCheck implemented on the server", function (assert) {
-      var done = assert.async();
 
-      var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-      var customerType = em.metadataStore.getEntityType("Customer");
-      customerType.setProperties({
-        serializerFn: function (dp, value) {
-          if (typeof (value) === "string") return value.toUpperCase();
-          if (dp.isUnmapped) {
-            if (dp.name == "anotherOne") {
-              value.extra = 666;
-            }
-          }
-          return value;
-        }
-      });
-      var Customer = testFns.makeEntityCtor(function () {
-        this.myUnmappedProperty = "anything22";
-        var x = {
-          x: "22",
-          y: "test",
-          z: ["a1", 3, true, null, undefined, { foo: 4 }, function (x, y, z) {
-            return 666
-          }],
-          testFn: function (a, b) {
-            return a + b;
+    var cust = customerType.createEntity();
+    cust.setProperty("companyName", "Test_compName");
+    em.addEntity(cust);
+
+    var entitiesToSave = new Array(cust);
+    var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedProperty" });
+
+
+    em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
+      ok(true);
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo", "does not YET have a SaveCheck implemented on the server").
+  test("unmapped property serialization on server", function (assert) {
+    var done = assert.async();
+
+    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var customerType = em.metadataStore.getEntityType("Customer");
+    customerType.setProperties({
+      serializerFn: function (dp, value) {
+        if (typeof (value) === "string") return value.toUpperCase();
+        if (dp.isUnmapped) {
+          if (dp.name == "anotherOne") {
+            value.extra = 666;
           }
         }
-        x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
-        this.anotherOne = x;
-      });
-      em.metadataStore.registerEntityTypeCtor("Customer", Customer);
-
-
-      var cust = customerType.createEntity();
-      cust.setProperty("companyName", "Test_compName");
-      em.addEntity(cust);
-
-      var entitiesToSave = new Array(cust);
-      var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedPropertySerialized" });
-      
-
-      em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
-        ok(true);
-      }).fail(handleFail).fin(done);
+        return value;
+      }
     });
-
-  testIfNot("unmapped property suppression",
-    "mongo", "does not YET have a SaveCheck implemented on the server", function (assert) {
-      var done = assert.async();
-
-      var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-      var customerType = em.metadataStore.getEntityType("Customer");
-      customerType.setProperties({
-        serializerFn: function (dp, value) {
-          if (dp.isUnmapped) return undefined;
-          return value;
+    var Customer = testFns.makeEntityCtor(function () {
+      this.myUnmappedProperty = "anything22";
+      var x = {
+        x: "22",
+        y: "test",
+        z: ["a1", 3, true, null, undefined, { foo: 4 }, function (x, y, z) {
+          return 666
+        }],
+        testFn: function (a, b) {
+          return a + b;
         }
-      });
-      var Customer = testFns.makeEntityCtor(function () {
-        this.myUnmappedProperty = "anything22";
-        var x = {
-          x: "22",
-          y: "test",
-          z: ["a1", 3, true, null, undefined, { foo: 4 }]
-        }
-        x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
-        this.anotherOne = x;
-      });
-      em.metadataStore.registerEntityTypeCtor("Customer", Customer);
+      }
+      x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
+      this.anotherOne = x;
+    });
+    em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
 
-      var cust = customerType.createEntity();
-      cust.setProperty("companyName", "Test_compName");
-      em.addEntity(cust);
+    var cust = customerType.createEntity();
+    cust.setProperty("companyName", "Test_compName");
+    em.addEntity(cust);
 
-      var entitiesToSave = new Array(cust);
-      var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedPropertySuppressed" });
-      
+    var entitiesToSave = new Array(cust);
+    var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedPropertySerialized" });
 
-      em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
-        ok(true);
-      }).fail(handleFail).fin(done);
+
+    em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
+      ok(true);
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo", "does not YET have a SaveCheck implemented on the server").
+  test("unmapped property suppression", function (assert) {
+    var done = assert.async();
+
+    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var customerType = em.metadataStore.getEntityType("Customer");
+    customerType.setProperties({
+      serializerFn: function (dp, value) {
+        if (dp.isUnmapped) return undefined;
+        return value;
+      }
+    });
+    var Customer = testFns.makeEntityCtor(function () {
+      this.myUnmappedProperty = "anything22";
+      var x = {
+        x: "22",
+        y: "test",
+        z: ["a1", 3, true, null, undefined, { foo: 4 }]
+      }
+      x.recursive = { ok: true, notOk: x }; // notOk should not get serialized.
+      this.anotherOne = x;
+    });
+    em.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+
+    var cust = customerType.createEntity();
+    cust.setProperty("companyName", "Test_compName");
+    em.addEntity(cust);
+
+    var entitiesToSave = new Array(cust);
+    var saveOptions = new SaveOptions({ resourceName: "SaveCheckUnmappedPropertySuppressed" });
+
+
+    em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
+      ok(true);
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo", "does not YET have a SaveCheck implemented on the server").
+  test("check initializer is hit for entities added/saved on server", function (assert) {
+    var done = assert.async();
+
+    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var ordInitializer = function (ord) {
+      ord.setProperty("shipCountry", "Brazil");
+    };
+
+    em.metadataStore.registerEntityTypeCtor("Order", null, ordInitializer);
+
+    var emp = em.createEntity("Employee");
+    emp.setProperty("firstName", "Test fn");
+    emp.setProperty("lastName", "Test ln");
+    emp.setProperty("fullName", "foo");
+    em.addEntity(emp);
+    var so = new SaveOptions({ resourceName: "SaveCheckInitializer" });
+
+    em.saveChanges(null, so).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 2, "since an Order was created/saved in the interceptor, length should be 2");
+      ok(ents[1].getProperty("shipCountry") === "Brazil", "initializer was not 'hit'");
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support server side interception or alt resource").
+  skipIf("mongo", "test is not yet implemented because it requires a server side async call").
+  test("entities modified on server being saved as new entities", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+
+    var q = EntityQuery.from("Categories").where("categoryName", "startsWith", "Beverage");
+
+    em.executeQuery(q).then(function (data) {
+      var category = data.results[0];
+      testFns.morphStringProp(category, "categoryName");
+
+      var entitiesToSave = new Array(category);
+      var saveOptions = new SaveOptions({ tag: "increaseProductPrice" });
+      return em.saveChanges(entitiesToSave, saveOptions);
+    }).then(function (sr) {
+      ok(sr.entities.length === 13, "13 records should have been saved - 1 category + 12 products");
+      // TODO: we should now requery and check that the 12 products actually have increased in price.
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("data with additional entity added on server", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+
+    var supplier = em.createEntity("Supplier", { companyName: "CompName" });
+    var entitiesToSave = new Array(supplier);
+    var saveOptions = new SaveOptions({ tag: "addProdOnServer" });
+
+    em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
+      var addedProducts = em.getEntities(["Product"], EntityState.Added);
+
+      ok(addedProducts.length === 0, "There should be no Added Products");
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo", " does not allow primary keys to be shared between collections").
+  test("can save a Northwind Order & InternationalOrder", function (assert) {
+    var done = assert.async();
+
+    // Create and initialize entity to save
+    var em = newEm();
+
+    var order = em.createEntity('Order', {
+      customerID: wellKnownData.alfredsID,
+      employeeID: wellKnownData.nancyID,
+      shipName: "Test " + new Date().toISOString()
     });
 
-
-  testIfNot("check initializer is hit for entities added/saved on server",
-    "mongo,odata", "do not YET have a SaveCheck implemented on the server", function (assert) {
-      var done = assert.async();
-
-      var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
-      var ordInitializer = function (ord) {
-        ord.setProperty("shipCountry", "Brazil");
-      };
-
-      em.metadataStore.registerEntityTypeCtor("Order", null, ordInitializer);
-
-      var emp = em.createEntity("Employee");
-      emp.setProperty("firstName", "Test fn");
-      emp.setProperty("lastName", "Test ln");
-      emp.setProperty("fullName", "foo");
-      em.addEntity(emp);
-      var so = new SaveOptions({ resourceName: "SaveCheckInitializer" });
-      
-      em.saveChanges(null, so).then(function (sr) {
-        var ents = sr.entities;
-        ok(ents.length === 2, "since an Order was created/saved in the interceptor, length should be 2");
-        ok(ents[1].getProperty("shipCountry") === "Brazil", "initializer was not 'hit'");
-      }).fail(handleFail).fin(done);
+    var internationalOrder = em.createEntity('InternationalOrder', {
+      // I thought Jay fixed this?
+      order: order, // sets OrderID and pulls it into the order's manager
+      // orderID: order.getProperty("orderID"),
+      customsDescription: "rare, exotic birds"
     });
 
-  testIfNot("entities modified on server being saved as new entities",
-    "odata-does not support server side interception or alt resource, mongo-test is not yet implemented because it requires a server side async call", "",
-    function (assert) {
-      var done = assert.async();
-      var em = newEm();
+    em.saveChanges().then(function (data) {
 
-      var q = EntityQuery.from("Categories").where("categoryName", "startsWith", "Beverage");
-      
-      em.executeQuery(q).then(function (data) {
-        var category = data.results[0];
-        testFns.morphStringProp(category, "categoryName");
+      var orderId = order.getProperty("orderID");
+      var internationalOrderID = internationalOrder.getProperty("orderID");
 
-        var entitiesToSave = new Array(category);
-        var saveOptions = new SaveOptions({ tag: "increaseProductPrice" });
-        return em.saveChanges(entitiesToSave, saveOptions);
-      }).then(function (sr) {
-        ok(sr.entities.length === 13, "13 records should have been saved - 1 category + 12 products");
-        // TODO: we should now requery and check that the 12 products actually have increased in price.
-      }).fail(handleFail).fin(done);
+      equal(internationalOrderID, orderId,
+              "the new internationalOrder should have the same OrderID as its new parent Order, " + orderId);
+      ok(orderId > 0, "the OrderID is positive, indicating it is a permanent order");
+
+    }).fail(handleFail).fin(done);
+
+  });
+
+  testFns.skipIf("mongo", " does not allow primary keys to be shared between collections").
+  test("can save a Northwind Order & OrderDetail", function (assert) {
+    var done = assert.async();
+
+    // Create and initialize entity to save
+    var em = newEm();
+
+    var order = em.createEntity('Order', {
+      customerID: wellKnownData.alfredsID,
+      employeeID: wellKnownData.nancyID,
+      shipName: "Test " + new Date().toISOString()
     });
 
-  testIfNot("data with additional entity added on server",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-
-      var supplier = em.createEntity("Supplier", { companyName: "CompName" });
-      var entitiesToSave = new Array(supplier);
-      var saveOptions = new SaveOptions({ tag: "addProdOnServer" });
-      
-      em.saveChanges(entitiesToSave, saveOptions).then(function (sr) {
-        var addedProducts = em.getEntities(["Product"], EntityState.Added);
-
-        ok(addedProducts.length === 0, "There should be no Added Products");
-      }).fail(handleFail).fin(done);
+    var orderDetail1 = em.createEntity('OrderDetail', {
+      order: order, // sets OrderID and pulls it into the order's manager
+      productID: wellKnownData.chaiProductID, // wellKnownData.alfredsOrderDetailKey.ProductID
+      quantity: 5
+    });
+    var orderDetail2 = em.createEntity('OrderDetail', {
+      order: order, // sets OrderID and pulls it into the order's manager
+      productID: wellKnownData.alfredsOrderDetailKey.ProductID,
+      quantity: 6
     });
 
-  testIfNot("can save a Northwind Order & InternationalOrder",
-    "mongo", " does not allow primary keys to be shared between collections", function (assert) {
-      var done = assert.async();
+    em.saveChanges().then(function (data) {
 
-      // Create and initialize entity to save
-      var em = newEm();
+      var orderId = order.getProperty("orderID");
+      ok(orderId > 0, "orderID is positive");
 
-      var order = em.createEntity('Order', {
-        customerID: wellKnownData.alfredsID,
-        employeeID: wellKnownData.nancyID,
-        shipName: "Test " + new Date().toISOString()
-      });
+    }).fail(handleFail).fin(done);
 
-      var internationalOrder = em.createEntity('InternationalOrder', {
-        // I thought Jay fixed this?
-        order: order, // sets OrderID and pulls it into the order's manager
-        // orderID: order.getProperty("orderID"),
-        customsDescription: "rare, exotic birds"
-      });
-      
-      em.saveChanges().then(function (data) {
-
-        var orderId = order.getProperty("orderID");
-        var internationalOrderID = internationalOrder.getProperty("orderID");
-
-        equal(internationalOrderID, orderId,
-                "the new internationalOrder should have the same OrderID as its new parent Order, " + orderId);
-        ok(orderId > 0, "the OrderID is positive, indicating it is a permanent order");
-
-      }).fail(handleFail).fin(done);
-
-    });
-
-  testIfNot("can save a Northwind Order & OrderDetail",
-    "mongo", " does not allow primary keys to be shared between collections", function (assert) {
-      var done = assert.async();
-
-      // Create and initialize entity to save
-      var em = newEm();
-
-      var order = em.createEntity('Order', {
-        customerID: wellKnownData.alfredsID,
-        employeeID: wellKnownData.nancyID,
-        shipName: "Test " + new Date().toISOString()
-      });
-
-      var orderDetail1 = em.createEntity('OrderDetail', {
-        order: order, // sets OrderID and pulls it into the order's manager
-        productID: wellKnownData.chaiProductID, // wellKnownData.alfredsOrderDetailKey.ProductID
-        quantity: 5
-      });
-      var orderDetail2 = em.createEntity('OrderDetail', {
-        order: order, // sets OrderID and pulls it into the order's manager
-        productID: wellKnownData.alfredsOrderDetailKey.ProductID,
-        quantity: 6
-      });
-      
-      em.saveChanges().then(function (data) {
-
-        var orderId = order.getProperty("orderID");
-        ok(orderId > 0, "orderID is positive");
-
-      }).fail(handleFail).fin(done);
-
-    });
+  });
 
 
   test("save with date as part of key", function (assert) {
@@ -960,7 +957,7 @@
     dt.setUTCMilliseconds(100);
     var c1 = em.createEntity("Comment", { createdOn: dt, seqNum: 1, comment1: "now is the time for" });
     var c2 = em.createEntity("Comment", { createdOn: dt, seqNum: 2, comment1: "and again" });
-    
+
     em.saveChanges().then(function (sr) {
       var comments = sr.entities;
       ok(comments.length === 2, "should have saved 2 comments");
@@ -973,76 +970,75 @@
     }).fail(handleFail).fin(done);
   });
 
+  testFns.skipIf("mongo,sequelize,hibernate", "does not yet support computed properties").
+  test("computed update", function (assert) {
+    var done = assert.async();
 
-  testIfNot("computed update",
-    "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
-      var done = assert.async();
+    var em = newEm();
+    var q = EntityQuery.from("Employees").take(3);
 
-      var em = newEm();
-      var q = EntityQuery.from("Employees").take(3);
-      
-      em.executeQuery(q).then(function (data) {
-        var emps = data.results;
-        testFns.morphStringProp(emps[0], "lastName");
-        return em.saveChanges();
-      }).then(function (sr) {
-        var ents = sr.entities;
-        ok(ents.length === 1);
-        var emp = ents[0];
-        var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
-        if (testFns.DEBUG_ODATA) {
-          ok(fullName !== emp.getProperty("fullName"), "fullNames will not match with ODATA because no records are returned after save");
-        } else {
-          ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
-        }
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("computed update - mod computed",
-    "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-      var q = EntityQuery.from("Employees").take(3);
-      
-      em.executeQuery(q).then(function (data) {
-        var emps = data.results;
-        testFns.morphStringProp(emps[0], "lastName");
-        emps[0].setProperty("fullName", "xxx");
-        return em.saveChanges();
-      }).then(function (sr) {
-        var ents = sr.entities;
-        ok(ents.length === 1);
-        var emp = ents[0];
-        var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
-        if (testFns.DEBUG_ODATA) {
-          ok(fullName !== emp.getProperty("fullName"), "fullNames will not match with ODATA because no records are returned after save");
-        } else {
-          ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
-        }
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("computed insert",
-    "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
-      var done = assert.async();
-      var em = newEm();
-      var emp = em.createEntity("Employee");
-      emp.setProperty("firstName", "Test fn");
-      emp.setProperty("lastName", "Test ln");
-      emp.setProperty("fullName", "foo");
-      em.addEntity(emp);
-      
-      em.saveChanges().then(function (sr) {
-        var ents = sr.entities;
-        ok(ents.length === 1);
-        ok(ents[0] === emp, "should be the same emp");
-        var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
+    em.executeQuery(q).then(function (data) {
+      var emps = data.results;
+      testFns.morphStringProp(emps[0], "lastName");
+      return em.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      var emp = ents[0];
+      var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
+      if (testFns.DEBUG_ODATA) {
+        ok(fullName !== emp.getProperty("fullName"), "fullNames will not match with ODATA because no records are returned after save");
+      } else {
         ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
+      }
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo,sequelize,hibernate", "does not yet support computed properties").
+  test("computed update - mod computed", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var q = EntityQuery.from("Employees").take(3);
+
+    em.executeQuery(q).then(function (data) {
+      var emps = data.results;
+      testFns.morphStringProp(emps[0], "lastName");
+      emps[0].setProperty("fullName", "xxx");
+      return em.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      var emp = ents[0];
+      var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
+      if (testFns.DEBUG_ODATA) {
+        ok(fullName !== emp.getProperty("fullName"), "fullNames will not match with ODATA because no records are returned after save");
+      } else {
+        ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
+      }
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo,sequelize,hibernate", "does not yet support computed properties").
+  test("computed insert", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var emp = em.createEntity("Employee");
+    emp.setProperty("firstName", "Test fn");
+    emp.setProperty("lastName", "Test ln");
+    emp.setProperty("fullName", "foo");
+    em.addEntity(emp);
+
+    em.saveChanges().then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      ok(ents[0] === emp, "should be the same emp");
+      var fullName = emp.getProperty("lastName") + ", " + emp.getProperty("firstName");
+      ok(fullName === emp.getProperty("fullName"), "fullNames do not match");
 
 
-      }).fail(handleFail).fin(done);
-    });
+    }).fail(handleFail).fin(done);
+  });
 
   test("update with unmapped changes", function (assert) {
     var done = assert.async();
@@ -1051,7 +1047,7 @@
       this.miscData = "asdf";
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    
+
     var q = new EntityQuery("Customers").take(1);
     em1.executeQuery(q).then(function (data) {
       var custType = em1.metadataStore.getEntityType("Customer");
@@ -1076,7 +1072,7 @@
         em1 = newEm(testFns.newMs()),
         extraMetadata;
 
-    
+
     new EntityQuery("Customers").take(1).using(em1).execute().then(function (data) {
       cust = data.results[0];
 
@@ -1113,7 +1109,7 @@
     var em1 = newEm(testFns.newMs());
     var Customer = testFns.models.CustomerWithES5Props();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    
+
     var q = new EntityQuery("Customers").take(1);
     em1.executeQuery(q).then(function (data) {
       var custType = em1.metadataStore.getEntityType("Customer");
@@ -1137,7 +1133,7 @@
       this.miscData = "asdf";
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    
+
     var zzz;
     em1.fetchMetadata().then(function () {
       zzz = createParentAndChildren(em1);
@@ -1160,233 +1156,234 @@
 
   });
 
-  testIfNot("with server reject",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with server reject", function (assert) {
+    var done = assert.async();
 
-      var em = newEm();
+    var em = newEm();
 
-      var user = em.createEntity("Region");
+    var user = em.createEntity("Region");
 
-      user.setProperty("regionDescription", "error here");
-      em.addEntity(user);
-      var hasChanges = em.hasChanges();
-      ok(hasChanges, "should have some changes");
-      
-      em.saveChanges().then(function (sr) {
-        ok(sr.entities.length == 0, "should not have saved anything");
-        hasChanges = em.hasChanges();
-        ok(hasChanges, "should still have some changes because user should have been rejected on the server");
-        // var q2 = EntityQuery.fromEntities(order);
-      }).fail(handleFail).fin(done);
-    });
+    user.setProperty("regionDescription", "error here");
+    em.addEntity(user);
+    var hasChanges = em.hasChanges();
+    ok(hasChanges, "should have some changes");
 
-  testIfNot("with alt resource and server side add",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
+    em.saveChanges().then(function (sr) {
+      ok(sr.entities.length == 0, "should not have saved anything");
+      hasChanges = em.hasChanges();
+      ok(hasChanges, "should still have some changes because user should have been rejected on the server");
+      // var q2 = EntityQuery.fromEntities(order);
+    }).fail(handleFail).fin(done);
+  });
 
-      var em = newEm();
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with alt resource and server side add", function (assert) {
+    var done = assert.async();
 
-      var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1).orderBy("orderID");
-      
-      var order;
-      var freight;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        freight = order.getProperty("freight") + .5;
-        order.setProperty("freight", freight);
+    var em = newEm();
 
-        var so = new SaveOptions({ resourceName: "SaveWithComment", tag: "SaveWithComment - order" });
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).take(1).orderBy("orderID");
 
-        return em.saveChanges(null, so);
-      }).then(function (sr) {
-        ok(sr.entities.length == 2, "should have saved two entities");
-        sr.entities.forEach(function (e) {
-          ok(e.entityAspect, "entities should have an entityAspect after save");
-        });
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var freight2 = order2.getProperty("freight");
-        ok(freight2 == freight, "freight2=" + freight2 + " vs " + freight);
-      }).fail(handleFail).fin(done);
-    });
+    var order;
+    var freight;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight") + .5;
+      order.setProperty("freight", freight);
 
+      var so = new SaveOptions({ resourceName: "SaveWithComment", tag: "SaveWithComment - order" });
 
-  testIfNot("with alt resource and server update",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-
-      var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
-      
-      var order;
-      var freight;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        freight = order.getProperty("freight") + .5;
-        order.setProperty("freight", freight);
-
-        var so = new SaveOptions({ resourceName: "SaveWithFreight2", tag: "freight update" });
-
-        return em.saveChanges(null, so);
-      }).then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved one entity");
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var freight2 = order2.getProperty("freight");
-        ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("with alt resource and server update - ForceUpdate",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-
-      var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
-      
-      var order, freight, shipCountry;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        freight = order.getProperty("freight");
-        shipCountry = testFns.morphString(order.getProperty("shipCountry"));
-        order.setProperty("shipCountry", shipCountry);
-        var so = new SaveOptions({ resourceName: "SaveWithFreight", tag: "freight update-force" });
-        return em.saveChanges(null, so);
-      }).then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved one entity");
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var freight2 = order2.getProperty("freight");
-        ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("with server update - original values fixup",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-
-      var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
-      
-      var order, freight, shipCity;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        freight = order.getProperty("freight");
-        shipCity = testFns.morphString(order.getProperty("shipCountry"));
-        order.setProperty("shipCountry", shipCity);
-        var so = new SaveOptions({ resourceName: "SaveWithFreight", tag: "freight update-ov" });
-        return em.saveChanges(null, so);
-      }).then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved one entity");
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var freight2 = order2.getProperty("freight");
-        ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("with saveOptions exit",
-    "odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-      var zzz = createParentAndChildren(em);
-      var cust1 = zzz.cust1;
-      var so = new SaveOptions({ resourceName: "SaveWithExit", tag: "exit" });
-      
-      em.saveChanges(null, so).then(function (sr) {
-        ok(sr.entities.length == 0);
-      }).fail(handleFail).fin(done);
-
-    });
-
-  testIfNot("adds with EntityErrorsException",
-    "mongo (not yet),odata", "does not support server interception or alt resources", function (assert) {
-      var done = assert.async();
-
-      var em = newEm();
-      var zzz = createParentAndChildren(em);
-      var cust1 = zzz.cust1;
-      var so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
-      var order1ValErrorsChangedArgs = [];
-      zzz.order1.entityAspect.validationErrorsChanged.subscribe(function (e) {
-        order1ValErrorsChangedArgs.push(e);
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 2, "should have saved two entities");
+      sr.entities.forEach(function (e) {
+        ok(e.entityAspect, "entities should have an entityAspect after save");
       });
-      
-      em.saveChanges(null, so).then(function (sr) {
-        ok(false, "should not get here");
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var freight2 = order2.getProperty("freight");
+      ok(freight2 == freight, "freight2=" + freight2 + " vs " + freight);
+    }).fail(handleFail).fin(done);
+  });
 
-      }).fail(function (e) {
-        ok(e.message == "test of custom exception message", "wrong custom error message: " + e.message);
-        ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
-        ok(order1ValErrorsChangedArgs[0].added.length == 1, "should have added 1");
-        ok(order1ValErrorsChangedArgs[0].removed.length == 0, "should have added 1");
-        ok(e.entityErrors, "should have server errors");
-        ok(e.entityErrors.length === 2, "2 order entities should have failed");
-        ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
-        var order2Errs = zzz.order2.entityAspect.getValidationErrors();
-        ok(order2Errs.length === 1, "should be 1 error for order2");
-        ok(order2Errs[0].propertyName === "orderID", "errant property should have been 'orderID'");
-        // now save it properly
-        order1ValErrorsChangedArgs.length = 0;
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with alt resource and server update", function (assert) {
+    var done = assert.async();
 
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(sr.entities.length === 4, "should have saved ok");
-        ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
-        ok(order1ValErrorsChangedArgs[0].added.length == 0, "should have removed 1");
-        ok(order1ValErrorsChangedArgs[0].removed.length == 1, "should have removed 1");
-      }).fail(handleFail).fin(done);
+    var em = newEm();
 
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(1).take(1).orderBy("orderID");
+
+    var order;
+    var freight;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight") + .5;
+      order.setProperty("freight", freight);
+
+      var so = new SaveOptions({ resourceName: "SaveWithFreight2", tag: "freight update" });
+
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var freight2 = order2.getProperty("freight");
+      ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with alt resource and server update - ForceUpdate", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(2).take(1).orderBy("orderID");
+
+    var order, freight, shipCountry;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight");
+      shipCountry = testFns.morphString(order.getProperty("shipCountry"));
+      order.setProperty("shipCountry", shipCountry);
+      var so = new SaveOptions({ resourceName: "SaveWithFreight", tag: "freight update-force" });
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var freight2 = order2.getProperty("freight");
+      ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with server update - original values fixup", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+
+    var q = new EntityQuery("Orders").where("shipCountry", "ne", null).skip(3).take(1).orderBy("orderID");
+
+    var order, freight, shipCity;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      freight = order.getProperty("freight");
+      shipCity = testFns.morphString(order.getProperty("shipCountry"));
+      order.setProperty("shipCountry", shipCity);
+      var so = new SaveOptions({ resourceName: "SaveWithFreight", tag: "freight update-ov" });
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var freight2 = order2.getProperty("freight");
+      ok(freight2 == freight + 1, "freight2=" + freight2 + " vs " + (freight + 1));
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("with saveOptions exit", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var zzz = createParentAndChildren(em);
+    var cust1 = zzz.cust1;
+    var so = new SaveOptions({ resourceName: "SaveWithExit", tag: "exit" });
+
+    em.saveChanges(null, so).then(function (sr) {
+      ok(sr.entities.length == 0);
+    }).fail(handleFail).fin(done);
+
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  skipIf("mongo", "has not yet implemented this").
+  test("adds with EntityErrorsException", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var zzz = createParentAndChildren(em);
+    var cust1 = zzz.cust1;
+    var so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
+    var order1ValErrorsChangedArgs = [];
+    zzz.order1.entityAspect.validationErrorsChanged.subscribe(function (e) {
+      order1ValErrorsChangedArgs.push(e);
     });
 
-  testIfNot("mods with EntityErrorsException",
-    "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
-      var done = assert.async();
+    em.saveChanges(null, so).then(function (sr) {
+      ok(false, "should not get here");
 
-      var em = newEm();
-      var zzz = createParentAndChildren(em);
-      var cust1 = zzz.cust1;
+    }).fail(function (e) {
+      ok(e.message == "test of custom exception message", "wrong custom error message: " + e.message);
+      ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
+      ok(order1ValErrorsChangedArgs[0].added.length == 1, "should have added 1");
+      ok(order1ValErrorsChangedArgs[0].removed.length == 0, "should have added 1");
+      ok(e.entityErrors, "should have server errors");
+      ok(e.entityErrors.length === 2, "2 order entities should have failed");
+      ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
+      var order2Errs = zzz.order2.entityAspect.getValidationErrors();
+      ok(order2Errs.length === 1, "should be 1 error for order2");
+      ok(order2Errs[0].propertyName === "orderID", "errant property should have been 'orderID'");
+      // now save it properly
+      order1ValErrorsChangedArgs.length = 0;
 
-      
-      em.saveChanges().then(function (sr) {
-        zzz.cust1.setProperty("contactName", "foo");
-        zzz.cust2.setProperty("contactName", "foo");
-        zzz.order1.setProperty("freight", 888.11);
-        zzz.order2.setProperty("freight", 888.11);
-        ok(zzz.cust1.entityAspect.entityState.isModified(), "cust1 should be modified");
-        ok(zzz.order1.entityAspect.entityState.isModified(), "order1 should be modified");
-        var so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
-        return em.saveChanges(null, so);
-      }).then(function (sr2) {
-        ok(false, "should not get here");
-      }).fail(function (e) {
-        ok(e.message == "test of custom exception message", "wrong custom error message: " + e.message);
-        ok(e.entityErrors, "should have server errors");
-        ok(e.entityErrors.length === 2, "2 order entities should have failed");
-        ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
-        var order2Errs = zzz.order2.entityAspect.getValidationErrors();
-        ok(order2Errs.length === 1, "should be 1 error for order2");
-        ok(order2Errs[0].propertyName === "orderID", "errant property should have been 'orderID'");
-        // now save it properly
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(sr.entities.length === 4, "should have saved ok");
-      }).fail(handleFail).fin(done);
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(sr.entities.length === 4, "should have saved ok");
+      ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
+      ok(order1ValErrorsChangedArgs[0].added.length == 0, "should have removed 1");
+      ok(order1ValErrorsChangedArgs[0].removed.length == 1, "should have removed 1");
+    }).fail(handleFail).fin(done);
 
-    });
+  });
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  skipIf("mongo", "has not yet implemented this").
+  test("mods with EntityErrorsException", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var zzz = createParentAndChildren(em);
+    var cust1 = zzz.cust1;
+
+
+    em.saveChanges().then(function (sr) {
+      zzz.cust1.setProperty("contactName", "foo");
+      zzz.cust2.setProperty("contactName", "foo");
+      zzz.order1.setProperty("freight", 888.11);
+      zzz.order2.setProperty("freight", 888.11);
+      ok(zzz.cust1.entityAspect.entityState.isModified(), "cust1 should be modified");
+      ok(zzz.order1.entityAspect.entityState.isModified(), "order1 should be modified");
+      var so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
+      return em.saveChanges(null, so);
+    }).then(function (sr2) {
+      ok(false, "should not get here");
+    }).fail(function (e) {
+      ok(e.message == "test of custom exception message", "wrong custom error message: " + e.message);
+      ok(e.entityErrors, "should have server errors");
+      ok(e.entityErrors.length === 2, "2 order entities should have failed");
+      ok(zzz.order1.entityAspect.getValidationErrors().length === 1);
+      var order2Errs = zzz.order2.entityAspect.getValidationErrors();
+      ok(order2Errs.length === 1, "should be 1 error for order2");
+      ok(order2Errs[0].propertyName === "orderID", "errant property should have been 'orderID'");
+      // now save it properly
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(sr.entities.length === 4, "should have saved ok");
+    }).fail(handleFail).fin(done);
+
+  });
 
   test("with client side validation error", function (assert) {
     var done = assert.async();
@@ -1394,7 +1391,7 @@
     var zzz = createParentAndChildren(em);
     var cust1 = zzz.cust1;
     cust1.setProperty("companyName", null);
-    
+
     em.saveChanges().then(function (sr) {
       ok(false, "should not get here");
     }).fail(function (e) {
@@ -1407,50 +1404,52 @@
     }).fin(done);
   });
 
-  testIfNot("with server side entity level validation error",
-    "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
-      var done = assert.async();
-      var em = newEm();
-      var zzz = createParentAndChildren(em);
-      var cust1 = zzz.cust1;
-      cust1.setProperty("companyName", "error");
-      
-      em.saveChanges().then(function (sr) {
-        ok(false, "should not get here");
-      }).fail(function (e) {
-        ok(e.entityErrors, "should be a server error");
-        ok(e.entityErrors.length === 1, "should be only one server error");
-        var errors = cust1.entityAspect.getValidationErrors();
-        ok(errors[0].errorMessage === e.entityErrors[0].errorMessage, "error message should appear on the cust");
-      }).fin(done);
-    });
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  skipIf("mongo", "has not yet implemented this").
+  test("with server side entity level validation error", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var zzz = createParentAndChildren(em);
+    var cust1 = zzz.cust1;
+    cust1.setProperty("companyName", "error");
 
-  testIfNot("with server side entity level validation error + repeat",
-    "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
-      var done = assert.async();
+    em.saveChanges().then(function (sr) {
+      ok(false, "should not get here");
+    }).fail(function (e) {
+      ok(e.entityErrors, "should be a server error");
+      ok(e.entityErrors.length === 1, "should be only one server error");
+      var errors = cust1.entityAspect.getValidationErrors();
+      ok(errors[0].errorMessage === e.entityErrors[0].errorMessage, "error message should appear on the cust");
+    }).fin(done);
+  });
 
-      var em = newEm();
-      var zzz = createParentAndChildren(em);
-      var cust1 = zzz.cust1;
-      cust1.setProperty("companyName", "error");
-      
-      em.saveChanges().then(function (sr) {
-        ok(false, "should not get here");
-      }).fail(function (e) {
-        ok(e.entityErrors, "should be a server error");
-        ok(e.entityErrors.length === 1, "should be only one server error");
-        var errors = cust1.entityAspect.getValidationErrors();
-        ok(errors.length === 1, "should only be 1 error");
-        ok(errors[0].errorMessage === e.entityErrors[0].errorMessage, "error message should appear on the cust");
-        return em.saveChanges();
-      }).fail(function (e2) {
-        ok(e2.entityErrors, "should be a server error");
-        ok(e2.entityErrors.length === 1, "should be only one server error");
-        var errors = cust1.entityAspect.getValidationErrors();
-        ok(errors.length === 1, "should only be 1 error");
-        ok(errors[0].errorMessage === e2.entityErrors[0].errorMessage, "error message should appear on the cust");
-      }).fin(done);
-    });
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  skipIf("mongo", "has not yet implemented this").
+  test("with server side entity level validation error + repeat", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var zzz = createParentAndChildren(em);
+    var cust1 = zzz.cust1;
+    cust1.setProperty("companyName", "error");
+
+    em.saveChanges().then(function (sr) {
+      ok(false, "should not get here");
+    }).fail(function (e) {
+      ok(e.entityErrors, "should be a server error");
+      ok(e.entityErrors.length === 1, "should be only one server error");
+      var errors = cust1.entityAspect.getValidationErrors();
+      ok(errors.length === 1, "should only be 1 error");
+      ok(errors[0].errorMessage === e.entityErrors[0].errorMessage, "error message should appear on the cust");
+      return em.saveChanges();
+    }).fail(function (e2) {
+      ok(e2.entityErrors, "should be a server error");
+      ok(e2.entityErrors.length === 1, "should be only one server error");
+      var errors = cust1.entityAspect.getValidationErrors();
+      ok(errors.length === 1, "should only be 1 error");
+      ok(errors[0].errorMessage === e2.entityErrors[0].errorMessage, "error message should appear on the cust");
+    }).fin(done);
+  });
 
 
   test("delete unsaved entity", function (assert) {
@@ -1459,7 +1458,7 @@
     ok(realEm.hasChanges() === false, "The entity manager must not have changes");
     var query = EntityQuery.from("Customers")
         .where(testFns.customerKeyName, "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
-    
+
     var cust;
     realEm.executeQuery(query).then(function (data) {
       cust = data.results[0];
@@ -1489,7 +1488,7 @@
     }
     ok(recentArgs.hasChanges === true);
 
-    
+
     var startMs = Date.now();
     var endMs;
     em.saveChanges().then(function (sr) {
@@ -1513,7 +1512,7 @@
     }
     ok(recentArgs.hasChanges === true);
 
-    
+
     var startMs = Date.now();
     var endMs;
     em.saveChanges().then(function (sr) {
@@ -1529,7 +1528,7 @@
     var done = assert.async();
     var em = newEm();
     var q = new EntityQuery("Customers");
-    
+
     q.using(em).execute().then(function (data) {
       return em.saveChanges();
     }).then(function (sr) {
@@ -1539,108 +1538,108 @@
     }).fail(handleFail).fin(done);
   });
 
-  testIfNot("data with millseconds - UTC time - IE bug",
-    "sequelize/MySQL,hibernate/MySQL", "does not support millisecond resolution", function (assert) {
-      var done = assert.async();
+  testFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
+  test("data with millseconds - UTC time - IE bug", function (assert) {
+    var done = assert.async();
 
 
-      var em = newEm();
-      var dt = new Date(Date.parse("2012-12-17T13:35:15.690Z"));
-      var offset = dt.getTimezoneOffset() * 60000;
-      var dt1 = new Date(dt.getTime() - offset);
-      var dt2 = new Date(dt.getTime() + offset);
-      var ms = dt.getUTCMilliseconds();
-      ok(ms === 690);
-      var q = new EntityQuery("Orders").where("shippedDate", "!=", dt).take(1);
-      
-      var order;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        order.setProperty("shippedDate", dt);
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved one entity");
-        var sameOrder = sr.entities[0];
-        ok(order === sameOrder, "should be the sameOrder");
-        var sameDt = sameOrder.getProperty("shippedDate");
-        ok(dt.getTime() === sameDt.getTime(), "should be the same date");
-        var em2 = newEm();
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em2).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var sameDt2 = order2.getProperty("shippedDate");
-        ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
-      }).fail(handleFail).fin(done);
-    });
+    var em = newEm();
+    var dt = new Date(Date.parse("2012-12-17T13:35:15.690Z"));
+    var offset = dt.getTimezoneOffset() * 60000;
+    var dt1 = new Date(dt.getTime() - offset);
+    var dt2 = new Date(dt.getTime() + offset);
+    var ms = dt.getUTCMilliseconds();
+    ok(ms === 690);
+    var q = new EntityQuery("Orders").where("shippedDate", "!=", dt).take(1);
 
-  testIfNot("data with millseconds - local time",
-    "sequelize/MySQL,hibernate/MySQL", "does not support millisecond resolution", function (assert) {
-      var done = assert.async();
+    var order;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      order.setProperty("shippedDate", dt);
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      var sameOrder = sr.entities[0];
+      ok(order === sameOrder, "should be the sameOrder");
+      var sameDt = sameOrder.getProperty("shippedDate");
+      ok(dt.getTime() === sameDt.getTime(), "should be the same date");
+      var em2 = newEm();
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em2).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var sameDt2 = order2.getProperty("shippedDate");
+      ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
+    }).fail(handleFail).fin(done);
+  });
 
-      var em = newEm();
-      // Date.parse("2012-12-17T13:35:15.690");
-      var dt = new Date(2012, 11, 17, 13, 35, 15, 690); // local time
-      var ms = dt.getMilliseconds();
-      ok(ms === 690);
-      var q = new EntityQuery("Orders").take(1);
-      
-      var order;
-      q.using(em).execute().then(function (data) {
-        order = data.results[0];
-        order.setProperty("shippedDate", dt);
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(sr.entities.length == 1, "should have saved one entity");
-        var sameOrder = sr.entities[0];
-        ok(order === sameOrder, "should be the sameOrder");
-        var sameDt = sameOrder.getProperty("shippedDate");
-        ok(dt.getTime() === sameDt.getTime(), "should be the same date");
-        var em2 = newEm();
-        var q2 = EntityQuery.fromEntities(order);
-        return q2.using(em2).execute();
-      }).then(function (data2) {
-        var order2 = data2.results[0];
-        var sameDt2 = order2.getProperty("shippedDate");
-        ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
-      }).fail(handleFail).fin(done);
-    });
+  testFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
+  test("data with millseconds - local time", function (assert) {
+    var done = assert.async();
 
-  testIfNot("custom data annotation validation",
-    "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
-      var done = assert.async();
+    var em = newEm();
+    // Date.parse("2012-12-17T13:35:15.690");
+    var dt = new Date(2012, 11, 17, 13, 35, 15, 690); // local time
+    var ms = dt.getMilliseconds();
+    ok(ms === 690);
+    var q = new EntityQuery("Orders").take(1);
 
-      // This test will fail currently with the DATABASEFIRST_OLD define.
-      // This is because ObjectContext.SaveChanges() does not automatically validate
-      // entities. It must be done manually.
-      var em = newEm();
-      var q = new EntityQuery("Customers").skip(20).take(1).orderBy("contactName");
-      
-      var cust1;
-      q.using(em).execute().then(function (data) {
-        ok(data.results.length === 1);
-        cust1 = data.results[0];
-        var region = cust1.getProperty("contactName");
-        var newRegion = region == "Error" ? "Error again" : "Error";
-        cust1.setProperty("contactName", newRegion);
-        return em.saveChanges();
-      }).then(function (sr) {
-        ok(false, "shouldn't get here - except with DATABASEFIRST_OLD");
-      }).fail(function (error) {
-        ok(error.entityErrors, "should be some server errors");
-        ok(error.entityErrors.length === 1, "should be 1 server error");
-        ok(error.entityErrors[0].errorMessage.indexOf("the word 'Error'") > 0, "incorrect error message");
-        var custErrors = cust1.entityAspect.getValidationErrors();
-        ok(error.entityErrors[0].errorMessage === custErrors[0].errorMessage);
-        // ok(error.message.indexOf("the word 'Error'") > 0, "incorrect error message");
-      }).fin(done);
-    });
+    var order;
+    q.using(em).execute().then(function (data) {
+      order = data.results[0];
+      order.setProperty("shippedDate", dt);
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      var sameOrder = sr.entities[0];
+      ok(order === sameOrder, "should be the sameOrder");
+      var sameDt = sameOrder.getProperty("shippedDate");
+      ok(dt.getTime() === sameDt.getTime(), "should be the same date");
+      var em2 = newEm();
+      var q2 = EntityQuery.fromEntities(order);
+      return q2.using(em2).execute();
+    }).then(function (data2) {
+      var order2 = data2.results[0];
+      var sameDt2 = order2.getProperty("shippedDate");
+      ok(dt.getTime() === sameDt2.getTime(), "should be the same date: " + dt.toString() + " != " + sameDt2.toString());
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
+  test("custom data annotation validation", function (assert) {
+    var done = assert.async();
+
+    // This test will fail currently with the DATABASEFIRST_OLD define.
+    // This is because ObjectContext.SaveChanges() does not automatically validate
+    // entities. It must be done manually.
+    var em = newEm();
+    var q = new EntityQuery("Customers").skip(20).take(1).orderBy("contactName");
+
+    var cust1;
+    q.using(em).execute().then(function (data) {
+      ok(data.results.length === 1);
+      cust1 = data.results[0];
+      var region = cust1.getProperty("contactName");
+      var newRegion = region == "Error" ? "Error again" : "Error";
+      cust1.setProperty("contactName", newRegion);
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(false, "shouldn't get here - except with DATABASEFIRST_OLD");
+    }).fail(function (error) {
+      ok(error.entityErrors, "should be some server errors");
+      ok(error.entityErrors.length === 1, "should be 1 server error");
+      ok(error.entityErrors[0].errorMessage.indexOf("the word 'Error'") > 0, "incorrect error message");
+      var custErrors = cust1.entityAspect.getValidationErrors();
+      ok(error.entityErrors[0].errorMessage === custErrors[0].errorMessage);
+      // ok(error.message.indexOf("the word 'Error'") > 0, "incorrect error message");
+    }).fin(done);
+  });
 
   test("date", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = new EntityQuery("Orders").where("orderDate", '!=', null).take(10);
-    
+
     var order, orderDate, newOrderDate;
     q.using(em).execute().then(function (data) {
       var r = data.results;
@@ -1676,7 +1675,7 @@
       this.miscData = "asdf";
     });
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    
+
     var q = new EntityQuery("Customers")
         .where("companyName", "startsWith", "C");
     q.using(em1).execute().then(function (data) {
@@ -1705,7 +1704,7 @@
     var Customer = testFns.models.CustomerWithES5Props();
 
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
-    
+
     var q = new EntityQuery("Customers")
         .where("companyName", "startsWith", "C");
     q.using(em1).execute().then(function (data) {
@@ -1735,7 +1734,7 @@
     });
     var zzz = createParentAndChildren(em);
     ok(recentArgs.hasChanges === true);
-    
+
     em.saveChanges(null, null).then(function (saveResult) {
       ok(recentArgs.hasChanges === false);
       ok(zzz.cust1.entityAspect.entityState.isUnchanged());
@@ -1761,7 +1760,7 @@
     var q = new EntityQuery()
         .from("Customers")
         .take(2);
-    
+
 
     em.executeQuery(q).then(function (data) {
       // query cust
@@ -1796,7 +1795,7 @@
         .from("Products")
         .take(2);
 
-    
+
     var prod;
 
     em.executeQuery(q).then(function (data) {
@@ -1823,7 +1822,7 @@
         .from("Products")
         .take(2);
 
-    
+
     var prod;
 
     em.executeQuery(q).then(function (data) {
@@ -1852,7 +1851,7 @@
         .from("Customers")
         .where("companyName", "startsWith", "C")
         .take(2);
-    
+
     var newCompanyName, cust;
     em.executeQuery(query).then(function (data) {
       cust = data.results[0];
@@ -1882,7 +1881,7 @@
   test("modify parent and children", function (assert) {
     var done = assert.async();
     var em = newEm();
-    
+
     var cust;
     saveNewCustAndOrders(em).then(function (savedCust) {
       cust = savedCust;
@@ -1926,13 +1925,13 @@
     }).fail(handleFail).fin(done);
   });
 
-  
+
 
   test("delete parent, children stranded", function (assert) {
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       zzz.cust1.entityAspect.setDeleted();
       var order1custid = zzz.order1.getProperty("customerID");
@@ -1953,7 +1952,7 @@
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       ok(!em.hasChanges());
       zzz.cust1.entityAspect.setDeleted();
@@ -1977,7 +1976,7 @@
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       ok(!em.hasChanges());
       zzz.cust1.entityAspect.setDeleted();
@@ -2000,7 +1999,7 @@
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       var orders = zzz.cust1.getProperty("orders");
       ok(zzz.order1 === orders[0]);
@@ -2028,7 +2027,7 @@
     var em = newEm();
     var em2 = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     var cust;
     em.saveChanges().then(function (saveResult) {
       var q = EntityQuery.fromEntities(zzz.cust1);
@@ -2060,7 +2059,7 @@
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       zzz.order1.entityAspect.setDeleted();
       ok(zzz.cust1.getProperty("orders").length === 1, "should only be 1 order now");
@@ -2080,7 +2079,7 @@
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
-    
+
     em.saveChanges().then(function (saveResult) {
       zzz.cust1.entityAspect.setDeleted();
       zzz.order1.setProperty("customer", zzz.cust2);
@@ -2104,7 +2103,7 @@
         .from("Customers")
         .take(2);
 
-    
+
     var cust;
     var sameCust;
     em.executeQuery(q).then(function (data) {
@@ -2147,7 +2146,7 @@
         .from(resourceName)
         .take(2);
 
-    
+
     var em2;
     em.executeQuery(q).then(function (data) {
       var o = data.results[0];
@@ -2173,243 +2172,244 @@
     }).fin(done);
   });
 
-  testIfNot("insert using existing entity re-attached",
-    "odata (does not support this),mongo,hibernate,sequelize", "does not have a TimeGroup table", function(assert) {
-      var done = assert.async();
-      var em = newEm();
-      var q = new EntityQuery()
-          .from("TimeGroups")
-          .take(2);
-      var tg = "test";
-      
-      em.executeQuery(q).then(function (data) {
+  testFns.skipIf("mongo,hibernate,sequelize", "does not have a TimeGroup table").
+  skipIf("odata", "does not support this feature").
+  test("insert using existing entity re-attached", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var q = new EntityQuery()
+        .from("TimeGroups")
+        .take(2);
+    var tg = "test";
 
-        if (data.results.length == 0) {
-          tg = em.createEntity("TimeGroup", { comment: "trigger" });
-        } else {
-          tg = data.results[0];
-          testFns.morphStringProp(tg, "comment");
-        }
-        return em.saveChanges();
-      }).then(function (sr) {
-        var tg1 = sr.entities[0];
-        ok(tg1 == tg, "should be the same");
+    em.executeQuery(q).then(function (data) {
 
-        em.detachEntity(tg);
-        tg.Id = -1;
-        em.attachEntity(tg, breeze.EntityState.Added);
-        tg.setProperty("comment", "This was re-attached");
-        return em.saveChanges();
-      }).then(function (sr2) {
-        ok(true, "save successful");
-      }).fail(handleFail).fin(done);
-    });
+      if (data.results.length == 0) {
+        tg = em.createEntity("TimeGroup", { comment: "trigger" });
+      } else {
+        tg = data.results[0];
+        testFns.morphStringProp(tg, "comment");
+      }
+      return em.saveChanges();
+    }).then(function (sr) {
+      var tg1 = sr.entities[0];
+      ok(tg1 == tg, "should be the same");
 
-  testIfNot("insert with generated key",
-    "odata", "does not support custom server side key generation", function(assert) {
-      var done = assert.async();
-      var em = newEm();
+      em.detachEntity(tg);
+      tg.Id = -1;
+      em.attachEntity(tg, breeze.EntityState.Added);
+      tg.setProperty("comment", "This was re-attached");
+      return em.saveChanges();
+    }).then(function (sr2) {
+      ok(true, "save successful");
+    }).fail(handleFail).fin(done);
+  });
 
-      var region1 = createRegion(em, "1");
-      var k1 = region1.entityAspect.getKey();
+  testFns.skipIf("odata", "does not support custom server side key generation").
+  test("insert with generated key", function (assert) {
+    var done = assert.async();
+    var em = newEm();
 
-      var region2 = createRegion(em, "2");
-      var k2 = region2.entityAspect.getKey();
+    var region1 = createRegion(em, "1");
+    var k1 = region1.entityAspect.getKey();
 
-      
-      em.saveChanges().then(function (data) {
-        ok(!em.hasChanges());
-        ok(data.entities.length === 2);
-        ok(!region1.entityAspect.getKey().equals(k1));
-        ok(!region2.entityAspect.getKey().equals(k2));
-        return data;
-      }).then(function (data2) {
-        // curious about synchronous results
-        ok(data2.entities.length == 2);
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("insert uni (1-n) relationships with generated key",
-    "odata", "does not support custom server side key generation", function(assert) {
-      var done = assert.async();
-      var em = newEm();
-
-      var region1 = createRegion(em, "1");
-      var k1 = region1.entityAspect.getKey();
-      var terrs1 = region1.getProperty("territories");
-      var terr1a = createTerritory(em, "test 1a");
-      var terr1b = createTerritory(em, "test 1b");
-      terrs1.push(terr1a);
-      terrs1.push(terr1b);
-
-      var region2 = createRegion(em, "2");
-      var k2 = region2.entityAspect.getKey();
-      var terrs2 = region2.getProperty("territories");
-      var terr2a = createTerritory(em, "test 2a");
-      var terr2b = createTerritory(em, "test 2b");
-      terrs2.push(terr2a);
-      terrs2.push(terr2b);
-
-      ok(region1.getProperty("territories").length === 2, "should have two terrs");
-      ok(region2.getProperty("territories").length === 2, "should have two terrs");
-
-      
-      var terrs1x, terrs2x, region1y, terrs1y;
-      var em2 = newEm();
-      em.saveChanges().then(function (data) {
-        ok(!em.hasChanges());
-
-        ok(data.entities.length === 6);
-        ok(!region1.entityAspect.getKey().equals(k1));
-        terrs1x = region1.getProperty("territories");
-        ok(terrs1x === terrs1, "territories should be the same");
-        ok(terrs1x.length == 2, "terrs1 - length should be 2");
-        ok(!region2.entityAspect.getKey().equals(k2));
-        terrs2x = region2.getProperty("territories");
-        ok(terrs2x === terrs2, "territories should be the same");
-        ok(terrs2x.length == 2, "terrs2 - length should be 2");
-        ok(terrs2x[0].getProperty("regionID") === region2.getProperty(testFns.regionKeyName), "regionId should have been updated");
-        // now move them all onto region1;
-        terrs2x.slice(0).forEach(function (t) {
-          t.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
-        });
-        ok(terrs1x.length == 4, "terrs1x should now be length 4");
-        ok(terrs2x.length == 0, "terrs2x should now be length 0");
-        return em.saveChanges();
-      }).then(function (sr2) {
-        ok(sr2.entities.length == 2, "should have saved 2 recs");
-        ok(terrs1x.length == 4, "terrs1x should now be length 4");
-        ok(terrs2x.length == 0, "terrs2x should now be length 0");
-        return EntityQuery.fromEntities(region1).using(em2).execute();
-      }).then(function (data3) {
-        region1y = data3.results[0];
-        terrs1y = region1y.getProperty("territories");
-        return terrs1y.load();
-      }).then(function (data4) {
-        ok(data4.results.length === 4, "should be 4 terrs");
-        ok(terrs1y.length === 4, "terrs1y should be of length 4");
-
-      }).fail(handleFail).fin(done);
-    });
+    var region2 = createRegion(em, "2");
+    var k2 = region2.entityAspect.getKey();
 
 
-  testIfNot("insert uni (1-n) relationships with generated key - v2",
-    "mongo does not yet support 'expand',odata does not support custom server side key generation", "", function(assert) {
-      var done = assert.async();
+    em.saveChanges().then(function (data) {
+      ok(!em.hasChanges());
+      ok(data.entities.length === 2);
+      ok(!region1.entityAspect.getKey().equals(k1));
+      ok(!region2.entityAspect.getKey().equals(k2));
+      return data;
+    }).then(function (data2) {
+      // curious about synchronous results
+      ok(data2.entities.length == 2);
+    }).fail(handleFail).fin(done);
+  });
 
-      var em = newEm();
-      var em2 = newEm();
+  testFns.skipIf("odata", "does not support custom server side key generation").
+  test("insert uni (1-n) relationships with generated key", function (assert) {
+    var done = assert.async();
+    var em = newEm();
 
-      var region1 = createRegion(em, "1");
-      var k1 = region1.entityAspect.getKey();
-      var terrs1 = region1.getProperty("territories");
-      var terr1a = createTerritory(em, "test 1a");
-      var terr1b = createTerritory(em, "test 1b");
-      terr1a.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
-      terr1b.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+    var region1 = createRegion(em, "1");
+    var k1 = region1.entityAspect.getKey();
+    var terrs1 = region1.getProperty("territories");
+    var terr1a = createTerritory(em, "test 1a");
+    var terr1b = createTerritory(em, "test 1b");
+    terrs1.push(terr1a);
+    terrs1.push(terr1b);
 
-      var region2 = createRegion(em, "2");
-      var k2 = region2.entityAspect.getKey();
-      var terrs2 = region2.getProperty("territories");
-      var terr2a = createTerritory(em, "test 2a");
-      var terr2b = createTerritory(em, "test 2b");
-      terr2a.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
-      terr2b.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
+    var region2 = createRegion(em, "2");
+    var k2 = region2.entityAspect.getKey();
+    var terrs2 = region2.getProperty("territories");
+    var terr2a = createTerritory(em, "test 2a");
+    var terr2b = createTerritory(em, "test 2b");
+    terrs2.push(terr2a);
+    terrs2.push(terr2b);
 
-      ok(region1.getProperty("territories").length === 2, "should have two terrs");
-      ok(region2.getProperty("territories").length === 2, "should have two terrs");
-
-      var terrs1x, terrs2x, region1ID, region1y, terrs1y;
-
-      
-      em.saveChanges().then(function (data) {
-        ok(!em.hasChanges());
-        ok(data.entities.length === 6);
-        ok(!region1.entityAspect.getKey().equals(k1));
-        terrs1x = region1.getProperty("territories");
-        ok(terrs1x === terrs1, "territories should be the same");
-        ok(terrs1x.length == 2, "terrs1 - length should be 2");
-        ok(!region2.entityAspect.getKey().equals(k2));
-        terrs2x = region2.getProperty("territories");
-        ok(terrs2x === terrs2, "territories should be the same");
-        ok(terrs2x.length == 2, "terrs2 - length should be 2");
-        ok(terrs2x[0].getProperty("regionID") === region2.getProperty(testFns.regionKeyName), "regionId should have been updated");
-        // now move them all onto region1;
-        terrs2x.slice(0).forEach(function (t) {
-          terrs1x.push(t);
-        });
-        ok(terrs1x.length == 4, "terrs1x should now be length 4");
-        ok(terrs2x.length == 0, "terrs2x should now be length 0");
-        return em.saveChanges();
-      }).then(function (sr2) {
-        ok(sr2.entities.length == 2, "should have saved 2 recs");
-        ok(terrs1x.length == 4, "terrs1x should now be length 4");
-        ok(terrs2x.length == 0, "terrs2x should now be length 0");
-        return EntityQuery.fromEntities(region1).expand("territories").using(em).execute();
-      }).then(function (data3) {
-        ok(data3.results.length === 1, "should be 1 region");
-        ok(region1 === data3.results[0], "should be same region");
-        ok(terrs1x.length === 4, "terrs1x should be of length 4");
-        return EntityQuery.fromEntities(region1).expand("territories").using(em2).execute();
-      }).then(function (data4) {
-        ok(data4.results.length === 1, "should be 1 region");
-        terrs1y = data4.results[0].getProperty("territories");
-        ok(terrs1y.length === 4, "should still be 4 recs");
-      }).fail(handleFail).fin(done);
-    });
-
-  testIfNot("insert uni (1-n) relationships with unattached children - v3",
-    "odata", "does not support custom server side key generation (except identity)", function(assert) {
-      var done = assert.async();
-
-      var em = newEm();
-      var em2 = newEm();
-
-      var region1 = createRegion(em, "1");
-      var k1 = region1.entityAspect.getKey();
-      var terrs1 = region1.getProperty("territories");
-      var terr1a = createTerritory(em, "test 1a");
-      var terr1b = createTerritory(em, "test 1b");
-      terr1a.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
-      terr1b.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
-
-      var region2 = createRegion(em, "2");
-      var k2 = region2.entityAspect.getKey();
-      var terrs2 = region2.getProperty("territories");
-      var terr2a = createTerritory(em, "test 2a");
-      var terr2b = createTerritory(em, "test 2b");
-      terr2a.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
-      terr2b.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
-
-      ok(region1.getProperty("territories").length === 2, "should have two terrs");
-      ok(region2.getProperty("territories").length === 2, "should have two terrs");
-      var terrs1x, terrs2x, region1ID, region1y, terrs1y;
+    ok(region1.getProperty("territories").length === 2, "should have two terrs");
+    ok(region2.getProperty("territories").length === 2, "should have two terrs");
 
 
-      
-      em.saveChanges().then(function (data) {
-        ok(!em.hasChanges());
-        ok(data.entities.length === 6);
-        ok(!region1.entityAspect.getKey().equals(k1));
-        var territories = em.getEntities("Territory");
-        return EntityQuery.fromEntities(territories).using(em2).execute();
-      }).then(function (data2) {
-        ok(data2.results.length === 4, "should be 4 recs");
-        return EntityQuery.fromEntities(region1).using(em2).execute();
-      }).then(function (data3) {
-        ok(data3.results.length === 1, "should be 1 rec");
-        var region1a = data3.results[0];
-        var terrs1a = region1a.getProperty("territories");
-        ok(terrs1a.length == 2, "should be 2 terrs in region1");
-      }).fail(handleFail).fin(done);
-    });
+    var terrs1x, terrs2x, region1y, terrs1y;
+    var em2 = newEm();
+    em.saveChanges().then(function (data) {
+      ok(!em.hasChanges());
+
+      ok(data.entities.length === 6);
+      ok(!region1.entityAspect.getKey().equals(k1));
+      terrs1x = region1.getProperty("territories");
+      ok(terrs1x === terrs1, "territories should be the same");
+      ok(terrs1x.length == 2, "terrs1 - length should be 2");
+      ok(!region2.entityAspect.getKey().equals(k2));
+      terrs2x = region2.getProperty("territories");
+      ok(terrs2x === terrs2, "territories should be the same");
+      ok(terrs2x.length == 2, "terrs2 - length should be 2");
+      ok(terrs2x[0].getProperty("regionID") === region2.getProperty(testFns.regionKeyName), "regionId should have been updated");
+      // now move them all onto region1;
+      terrs2x.slice(0).forEach(function (t) {
+        t.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+      });
+      ok(terrs1x.length == 4, "terrs1x should now be length 4");
+      ok(terrs2x.length == 0, "terrs2x should now be length 0");
+      return em.saveChanges();
+    }).then(function (sr2) {
+      ok(sr2.entities.length == 2, "should have saved 2 recs");
+      ok(terrs1x.length == 4, "terrs1x should now be length 4");
+      ok(terrs2x.length == 0, "terrs2x should now be length 0");
+      return EntityQuery.fromEntities(region1).using(em2).execute();
+    }).then(function (data3) {
+      region1y = data3.results[0];
+      terrs1y = region1y.getProperty("territories");
+      return terrs1y.load();
+    }).then(function (data4) {
+      ok(data4.results.length === 4, "should be 4 terrs");
+      ok(terrs1y.length === 4, "terrs1y should be of length 4");
+
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support custom server side key generation").
+  skipIf("mongo", "does not support 'expand'").
+  test("insert uni (1-n) relationships with generated key - v2", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var em2 = newEm();
+
+    var region1 = createRegion(em, "1");
+    var k1 = region1.entityAspect.getKey();
+    var terrs1 = region1.getProperty("territories");
+    var terr1a = createTerritory(em, "test 1a");
+    var terr1b = createTerritory(em, "test 1b");
+    terr1a.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+    terr1b.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+
+    var region2 = createRegion(em, "2");
+    var k2 = region2.entityAspect.getKey();
+    var terrs2 = region2.getProperty("territories");
+    var terr2a = createTerritory(em, "test 2a");
+    var terr2b = createTerritory(em, "test 2b");
+    terr2a.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
+    terr2b.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
+
+    ok(region1.getProperty("territories").length === 2, "should have two terrs");
+    ok(region2.getProperty("territories").length === 2, "should have two terrs");
+
+    var terrs1x, terrs2x, region1ID, region1y, terrs1y;
+
+
+    em.saveChanges().then(function (data) {
+      ok(!em.hasChanges());
+      ok(data.entities.length === 6);
+      ok(!region1.entityAspect.getKey().equals(k1));
+      terrs1x = region1.getProperty("territories");
+      ok(terrs1x === terrs1, "territories should be the same");
+      ok(terrs1x.length == 2, "terrs1 - length should be 2");
+      ok(!region2.entityAspect.getKey().equals(k2));
+      terrs2x = region2.getProperty("territories");
+      ok(terrs2x === terrs2, "territories should be the same");
+      ok(terrs2x.length == 2, "terrs2 - length should be 2");
+      ok(terrs2x[0].getProperty("regionID") === region2.getProperty(testFns.regionKeyName), "regionId should have been updated");
+      // now move them all onto region1;
+      terrs2x.slice(0).forEach(function (t) {
+        terrs1x.push(t);
+      });
+      ok(terrs1x.length == 4, "terrs1x should now be length 4");
+      ok(terrs2x.length == 0, "terrs2x should now be length 0");
+      return em.saveChanges();
+    }).then(function (sr2) {
+      ok(sr2.entities.length == 2, "should have saved 2 recs");
+      ok(terrs1x.length == 4, "terrs1x should now be length 4");
+      ok(terrs2x.length == 0, "terrs2x should now be length 0");
+      return EntityQuery.fromEntities(region1).expand("territories").using(em).execute();
+    }).then(function (data3) {
+      ok(data3.results.length === 1, "should be 1 region");
+      ok(region1 === data3.results[0], "should be same region");
+      ok(terrs1x.length === 4, "terrs1x should be of length 4");
+      return EntityQuery.fromEntities(region1).expand("territories").using(em2).execute();
+    }).then(function (data4) {
+      ok(data4.results.length === 1, "should be 1 region");
+      terrs1y = data4.results[0].getProperty("territories");
+      ok(terrs1y.length === 4, "should still be 4 recs");
+    }).fail(handleFail).fin(done);
+  });
+
+  testFns.skipIf("odata", "does not support custom server side key generation (except identity)").
+  test("insert uni (1-n) relationships with unattached children - v3", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var em2 = newEm();
+
+    var region1 = createRegion(em, "1");
+    var k1 = region1.entityAspect.getKey();
+    var terrs1 = region1.getProperty("territories");
+    var terr1a = createTerritory(em, "test 1a");
+    var terr1b = createTerritory(em, "test 1b");
+    terr1a.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+    terr1b.setProperty("regionID", region1.getProperty(testFns.regionKeyName));
+
+    var region2 = createRegion(em, "2");
+    var k2 = region2.entityAspect.getKey();
+    var terrs2 = region2.getProperty("territories");
+    var terr2a = createTerritory(em, "test 2a");
+    var terr2b = createTerritory(em, "test 2b");
+    terr2a.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
+    terr2b.setProperty("regionID", region2.getProperty(testFns.regionKeyName));
+
+    ok(region1.getProperty("territories").length === 2, "should have two terrs");
+    ok(region2.getProperty("territories").length === 2, "should have two terrs");
+    var terrs1x, terrs2x, region1ID, region1y, terrs1y;
+
+
+
+    em.saveChanges().then(function (data) {
+      ok(!em.hasChanges());
+      ok(data.entities.length === 6);
+      ok(!region1.entityAspect.getKey().equals(k1));
+      var territories = em.getEntities("Territory");
+      return EntityQuery.fromEntities(territories).using(em2).execute();
+    }).then(function (data2) {
+      ok(data2.results.length === 4, "should be 4 recs");
+      return EntityQuery.fromEntities(region1).using(em2).execute();
+    }).then(function (data3) {
+      ok(data3.results.length === 1, "should be 1 rec");
+      var region1a = data3.results[0];
+      var terrs1a = region1a.getProperty("territories");
+      ok(terrs1a.length == 2, "should be 2 terrs in region1");
+    }).fail(handleFail).fin(done);
+  });
 
   test("save of deleted entity should not trigger validation", function (assert) {
     var done = assert.async();
     // TODO: OData bug here is because of region - AutoGeneratedKeyType
     var em = newEm();
     var cust = createCustomer(em);
-    
+
     ok(em.hasChanges());
     em.saveChanges().then(function (sr) {
       ok(!em.hasChanges());
@@ -2447,42 +2447,42 @@
 
   });
 
-  testIfNot("cleanup  test data",
-    "mongo", "does not support 'expand'", function(assert) {
-      var done = assert.async();
-      var em = newEm();
-      var p = breeze.Predicate.create("companyName", FilterQueryOp.StartsWith, "Test")
-          .or("companyName", FilterQueryOp.StartsWith, "foo");
-      var q = EntityQuery.from("Customers").where(p).expand("orders"); // .take(50);
-      
-      em.executeQuery(q).then(function (data) {
-        // var promises = [];
-        em.saveOptions = new SaveOptions({ allowConcurrentSaves: true });
-        data.results.forEach(function (cust) {
-          var orders = cust.getProperty("orders").slice(0);
-          orders.forEach(function (order) {
-            //var details = order.getProperty("orderDetails");
-            //details.forEach(function (detail) {
-            //    detail.entityAspect.setDeleted();
-            //});
-            //var io = order.getProperty("internationalOrder");
-            //if (io) {
-            //    io.entityAspect.setDeleted();
-            //}
-            order.entityAspect.setDeleted();
-          });
-          cust.entityAspect.setDeleted();
-          //var pr = em.saveChanges();
-          //promises.push(pr);
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("cleanup  test data", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var p = breeze.Predicate.create("companyName", FilterQueryOp.StartsWith, "Test")
+        .or("companyName", FilterQueryOp.StartsWith, "foo");
+    var q = EntityQuery.from("Customers").where(p).expand("orders"); // .take(50);
+
+    em.executeQuery(q).then(function (data) {
+      // var promises = [];
+      em.saveOptions = new SaveOptions({ allowConcurrentSaves: true });
+      data.results.forEach(function (cust) {
+        var orders = cust.getProperty("orders").slice(0);
+        orders.forEach(function (order) {
+          //var details = order.getProperty("orderDetails");
+          //details.forEach(function (detail) {
+          //    detail.entityAspect.setDeleted();
+          //});
+          //var io = order.getProperty("internationalOrder");
+          //if (io) {
+          //    io.entityAspect.setDeleted();
+          //}
+          order.entityAspect.setDeleted();
         });
-        // return Q.all(promises);
-        return em.saveChanges();
+        cust.entityAspect.setDeleted();
+        //var pr = em.saveChanges();
+        //promises.push(pr);
+      });
+      // return Q.all(promises);
+      return em.saveChanges();
 
-      }).then(function (sr) {
+    }).then(function (sr) {
 
-        ok(sr.entities.length, "deleted count:" + sr.entities.length);
-      }).fail(handleFail).fin(done);
-    });
+      ok(sr.entities.length, "deleted count:" + sr.entities.length);
+    }).fail(handleFail).fin(done);
+  });
 
   function createCustomer(em) {
     var metadataStore = em.metadataStore;

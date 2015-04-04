@@ -17,8 +17,7 @@
   var EntityType = breeze.EntityType;
 
   var newEm = testFns.newEm;
-  var testIfNot = testFns.testIfNot;
-
+  
   module("query - raw odata", {
     beforeEach: function (assert) {
       testFns.setup(assert);
@@ -42,8 +41,8 @@
   //    }).fail(testFns.handleFail).fin(done);
   //});
 
-  testIfNot("filter and order by",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("filter and order by", function (assert) {
       var done = assert.async();
     
     var em = newEm(testFns.newMs());
@@ -63,8 +62,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("select",
-    "mongo", "does not support 'expand'", function (assert) {
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("select", function (assert) {
       var done = assert.async();
     var em = newEm(testFns.newMs());
     ok(em, "no em found");
@@ -102,8 +101,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testIfNot("raw ajax to web api - server side include many - customer and orders", 
-    "mongo,odata", "does not implement the 'CustomersAndOrders' endpoint'", function (assert) {
+  testFns.skipIf("mongo,odata", "does not implement the 'CustomersAndOrders' endpoint'").
+  test("raw ajax to web api - server side include many - customer and orders",  function (assert) {
       var done = assert.async();
     
     try {

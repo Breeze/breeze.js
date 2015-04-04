@@ -35,8 +35,9 @@
 
     <script>
         // -- Initialize Test vars
-        breezeTestFns.setDataService("WebApi");
+        breezeTestFns.setDataService("DotNetWebApi");
         breezeTestFns.setSampleNamespace("Sample_WebApi2.Models");
+        breezeTestFns.queryServerVersion("/api/testconfig");
     </script>
 
     <script src="tests/ajaxAdapterTests.js"></script>
@@ -69,7 +70,7 @@
 
     <!-- Tests are loaded; let's go! -->
     <script>
-        breezeTestFns.queryServerVersion("/api/testconfig");
+        QUnit.start();
     </script>
 </body>
 </html>
