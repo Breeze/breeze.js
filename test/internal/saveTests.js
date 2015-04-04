@@ -33,6 +33,24 @@
     }
   });
 
+  test("update with client concurrency update", function (assert) {
+    var done = assert.async();
+    var cust, rowVersion;
+    var em1 = newEm();
+
+    em1.executeQuery(new EntityQuery("Customers").take(1)).then(function (data) {
+      cust = data.results[0];
+
+      testFns.morphStringProp(cust, "contactName");
+      rowVersion = cust.getProperty("rowVersion");
+      return em1.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1, "1 record should have been saved");
+      ok(cust.getProperty("rowVersion") == rowVersion+1);
+    }).fail(handleFail).fin(done);
+  });
+
   test("update order", function(assert) {
     var done = assert.async();
     var em = newEm();
@@ -500,8 +518,13 @@
       }).then(function (sr) {
         ok(false, "should not get here");
       }).fail(function (e) {
-        var isOk = e.message.indexOf("part of the entity's key") > 0;
-        ok(isOk, "error message should mention the entity key");
+        var isOk;
+        if (testFns.DEBUG_HIBERNATE) {
+          isOk = e.message.toLowerCase().indexOf("row was updated or deleted by another") >= 0;
+        } else {
+          isOk = e.message.indexOf("part of the entity's key") > 0;
+        }
+        ok(isOk, "error message should mention why it failed");
       }).fail(handleFail).fin(done);
     });
 
@@ -580,7 +603,7 @@
 
     });
 
-  testIfNot("save new entity with enum",
+  testIfNot("new entity with enum",
     "mongo,odata,sequelize,hibernate", " does not yet support enums", function (assert) {
       var done = assert.async();
 
@@ -713,7 +736,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("test unmapped property serialization on server",
+  testIfNot("unmapped property serialization on server",
     "mongo", "does not YET have a SaveCheck implemented on the server", function (assert) {
       var done = assert.async();
 
@@ -761,7 +784,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("test unmapped property suppression",
+  testIfNot("unmapped property suppression",
     "mongo", "does not YET have a SaveCheck implemented on the server", function (assert) {
       var done = assert.async();
 
@@ -846,7 +869,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save data with additional entity added on server",
+  testIfNot("data with additional entity added on server",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -951,7 +974,7 @@
   });
 
 
-  testIfNot("save computed update",
+  testIfNot("computed update",
     "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
       var done = assert.async();
 
@@ -975,7 +998,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save computed update - mod computed",
+  testIfNot("computed update - mod computed",
     "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
       var done = assert.async();
 
@@ -1000,7 +1023,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save computed insert",
+  testIfNot("computed insert",
     "mongo,sequelize,hibernate", "does not yet support computed properties", function (assert) {
       var done = assert.async();
       var em = newEm();
@@ -1021,7 +1044,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  test("save update with unmapped changes", function (assert) {
+  test("update with unmapped changes", function (assert) {
     var done = assert.async();
     var em1 = newEm(testFns.newMs());
     var Customer = testFns.makeEntityCtor(function () {
@@ -1047,7 +1070,7 @@
 
   // Test asserts will fail for OData until we fix #2574
   // "entityAspect.extraMetdata not preserved after export/import"
-  test("save update after exporting and reimporting a customer", function (assert) {
+  test("update after exporting and reimporting a customer", function (assert) {
     var done = assert.async();
     var cust,
         em1 = newEm(testFns.newMs()),
@@ -1085,7 +1108,7 @@
     }).fail(handleFail).fin(done);
   });
 
-  test("save update with ES5 props and unmapped changes", function (assert) {
+  test("update with ES5 props and unmapped changes", function (assert) {
     var done = assert.async();
     var em1 = newEm(testFns.newMs());
     var Customer = testFns.models.CustomerWithES5Props();
@@ -1107,7 +1130,7 @@
     }).fail(handleFail).fin(done);
   });
 
-  test("save delete with unmapped changes", function (assert) {
+  test("delete with unmapped changes", function (assert) {
     var done = assert.async();
     var em1 = newEm(testFns.newMs());
     var Customer = testFns.makeEntityCtor(function () {
@@ -1137,7 +1160,7 @@
 
   });
 
-  testIfNot("save data with server reject",
+  testIfNot("with server reject",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1158,7 +1181,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save data with alt resource and server side add",
+  testIfNot("with alt resource and server side add",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1191,7 +1214,7 @@
     });
 
 
-  testIfNot("save data with alt resource and server update",
+  testIfNot("with alt resource and server update",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1220,7 +1243,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save data with alt resource and server update - ForceUpdate",
+  testIfNot("with alt resource and server update - ForceUpdate",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1247,7 +1270,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save data with server update - original values fixup",
+  testIfNot("with server update - original values fixup",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1274,7 +1297,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save with saveOptions exit",
+  testIfNot("with saveOptions exit",
     "odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1289,7 +1312,7 @@
 
     });
 
-  testIfNot("save/adds with EntityErrorsException",
+  testIfNot("adds with EntityErrorsException",
     "mongo (not yet),odata", "does not support server interception or alt resources", function (assert) {
       var done = assert.async();
 
@@ -1329,7 +1352,7 @@
 
     });
 
-  testIfNot("save/mods with EntityErrorsException",
+  testIfNot("mods with EntityErrorsException",
     "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
       var done = assert.async();
 
@@ -1365,7 +1388,7 @@
 
     });
 
-  test("save with client side validation error", function (assert) {
+  test("with client side validation error", function (assert) {
     var done = assert.async();
     var em = newEm();
     var zzz = createParentAndChildren(em);
@@ -1384,7 +1407,7 @@
     }).fin(done);
   });
 
-  testIfNot("save with server side entity level validation error",
+  testIfNot("with server side entity level validation error",
     "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
       var done = assert.async();
       var em = newEm();
@@ -1402,7 +1425,7 @@
       }).fin(done);
     });
 
-  testIfNot("save with server side entity level validation error + repeat",
+  testIfNot("with server side entity level validation error + repeat",
     "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
       var done = assert.async();
 
@@ -1516,7 +1539,7 @@
     }).fail(handleFail).fin(done);
   });
 
-  testIfNot("save data with millseconds - UTC time - IE bug",
+  testIfNot("data with millseconds - UTC time - IE bug",
     "sequelize/MySQL,hibernate/MySQL", "does not support millisecond resolution", function (assert) {
       var done = assert.async();
 
@@ -1551,7 +1574,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save data with millseconds - local time",
+  testIfNot("data with millseconds - local time",
     "sequelize/MySQL,hibernate/MySQL", "does not support millisecond resolution", function (assert) {
       var done = assert.async();
 
@@ -1583,7 +1606,7 @@
       }).fail(handleFail).fin(done);
     });
 
-  testIfNot("save custom data annotation validation",
+  testIfNot("custom data annotation validation",
     "mongo does not yet support server side validation,odata does not support server side interceptions", "", function (assert) {
       var done = assert.async();
 
@@ -1613,7 +1636,7 @@
       }).fin(done);
     });
 
-  test("save date", function (assert) {
+  test("date", function (assert) {
     var done = assert.async();
     var em = newEm();
     var q = new EntityQuery("Orders").where("orderDate", '!=', null).take(10);
@@ -1644,7 +1667,7 @@
     }).fail(handleFail).fin(done);
   });
 
-  test("unmapped save", function (assert) {
+  test("unmapped", function (assert) {
     var done = assert.async();
 
     // use a different metadata store for this em - so we don't polute other tests
@@ -1674,7 +1697,7 @@
     }).fail(handleFail).fin(done);
   });
 
-  test("unmapped save with ES5 props", function (assert) {
+  test("unmapped with ES5 props", function (assert) {
     var done = assert.async();
 
     // use a different metadata store for this em - so we don't polute other tests
