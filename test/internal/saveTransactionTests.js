@@ -69,7 +69,7 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
-  
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order and add ShipAddress to Comment in BeforeSave - SaveWithNoTransaction", function(assert) {
       saveOrderAndAddShipAddressToComment(assert, "SaveWithNoTransaction");
     });
@@ -78,6 +78,7 @@
       saveOrderAndAddShipAddressToComment(assert, "SaveWithDbTransaction");
     });
 
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order and add ShipAddress to Comment in BeforeSave - SaveWithTransactionScope", function(assert) {
       saveOrderAndAddShipAddressToComment(assert, "SaveWithTransactionScope");
     });
@@ -109,12 +110,16 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithNoTransaction", function(assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithNoTransaction");
   });
+
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithDbTransaction", function (assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithDbTransaction");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithTransactionScope - DTC", function(assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithTransactionScope");
   });
@@ -149,12 +154,17 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order and add KeyMapping to Comment in AfterSave - SaveWithNoTransaction", function(assert) {
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithNoTransaction");
   });
+
+  testFns.skipIf("hibernate", "does not YET support adding data in afterSaveEntities").
   test("save Order and add KeyMapping to Comment in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithDbTransaction");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order and add KeyMapping to Comment in AfterSave - SaveWithTransactionScope", function (assert) {
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithTransactionScope");
   });
@@ -189,12 +199,16 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithNoTransaction", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithNoTransaction");
   });
+
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithDbTransaction");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithTransactionScope", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithTransactionScope");  // DTC iff database != SQL 2008+
   });
@@ -219,42 +233,62 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order with lookup in second Context in BeforeSave - SaveWithNoTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithNoTransaction", "LookupEmployeeInSeparateContext.Before");
   });
+
+  testFns.skipIf("hibernate", "does not YET support operations in a separate context").
   test("save Order with lookup in second Context in BeforeSave - SaveWithDbTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.Before");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order with lookup in second Context in BeforeSave - SaveWithTransactionScope - DTC", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.Before");
   });
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order with lookup in second Context in BeforeSave - Same Connection - SaveWithNoTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithNoTransaction", "LookupEmployeeInSeparateContext.SameConnection.Before");
   });
+
+  testFns.skipIf("hibernate", "does not YET support operations in a separate context").
   test("save Order with lookup in second Context in BeforeSave - Same Connection- SaveWithDbTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.SameConnection.Before");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order with lookup in second Context in BeforeSave - Same Connection- SaveWithTransactionScope", function (assert) {
     saveOrderWithLookupInSecondContext(assert,"SaveWithTransactionScope", "LookupEmployeeInSeparateContext.SameConnection.Before");
   });
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order with lookup in second Context in AfterSave - SaveWithNoTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert,"SaveWithNoTransaction", "LookupEmployeeInSeparateContext.After");
   });
+
+  testFns.skipIf("hibernate", "does not YET support operations in a separate context").
   test("save Order with lookup in second Context in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.After");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order with lookup in second Context in AfterSave - SaveWithTransactionScope - DTC", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.After");
   });
 
+  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
   test("save Order with lookup in second Context in AfterSave - Same Connection- SaveWithNoTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithNoTransaction", "LookupEmployeeInSeparateContext.SameConnection.After");
   });
+
+  testFns.skipIf("hibernate", "does not YET support operations in a separate context").
   test("save Order with lookup in second Context in AfterSave - Same Connection- SaveWithDbTransaction", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.SameConnection.After");
   });
+
+  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
   test("save Order with lookup in second Context in AfterSave - Same Connection- SaveWithTransactionScope", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.SameConnection.After");
   });

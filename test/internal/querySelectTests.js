@@ -25,7 +25,7 @@
     }
   });
 
-  test("select company names of orders with Freight > 500", function (assert) {
+  test("company names of orders with Freight > 500", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -46,7 +46,7 @@
   });
 
   testFns.skipIf("sequelize", "does not yet support complex types").
-  test("select - complex type", function (assert) {
+  test("complex type", function (assert) {
     var done = assert.async();
 
     var em = newEm();
@@ -69,7 +69,8 @@
   });
 
   testFns.skipIf("odata,mongo,sequelize", "does not use the WebApi jsonResultsAdapter that this test assumes").
-  test("select - anon with jra & dateTimes", function (assert) {
+  skipIf("hibernate", "does not have the 'UnusualDates' table this test assumes").
+  test("anon with jra & dateTimes", function (assert) {
     var done = assert.async();
     var em = newEm();
     var jra = new breeze.JsonResultsAdapter({
@@ -106,7 +107,7 @@
 
   });
 
-  test("select - anon simple", function (assert) {
+  test("anon simple", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -127,7 +128,8 @@
   });
 
   testFns.skipIf("mongo", "does not support 'join' capability").
-  test("select - anon collection", function (assert) {
+  skipIf("hibernate", "cannot project entity collections").
+  test("anon collection", function (assert) {
       var done = assert.async();
 
       var em = newEm();
@@ -156,7 +158,8 @@
     });
 
   testFns.skipIf("mongo", "does not support 'join' capability").
-  test("select - anon simple, entity collection projection", function (assert) {
+  skipIf("hibernate", "cannot project entity collections").
+  test("anon simple, entity collection projection", function (assert) {
       var done = assert.async();
       var em = newEm();
 
@@ -189,17 +192,16 @@
     });
 
   testFns.skipIf("mongo", "does not support 'join' capability").
-  test("select - anon simple, entity scalar projection", function (assert) {
+  test("anon simple, entity scalar projection", function (assert) {
       var done = assert.async();
       var em = newEm();
 
       var query = EntityQuery
           .from("Orders")
-          .where("customer.companyName", "startsWith", "C");
-      // .orderBy("customer.companyName");  - problem for the OData Web api provider.
-      if (testFns.DEBUG_DOTNET_WEBAPI) {
+          .where("customer.companyName", "startsWith", "C")
+          .orderBy("customer.companyName");  // - problem for the OData Web api provider.
+      if (!testFns.DEBUG_ODATA) {
         query = query.select("customer.companyName, customer, orderDate");
-        query = query.expand("customer");
       } else {
         query = query.select("customer, orderDate");
         query = query.expand("customer");
@@ -214,9 +216,13 @@
         ok(data.results.length > 0, "empty data");
         var anons = data.results;
         anons.forEach(function (a) {
-          if (testFns.DEBUG_DOTNET_WEBAPI) {
+          if (!testFns.DEBUG_ODATA) {
             ok(Object.keys(a).length === 3, "should have 3 properties");
-            ok(typeof (a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
+            if (testFns.DEBUG_DOTNET_WEBAPI) {
+              ok(typeof (a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
+            } else {
+              ok(typeof (a["customer.companyName"]) === 'string', "customer_CompanyName is not a string");
+            }
           } else {
             ok(Object.keys(a).length === 2, "should have 2 properties");
           }
@@ -227,7 +233,7 @@
     });
 
   testFns.skipIf("mongo", "does not support 'join' capability").
-  test("select - anon two props", function (assert) {
+  test("anon two props", function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery
@@ -242,7 +248,7 @@
     });
 
   testFns.skipIf("mongo", "does not support 'expand'").
-  test("select with expand should fail with good msg",  function (assert) {
+  test("with expand should fail with good msg",  function (assert) {
       var done = assert.async();
       var em = newEm();
       var query = EntityQuery

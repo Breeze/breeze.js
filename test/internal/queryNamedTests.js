@@ -470,6 +470,7 @@
     });
 
   testFns.skipIf("mongo", "does not support 'expand'").
+  skipIf("hibernate","cannot 'project' collections of entities").
   test("project objects containing entities", function (assert) {
       var done = assert.async();
       var em = newEm();

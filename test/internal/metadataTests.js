@@ -170,7 +170,7 @@
 
   });
 
-  testFns.skipIf("mongo,hibernate", "do not yet have TimeList and TimeGroup tables").
+  testFns.skipIf("mongo,hibernate", "does not yet have TimeList and TimeGroup tables").
   test("create metadata and use it for save - CodeFirst only", function (assert) {
     if (!testFns.DEBUG_EFCODEFIRST) {
       ok(true, "skipped");
@@ -195,7 +195,7 @@
 
   });
 
-  testFns.skipIf("mongo,hibernate", "do not yet have TimeList and TimeGroup tables").
+  testFns.skipIf("mongo,hibernate", "does not yet have TimeList and TimeGroup tables").
   test("create metadata and insert using existing entity re-attached - CodeFirst only", function (assert) {
     var done = assert.async();
     var em0 = createEmWithTimeGroupMetadata();
