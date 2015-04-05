@@ -19,26 +19,16 @@
     teardown_inheritanceReset: teardown_inheritanceReset
   };
 
-  testFns.skipIf = function (debugVars, msg) {
-    var skipMsg;
-    if (debugVars !== true) {
-      var tokens = debugVars.split(",").map(function (s) {
-        return s.trim().toLowerCase();
-      });
-      skipMsg = _.find(tokens, function (t) {
-        return getSkipMsg(t) != null;
-      });
-    } else {
-      skipMsg = "Always skipped -";
-    }
+  testFns.skipIf = function (delimTokens, msg) {
+    var skipToken = getSkipToken(delimTokens);
 
-    if (skipMsg) {
+    if (skipToken) {
       return {
         test: function (testName, fn) {
-          QUnit.skip("[" + skipMsg + " " + msg + "]: " + testName, fn);
+          QUnit.skip(testName + " -- [" + skipToken + " " + msg + "]", fn);
         },
         skipIf: function (a, b) {
-          return testFns.skipIf(debugVars, msg);
+          return testFns.skipIf(delimTokens, msg);
         }
       }
     } else {
@@ -46,25 +36,35 @@
         test: function (testName, fn) {
           QUnit.test(testName, fn);
         },
-        skipIf: function(debugVars, msg) {
-          return testFns.skipIf(debugVars, msg);
+        skipIf: function(delimTokens, msg) {
+          return testFns.skipIf(delimTokens, msg);
         }
       }
     }
   }
 
-  function getSkipMsg(s) {
-    if ((testFns.DEBUG_MONGO && s.indexOf("mongo",0) === 0) ||
-       (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel",0) === 0) ||
-       (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib",0) === 0) ||
-       (testFns.DEBUG_HIBERNATE && s.indexOf("hib",0) == 0) ||
-       (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
-       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0)
-      ) {
-      return s;
+  function getSkipToken(delimTokens) {
+    var skipToken;
+    if (delimTokens !== true) {
+      var tokens = delimTokens.split(",").map(function (s) {
+        return s.trim().toLowerCase();
+      });
+      skipToken = _.find(tokens, function (t) {
+        return isSkipToken(t);
+      });
     } else {
-      return null;
+      skipToken = "Always skipped -";
     }
+    return skipToken;
+  }
+
+  function isSkipToken(s) {
+    return (testFns.DEBUG_MONGO && s.indexOf("mongo", 0) === 0) ||
+       (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel", 0) === 0) ||
+       (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib", 0) === 0) ||
+       (testFns.DEBUG_HIBERNATE && s.indexOf("hib", 0) == 0) ||
+       (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
+       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0);
   }
 
   testFns.TEST_RECOMPOSITION = true;
