@@ -19,13 +19,18 @@
     teardown_inheritanceReset: teardown_inheritanceReset
   };
 
-  testFns.skipIf = function(debugVars, msg) {
-    var tokens = debugVars.split(",").map(function (s) {
-      return s.trim().toLowerCase();
-    });
-    var skipMsg = _.find(tokens, function (t) {
-      return getSkipMsg(t) != null;
-    });
+  testFns.skipIf = function (debugVars, msg) {
+    var skipMsg;
+    if (debugVars !== true) {
+      var tokens = debugVars.split(",").map(function (s) {
+        return s.trim().toLowerCase();
+      });
+      skipMsg = _.find(tokens, function (t) {
+        return getSkipMsg(t) != null;
+      });
+    } else {
+      skipMsg = "Always skipped -";
+    }
 
     if (skipMsg) {
       return {

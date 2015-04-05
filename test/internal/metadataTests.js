@@ -172,6 +172,10 @@
 
   testFns.skipIf("mongo,hibernate", "do not yet have TimeList and TimeGroup tables").
   test("create metadata and use it for save - CodeFirst only", function (assert) {
+    if (!testFns.DEBUG_EFCODEFIRST) {
+      ok(true, "skipped");
+      return;
+    }
     var done = assert.async();
     var em = createEmWithTimeGroupMetadata();
 
