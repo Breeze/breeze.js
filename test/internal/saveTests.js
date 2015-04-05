@@ -1882,13 +1882,13 @@
     var done = assert.async();
     var em = newEm();
 
-    var cust;
+    var cust, orders, newCompanyName;
     saveNewCustAndOrders(em).then(function (savedCust) {
       cust = savedCust;
       if (cust == null) {
         throw new Error("Test error - need a customer with orders");
       }
-      companyName = cust.getProperty("companyName");
+      var companyName = cust.getProperty("companyName");
       newCompanyName = testFns.morphStringProp(cust, "companyName");
       ok(cust.entityAspect.entityState.isModified(), "should be modified");
       orders = cust.getProperty("orders");

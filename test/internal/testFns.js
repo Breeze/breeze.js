@@ -119,6 +119,7 @@
     testFns.sampleNamespace = value;
   };
 
+  // TODO: check if this is needed any longer
   testFns.queryServerVersion = function (url) {
     url = url || "/testconfig";
     var ajaxImpl = core.config.getAdapterInstance("ajax");
@@ -130,40 +131,30 @@
       success: function (httpResponse) {
         var data = httpResponse.data;
         testFns.setServerVersion(data.value, data.version);
-        testFns.northwindIBMetadata = JSON.parse(data.metadata);
-        QUnit.start();
+        testFns.northwindIBMetadata = JSON.parse(data.metadata);       
       },
       error: function (httpResponse) {
         alert("error getting server version data: " + httpResponse.status);
       }
     });
-    
   }
 
-  testFns.setServerVersion = function (value, version) {
-    value = value.toLowerCase();
+  testFns.setServerVersion = function (serverName, version) {
+    serverName = serverName.toLowerCase();
     version = (version || "").toLowerCase();
-    testFns.serverVersion = value + '/' + version;
-
+    // servername
+    testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF or NHIBERNATE
+    testFns.DEBUG_ODATA = serverName === "odata" || serverName === "odata4";
+    testFns.DEBUG_MONGO = serverName === "mongo";
+    testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
+    testFns.DEBUG_HIBERNATE = serverName == "hibernate";
+    testFns.serverVersion = serverName + "/" + (version || "");
+    // version
     testFns.DEBUG_NHIBERNATE = version === "nhibernate";
     testFns.DEBUG_EF_CODEFIRST = version === "codefirst_provider";
     testFns.DEBUG_EF_DBFIRST = version === "databasefirst_new";
     testFns.DEBUG_EF_DBFIRST_OLD = version === "databasefirst_old";
     testFns.DEBUG_EF_ORACLE = version === "oracle_edmx";
-
-    updateTitle();
-  }
-
-  testFns.setDataService = function (value, version) {
-    value = value.toLowerCase();
-    version = (version || "").toLowerCase();
-    
-    testFns.DEBUG_DOTNET_WEBAPI = value === 'dotnetwebapi'; // version will eventually be either EF or NHIBERNATE
-    testFns.DEBUG_ODATA = value === "odata" || value === "odata4";
-    testFns.DEBUG_MONGO = value === "mongo";
-    testFns.DEBUG_SEQUELIZE = value === "sequelize";
-    testFns.DEBUG_HIBERNATE = value == "hibernate";
-    testFns.serverVersion = value + "/" + (version || "");
 
     var dataServiceAdapterName;
     // defaults
@@ -175,10 +166,10 @@
       if (testFns.DEBUG_ODATA_VERSION == "wcf") {
         dataServiceAdapterName = "OData";
         testFns.defaultServiceName = "http://localhost:9009/ODataService.svc";
-      } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata") {
+      } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && serverName == "odata") {
         dataServiceAdapterName = "webApiOData";
         testFns.defaultServiceName = "http://localhost:9011/NorthwindIB_odata";
-      } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && value == "odata4") {
+      } else if (testFns.DEBUG_ODATA_VERSION == "webapi2" && serverName == "odata4") {
         dataServiceAdapterName = "webApiOData4";
         testFns.defaultServiceName = "http://localhost:9017/NorthwindIB_odata";
       }

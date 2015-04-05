@@ -102,8 +102,9 @@
         });
   });
 
-  // A future test when we want to explore intercepting multiple requests
-  QUnit.skip("insert multipart entity", function (assert) {
+  
+  testFns.skipIf(true, "A future test when we want to explore intercepting multiple requests" ).
+  test("insert multipart entity", function (assert) {
     var done = assert.async();
     var em = newEm();
     var product = createProduct(em);

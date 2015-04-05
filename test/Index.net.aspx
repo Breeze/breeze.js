@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿<%@ page language="C#" %>
+<%@ Import namespace="Sample_WebApi2.Controllers" %>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -35,8 +37,9 @@
 
     <script>
         // -- Initialize Test vars
-        breezeTestFns.setDataService("DotNetWebApi");
-        breezeTestFns.setSampleNamespace("Sample_WebApi2.Models");
+        var configVersion = "<%=NorthwindContextProvider.CONFIG_VERSION %>";
+        breezeTestFns.setServerVersion("DotNetWebApi", configVersion);
+        breezeTestFns.setSampleNamespace("Sample_WebApi2.Models");       
     </script>
 
     <script src="internal/ajaxAdapterTests.js"></script>
@@ -69,8 +72,9 @@
 
     <!-- Tests are loaded; let's go! -->
     <script>
-        breezeTestFns.queryServerVersion("/api/testconfig");
-        // calls QUnit.start() internally
+        //breezeTestFns.queryServerVersion("/api/testconfig");
+        QUnit.start();
+        
     </script>
 </body>
 </html>
