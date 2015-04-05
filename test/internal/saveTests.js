@@ -31,12 +31,30 @@
     }
   });
 
-  test("update with client concurrency update", function (assert) {
+  test("update with client concurrency update with null rowVersion", function (assert) {
     var done = assert.async();
     var cust, rowVersion;
     var em1 = newEm();
 
-    em1.executeQuery(new EntityQuery("Customers").take(1)).then(function (data) {
+    em1.executeQuery(new EntityQuery("Customers").where("rowVersion", "==", null).take(1)).then(function (data) {
+      cust = data.results[0];
+
+      testFns.morphStringProp(cust, "contactName");
+      rowVersion = cust.getProperty("rowVersion");
+      return em1.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1, "1 record should have been saved");
+      ok(cust.getProperty("rowVersion") == rowVersion + 1);
+    }).fail(handleFail).fin(done);
+  });
+
+  test("update with client concurrency update with non-null rowVersion", function (assert) {
+    var done = assert.async();
+    var cust, rowVersion;
+    var em1 = newEm();
+
+    em1.executeQuery(new EntityQuery("Customers").where("rowVersion", "!=", null).take(1)).then(function (data) {
       cust = data.results[0];
 
       testFns.morphStringProp(cust, "contactName");
