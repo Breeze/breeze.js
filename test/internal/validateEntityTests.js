@@ -2,10 +2,8 @@
   var breeze = testFns.breeze;
   var core = breeze.core;
 
-
   var Enum = core.Enum;
   var Event = core.Event;
-
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;
   var EntityQuery = breeze.EntityQuery;
@@ -14,16 +12,14 @@
   var Validator = breeze.Validator;
   var ValidationError = breeze.ValidationError;
 
-
   var newEm = testFns.newEm;
   var wellKnownData = testFns.wellKnownData;
 
-
   module("validate entity", {
-    setup: function () {
-      testFns.setup();
+    beforeEach: function (assert) {
+      testFns.setup(assert);
     },
-    teardown: function () {
+    afterEach: function (assert) {
 
     }
   });

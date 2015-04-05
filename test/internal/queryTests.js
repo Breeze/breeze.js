@@ -2519,7 +2519,7 @@
     var done = assert.async();
     var em = newEm();
 
-    var query = new EntityQuery("Orders").where("customerID", "!=", null);
+    var query = new EntityQuery("Orders").where("customerID", "!=", null).where("employeeID", "!=", null);
 
     query = query.expand(["customer", "employee"])
       .take(20);
@@ -2540,8 +2540,8 @@
           emps.push(emp);
         }
       });
-      ok(custs.length === 20, "should have 20 customers");
-      ok(emps.length === 20, "should have 20 employees");
+      ok(custs.length === 20, "should have 20 customers but got " + custs.length);
+      ok(emps.length === 20, "should have 20 employees but got " + emps.length);
 
 
     }).fail(testFns.handleFail).fin(done)

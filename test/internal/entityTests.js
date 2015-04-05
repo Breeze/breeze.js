@@ -118,9 +118,9 @@
 
   test("entityChange on multiple setDeleted calls", function () {
       var em = newEm();
-      var entity1 = em.createEntity("Customer")
-      var entity2 = em.createEntity("Customer")
-      var entity3 = em.createEntity("Customer")
+      var entity1 = em.createEntity("Customer");
+      var entity2 = em.createEntity("Customer");
+      var entity3 = em.createEntity("Customer");
       var entity4 = em.createEntity("Customer");
       entity1.entityAspect.acceptChanges();
       entity2.entityAspect.acceptChanges();
@@ -129,7 +129,7 @@
       var changedCount = 0;
       em.entityChanged.subscribe(function (changeArgs) {
           changedCount++;
-      })
+      });
       entity1.entityAspect.setDeleted();
       // entityChanged is called on the manager, where entityAction === EntityStateChange - all good.
       ok(changedCount == 1, "changed 1");
@@ -723,7 +723,7 @@
     var cfg = {
       firstName: "John",
       lastName: "Smith"
-    }
+    };
     var testVal;
     if (testFns.DEBUG_MONGO) {
       testVal = "FakeKey-42";
@@ -738,7 +738,7 @@
     cfg = {
       firstxame: "John",
       lastName: "Smith"
-    }
+    };
     cfg[testFns.employeeKeyName] = wellKnownData.dummyEmployeeID;
     var partialEmp = empType.createEntity(cfg);
     ok(employee.getProperty("lastName") === "Smith", "lastName should be 'Smith'");
@@ -1103,7 +1103,6 @@
 
 
   test("unmapped import export", function () {
-
     // use a different metadata store for this em - so we don't polute other tests
 
     var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
@@ -1132,7 +1131,6 @@
   });
 
   test("unmapped import export unmapped suppressed", function () {
-
     // use a different metadata store for this em - so we don't polute other tests
     var em1 = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var Customer = testFns.makeEntityCtor(function () {
@@ -1263,15 +1261,9 @@
     });
   });
 
-  // TODO: skipIf will not work with efcodefirst and nhibernate ...
-  // testFns.DEBUG_EF_CODEFIRST and DEBUG_NHIBERNATE are not known until inside the test because they are set by testFns.setup asynchronously
-  testFns.skipIf("mongo,efcodefirst,nhibernate", "does not support 'defaultValues'").
+  testFns.skipIf("mongo,efcodefirst,nhibernate,hibernate", "does not support 'defaultValues'").
   test("category default rowversion value", function () {
-    // testFns.DEBUG_EF_CODEFIRST and DEBUG_NHIBERNATE are not known until inside the test because they are set by testFns.setup asynchronously
-    if (testFns.DEBUG_EF_CODEFIRST || testFns.DEBUG_NHIBERNATE) {
-      ok(true, "default values not supported in this env");
-      return;
-    }
+
     var em = newEm();
     var catType = em.metadataStore.getEntityType("Category");
     var cat = em.createEntity("Category");
@@ -1409,7 +1401,7 @@
     ok(details.length > 0, "order should have details");
     copyDetails.forEach(function (od) {
       od.entityAspect.setDeleted();
-    })
+    });
     order.entityAspect.setDeleted();
     ok(order.entityAspect.entityState.isDeleted(), "order should be deleted");
 
@@ -1434,7 +1426,7 @@
     ok(copyOrders.length > 0, "order should have details");
     copyOrders.forEach(function (order) {
       order.entityAspect.setDeleted();
-    })
+    });
     customer.entityAspect.setDeleted();
     ok(customer.entityAspect.entityState.isDeleted(), "order should be deleted");
 
