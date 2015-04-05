@@ -230,8 +230,8 @@
 
   });
 
-  QUnit.skip("query Fruits w/client ofType", function () {
-    ok(false, "Expected failure - OfType operator not yet supported - will be added later");
+  testFns.skipIf(true, "OfType operator not yet supported - will be added later" ).
+  test("query Fruits w/client ofType", function () {
     var em = newEmX();
     
     var q = EntityQuery.from("ItemsOfProduce")
