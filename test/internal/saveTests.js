@@ -153,6 +153,9 @@
 
     em.saveChanges().then(function (sr) {
       ok(sr.entities.length == 3, "should have saved 3 entities");
+      ok(sr.entities.indexOf(product) >= 0, "should be the same product");
+      ok(sr.entities.indexOf(order) >= 0, "should be the same order");
+      ok(sr.entities.indexOf(orderDetail) >= 0, "should be the same orderDetail");
       var orderIDx = order.getProperty("orderID");
       var productIDx = product.getProperty("productID");
       ok(orderID != orderIDx, "orderID should have changed");
@@ -1424,6 +1427,7 @@
 
   testFns.skipIf("odata", "does not support server interception or alt resources").
   skipIf("mongo", "has not yet implemented this").
+  // skipIf("hibernate", "is not applicable because this test uses EF validation annotations")
   test("with server side entity level validation error", function (assert) {
     var done = assert.async();
     var em = newEm();
