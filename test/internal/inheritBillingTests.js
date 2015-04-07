@@ -1,17 +1,15 @@
 (function (testFns) {
 
   if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-    module("inheritBilling", {});
-    test("Skipping tests for Mongo/Sequelize/Hibernate", function () {
-      ok(true, "Skipped tests");
-    });
+    module("inherit - Billing", {});
+    QUnit.skip("This server does not yet support these tests", function () {});
     return;
   };
+
 
   var breeze = testFns.breeze;
   var core = breeze.core;
   var Event = core.Event;
-
 
   var EntityQuery = breeze.EntityQuery;
   var DataService = breeze.DataService;
@@ -38,7 +36,7 @@
   var newEmX = testFns.newEmX;
 
 
-  module("inheritBilling", {
+  module("inherit - Billing", {
     beforeEach: function (assert) {
       testFns.setup(assert, { serviceName: altServiceName });
     },
@@ -67,7 +65,8 @@
     prop.validators.push(Validator.maxLength({ maxLength: 10, messageTemplate: "%displayName% must be <= %maxLength% in length. and %foo%", foo: getFooValue }));
   }
 
-  test("base class property validation - BillingDetailTPH", function () {
+  test("base class property validation - BillingDetailTPH", function (assert) {
+    var done = assert.async();
     var ms = testFns.newMs();
     tweakMetadataOnFetch(ms, "TPH");
     var em = newEm(ms);
@@ -75,7 +74,7 @@
     var typeName = "BankAccountTPH";
     var q = EntityQuery.from(typeName + 's').take(3)
         .using(em);
-    stop();
+
 
     q.execute().then(function (data) {
       var bankAccounts = data.results;
@@ -86,15 +85,16 @@
       ves = ba1.entityAspect.getValidationErrors();
       ok(ves.length == 1);
       ok(ves[0].errorMessage == "<Owner> must be > 0 and <= 25 in length.");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  function queryBillingBase(typeName) {
+  function queryBillingBase(typeName, assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var q = EntityQuery.from(typeName + 's')
         .using(em);
-    stop();
+
     var iopType = em.metadataStore.getEntityType(typeName);
     q.execute().then(function (data) {
       var r = data.results;
@@ -105,18 +105,18 @@
 
     }).fail(function (e) {
       ok(false, e.message);
-    }).fin(start);
+    }).fin(done);
 
   }
 
-  test("query BillingDetailTPH", function () {
-    queryBillingBase("BillingDetailTPH");
+  test("query BillingDetailTPH", function (assert) {
+    queryBillingBase("BillingDetailTPH", assert);
   });
-  test("query BillingDetailTPT", function () {
-    queryBillingBase("BillingDetailTPT");
+  test("query BillingDetailTPT", function (assert) {
+    queryBillingBase("BillingDetailTPT", assert);
   });
-  test("query BillingDetailTPC", function () {
-    queryBillingBase("BillingDetailTPC");
+  test("query BillingDetailTPC", function (assert) {
+    queryBillingBase("BillingDetailTPC", assert);
   });
 
 
@@ -133,18 +133,15 @@
   });
 
 
-  function queryBillingBaseWithES5(typeName) {
-
+  function queryBillingBaseWithES5(typeName, assert) {
+    var done = assert.async();
     var em = newEmX();
     var extn = typeName.substring(typeName.length - 3);
     tweakMetadata(em.metadataStore, extn);
     var baseType = registerBaseBillingDetailWithES5(em, typeName);
 
-
     var q = EntityQuery.from(typeName + 's')
         .using(em);
-    stop();
-
 
     q.execute().then(function (data) {
       var r = data.results;
@@ -185,43 +182,44 @@
       ok(ves[0].errorMessage == "<Number> must be <= 10 in length. and 2nd sentence.");
     }).fail(function (e) {
       ok(false, e.message);
-    }).fin(start);
+    }).fin(done);
   }
 
-  test("query BillingDetailTPH - ES5", function () {
-    queryBillingBaseWithES5("BillingDetailTPH");
+  test("query BillingDetailTPH - ES5", function (assert) {
+    queryBillingBaseWithES5("BillingDetailTPH", assert);
   });
-  test("query BillingDetailTPT - ES5", function () {
-    queryBillingBaseWithES5("BillingDetailTPT");
+  test("query BillingDetailTPT - ES5", function (assert) {
+    queryBillingBaseWithES5("BillingDetailTPT", assert);
   });
-  test("query BillingDetailTPC - ES5", function () {
-    queryBillingBaseWithES5("BillingDetailTPC");
-  });
-
-
-  test("query BankAccountTPH - ES5", function () {
-    queryBillingBaseWithES5("BankAccountTPH");
-  });
-  test("query BankAccountTPT - ES5", function () {
-    queryBillingBaseWithES5("BankAccountTPT");
-  });
-  test("query BankAccountTPC - ES5", function () {
-    queryBillingBaseWithES5("BankAccountTPC");
+  test("query BillingDetailTPC - ES5", function (assert) {
+    queryBillingBaseWithES5("BillingDetailTPC", assert);
   });
 
-  test("can delete BankAccountTPH - ES5", function () {
-    assertCanDelete("BankAccountTPH", "deposits");
+
+  test("query BankAccountTPH - ES5", function (assert) {
+    queryBillingBaseWithES5("BankAccountTPH", assert);
+  });
+  test("query BankAccountTPT - ES5", function (assert) {
+    queryBillingBaseWithES5("BankAccountTPT", assert);
+  });
+  test("query BankAccountTPC - ES5", function (assert) {
+    queryBillingBaseWithES5("BankAccountTPC", assert);
   });
 
-  test("can delete BankAccountTPT - ES5", function () {
-    assertCanDelete("BankAccountTPT", "deposits");
+  test("can delete BankAccountTPH - ES5", function (assert) {
+    assertCanDelete("BankAccountTPH", "deposits",assert);
   });
 
-  test("can delete BankAccountTPC - ES5", function () {
-    assertCanDelete("BankAccountTPC", "deposits");
+  test("can delete BankAccountTPT - ES5", function (assert) {
+    assertCanDelete("BankAccountTPT", "deposits", assert);
   });
 
-  function assertCanDelete(typeName, expandPropName) {
+  test("can delete BankAccountTPC - ES5", function (assert) {
+    assertCanDelete("BankAccountTPC", "deposits", assert);
+  });
+
+  function assertCanDelete(typeName, expandPropName, assert) {
+    var done = assert.async();
     var em = newEm();
 
     // Registering resource names for each derived type
@@ -236,8 +234,8 @@
     if (expandPropName) {
       q = q.expand(expandPropName);
     }
-    stop();
-    return q.using(em).execute().then(querySuccess).fail(testFns.handleFail).fin(start);
+
+    return q.using(em).execute().then(querySuccess).fail(testFns.handleFail).fin(done);
 
     function querySuccess(data) {
       targetEntity = data.results[0];

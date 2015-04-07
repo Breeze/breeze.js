@@ -3,7 +3,6 @@
   var core = breeze.core;
   var Event = core.Event;
 
-
   var EntityQuery = breeze.EntityQuery;
   var MetadataStore = breeze.MetadataStore;
   var EntityManager = breeze.EntityManager;

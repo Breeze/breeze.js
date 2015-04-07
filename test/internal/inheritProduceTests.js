@@ -1,10 +1,8 @@
 (function (testFns) {
 
   if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
-    module("inheritProduce", {});
-    test("Skipping tests for Mongo/Sequelize/Hibernate", function () {
-      ok(true, "Skipped tests");
-    });
+    module("inherit - Produce", {});
+    QUnit.skip("This server does not yet support these tests", function () {});
     return;
   };
 
@@ -34,7 +32,7 @@
   var newEm = testFns.newEm;
   var newEmX = testFns.newEmX;
 
-  module("inheritProduce", {
+  module("inherit - Produce", {
     beforeEach: function (assert) {
       testFns.setup(assert, { serviceName: altServiceName });
     },
@@ -43,20 +41,22 @@
     }
   });
 
-  test("getEntityByKey failing 1", function () {
+  test("getEntityByKey failing 1", function (assert) {
+    var done = assert.async();
     var manager = newEmX();
     var query = new breeze.EntityQuery()
         .from("Fruits");
-    stop();
+
     manager.executeQuery(query).then(function (data) {
       var fruit1 = data.results[0];
       var key = fruit1.getProperty("id");
       var fruit2 = manager.getEntityByKey("Fruit", key);
       ok(fruit1 === fruit2, "should be same entity");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query with predicate failing on inheritance entities", function () {
+  test("query with predicate failing on inheritance entities", function (assert) {
+    var done = assert.async();
     var manager = newEmX();
 
     var predicate = Predicate.create('name', '==', 'Apple')
@@ -69,32 +69,34 @@
       // .toType('ItemOfProduce');  // this will fail because 'ItemOfProduce' does not have a 'name' property.
         .toType("Fruit");  // without this we get the "time" issue.
 
-    stop();
+
     manager.executeQuery(query).then(function (data) {
       ok(true);
     }).fail(function (e) {
       ok(false, e.message);
-    }).fin(start);
+    }).fin(done);
   });
 
-  test("getEntityByKey failing 2", function () {
+  test("getEntityByKey failing 2", function (assert) {
+    var done = assert.async();
     var manager = newEmX();
     var query = new breeze.EntityQuery()
         .from("ItemsOfProduce");
-    stop();
+
     manager.executeQuery(query).then(function (data) {
       var ioprod1 = data.results[0];
       var key = ioprod1.getProperty("id");
       var ioprod2 = manager.getEntityByKey("ItemOfProduce", key);
       ok(ioprod1 === ioprod2, "should be same entity");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("Localquery failing on inheritance entities1", function () {
+  test("Localquery failing on inheritance entities1", function (assert) {
+    var done = assert.async();
     var manager = newEmX();
     var query = new breeze.EntityQuery()
         .from("Fruits");
-    stop();
+
     manager.executeQuery(query).then(function (data) {
       var fruits = data.results;
 
@@ -106,14 +108,15 @@
       ok(true);
     }).fail(function (e) {
       ok(false, e.message);
-    }).fin(start);
+    }).fin(done);
   });
 
-  test("Localquery failing on inheritance entities2", function () {
+  test("Localquery failing on inheritance entities2", function (assert) {
+    var done = assert.async();
     var manager = newEmX();
     var query = new breeze.EntityQuery()
         .from("Fruits");
-    stop();
+
     manager.executeQuery(query).then(function (data) {
       var fruits = data.results;
 
@@ -123,32 +126,34 @@
       ok(true);
     }).fail(function (e) {
       ok(false, e.message);
-    }).fin(start);
+    }).fin(done);
   });
 
-  test("EntityKey for ItemsOfProduce", function () {
+  test("EntityKey for ItemsOfProduce", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var rdAppleId = "D35E9669-2BAE-4D69-A27A-252B31800B74";
     var et = em.metadataStore.getEntityType("ItemOfProduce");
 
     var ek = new EntityKey(et, rdAppleId);
-    stop();
+
     em.fetchEntityByKey(ek).then(function (data) {
       var item = data.entity;
       ok(item, "item should have been found");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("fetchEntityByKey Apple", function () {
+  test("fetchEntityByKey Apple", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var rdAppleId = "D35E9669-2BAE-4D69-A27A-252B31800B74";
     var appleType = em.metadataStore.getEntityType("Apple");
 
-    stop();
+
     var item;
     em.fetchEntityByKey("Apple", rdAppleId).then(function (data) {
       item = data.entity;
@@ -161,15 +166,16 @@
       ok(item, "item should have been found");
       ok(data2.fromCache === true, "should have been from cache");
       ok(item.entityType === appleType);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("fetchEntityByKey ItemOfProduce/Apple", function () {
+  test("fetchEntityByKey ItemOfProduce/Apple", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var rdAppleId = "D35E9669-2BAE-4D69-A27A-252B31800B74";
     var appleType = em.metadataStore.getEntityType("Apple");
-    stop();
+
     var item;
     em.fetchEntityByKey("ItemOfProduce", rdAppleId).then(function (data) {
       item = data.entity;
@@ -182,15 +188,16 @@
       ok(item, "item should have been found");
       ok(data2.fromCache === true, "should have been from cache");
       ok(item.entityType === appleType);
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query ItemsOfProduce", function () {
+  test("query ItemsOfProduce", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var q = EntityQuery.from("ItemsOfProduce")
         .using(em);
-    stop();
+
     var iopType = em.metadataStore.getEntityType("ItemOfProduce");
     q.execute().then(function (data) {
       var r = data.results;
@@ -208,16 +215,17 @@
       ok(r0valueNew === "zzzz", "r0ValueNew should have changed");
       ok(r1valueNew === r1value, "r1ValueNew should not have changed");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query Fruits w/server ofType", function () {
+  test("query Fruits w/server ofType", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var q = EntityQuery.from("Fruits")
         .using(em);
-    stop();
+
     var fruitType = em.metadataStore.getEntityType("Fruit");
     q.execute().then(function (data) {
       var r = data.results;
@@ -226,18 +234,19 @@
         return f.entityType.isSubtypeOf(fruitType);
       }));
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
   testFns.skipIf(true, "OfType operator not yet supported - will be added later" ).
-  test("query Fruits w/client ofType", function () {
+  test("query Fruits w/client ofType", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     
     var q = EntityQuery.from("ItemsOfProduce")
         .where(null, FilterQueryOp.IsTypeOf, "Fruit")
         .using(em);
-    stop();
+
     var fruitType = em.metadataStore.getEntityType("Fruit");
     q.execute().then(function (data) {
       var r = data.results;
@@ -246,16 +255,17 @@
         return f.entityType.isSubtypeOf(fruitType);
       }));
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query Fruits locally", function () {
+  test("query Fruits locally", function (assert) {
+    var done = assert.async();
     var em = newEmX();
 
     var q = EntityQuery.from("Fruits")
         .using(em);
-    stop();
+
 
     q.execute().then(function (data) {
       var fruits = data.results;
@@ -265,17 +275,18 @@
       var fruits2 = em.executeQueryLocally(q2);
       ok(fruits2.length === fruits.length);
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query ItemsOfProduce(ES5) and modify ", function () {
+  test("query ItemsOfProduce(ES5) and modify ", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     registerItemOfProduceWithES5(em, "ItemOfProduce");
 
     var q = EntityQuery.from("ItemsOfProduce")
         .using(em).take(2);
-    stop();
+
 
     q.execute().then(function (data) {
       var r = data.results;
@@ -291,16 +302,17 @@
       ok(r0valueNew === "ZZZZ", "r0ValueNew should have changed");
       ok(r1valueNew === r1value, "r1ValueNew should not have changed");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query ItemsOfProduc(ES5)e unique quantityPerProduct values", function () {
+  test("query ItemsOfProduc(ES5)e unique quantityPerProduct values", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     registerItemOfProduceWithES5(em, "ItemOfProduce");
 
     var q = EntityQuery.from("ItemsOfProduce")
         .using(em);
-    stop();
+
 
     q.execute().then(function (data) {
       var r = data.results;
@@ -315,16 +327,17 @@
         }
       });
       ok(count > 1, "count shoud be greater than 1");
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
   });
 
-  test("query ItemsOfProduce(ES5)", function () {
+  test("query ItemsOfProduce(ES5)", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     registerItemOfProduceWithES5(em, "ItemOfProduce");
 
     var q = EntityQuery.from("ItemsOfProduce")
         .using(em);
-    stop();
+
     var iopType = em.metadataStore.getEntityType("ItemOfProduce");
     q.execute().then(function (data) {
       var r = data.results;
@@ -360,18 +373,19 @@
         return amount.length > 1 && amount == (stock + ':' + quan);
       }), "every item has amountOnHand property == unitsInStock:quantityPerUnit");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query Fruits(ES5)", function () {
+  test("query Fruits(ES5)", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     // initializer only down to Fruit - not ItemOfProduce.
     registerItemOfProduceWithES5(em, "Fruit");
 
     var q = EntityQuery.from("Fruits")
         .using(em);
-    stop();
+
     var iopType = em.metadataStore.getEntityType("Fruit");
     q.execute().then(function (data) {
       var r = data.results;
@@ -407,21 +421,19 @@
         return amount.length > 1 && amount == (stock + ':' + quan);
       }), "every item has amountOnHand property == unitsInStock:quantityPerUnit");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
-  test("query ItemsOfProduce - Additional Base Class(ES5)", function () {
-    if (testFns.modelLibrary == "backbone") {
-      ok(true, "NA for backbone - not sure how to do this in backbone");
-      return;
-    }
+  testFns.skipIf("backbone", "because not sure how to do this in backbone").
+  test("query ItemsOfProduce - Additional Base Class(ES5)", function (assert) {
+    var done = assert.async();
     var em = newEmX();
     registerWithAdditionalBaseClass(em, "ItemOfProduce");
 
     var q = EntityQuery.from("ItemsOfProduce")
         .using(em);
-    stop();
+
     var iopType = em.metadataStore.getEntityType("ItemOfProduce");
     q.execute().then(function (data) {
       var r = data.results;
@@ -461,7 +473,7 @@
         return onBase === "I am on base";
       }), "every item has onBase == I am on base");
 
-    }).fail(testFns.handleFail).fin(start);
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
