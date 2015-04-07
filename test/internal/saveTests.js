@@ -2153,7 +2153,7 @@
     }).then(function (sr2) {
       ok(false, "should not get here, save should have failed");
     }).fail(function (error) {
-      ok(em.hasChanges());
+      ok(em.hasChanges(), "entityManager should still have changes pending after a save failure");
       var exceptionType = error.detail.ExceptionType.toLowerCase();
       ok((exceptionType.indexOf("concurrency") >= 0 || exceptionType.indexOf("staleobjectstate") >= 0), "wrong error message: " + error.detail.ExceptionType);
     }).fin(done);

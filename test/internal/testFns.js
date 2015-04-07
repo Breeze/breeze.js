@@ -19,6 +19,67 @@
     teardown_inheritanceReset: teardown_inheritanceReset
   };
 
+  testFns.TEST_RECOMPOSITION = true;
+  configQunit();
+
+  function configQunit() {
+
+    QUnit.config.autostart = false;
+    // global timeout of 20 secs
+    // No test should take that long but first time db build can.
+    QUnit.config.testTimeout = 20000;
+
+    QUnit.config.urlConfig.push({
+      id: "canStart",
+      label: "Start the tests",
+      tooltip: "Allows a user to set options before tests start."
+    });
+
+    QUnit.config.urlConfig.push({
+      id: "modelLibrary",
+      value: ["backingStore", "knockout", "backbone"],
+      label: "Model library",
+      tooltip: "Model library"
+    });
+
+    if (QUnit.urlParams.reset) {
+      QUnit.config.testId = [];
+      QUnit.urlParams.reset = undefined;
+    }
+
+    if (QUnit.config.testId.length > 0) {
+      QUnit.config.urlConfig.push({
+        id: "reset",
+        label: "reset",
+        tooltip: "reset"
+      })
+    }
+
+    if (!QUnit.urlParams.canStart) {
+      // insures that no tests run.
+      QUnit.config.testId = ["none"];
+      // Doesn't actually work.
+      // QUnit.config.moduleFilter = "none";
+    }
+
+    if (!QUnit.urlParams.modelLibrary) {
+      QUnit.urlParams.modelLibrary = "backingStore";
+    }
+
+    // Should be called after all of the tests have been loaded in the index.xxx.html file
+    // QUnit.start();
+  }
+
+
+  // For use when QUnit 2.0 is released and ok => assert.ok;
+  testFns.test = function(testName, fn) {
+    var fn2 = function(assert) {
+      var ok = assert.ok;
+      fn(assert);
+    };
+    QUnit.test(testName, fn2);
+  }
+
   testFns.skipIf = function (delimTokens, msg) {
     var skipToken = getSkipToken(delimTokens);
 
@@ -33,9 +94,7 @@
       }
     } else {
       return {
-        test: function (testName, fn) {
-          QUnit.test(testName, fn);
-        },
+        test: QUnit.test,
         skipIf: function(delimTokens, msg) {
           return testFns.skipIf(delimTokens, msg);
         }
@@ -67,77 +126,51 @@
        (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0);
   }
 
-  testFns.TEST_RECOMPOSITION = true;
-  configQunit();
-
-  function configQunit() {
-    
-    QUnit.config.autostart = false;
-    // global timeout of 20 secs
-    // No test should take that long but first time db build can.
-    QUnit.config.testTimeout = 20000;
-
-    QUnit.config.urlConfig.push({
-      id: "canStart",
-      label: "Start the tests",
-      tooltip: "Allows a user to set options before tests start."
-    });
-
-    QUnit.config.urlConfig.push({
-      id: "modelLibrary",
-      value: ["backingStore", "knockout", "backbone"],
-      label: "Model library",
-      tooltip: "Model library"
-    });
-
-    if (!QUnit.urlParams.canStart) {
-      // insures that no tests run.
-      QUnit.config.testId = ["none"];
-      // Doesn't actually work.
-      // QUnit.config.moduleFilter = "none";
+  testFns.setup = function (assert, config) {
+    config = config || {};
+    // config.serviceName - default = testFns.defaultServiceName
+    // config.serviceHasMetadata - default = true
+    // config.metadataFn - default = null
+    var serviceHasMetadata = (config.serviceHasMetadata === undefined) ? true : false;
+    if (config.serviceName == null || config.serviceName.length === 0) {
+      if (testFns.serviceName != testFns.defaultServiceName) {
+        testFns.serviceName = testFns.defaultServiceName;
+        testFns.metadataStore = null;
+      }
+    } else {
+      if (testFns.serviceName !== config.serviceName) {
+        testFns.serviceName = config.serviceName;
+        testFns.metadataStore = null;
+      }
     }
 
-    if (!QUnit.urlParams.modelLibrary) {
-      QUnit.urlParams.modelLibrary = "backingStore";
-    }
-    
-    // Should be called after all of the tests have been loaded in the index.xxx.html file
-    // QUnit.start(); 
-  
-  }
+    if (config.noMetadata) return;
 
-  function updateTitle() {
-    testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
-    var maintitle = "Breeze Test Suite -> " + testFns.title;
-    var el = document.getElementById("title");
-    if (el) el.innerHTML = maintitle;
-    el = document.getElementById("qunit-header");
-    if (el) el.innerHTML = maintitle;
-  }
+    if (!testFns.metadataStore) {
+      testFns.metadataStore = testFns.newMs();
+    }
+
+    updateWellKnownData(assert);
+
+    if (!testFns.metadataStore.isEmpty()) {
+      if (config.metadataFn) config.metadataFn();
+      return;
+    }
+
+    var em = testFns.newEm();
+    if (serviceHasMetadata) {
+      var done = assert.async();
+      em.fetchMetadata(function (rawMetadata) {
+        if (config.metadataFn) config.metadataFn();
+      }).fail(testFns.handleFail).fin(done);
+    }
+  };
+
+
 
   testFns.setSampleNamespace = function (value) {
     testFns.sampleNamespace = value;
   };
-
-  // TODO: check if this is needed any longer
-  testFns.queryServerVersion = function (url) {
-    url = url || "/testconfig";
-    var ajaxImpl = core.config.getAdapterInstance("ajax");
-    
-    ajaxImpl.ajax({
-      type: "GET",
-      url: url,
-      dataType: 'json',
-      success: function (httpResponse) {
-        var data = httpResponse.data;
-        testFns.setServerVersion(data.value, data.version);
-        testFns.northwindIBMetadata = JSON.parse(data.metadata);       
-      },
-      error: function (httpResponse) {
-        alert("error getting server version data: " + httpResponse.status);
-      }
-    });
-  }
 
   testFns.setServerVersion = function (serverName, version) {
     serverName = serverName.toLowerCase();
@@ -220,6 +253,15 @@
     setWellKnownData();
   };
 
+  function updateTitle() {
+    testFns.title = "server: " + testFns.serverVersion + ", dataService: " + (testFns.dataService || "--NONE SPECIFIED --") + ", modelLibrary: " + testFns.modelLibrary;
+    var maintitle = "Breeze Test Suite -> " + testFns.title;
+    var el = document.getElementById("title");
+    if (el) el.innerHTML = maintitle;
+    el = document.getElementById("qunit-header");
+    if (el) el.innerHTML = maintitle;
+  }
+
 
   function setWellKnownData() {
     var wellKnownData;
@@ -288,45 +330,7 @@
     updateTitle();
   };
 
-  testFns.setup = function (assert, config) {
-    config = config || {};
-    // config.serviceName - default = testFns.defaultServiceName
-    // config.serviceHasMetadata - default = true
-    // config.metadataFn - default = null
-    var serviceHasMetadata = (config.serviceHasMetadata === undefined) ? true : false;
-    if (config.serviceName == null || config.serviceName.length === 0) {
-      if (testFns.serviceName != testFns.defaultServiceName) {
-        testFns.serviceName = testFns.defaultServiceName;
-        testFns.metadataStore = null;
-      }
-    } else {
-      if (testFns.serviceName !== config.serviceName) {
-        testFns.serviceName = config.serviceName;
-        testFns.metadataStore = null;
-      }
-    }
 
-    if (config.noMetadata) return;
-
-    if (!testFns.metadataStore) {
-      testFns.metadataStore = testFns.newMs();
-    }
-    
-    updateWellKnownData(assert);
-
-    if (!testFns.metadataStore.isEmpty()) {
-      if (config.metadataFn) config.metadataFn();
-      return;
-    }
-    
-    var em = testFns.newEm();
-    if (serviceHasMetadata) {
-      var done = assert.async();
-      em.fetchMetadata(function (rawMetadata) {
-        if (config.metadataFn) config.metadataFn();
-      }).fail(testFns.handleFail).fin(done);
-    }
-  };
 
   testFns.configureMetadata = function (metadataFetchedArgs) {
     var ms = metadataFetchedArgs.metadataStore;
