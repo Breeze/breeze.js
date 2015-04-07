@@ -54,7 +54,10 @@
     var cust, rowVersion;
     var em1 = newEm();
 
-    em1.executeQuery(new EntityQuery("Customers").where("rowVersion", "!=", null).take(1)).then(function (data) {
+    em1.executeQuery(new EntityQuery("Customers")
+      .where("rowVersion", "!=", null)
+      .where("companyName", "!=","error")
+      .take(1)).then(function (data) {
       cust = data.results[0];
 
       testFns.morphStringProp(cust, "contactName");
@@ -581,6 +584,7 @@
   }
 
   testFns.skipIf("mongo", " can not handle this test as written").
+  skipIf("hibernate", " does not YET support the all predicate which this test uses").
   test("add UserRole", function (assert) {
     var done = assert.async();
 
@@ -589,6 +593,8 @@
     var userId = 6;
     var p2 = breeze.Predicate.create("userId", "ne", userId);
     var p1 = breeze.Predicate.create("userRoles", "all", p2);
+    //var p2 = breeze.Predicate.create("userId", "==", userId);
+    //var p1 = breeze.Predicate.create("userRoles", "any", p2).not();
 
     var q = new EntityQuery("Roles").where(p1).take(1);
 
