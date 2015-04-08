@@ -1588,8 +1588,8 @@ var Event = (function () {
     if (obj._getEventParent === undefined) {
       throw new Error("This object does not support event enabling/disabling");
     }
-    // return ctor._isEnabled(obj, getFullEventName(eventName));
-    return ctor._isEnabled(obj, eventName);
+    // return ctor._isEnabled(getFullEventName(eventName), obj);
+    return ctor._isEnabled(eventName, obj);
   };
 
   ctor._isEnabled = function (eventName, obj) {
