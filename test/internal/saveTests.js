@@ -521,7 +521,7 @@
   });
 
   testFns.skipIf("mongo", " can not handle this test as written").
-  test("pk update", function (assert) {
+  test("pk update should throw meaningful exception", function (assert) {
     var done = assert.async();
 
     var em = newEm();

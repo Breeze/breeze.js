@@ -34,7 +34,43 @@
     
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
-      ok(emps.length >= 1, "should be at least 1 emps with orders with freight > 950");
+      ok(emps.length >= 1 && emps.length <= 10, "should be between 1 and 10 emps with orders with freight > 950");
+    }).fail(testFns.handleFail).fin(done);
+
+  });
+
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("any can be expressed as not all", function (assert) {
+    var done = assert.async();
+    var maxFreight = 800;
+    var em = newEm();
+    var query = EntityQuery.from("Employees")
+      .where("orders", "any", "freight", ">", maxFreight)
+      .expand("orders");
+    var emps;
+    em.executeQuery(query).then(function (data) {
+      emps = data.results;
+      ok(emps.length >= 1, "should be at least 1 emps with orders with freight > maxFreight");
+      emps.forEach(function (emp) {
+        var orders = emp.getProperty("orders");
+        isOk = orders.some(function (order) {
+          return order.getProperty("freight") > maxFreight;
+        })
+        ok(isOk, "at least one order on each emp should be > maxFreight ")
+      });
+      var p1 = new Predicate("freight", "<=", maxFreight).or("freight", "==", null);
+      var predicate = new Predicate("orders", "all", p1).not();
+      var query2 = EntityQuery.from("Employees")
+        .where(predicate)
+        .expand("orders");
+      return em.executeQuery(query2);
+    }).then(function(data2) {
+      emps2 = data2.results;
+      ok(emps.length == emps2.length, "both emp arrays should be the same length");
+      isOk = emps.every(function(emp) {
+        return emps2.indexOf(emp) >= 0;
+      });
+      ok(isOk, "should be the same emps as the first query");
     }).fail(testFns.handleFail).fin(done);
 
   });

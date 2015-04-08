@@ -20,6 +20,7 @@
     }
   });
 
+  testFns.skipIf(true, "Need to rethink how to best create this test").
   test("compare NorthwindIB metadata to baseline", function () {
     var em = testFns.newEm();
     var store = em.metadataStore;
