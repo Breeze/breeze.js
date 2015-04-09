@@ -187,8 +187,7 @@
     @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
     **/
     proto.and = function () {
-      var pred = Predicate(__arraySlice(arguments));
-      return new AndOrPredicate("and", [this, pred]);
+      return new AndOrPredicate("and", argsForAndOrPredicates(this, arguments));
     };
     
     /**
@@ -211,8 +210,7 @@
     @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
     **/
     proto.or = function () {
-      var pred = Predicate(__arraySlice(arguments));
-      return new AndOrPredicate("or", [this, pred]);
+      return new AndOrPredicate("or", argsForAndOrPredicates(this, arguments));
     };
     
     /**
@@ -293,6 +291,16 @@
       }
     };
 
+    function argsForAndOrPredicates(obj, args) {
+      var preds = args[0];
+      if (preds instanceof Predicate) {
+        preds = __arraySlice(args);
+      } else if (!Array.isArray(preds)) {
+        preds = [Predicate(__arraySlice(args))];
+      }
+      return [obj].concat(preds);
+    }
+    
     function updateAliasMap(aliasMap, op, config) {
       var key = op.toLowerCase();
       config.key = key;
