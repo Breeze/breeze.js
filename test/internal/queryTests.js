@@ -2366,7 +2366,7 @@
         var empId = emp.getProperty("employeeID");
         var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
         ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
-        emp.directReports.forEach(function (dr) {
+        emp.getProperty("directReports").forEach(function (dr) {
           ok(dr.getProperty("reportsToEmployeeID") == emp.getProperty("employeeID"), "boss should match");
         });
 
@@ -2381,7 +2381,7 @@
         var empId = emp.getProperty("employeeID");
         var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
         ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
-        emp.directReports.forEach(function (dr) {
+        emp.getProperty("directReports").forEach(function (dr) {
           ok(dr.getProperty("reportsToEmployeeID") == emp.getProperty("employeeID"), "boss should match");
         });
       });
