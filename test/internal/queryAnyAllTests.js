@@ -47,7 +47,7 @@
     var query = EntityQuery.from("Employees")
       .where("orders", "any", "freight", ">", maxFreight)
       .expand("orders");
-    var emps;
+    var emps, emps2;
     em.executeQuery(query).then(function (data) {
       emps = data.results;
       ok(emps.length >= 1, "should be at least 1 emps with orders with freight > maxFreight");
@@ -74,6 +74,45 @@
     }).fail(testFns.handleFail).fin(done);
 
   });
+
+  testFns.skipIf("mongo", "does not support 'expand'").
+  test("any with territories/regions and inverse with all", function (assert) {
+      var done = assert.async();
+      var maxFreight = 800;
+      var em = newEm();
+      var query = EntityQuery.from("Regions")
+        .where("territories", "any", "territoryDescription", "startsWith", "B")
+        .expand("territories");
+      var regions;
+      em.executeQuery(query).then(function (data) {
+        regions = data.results;
+        ok(regions.length >= 1, "should be at least 1 region that matches");
+        regions.forEach(function (region) {
+          var territories = region.getProperty("territories");
+          isOk = territories.some(function (territory) {
+            var descr = territory.getProperty("territoryDescription");
+            return descr.indexOf("B") == 0;
+          })
+          ok(isOk, "at least one territory on each region should match");
+        });
+        var p1 = new Predicate("territoryDescription", "startsWith", "B").not().or("territoryDescription", "==", null);
+        var predicate = new Predicate("territories", "all", p1).not();
+        var query2 = EntityQuery.from("Regions")
+          .where(predicate)
+          .expand("territories");
+        return em.executeQuery(query2);
+      }).then(function(data2) {
+        var regions2 = data2.results;
+        ok(regions2.length == regions.length, "both arrays should be the same length");
+        isOk = regions.every(function(region) {
+          return regions2.indexOf(region) >= 0;
+        });
+        ok(isOk, "should be the same regions as the first query");
+      }).fail(testFns.handleFail).fin(done);
+
+    });
+
+
 
   test("any and gt (local)", function (assert) {
     var done = assert.async();

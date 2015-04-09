@@ -17,7 +17,7 @@
   var newEm = testFns.newEm;
   var wellKnownData = testFns.wellKnownData;
   var skipIfMongoExpand = testFns.skipIf("mongo", "does not support 'expand'");
-  var skipIfHibFuncExpr = testFns.skipIf("hibernate", "does not yet support function expressions");
+  var skipIfHibFuncExpr = testFns.skipIf("hibernate", "TODO: does not yet support function expressions");
 
   module("query - basic", {
     beforeEach: function (assert) {
@@ -26,6 +26,8 @@
     afterEach: function (assert) {
     }
   });
+
+
 
   testFns.skipIf("mongo", "eventually will not use OData syntax").
   skipIf("sequelize,hibernate", "does not use OData syntax").

@@ -343,7 +343,46 @@
 
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have enum support").
+  testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
+  test("enum query on Role", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var query = EntityQuery.from('Roles').using(em);
+    var roles;
+    query.execute().then(function(data) {
+      roles = data.results;
+      ok(roles.length >= 2, "should be at least 2 roles");
+      var query2 = query.expand("userRoles");
+      return query2.execute();
+    }).then(function(data2) {
+      roles = data2.results;
+      var isOk = roles.some(function(role) {
+        return role.getProperty("userRoles").length > 0;
+      })
+      ok(isOk, "should be at least 1 role with associated userRoles");
+    }).fail(testFns.handleFail).fin(done);
+
+  });
+
+  testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
+  test("enum query filter on Role", function(assert) {
+    var done = assert.async();
+    var em = newEm();
+    var query = new EntityQuery("Roles").where("roleType", "==", 'Restricted');
+    var roleType = em.metadataStore.getEntityType("Role");
+
+    var role;
+    em.executeQuery(query).then(function (data) {
+      var roles = data.results;
+      ok(roles.length > 1, "more than one entity should have been queried");
+      var isOk = roles.every(function(role){
+        return role.getProperty("roleType") === "Restricted";
+      });
+      ok(isOk, "every role should have a 'Restricted' role type");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
+  testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
   test("enums w/save", function(assert) {
     var done = assert.async();
     var em = newEm();

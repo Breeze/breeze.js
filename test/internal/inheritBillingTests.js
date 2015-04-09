@@ -2,9 +2,10 @@
 
   if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("inherit - Billing", {});
-    QUnit.skip("This server does not yet support these tests", function () {});
+    QUnit.skip("TODO: This server does not yet support these tests", function () {});
     return;
   };
+
 
 
   var breeze = testFns.breeze;

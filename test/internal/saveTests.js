@@ -584,17 +584,16 @@
   }
 
   testFns.skipIf("mongo", " can not handle this test as written").
-  skipIf("hibernate", " does not YET support the all predicate which this test uses").
   test("add UserRole", function (assert) {
     var done = assert.async();
 
     var em = newEm();
     var roleId;
     var userId = 6;
-    var p2 = breeze.Predicate.create("userId", "ne", userId);
-    var p1 = breeze.Predicate.create("userRoles", "all", p2);
-    //var p2 = breeze.Predicate.create("userId", "==", userId);
-    //var p1 = breeze.Predicate.create("userRoles", "any", p2).not();
+    //var p2 = breeze.Predicate.create("userId", "ne", userId);
+    //var p1 = breeze.Predicate.create("userRoles", "all", p2);
+    var p2 = breeze.Predicate.create("userId", "==", userId);
+    var p1 = breeze.Predicate.create("userRoles", "any", p2).not();
 
     var q = new EntityQuery("Roles").where(p1).take(1);
 

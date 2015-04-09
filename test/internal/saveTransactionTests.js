@@ -115,6 +115,7 @@
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithNoTransaction");
   });
 
+  testFns.skipIf("hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithDbTransaction", function (assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithDbTransaction");
   });
@@ -159,7 +160,7 @@
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithNoTransaction");
   });
 
-  testFns.skipIf("hibernate", "does not YET support adding data in afterSaveEntities").
+  testFns.skipIf("hibernate", "TODO: does not YET support adding data in afterSaveEntities").
   test("save Order and add KeyMapping to Comment in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithDbTransaction");
   });
@@ -204,6 +205,7 @@
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithNoTransaction");
   });
 
+  testFns.skipIf("hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithDbTransaction");
   });
