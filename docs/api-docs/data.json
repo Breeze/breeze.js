@@ -439,7 +439,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "..\\src\\a25_validate.js",
-            "line": 887,
+            "line": 890,
             "description": "A ValidationError is used to describe a failed validation."
         },
         "ValidationOptions": {
@@ -2171,7 +2171,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 893,
+            "line": 896,
             "description": "Constructs a new ValidationError",
             "itemtype": "method",
             "name": "<ctor> ValidationError",
@@ -2203,7 +2203,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 923,
+            "line": 926,
             "description": "The Validator associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validator",
@@ -2213,7 +2213,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 930,
+            "line": 933,
             "description": "A 'context' object associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "context",
@@ -2223,7 +2223,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 937,
+            "line": 940,
             "description": "The DataProperty or NavigationProperty associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "property",
@@ -2233,7 +2233,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 944,
+            "line": 947,
             "description": "The property name associated with this ValidationError. This will be a \"property path\" for any properties of a complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "propertyName",
@@ -2243,7 +2243,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 951,
+            "line": 954,
             "description": "The error message associated with the ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "errorMessage",
@@ -2253,7 +2253,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 958,
+            "line": 961,
             "description": "The key by which this validation error may be removed from a collection of ValidationErrors.\n\n__readOnly__",
             "itemtype": "property",
             "name": "key",
@@ -2263,7 +2263,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 965,
+            "line": 968,
             "description": "Whether this is a server error.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isServerError",
@@ -2273,7 +2273,7 @@
         },
         {
             "file": "..\\src\\a25_validate.js",
-            "line": 973,
+            "line": 976,
             "description": "Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName",
             "itemtype": "method",
             "name": "getKey",
@@ -6114,7 +6114,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 194,
+            "line": 193,
             "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.or(p2, p3);\nor",
@@ -6136,7 +6136,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 218,
+            "line": 216,
             "description": "Returns the 'negated' version of this Predicate",
             "example": [
                 "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = p1.not();\nThis can also be accomplished using the 'static' version of the 'not' method",
