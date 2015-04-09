@@ -2174,7 +2174,7 @@
         1: 2, 3: 2, 4: 3, 5: 8, 6: 2, 8: 3, 9: 6, 10: 6
       };
       emps.forEach(function (emp) {
-        ok(map[emp.employeeId] == emp.reportsToEmployeeId, "reportsToEmployeeID should match");
+        ok(map[emp.getProperty("employeeID")] == emp.getProperty("reportsToEmployeeID"), "reportsToEmployeeID should match");
       });
     }).fail(testFns.handleFail).fin(done);
   });
@@ -2280,8 +2280,10 @@
     query.using(em).execute().then(function (data) {
       var emps = data.results;
       emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
-        emp.reportsToEmployeeID && ok(emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
+        var empId = emp.getProperty("employeeID");
+        var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
+        ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
+        reportsToEmpId && ok(emp.getProperty("boss").getProperty("employeeID") == reportsToEmpId, "boss should match");
       });
       var em = newEm(ms);
       var query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
@@ -2290,8 +2292,10 @@
     }).then(function (data2) {
       var emps = data2.results;
       emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
-        emp.reportsToEmployeeID && ok(emp.boss.employeeID == emp.reportsToEmployeeID, "boss should match");
+        var empId = emp.getProperty("employeeID");
+        var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
+        ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
+        reportsToEmpId && ok(emp.getProperty("boss").getProperty("employeeID") == reportsToEmpId, "boss should match");
       });
       var foo = "foo";
     }).fail(testFns.handleFail).fin(done);
@@ -2359,9 +2363,11 @@
     query.using(em).execute().then(function (data) {
       var emps = data.results;
       emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+        var empId = emp.getProperty("employeeID");
+        var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
+        ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
         emp.directReports.forEach(function (dr) {
-          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+          ok(dr.getProperty("reportsToEmployeeID") == emp.getProperty("employeeID"), "boss should match");
         });
 
       });
@@ -2372,9 +2378,11 @@
     }).then(function (data2) {
       var emps = data2.results;
       emps.forEach(function (emp) {
-        ok(emp.employeeID && map[emp.employeeID] == emp.reportsToEmployeeID, "reportsToEmployeeID should match");
+        var empId = emp.getProperty("employeeID");
+        var reportsToEmpId = emp.getProperty("reportsToEmployeeID");
+        ok(empId && map[empId] == reportsToEmpId, "reportsToEmployeeID should match");
         emp.directReports.forEach(function (dr) {
-          ok(dr.reportsToEmployeeID == emp.employeeID, "boss should match");
+          ok(dr.getProperty("reportsToEmployeeID") == emp.getProperty("employeeID"), "boss should match");
         });
       });
       var foo = "foo";
