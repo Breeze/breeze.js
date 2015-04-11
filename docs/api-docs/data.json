@@ -5981,7 +5981,7 @@
                 },
                 {
                     "name": "value",
-                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general,\nif the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.\nIn most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'\nproperty and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any\nliteral based on context, if this fails you can force this inference by making the value argument an object with a\n'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.",
+                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general,\nif the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.\nIn most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'\nproperty and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any\nliteral based on context, if this fails you can force this inference by making the value argument an object with a\n'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.",
                     "type": "Object"
                 }
             ],
@@ -5990,7 +5990,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 65,
+            "line": 64,
             "description": "Same as using the ctor.",
             "example": [
                 "\n    // so \n    var p = Predicate.create(a, b, c);\n    // is the same as \n    var p = new Predicate(a, b, c); "
@@ -6010,14 +6010,8 @@
                 },
                 {
                     "name": "value",
-                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general,\nif the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.\nIn most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'\nproperty and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any\nliteral based on context, if this fails you can force this inference by making the value argument an object with a\n'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.",
+                    "description": "- This will be treated as either a property expression or a literal depending on context.  In general,\nif the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal.\nIn most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'\nproperty and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any\nliteral based on context, if this fails you can force this inference by making the value argument an object with a\n'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.",
                     "type": "Object"
-                },
-                {
-                    "name": "predicates",
-                    "description": "Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.",
-                    "type": "Multiple Predicates|Array of Predicate",
-                    "multiple": true
                 }
             ],
             "static": 1,
@@ -6026,7 +6020,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 87,
+            "line": 86,
             "description": "Creates a 'composite' Predicate by 'and'ing a set of specified Predicates together.",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.and(p1, p2, p3);\nor",
@@ -6048,7 +6042,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 109,
+            "line": 108,
             "description": "Creates a 'composite' Predicate by 'or'ing a set of specified Predicates together.",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = Predicate.or(p1, p2, p3);\nor",
@@ -6070,7 +6064,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 130,
+            "line": 129,
             "description": "Creates a 'composite' Predicate by 'negating' a specified predicate.",
             "example": [
                 "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = Predicate.not(p1);\nThis can also be accomplished using the 'instance' version of the 'not' method",
@@ -6092,7 +6086,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 170,
+            "line": 169,
             "description": "'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.and(p2, p3);\nor",
@@ -6114,7 +6108,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 193,
+            "line": 192,
             "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
                 "\n    var dt = new Date(88, 9, 12);\n    var p1 = Predicate.create(\"OrderDate\", \"ne\", dt);\n    var p2 = Predicate.create(\"ShipCity\", \"startsWith\", \"C\");\n    var p3 = Predicate.create(\"Freight\", \">\", 100);\n    var newPred = p1.or(p2, p3);\nor",
@@ -6136,7 +6130,7 @@
         },
         {
             "file": "..\\src\\a44_predicate.js",
-            "line": 216,
+            "line": 215,
             "description": "Returns the 'negated' version of this Predicate",
             "example": [
                 "\n    var p1 = Predicate.create(\"Freight\", \"gt\", 100);\n    var not_p1 = p1.not();\nThis can also be accomplished using the 'static' version of the 'not' method",

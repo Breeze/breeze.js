@@ -9721,8 +9721,7 @@ breeze.NamingConvention = NamingConvention;
     In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'
     property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any
     literal based on context, if this fails you can force this inference by making the value argument an object with a
-    'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.
-
+    'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.
     **/
 
     var ctor = function () {
@@ -9775,8 +9774,8 @@ breeze.NamingConvention = NamingConvention;
     In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value'
     property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any
     literal based on context, if this fails you can force this inference by making the value argument an object with a
-    'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.
-    @param predicates* {multiple Predicates|Array of Predicate} Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.
+    'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.
+
     @static
     **/
     ctor.create = ctor;

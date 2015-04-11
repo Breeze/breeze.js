@@ -584,7 +584,7 @@
   }
 
   testFns.skipIf("mongo", " can not handle this test as written").
-  test("add UserRole", function (assert) {
+  test("add entity with enum and related - UserRole", function (assert) {
     var done = assert.async();
 
     var em = newEm();
@@ -627,14 +627,13 @@
 
   });
 
-  testFns.skipIf("mongo,odata,sequelize,hibernate", " does not yet support enums").
+  testFns.skipIf("mongo,odata,sequelize", "does not yet support enums").
   test("new entity with enum", function (assert) {
     var done = assert.async();
 
     var em = newEm();
     var em2 = newEm();
     var roleType = em.metadataStore.getEntityType("Role");
-
 
     var aRole = em.createEntity("Role");
     var aRole2;

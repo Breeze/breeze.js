@@ -210,7 +210,8 @@
 
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  testFns.skipIf("mongo,sequelize", "does not have this datatype").
+  skipIf("hibernate","requires the TimeLimits table which has not yet been created").
   test("time w/save", function (assert) {
     var done = assert.async();
     var newMs = MetadataStore.importMetadata(testFns.metadataStore.exportMetadata());
@@ -265,7 +266,8 @@
 
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  testFns.skipIf("mongo,sequelize", "does not have this datatype").
+  skipIf("hibernate","requires the TimeLimits table which has not yet been created").
   test("time 2",  function (assert) {
     var done = assert.async();
     var em = newEm();
@@ -283,7 +285,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  testFns.skipIf("mongo,sequelize", "does not have this datatype").
+  skipIf("hibernate","requires the TimeLimits table which has not yet been created").
   test("time not null", function(assert) {
     var done = assert.async();
     var em = newEm();
@@ -301,7 +304,8 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  testFns.skipIf("mongo,sequelize", "does not have this datatype").
+  skipIf("hibernate","requires the TimeLimits table which has not yet been created").
   test("bad time", function() {
     
     var em = newEm();
@@ -318,7 +322,7 @@
     ok(valErrs.length == 0, "should be no more errors");
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not have this datatype").
+  testFns.skipIf("mongo,sequelize,hibernate", "do not update the ts file (varbinary(8)) on the server. This is SQLServer specific").
   test("timestamp w/save", function (assert) {
     var done = assert.async();
     var em = newEm();
@@ -418,7 +422,7 @@
 
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have enum support").
+  testFns.skipIf("mongo,sequelize,odata", "does not yet support enums").
   test("enums null - w/save", function(assert) {
     var done = assert.async();
     var em = newEm();

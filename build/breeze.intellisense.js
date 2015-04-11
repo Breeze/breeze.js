@@ -1,4 +1,4 @@
-// Generated on: Tue Mar 31 2015 16:56:17 GMT-0700 (US Mountain Standard Time)
+// Generated on: Thu Apr 09 2015 15:26:15 GMT-0700 (Pacific Daylight Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -348,7 +348,7 @@ intellisense.annotate(breeze.breeze, {
     ///   </summary>
     ///   <param name="property" type="String" optional="true">A property name, a nested property name or an expression involving a property name.</param>
     ///   <param name="operator" type="FilterQueryOp|String" optional="true"></param>
-    ///   <param name="value" type="Object" optional="true">- This will be treated as either a property expression or a literal depending on context.  In general, if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.</param>
+    ///   <param name="value" type="Object" optional="true">- This will be treated as either a property expression or a literal depending on context.  In general, if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.</param>
     /// </signature>
   },
   'EntityQuery': function() {
@@ -1733,8 +1733,7 @@ intellisense.annotate(breeze.breeze.Predicate, {
     ///   </summary>
     ///   <param name="property" type="String" optional="true">A property name, a nested property name or an expression involving a property name.</param>
     ///   <param name="operator" type="FilterQueryOp|String" optional="true"></param>
-    ///   <param name="value" type="Object" optional="true">- This will be treated as either a property expression or a literal depending on context.  In general, if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType'property set to one of the breeze.DataType enumeration instances.</param>
-    ///   <param name="predicates" type="Multiple Predicates|Array of Predicate" optional="true">Any null or undefined values passed in will be automatically filtered out before constructing the composite predicate.</param>
+    ///   <param name="value" type="Object" optional="true">- This will be treated as either a property expression or a literal depending on context.  In general, if the value can be interpreted as a property expression it will be, otherwise it will be treated as a literal. In most cases this works well, but you can also force the interpretation by making the value argument itself an object with a 'value' property and an 'isLiteral' property set to either true or false.  Breeze also tries to infer the dataType of any literal based on context, if this fails you can force this inference by making the value argument an object with a 'value' property and a 'dataType' property set to one of the breeze.DataType enumeration instances.</param>
     
     /// </signature>
   },  'and': function() {
