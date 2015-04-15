@@ -848,7 +848,7 @@
   testFns.skipIf("mongo", "does not YET have a SaveCheck implemented on the server").
   test("check initializer is hit for entities added/saved on server", function (assert) {
     var done = assert.async();
-
+    expect(2);
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
     var ordInitializer = function (ord) {
       ord.setProperty("shipCountry", "Brazil");
@@ -866,13 +866,18 @@
     em.saveChanges(null, so).then(function (sr) {
       var ents = sr.entities;
       ok(ents.length === 2, "since an Order was created/saved in the interceptor, length should be 2");
-      ok(ents[1].getProperty("shipCountry") === "Brazil", "initializer was not 'hit'");
+      ents.forEach(function(ent) {
+        if (ent.entityType.shortName == "Order" ) {
+          ok(ent.getProperty("shipCountry") === "Brazil", "initializer was not 'hit'");
+        }
+      })
+
     }).fail(handleFail).fin(done);
   });
 
   testFns.skipIf("odata", "does not support server side interception or alt resource").
   skipIf("mongo", "test is not yet implemented because it requires a server side async call").
-  test("entities modified on server being saved as new entities", function (assert) {
+  test("entities retrieved on server being modified and resaved", function (assert) {
     var done = assert.async();
     var em = newEm();
 
@@ -1350,7 +1355,7 @@
       ok(false, "should not get here");
 
     }).fail(function (e) {
-      ok(e.message == "test of custom exception message", "wrong custom error message: " + e.message);
+      ok(e.message.indexOf("test of custom exception message")>=0, "wrong custom error message: " + e.message);
       ok(order1ValErrorsChangedArgs.length == 1, "should have had order1ValErrorsChangedArgs");
       ok(order1ValErrorsChangedArgs[0].added.length == 1, "should have added 1");
       ok(order1ValErrorsChangedArgs[0].removed.length == 0, "should have added 1");
