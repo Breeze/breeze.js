@@ -323,8 +323,8 @@ var Validator = (function () {
           return (core.stringStartsWith(v, "US"));
       };
       var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" });
-      Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
-      This will have a similar effect to this
+      Validator.messageTemplates.countryIsUS = "'%displayName%' must start with 'US'";
+      // This will have a similar effect to this
       var countryValidator = new Validator("countryIsUS", valFn, {
           displayName: "Country", 
           messageTemplate: "'%displayName%' must start with 'US'" 
