@@ -1758,6 +1758,9 @@ var EntityManager = (function () {
       if (first.entityType) {
         // assume "entities" is an array of entities;
         entities.forEach(function (e) {
+          if (e.entityAspect.entityState == EntityState.Detached) {
+            throw new Error("Unable to export an entity with an EntityState of 'Detached'");
+          }
           var group = entityGroupMap[e.entityType.name];
           if (!group) {
             group = {};
@@ -1894,6 +1897,9 @@ var EntityManager = (function () {
 
       var entityKey = entityType.getEntityKeyFromRawEntity(rawEntity, rawValueFn);
       var entityState = EntityState.fromName(newAspect.entityState);
+      if (!entityState || entityState == EntityState.Detached ) {
+        throw new Error("Only entities with a non detached entity state may be imported.");
+      }
 
       // Merge if raw entity is in cache
       // UNLESS this is a new entity w/ a temp key

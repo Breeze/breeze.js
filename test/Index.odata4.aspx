@@ -27,7 +27,7 @@
     <script src="vendor/backbone.min.js"></script>
     <script src="vendor/jquery-2.0.3.min.js"></script>
     <script src="vendor/angular.min.js"></script>
-    <script src="vendor/datajs-1.1.2.js"></script>
+    <script src="vendor/odatajs-4.0.0.js"></script>   
     <script src="vendor/changesets.js"></script>
 
     <!-- Test helper scripts  -->
