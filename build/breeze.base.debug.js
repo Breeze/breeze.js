@@ -2392,8 +2392,8 @@ var Validator = (function () {
           return (core.stringStartsWith(v, "US"));
       };
       var countryValidator = new Validator("countryIsUS", valFn, { displayName: "Country" });
-      Validator.messageTemplates["countryIsUS", "'%displayName%' must start with 'US'");
-      This will have a similar effect to this
+      Validator.messageTemplates.countryIsUS = "'%displayName%' must start with 'US'";
+      // This will have a similar effect to this
       var countryValidator = new Validator("countryIsUS", valFn, {
           displayName: "Country", 
           messageTemplate: "'%displayName%' must start with 'US'" 
@@ -15276,7 +15276,8 @@ var MappingContext = (function () {
         }
       }
     } else {
-      if (typeof node === 'object' && !__isDate(node)) {
+
+      if ((!meta.passThru) && typeof node === 'object' && !__isDate(node)) {
         node = processAnonType(mc, node);
       }
 
@@ -15329,7 +15330,7 @@ var MappingContext = (function () {
     node = meta.node || node;
 
     if (meta.ignore) return;
-
+    if (meta.passThru) return node;
     if (Array.isArray(node)) {
       nodeContext.nodeType = nodeContext.nodeType + "Item";
       result[key] = node.map(function (v, ix) {

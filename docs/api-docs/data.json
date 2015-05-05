@@ -1719,7 +1719,7 @@
             "line": 316,
             "description": "Map of standard error message templates keyed by validator name.\nYou can add to or modify this object to customize the template used for any validation error message.",
             "example": [
-                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, { displayName: \"Country\" });\n    Validator.messageTemplates[\"countryIsUS\", \"'%displayName%' must start with 'US'\");\n    This will have a similar effect to this\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\", \n        messageTemplate: \"'%displayName%' must start with 'US'\" \n    });"
+                "\n    // v is this function is the value to be validated, in this case a \"country\" string.\n    var valFn = function (v) {\n        if (v == null) return true;\n        return (core.stringStartsWith(v, \"US\"));\n    };\n    var countryValidator = new Validator(\"countryIsUS\", valFn, { displayName: \"Country\" });\n    Validator.messageTemplates.countryIsUS = \"'%displayName%' must start with 'US'\";\n    // This will have a similar effect to this\n    var countryValidator = new Validator(\"countryIsUS\", valFn, {\n        displayName: \"Country\", \n        messageTemplate: \"'%displayName%' must start with 'US'\" \n    });"
             ],
             "itemtype": "property",
             "name": "messageTemplates",

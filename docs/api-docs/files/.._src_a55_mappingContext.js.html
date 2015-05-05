@@ -313,7 +313,8 @@ var MappingContext = (function () {
         }
       }
     } else {
-      if (typeof node === &#x27;object&#x27; &amp;&amp; !__isDate(node)) {
+
+      if ((!meta.passThru) &amp;&amp; typeof node === &#x27;object&#x27; &amp;&amp; !__isDate(node)) {
         node = processAnonType(mc, node);
       }
 
@@ -366,7 +367,7 @@ var MappingContext = (function () {
     node = meta.node || node;
 
     if (meta.ignore) return;
-
+    if (meta.passThru) return node;
     if (Array.isArray(node)) {
       nodeContext.nodeType = nodeContext.nodeType + &quot;Item&quot;;
       result[key] = node.map(function (v, ix) {
