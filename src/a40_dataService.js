@@ -222,7 +222,8 @@ var JsonResultsAdapter = (function () {
                   entityType: entityType,
                   nodeId: node.$id,
                   nodeRefId: node.$ref,
-                  ignore: ignore
+                  ignore: ignore,
+                  passThru: false // default
               };
           }
       });
