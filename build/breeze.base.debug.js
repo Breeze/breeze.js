@@ -6174,7 +6174,8 @@ var JsonResultsAdapter = (function () {
                   entityType: entityType,
                   nodeId: node.$id,
                   nodeRefId: node.$ref,
-                  ignore: ignore
+                  ignore: ignore,
+                  passThru: false // default
               };
           }
       });
@@ -15486,10 +15487,10 @@ var MappingContext = (function () {
       if (typeof relatedEntity === 'function') {
         mc.deferredFns.push(function () {
           relatedEntity = relatedEntity();
-          updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
+          updateRelatedEntityInCollection(mc, relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
         });
       } else {
-        updateRelatedEntityInCollection(relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
+        updateRelatedEntityInCollection(mc, relatedEntity, originalRelatedEntities, targetEntity, inverseProperty);
       }
     });
   }
@@ -15540,11 +15541,21 @@ var MappingContext = (function () {
     }
   }
 
-  function updateRelatedEntityInCollection(relatedEntity, relatedEntities, targetEntity, inverseProperty) {
+  function updateRelatedEntityInCollection(mc, relatedEntity, relatedEntities, targetEntity, inverseProperty) {
     if (!relatedEntity) return;
 
+    // don't update relatedCollection if preserveChanges & relatedEntity has an fkChange.
+    if (relatedEntity.entityAspect.entityState === EntityState.Modified
+      && mc.mergeOptions.mergeStrategy === MergeStrategy.PreserveChanges) {
+      var origValues = relatedEntity.entityAspect.originalValues;
+      var fkWasModified = inverseProperty.relatedDataProperties.some(function(dp) {
+        return origValues[dp.name] != undefined;
+      });
+      if (fkWasModified) return;
+    }
     // check if the related entity is already hooked up
     var thisEntity = relatedEntity.getProperty(inverseProperty.name);
+
     if (thisEntity !== targetEntity) {
       // if not - hook it up.
       relatedEntities.push(relatedEntity);
