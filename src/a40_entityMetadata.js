@@ -1100,7 +1100,7 @@ var CsdlMetadataParser = (function () {
   // schema is only needed for navProperty type name
   function parseTypeNameWithSchema(entityTypeName, schema) {
     var result = parseTypeName(entityTypeName);
-    if (schema) {
+    if (schema && !result.namespace) {
       var ns = getNamespaceFor(result.shortTypeName, schema);
       if (ns) {
         result = makeTypeHash(result.shortTypeName, ns);
