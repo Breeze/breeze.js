@@ -15,7 +15,7 @@
   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ↈ_primitiveArray_
+  @class ~primitiveArray
   **/
 
   /**

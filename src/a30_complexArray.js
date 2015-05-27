@@ -15,7 +15,7 @@
    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
    are all provided as well as several special purpose methods.
-   @class ↈ_complexArray_
+   @class ~complexArray
    **/
 
   /**

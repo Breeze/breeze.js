@@ -6,7 +6,7 @@
  This is an interface description. Any class that implements the methods and properties defined here is considered a valid
  implementation of this interface.
 
- @class ↈ_ajax_interface
+ @class ~ajax_interface
  **/
 
 /**
