@@ -1,8 +1,8 @@
 {
     "project": {},
     "files": {
-        "..\\src\\a01_coreFns.js": {
-            "name": "..\\src\\a01_coreFns.js",
+        "a01_coreFns.js": {
+            "name": "a01_coreFns.js",
             "modules": {
                 "core": 1
             },
@@ -10,15 +10,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a05_assertParam.js": {
-            "name": "..\\src\\a05_assertParam.js",
+        "a05_assertParam.js": {
+            "name": "a05_assertParam.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a05_enum.js": {
-            "name": "..\\src\\a05_enum.js",
+        "a05_enum.js": {
+            "name": "a05_enum.js",
             "modules": {},
             "classes": {
                 "Enum": 1,
@@ -27,8 +27,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a10_event.js": {
-            "name": "..\\src\\a10_event.js",
+        "a10_event.js": {
+            "name": "a10_event.js",
             "modules": {},
             "classes": {
                 "Event": 1
@@ -36,8 +36,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a20_config.js": {
-            "name": "..\\src\\a20_config.js",
+        "a20_config.js": {
+            "name": "a20_config.js",
             "modules": {
                 "breeze": 1
             },
@@ -47,8 +47,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a25_validate.js": {
-            "name": "..\\src\\a25_validate.js",
+        "a25_validate.js": {
+            "name": "a25_validate.js",
             "modules": {},
             "classes": {
                 "Validator": 1,
@@ -57,8 +57,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a25_validationOptions.js": {
-            "name": "..\\src\\a25_validationOptions.js",
+        "a25_validationOptions.js": {
+            "name": "a25_validationOptions.js",
             "modules": {},
             "classes": {
                 "ValidationOptions": 1
@@ -66,17 +66,17 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_complexArray.js": {
-            "name": "..\\src\\a30_complexArray.js",
+        "a30_complexArray.js": {
+            "name": "a30_complexArray.js",
             "modules": {},
             "classes": {
-                "ↈ_complexArray_": 1
+                "~complexArray": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_entityAction.js": {
-            "name": "..\\src\\a30_entityAction.js",
+        "a30_entityAction.js": {
+            "name": "a30_entityAction.js",
             "modules": {},
             "classes": {
                 "EntityAction": 1
@@ -84,8 +84,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_entityAspect.js": {
-            "name": "..\\src\\a30_entityAspect.js",
+        "a30_entityAspect.js": {
+            "name": "a30_entityAspect.js",
             "modules": {},
             "classes": {
                 "EntityAspect": 1,
@@ -94,8 +94,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_entityKey.js": {
-            "name": "..\\src\\a30_entityKey.js",
+        "a30_entityKey.js": {
+            "name": "a30_entityKey.js",
             "modules": {},
             "classes": {
                 "EntityKey": 1
@@ -103,8 +103,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_entityState.js": {
-            "name": "..\\src\\a30_entityState.js",
+        "a30_entityState.js": {
+            "name": "a30_entityState.js",
             "modules": {},
             "classes": {
                 "EntityState": 1
@@ -112,26 +112,26 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_primitiveArray.js": {
-            "name": "..\\src\\a30_primitiveArray.js",
+        "a30_primitiveArray.js": {
+            "name": "a30_primitiveArray.js",
             "modules": {},
             "classes": {
-                "ↈ_primitiveArray_": 1
+                "~primitiveArray": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a30_relationArray.js": {
-            "name": "..\\src\\a30_relationArray.js",
+        "a30_relationArray.js": {
+            "name": "a30_relationArray.js",
             "modules": {},
             "classes": {
-                "ↈ_relationArray_": 1
+                "~relationArray": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a37_dataType.js": {
-            "name": "..\\src\\a37_dataType.js",
+        "a37_dataType.js": {
+            "name": "a37_dataType.js",
             "modules": {},
             "classes": {
                 "DataType": 1
@@ -139,8 +139,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a40_dataService.js": {
-            "name": "..\\src\\a40_dataService.js",
+        "a40_dataService.js": {
+            "name": "a40_dataService.js",
             "modules": {},
             "classes": {
                 "DataService": 1,
@@ -149,8 +149,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a40_entityMetadata.js": {
-            "name": "..\\src\\a40_entityMetadata.js",
+        "a40_entityMetadata.js": {
+            "name": "a40_entityMetadata.js",
             "modules": {},
             "classes": {
                 "MetadataStore": 1,
@@ -163,15 +163,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a40_keyGenerator.js": {
-            "name": "..\\src\\a40_keyGenerator.js",
+        "a40_keyGenerator.js": {
+            "name": "a40_keyGenerator.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a40_localQueryComparisionOptions.js": {
-            "name": "..\\src\\a40_localQueryComparisionOptions.js",
+        "a40_localQueryComparisionOptions.js": {
+            "name": "a40_localQueryComparisionOptions.js",
             "modules": {},
             "classes": {
                 "LocalQueryComparisonOptions": 1
@@ -179,8 +179,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a40_namingConvention.js": {
-            "name": "..\\src\\a40_namingConvention.js",
+        "a40_namingConvention.js": {
+            "name": "a40_namingConvention.js",
             "modules": {},
             "classes": {
                 "NamingConvention": 1
@@ -188,8 +188,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a44_predicate.js": {
-            "name": "..\\src\\a44_predicate.js",
+        "a44_predicate.js": {
+            "name": "a44_predicate.js",
             "modules": {},
             "classes": {
                 "Predicate": 1
@@ -197,8 +197,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a45_entityQuery.js": {
-            "name": "..\\src\\a45_entityQuery.js",
+        "a45_entityQuery.js": {
+            "name": "a45_entityQuery.js",
             "modules": {},
             "classes": {
                 "EntityQuery": 1,
@@ -207,8 +207,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a45_queryOptions.js": {
-            "name": "..\\src\\a45_queryOptions.js",
+        "a45_queryOptions.js": {
+            "name": "a45_queryOptions.js",
             "modules": {},
             "classes": {
                 "MergeStrategy": 1,
@@ -218,15 +218,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a50_entityGroup.js": {
-            "name": "..\\src\\a50_entityGroup.js",
+        "a50_entityGroup.js": {
+            "name": "a50_entityGroup.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a50_entityManager.js": {
-            "name": "..\\src\\a50_entityManager.js",
+        "a50_entityManager.js": {
+            "name": "a50_entityManager.js",
             "modules": {},
             "classes": {
                 "EntityManager": 1
@@ -234,15 +234,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a55_mappingContext.js": {
-            "name": "..\\src\\a55_mappingContext.js",
+        "a55_mappingContext.js": {
+            "name": "a55_mappingContext.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a55_saveOptions.js": {
-            "name": "..\\src\\a55_saveOptions.js",
+        "a55_saveOptions.js": {
+            "name": "a55_saveOptions.js",
             "modules": {},
             "classes": {
                 "SaveOptions": 1
@@ -250,34 +250,34 @@
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\a60_abstractDataServiceAdapter.js": {
-            "name": "..\\src\\a60_abstractDataServiceAdapter.js",
+        "a60_abstractDataServiceAdapter.js": {
+            "name": "a60_abstractDataServiceAdapter.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\iface.ajaxInterface.js": {
-            "name": "..\\src\\iface.ajaxInterface.js",
+        "iface.ajaxInterface.js": {
+            "name": "iface.ajaxInterface.js",
             "modules": {},
             "classes": {
-                "ↈ_ajax_interface": 1,
+                "~ajax_interface": 1,
                 "HttpResponse": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\iface.keyGeneratorInterface.js": {
-            "name": "..\\src\\iface.keyGeneratorInterface.js",
+        "iface.keyGeneratorInterface.js": {
+            "name": "iface.keyGeneratorInterface.js",
             "modules": {},
             "classes": {
-                "ↈ_keyGenerator_interface": 1
+                "~keyGenerator_interface": 1
             },
             "fors": {},
             "namespaces": {}
         },
-        "..\\src\\iface.promise.js": {
-            "name": "..\\src\\iface.promise.js",
+        "iface.promise.js": {
+            "name": "iface.promise.js",
             "modules": {},
             "classes": {
                 "Promise": 1
@@ -298,7 +298,7 @@
             "fors": {},
             "namespaces": {},
             "tag": "module",
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 10
         },
         "breeze": {
@@ -309,14 +309,14 @@
                 "Validator": 1,
                 "ValidationError": 1,
                 "ValidationOptions": 1,
-                "ↈ_complexArray_": 1,
+                "~complexArray": 1,
                 "EntityAction": 1,
                 "EntityAspect": 1,
                 "ComplexAspect": 1,
                 "EntityKey": 1,
                 "EntityState": 1,
-                "ↈ_primitiveArray_": 1,
-                "ↈ_relationArray_": 1,
+                "~primitiveArray": 1,
+                "~relationArray": 1,
                 "DataType": 1,
                 "DataService": 1,
                 "JsonResultsAdapter": 1,
@@ -336,15 +336,15 @@
                 "QueryOptions": 1,
                 "EntityManager": 1,
                 "SaveOptions": 1,
-                "ↈ_ajax_interface": 1,
+                "~ajax_interface": 1,
                 "HttpResponse": 1,
-                "ↈ_keyGenerator_interface": 1,
+                "~keyGenerator_interface": 1,
                 "Promise": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
-            "file": "..\\src\\iface.promise.js",
+            "file": "iface.promise.js",
             "line": 5
         }
     },
@@ -359,7 +359,7 @@
             "extension_for": [],
             "module": "core",
             "namespace": "",
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 9,
             "description": "Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.\nA Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.\nUnlike enums in some other environments, each 'symbol' can have both methods and properties.",
             "example": [
@@ -376,7 +376,7 @@
             "extension_for": [],
             "module": "core",
             "namespace": "",
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 221,
             "description": "One of the constant values that is generated by the {{#crossLink \"Enum\"}}{{/crossLink}} \"addSymbol\" method.  EnumSymbols should ONLY be created via\nthe Enum.addSymbol method.",
             "example": [
@@ -393,7 +393,7 @@
             "extension_for": [],
             "module": "core",
             "namespace": "",
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 10,
             "description": "Class to support basic event publication and subscription semantics."
         },
@@ -407,7 +407,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 49,
             "description": "A singleton object that is the repository of all configuration options.",
             "example": [
@@ -424,7 +424,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 27,
             "description": "Instances of the Validator class provide the logic to validate another object and provide a description of any errors\nencountered during the validation process.  They are typically associated with a 'validators' property on the following types: {{#crossLink \"EntityType\"}}{{/crossLink}},\n{{#crossLink \"DataProperty\"}}{{/crossLink}} or {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.\n\nA number of property level validators are registered automatically, i.e added to each DataProperty.validators property\nbased on {{#crossLink \"DataProperty\"}}{{/crossLink}} metadata.  For example,\n\n- DataProperty.dataType -> one of the 'dataType' validator methods such as Validator.int64, Validator.date, Validator.bool etc.\n- DataProperty.maxLength -> Validator.maxLength\n- DataProperty.isNullable -> Validator.required (if not nullable)"
         },
@@ -438,7 +438,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 890,
             "description": "A ValidationError is used to describe a failed validation."
         },
@@ -452,13 +452,13 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 7,
             "description": "A ValidationOptions instance is used to specify the conditions under which validation will be executed."
         },
-        "ↈ_complexArray_": {
-            "name": "ↈ_complexArray_",
-            "shortname": "ↈ_complexArray_",
+        "~complexArray": {
+            "name": "~complexArray",
+            "shortname": "~complexArray",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -466,7 +466,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_complexArray.js",
+            "file": "a30_complexArray.js",
             "line": 13,
             "description": "Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of\ncomplexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.\nThis collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'\nare all provided as well as several special purpose methods."
         },
@@ -480,7 +480,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 7,
             "description": "EntityAction is an 'Enum' containing all of the valid actions that can occur to an 'Entity'.",
             "static": 1
@@ -495,7 +495,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 6,
             "description": "An EntityAspect instance is associated with every attached entity and is accessed via the entity's 'entityAspect' property.\n\nThe EntityAspect itself provides properties to determine and modify the EntityState of the entity and has methods\nthat provide a variety of services including validation and change tracking.\n\nAn EntityAspect will almost never need to be constructed directly. You will usually get an EntityAspect by accessing\nan entities 'entityAspect' property.  This property will be automatically attached when an entity is created via either\na query, import or EntityManager.createEntity call.",
             "example": [
@@ -512,7 +512,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 840,
             "description": "An ComplexAspect instance is associated with every complex object instance and is accessed via the complex object's 'complexAspect' property.\n\nThe ComplexAspect itself provides properties to determine the parent object, parent property and original values for the complex object.\n\nA ComplexAspect will almost never need to be constructed directly. You will usually get an ComplexAspect by accessing\nan entities 'complexAspect' property.  This property will be automatically attached when an complex object is created as part of an\nentity via either a query, import or EntityManager.createEntity call.",
             "example": [
@@ -529,7 +529,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 9,
             "description": "An EntityKey is an object that represents the unique identity of an entity.  EntityKey's are immutable."
         },
@@ -543,14 +543,14 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 6,
             "description": "EntityState is an 'Enum' containing all of the valid states for an 'Entity'.",
             "static": 1
         },
-        "ↈ_primitiveArray_": {
-            "name": "ↈ_primitiveArray_",
-            "shortname": "ↈ_primitiveArray_",
+        "~primitiveArray": {
+            "name": "~primitiveArray",
+            "shortname": "~primitiveArray",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -558,13 +558,13 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_primitiveArray.js",
+            "file": "a30_primitiveArray.js",
             "line": 13,
             "description": "Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of\nprimitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.\nThis collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'\nare all provided as well as several special purpose methods."
         },
-        "ↈ_relationArray_": {
-            "name": "ↈ_relationArray_",
-            "shortname": "ↈ_relationArray_",
+        "~relationArray": {
+            "name": "~relationArray",
+            "shortname": "~relationArray",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -572,7 +572,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a30_relationArray.js",
+            "file": "a30_relationArray.js",
             "line": 5,
             "description": "Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of\nentities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.\nThis collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'\nare all provided as well as several special purpose methods."
         },
@@ -586,7 +586,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 7,
             "description": "DataType is an 'Enum' containing all of the supported data types.",
             "static": 1
@@ -601,7 +601,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 7,
             "description": "A DataService instance is used to encapsulate the details of a single 'service'; this includes a serviceName, a dataService adapterInstance,\nand whether the service has server side metadata.\n\nYou can construct an EntityManager with either a serviceName or a DataService instance, if you use a serviceName then a DataService\nis constructed for you.  (It can also be set via the EntityManager.setProperties method).\n\nThe same applies to the MetadataStore.fetchMetadata method, i.e. it takes either a serviceName or a DataService instance.\n\nEach metadataStore contains a list of DataServices, each accessible via its ‘serviceName’.\n( see MetadataStore.getDataService and MetadataStore.addDataService).  The ‘addDataService’ method is called internally\nanytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or service name)."
         },
@@ -615,7 +615,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 199,
             "description": "A JsonResultsAdapter instance is used to provide custom extraction and parsing logic on the json results returned by any web service.\nThis facility makes it possible for breeze to talk to virtually any web service and return objects that will be first class 'breeze' citizens."
         },
@@ -629,7 +629,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 38,
             "description": "An instance of the MetadataStore contains all of the metadata about a collection of {{#crossLink \"EntityType\"}}{{/crossLink}}'s.\nMetadataStores may be shared across {{#crossLink \"EntityManager\"}}{{/crossLink}}'s.  If an EntityManager is created without an\nexplicit MetadataStore, the MetadataStore from the MetadataStore.defaultInstance property will be used."
         },
@@ -643,8 +643,8 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1135,
+            "file": "a40_entityMetadata.js",
+            "line": 1155,
             "description": "Container for all of the metadata about a specific type of Entity."
         },
         "ComplexType": {
@@ -657,8 +657,8 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2110,
+            "file": "a40_entityMetadata.js",
+            "line": 2130,
             "description": "Container for all of the metadata about a specific type of Complex object."
         },
         "DataProperty": {
@@ -671,8 +671,8 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2321,
+            "file": "a40_entityMetadata.js",
+            "line": 2341,
             "description": "A DataProperty describes the metadata for a single property of an  {{#crossLink \"EntityType\"}}{{/crossLink}} that contains simple data.\n\nInstances of the DataProperty class are constructed automatically during Metadata retrieval. However it is also possible to construct them\ndirectly via the constructor."
         },
         "NavigationProperty": {
@@ -685,8 +685,8 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2661,
+            "file": "a40_entityMetadata.js",
+            "line": 2681,
             "description": "A NavigationProperty describes the metadata for a single property of an  {{#crossLink \"EntityType\"}}{{/crossLink}} that return instances of other EntityTypes.\n\nInstances of the NavigationProperty class are constructed automatically during Metadata retrieval.   However it is also possible to construct them\ndirectly via the constructor."
         },
         "AutoGeneratedKeyType": {
@@ -699,8 +699,8 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 3012,
+            "file": "a40_entityMetadata.js",
+            "line": 3032,
             "description": "AutoGeneratedKeyType is an 'Enum' containing all of the valid states for an automatically generated key.",
             "static": 1,
             "final": 1
@@ -715,7 +715,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_localQueryComparisionOptions.js",
+            "file": "a40_localQueryComparisionOptions.js",
             "line": 7,
             "description": "A LocalQueryComparisonOptions instance is used to specify the \"comparison rules\" used when performing \"local queries\" in order\nto match the semantics of these same queries when executed against a remote service.  These options should be set based on the\nmanner in which your remote service interprets certain comparison operations.\n\nThe default LocalQueryComparisonOptions stipulates 'caseInsensitive\" queries with ANSI SQL rules regarding comparisons of unequal\nlength strings."
         },
@@ -729,7 +729,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 6,
             "description": "A NamingConvention instance is used to specify the naming conventions under which a MetadataStore\nwill translate property names between the server and the javascript client.\n\nThe default NamingConvention does not perform any translation, it simply passes property names thru unchanged."
         },
@@ -743,7 +743,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 4,
             "description": "Used to define a 'where' predicate for an EntityQuery.  Predicates are immutable, which means that any\nmethod that would modify a Predicate actually returns a new Predicate."
         },
@@ -757,7 +757,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 2,
             "description": "An EntityQuery instance is used to query entities either from a remote datasource or from a local {{#crossLink \"EntityManager\"}}{{/crossLink}}.\n\nEntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that\nEntityQueries can be 'modified' without affecting any current instances."
         },
@@ -771,7 +771,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 979,
             "description": "FilterQueryOp is an 'Enum' containing all of the valid  {{#crossLink \"Predicate\"}}{{/crossLink}}\nfilter operators for an {{#crossLink \"EntityQuery\"}}{{/crossLink}}.",
             "static": 1
@@ -786,7 +786,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 6,
             "description": "MergeStrategy is an 'Enum' that determines how entities are merged into an EntityManager.",
             "static": 1
@@ -801,7 +801,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 61,
             "description": "FetchStrategy is an 'Enum' that determines how and where entities are retrieved from as a result of a query.",
             "static": 1
@@ -816,7 +816,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 87,
             "description": "A QueryOptions instance is used to specify the 'options' under which a query will occur."
         },
@@ -830,7 +830,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 6,
             "description": "Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client."
         },
@@ -844,13 +844,13 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 6,
             "description": "A SaveOptions instance is used to specify the 'options' under which a save will occur."
         },
-        "ↈ_ajax_interface": {
-            "name": "ↈ_ajax_interface",
-            "shortname": "ↈ_ajax_interface",
+        "~ajax_interface": {
+            "name": "~ajax_interface",
+            "shortname": "~ajax_interface",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -858,7 +858,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 5,
             "description": "This is an interface description. Any class that implements the methods and properties defined here is considered a valid\nimplementation of this interface."
         },
@@ -872,13 +872,13 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 30,
             "description": "A generic wrapper for any Http response returned by a server."
         },
-        "ↈ_keyGenerator_interface": {
-            "name": "ↈ_keyGenerator_interface",
-            "shortname": "ↈ_keyGenerator_interface",
+        "~keyGenerator_interface": {
+            "name": "~keyGenerator_interface",
+            "shortname": "~keyGenerator_interface",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -886,7 +886,7 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\iface.keyGeneratorInterface.js",
+            "file": "iface.keyGeneratorInterface.js",
             "line": 5,
             "description": "This is an interface description. Any class that implements the methods and properties defined here is considered a valid\nimplementation of this interface.\n\nEach EntityManager can have a single KeyGenerator implementation that it will use to manage the generation of all 'temporary' keys.\n\nA KeyGenerator implementation is assigned to an EntityManager via the {{#crossLink \"EntityManager/setProperties\"}}{{/crossLink}}\nmethod with a config parameter of 'keyGeneratorCtor'.\n\n    MyKeyGenerator = function() {\n        // your code here\n    }\n    MyKeyGenerator.prototype.generateTempKeyValue = function(entityType) {\n        // your implementation here.\n    }\n    em.setProperties( {keyGeneratorCtor: MyKeyGenerator });\n\nThe assigned KeyGenerator is then called whenever the\nEntityManager.generateTempKeyValue method is called.  The EntityManager internally keeps track of all of the generated keys\nand handles all of the mapping of these temporary keys to real keys after any save.\n\nThe KeyGenerator implementation only needs to do one thing.  Return a unique key value of the correct datatype for each\ncall to the generateTempKeyValue method.  Note, that KeyGeneration is NOT supported for multipart keys.\n\nIf no KeyGenerator is supplied, a default KeyGenerator will be automatically provided."
         },
@@ -900,14 +900,14 @@
             "extension_for": [],
             "module": "breeze",
             "namespace": "",
-            "file": "..\\src\\iface.promise.js",
+            "file": "iface.promise.js",
             "line": 5,
             "description": "This is an simply api documentation for the CommonJS A Promises specification as it is used within Breeze."
         }
     },
     "classitems": [
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 51,
             "description": "Enum constructor - may be used to create new Enums.",
             "example": [
@@ -932,7 +932,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 80,
             "description": "Checks if an object is an Enum 'symbol'.",
             "example": [
@@ -949,7 +949,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 94,
             "description": "Returns an Enum symbol given its name.",
             "example": [
@@ -972,7 +972,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 107,
             "description": "Adds a new symbol to an Enum.",
             "example": [
@@ -996,7 +996,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 131,
             "description": "Seals this enum so that no more symbols may be added to it. This should only be called after all symbols\nhave already been added to the Enum.",
             "example": [
@@ -1008,7 +1008,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 171,
             "description": "Returns all of the symbols contained within this Enum.",
             "example": [
@@ -1024,7 +1024,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 184,
             "description": "Returns the names of all of the symbols contained within this Enum.",
             "example": [
@@ -1040,7 +1040,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 203,
             "description": "Returns whether an Enum contains a specified symbol.",
             "example": [
@@ -1063,7 +1063,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 233,
             "description": "The {{#crossLink \"Enum\"}}{{/crossLink}} to which this symbol belongs.\n__readOnly__",
             "itemtype": "property",
@@ -1073,7 +1073,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 239,
             "description": "Returns the name of this symbol.",
             "example": [
@@ -1085,7 +1085,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a05_enum.js",
+            "file": "a05_enum.js",
             "line": 256,
             "description": "Same as the getName method. Returns the name of this symbol.",
             "example": [
@@ -1097,7 +1097,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 15,
             "description": "Constructor for an Event",
             "example": [
@@ -1135,7 +1135,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 42,
             "description": "Publish data for this event.",
             "example": [
@@ -1181,7 +1181,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 97,
             "description": "Publish data for this event asynchronously.",
             "example": [
@@ -1215,7 +1215,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 119,
             "description": "Subscribe to this event.",
             "example": [
@@ -1248,7 +1248,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 154,
             "description": "Unsubscribe from this event.",
             "example": [
@@ -1271,7 +1271,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 194,
             "description": "Enables or disables the named event for an object and all of its children.",
             "example": [
@@ -1305,7 +1305,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a10_event.js",
+            "file": "a10_event.js",
             "line": 233,
             "description": "Returns whether for a specific event and a specific object and its children, notification is enabled or disabled or not set.",
             "example": [
@@ -1334,7 +1334,7 @@
             "module": "core"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 60,
             "description": "This method is now OBSOLETE.  Use the \"initializeAdapterInstances\" to accomplish the same result.",
             "itemtype": "method",
@@ -1371,7 +1371,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 87,
             "description": "Method use to register implementations of standard breeze interfaces.  Calls to this method are usually\nmade as the last step within an adapter implementation.",
             "itemtype": "method",
@@ -1392,7 +1392,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 108,
             "description": "Returns the ctor function used to implement a specific interface with a specific adapter name.",
             "itemtype": "method",
@@ -1418,7 +1418,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 126,
             "description": "Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.",
             "itemtype": "method",
@@ -1463,7 +1463,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 147,
             "description": "Initializes a single adapter implementation. Initialization means either newing a instance of the\nspecified interface and then calling \"initialize\" on it or simply calling \"initialize\" on the instance\nif it already exists.",
             "itemtype": "method",
@@ -1495,7 +1495,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a20_config.js",
+            "file": "a20_config.js",
             "line": 172,
             "description": "Returns the adapter instance corresponding to the specified interface and adapter names.",
             "itemtype": "method",
@@ -1521,7 +1521,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 42,
             "description": "Validator constructor - This method is used to create create custom validations.  Several\nbasic \"Validator\" construction methods are also provided as static methods to this class. These methods\nprovide a simpler syntax for creating basic validations.\n\nMany of these stock validators are inspired by and implemented to conform to the validators defined at\nhttp://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx\n\nSometimes a custom validator will be required.",
             "example": [
@@ -1595,7 +1595,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 175,
             "description": "The name of this validator.\n\n__readOnly__",
             "itemtype": "property",
@@ -1605,7 +1605,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 182,
             "description": "The context for this validator.\n\nThis object will typically contain at a minimum the following properties. \"name\", \"displayName\", and \"message\" or \"messageTemplate\".\n__readOnly__",
             "itemtype": "property",
@@ -1615,7 +1615,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 191,
             "description": "Run this validator against the specified value.  This method will usually be called internally either\nautomatically by an property change, entity attach, query or save operation, or manually as a result of\na validateEntity call on the EntityAspect. The resulting ValidationResults are available via the\nEntityAspect.getValidationErrors method.\n\nHowever, you can also call a validator directly either for testing purposes or some other reason if needed.",
             "example": [
@@ -1643,7 +1643,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 239,
             "description": "Returns the message generated by the most recent execution of this Validator.",
             "example": [
@@ -1659,7 +1659,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 272,
             "description": "Creates a validator instance from a JSON object or an array of instances from an array of JSON objects.",
             "itemtype": "method",
@@ -1676,7 +1676,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 293,
             "description": "Register a validator instance so that any deserialized metadata can reference it.",
             "itemtype": "method",
@@ -1693,7 +1693,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 305,
             "description": "Register a validator factory so that any deserialized metadata can reference it.",
             "itemtype": "method",
@@ -1715,7 +1715,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 316,
             "description": "Map of standard error message templates keyed by validator name.\nYou can add to or modify this object to customize the template used for any validation error message.",
             "example": [
@@ -1729,7 +1729,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 354,
             "description": "Returns a standard 'required value' Validator",
             "example": [
@@ -1761,7 +1761,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 382,
             "description": "Returns a standard maximum string length Validator; the maximum length must be specified",
             "example": [
@@ -1792,7 +1792,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 405,
             "description": "Returns a standard string length Validator; both minimum and maximum lengths must be specified.",
             "example": [
@@ -1828,7 +1828,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 432,
             "description": "Returns a standard string dataType Validator.",
             "example": [
@@ -1845,7 +1845,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 452,
             "description": "Returns a Guid data type Validator.",
             "example": [
@@ -1862,7 +1862,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 472,
             "description": "Returns a ISO 8601 duration string  Validator.",
             "example": [
@@ -1879,7 +1879,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 492,
             "description": "Returns a standard numeric data type Validator.",
             "example": [
@@ -1896,7 +1896,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 517,
             "description": "Returns a standard large integer data type - 64 bit - Validator.",
             "example": [
@@ -1913,7 +1913,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 540,
             "description": "Returns a standard 32 bit integer data type Validator.",
             "example": [
@@ -1930,7 +1930,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 555,
             "description": "Returns a standard 16 bit integer data type Validator.",
             "example": [
@@ -1947,7 +1947,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 571,
             "description": "Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).",
             "example": [
@@ -1964,7 +1964,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 588,
             "description": "Returns a standard boolean data type Validator.",
             "example": [
@@ -1981,7 +1981,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 615,
             "description": "Returns a standard date data type Validator.",
             "example": [
@@ -1998,7 +1998,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 646,
             "description": "Returns a credit card number validator\nPerforms a luhn algorithm checksum test for plausability\ncatches simple mistakes; only service knows for sure",
             "example": [
@@ -2023,7 +2023,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 679,
             "description": "Returns a regular expression validator; the expression must be specified",
             "example": [
@@ -2054,7 +2054,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 708,
             "description": "Returns the email address validator",
             "example": [
@@ -2079,7 +2079,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 727,
             "description": "Returns the phone validator\nProvides basic assertions on the format and will help to eliminate most nonsense input\nMatches:\nInternational dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])\n> ((\\+)|(0(\\d+)?[-/.\\s]))\nCountry code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])\n> [1-9]\\d{,2}[-/.\\s]?\nArea code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])\n> ((\\(\\d{1,6}\\)|\\d{1,6})[-/.\\s]?)?\nLocal: {0, ...}+ (with or without a trailing break character: [-/. ])\n> (\\d+[-/.\\s]?)+\\d+",
             "example": [
@@ -2104,7 +2104,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 756,
             "description": "Returns the URL (protocol required) validator",
             "example": [
@@ -2129,7 +2129,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 775,
             "description": "Creates a regular expression validator with a fixed expression.\nMany of the stock validators are built with this factory method.\nTheir expressions are often derived from\nhttps://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions\nYou can try many of them at http://dataannotationsextensions.org/",
             "example": [
@@ -2170,7 +2170,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 896,
             "description": "Constructs a new ValidationError",
             "itemtype": "method",
@@ -2202,7 +2202,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 926,
             "description": "The Validator associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
@@ -2212,7 +2212,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 933,
             "description": "A 'context' object associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
@@ -2222,7 +2222,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 940,
             "description": "The DataProperty or NavigationProperty associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
@@ -2232,7 +2232,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 947,
             "description": "The property name associated with this ValidationError. This will be a \"property path\" for any properties of a complex object.\n\n__readOnly__",
             "itemtype": "property",
@@ -2242,7 +2242,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 954,
             "description": "The error message associated with the ValidationError.\n\n__readOnly__",
             "itemtype": "property",
@@ -2252,7 +2252,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 961,
             "description": "The key by which this validation error may be removed from a collection of ValidationErrors.\n\n__readOnly__",
             "itemtype": "property",
@@ -2262,7 +2262,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 968,
             "description": "Whether this is a server error.\n\n__readOnly__",
             "itemtype": "property",
@@ -2272,7 +2272,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validate.js",
+            "file": "a25_validate.js",
             "line": 976,
             "description": "Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName",
             "itemtype": "method",
@@ -2298,7 +2298,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 13,
             "description": "ValidationOptions constructor",
             "example": [
@@ -2348,7 +2348,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 31,
             "description": "Whether entity and property level validation should occur when entities are attached to the EntityManager other than via a query.\n\n__readOnly__",
             "itemtype": "property",
@@ -2358,7 +2358,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 38,
             "description": "Whether entity and property level validation should occur before entities are saved. A failed validation will force the save to fail early.\n\n__readOnly__",
             "itemtype": "property",
@@ -2368,7 +2368,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 45,
             "description": "Whether entity and property level validation should occur after entities are queried from a remote server.\n\n__readOnly__",
             "itemtype": "property",
@@ -2378,7 +2378,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 52,
             "description": "Whether property level validation should occur after entities are modified.\n\n__readOnly__",
             "itemtype": "property",
@@ -2388,7 +2388,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 61,
             "description": "Returns a copy of this ValidationOptions with changes to the specified config properties.",
             "example": [
@@ -2438,7 +2438,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 82,
             "description": "Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.\nThe current instance is returned unchanged.",
             "example": [
@@ -2451,7 +2451,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a25_validationOptions.js",
+            "file": "a25_validationOptions.js",
             "line": 96,
             "description": "The default value whenever ValidationOptions are not specified.",
             "itemtype": "property",
@@ -2462,7 +2462,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_complexArray.js",
+            "file": "a30_complexArray.js",
             "line": 21,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event\nis fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.\nAdds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual\ncollections are collected into a single notification event for each relation array.",
             "example": [
@@ -2483,11 +2483,11 @@
                 }
             ],
             "readonly": "",
-            "class": "ↈ_complexArray_",
+            "class": "~complexArray",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 27,
             "description": "Attach - Entity was attached via an AttachEntity call.",
             "itemtype": "property",
@@ -2499,7 +2499,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 36,
             "description": "AttachOnQuery - Entity was attached as a result of a query.",
             "itemtype": "property",
@@ -2511,7 +2511,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 45,
             "description": "AttachOnImport - Entity was attached as a result of an import.",
             "itemtype": "property",
@@ -2523,7 +2523,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 55,
             "description": "Detach - Entity was detached.",
             "itemtype": "property",
@@ -2535,7 +2535,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 64,
             "description": "MergeOnQuery - Properties on the entity were merged as a result of a query.",
             "itemtype": "property",
@@ -2547,7 +2547,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 73,
             "description": "MergeOnImport - Properties on the entity were merged as a result of an import.",
             "itemtype": "property",
@@ -2559,7 +2559,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 82,
             "description": "MergeOnSave - Properties on the entity were merged as a result of a save",
             "itemtype": "property",
@@ -2571,7 +2571,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 91,
             "description": "PropertyChange - A property on the entity was changed.",
             "itemtype": "property",
@@ -2583,7 +2583,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 100,
             "description": "EntityStateChange - The EntityState of the entity was changed.",
             "itemtype": "property",
@@ -2595,7 +2595,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 110,
             "description": "AcceptChanges - AcceptChanges was called on the entity, or its entityState was set to Unmodified.",
             "itemtype": "property",
@@ -2607,7 +2607,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 119,
             "description": "RejectChanges - RejectChanges was called on the entity.",
             "itemtype": "property",
@@ -2619,7 +2619,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAction.js",
+            "file": "a30_entityAction.js",
             "line": 128,
             "description": "Clear - The EntityManager was cleared.  All entities detached.",
             "itemtype": "property",
@@ -2631,7 +2631,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 77,
             "description": "The Entity that this aspect is associated with.\n\n__readOnly__",
             "itemtype": "property",
@@ -2641,7 +2641,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 84,
             "description": "The {{#crossLink \"EntityManager\"}}{{/crossLink}} that contains this entity.\n\n__readOnly__",
             "itemtype": "property",
@@ -2651,7 +2651,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 91,
             "description": "The {{#crossLink \"EntityState\"}}{{/crossLink}} of this entity.\n\n__readOnly__",
             "itemtype": "property",
@@ -2661,7 +2661,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 98,
             "description": "Extra metadata about this entity such as the entity's etag.\nYou may extend this object with your own metadata information.\nBreeze (de)serializes this object when importing/exporting the entity.",
             "itemtype": "property",
@@ -2671,7 +2671,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 106,
             "description": "Whether this entity is in the process of being saved.\n\n__readOnly__",
             "itemtype": "property",
@@ -2681,7 +2681,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 113,
             "description": "Whether this entity has any validation errors.\n\n__readOnly__",
             "itemtype": "property",
@@ -2691,7 +2691,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 120,
             "description": "The 'original values' of this entity where they are different from the 'current values'.\nThis is a map where the key is a property name and the value is the 'original value' of the property.\n\n__readOnly__",
             "itemtype": "property",
@@ -2701,7 +2701,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 128,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever a value of one of this entity's properties change.",
             "example": [
@@ -2746,7 +2746,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 152,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever any of the validation errors on this entity change.\nNote that this might be the removal of an error when some data on the entity is fixed.",
             "example": [
@@ -2776,7 +2776,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 172,
             "description": "Returns the {{#crossLink \"EntityKey\"}}{{/crossLink}} for this Entity.",
             "example": [
@@ -2801,7 +2801,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 194,
             "description": "Returns the entity to an {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Unchanged' by committing all changes made since the entity was last queried\nhad 'acceptChanges' called on it.",
             "example": [
@@ -2813,7 +2813,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 214,
             "description": "Returns the entity to an EntityState of 'Unchanged' by rejecting all changes made to it since the entity was last queried\nhad 'rejectChanges' called on it.",
             "example": [
@@ -2825,7 +2825,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 270,
             "description": "Sets the entity to an EntityState of 'Added'.  This is NOT the equivalent of calling {{#crossLink \"EntityManager/addEntity\"}}{{/crossLink}}\nbecause no key generation will occur for autogenerated keys as a result of this operation. As a result this operation can be problematic\nunless you are certain that the entity being marked 'Added' does not already exist in the database and does not have an autogenerated key.\nThe same operation can be performed by calling  {{#crossLink \"EntityAspect/setEntityState\"}}{{/crossLink}}.",
             "example": [
@@ -2837,7 +2837,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 285,
             "description": "Sets the entity to an EntityState of 'Unchanged'.  This is also the equivalent of calling {{#crossLink \"EntityAspect/acceptChanges\"}}{{/crossLink}}.\nThe same operation can be performed by calling  {{#crossLink \"EntityAspect/setEntityState\"}}{{/crossLink}}.",
             "example": [
@@ -2849,7 +2849,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 299,
             "description": "Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.\nThe same operation can be performed by calling  {{#crossLink \"EntityAspect/setEntityState\"}}{{/crossLink}}.",
             "example": [
@@ -2861,7 +2861,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 312,
             "description": "Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call\nbut also removes the entity from all of its related entities.\nThe same operation can be performed by calling  {{#crossLink \"EntityAspect/setEntityState\"}}{{/crossLink}}.",
             "example": [
@@ -2873,7 +2873,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 326,
             "description": "Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities.\nThe same operation can be performed by calling  {{#crossLink \"EntityAspect/setEntityState\"}}{{/crossLink}}.",
             "example": [
@@ -2885,7 +2885,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 339,
             "description": "Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc.",
             "example": [
@@ -2897,7 +2897,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 408,
             "description": "Performs a query for the value of a specified {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
             "example": [
@@ -2933,7 +2933,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 445,
             "description": "Marks this navigationProperty on this entity as already having been loaded.",
             "example": [
@@ -2953,7 +2953,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 459,
             "description": "Determines whether a navigationProperty on this entity has already been loaded.",
             "example": [
@@ -2973,7 +2973,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 491,
             "description": "Performs validation on the entity, any errors encountered during the validation are available via the\n{{#crossLink \"EntityAspect.getValidationErrors\"}}{{/crossLink}} method. Validating an entity means executing\nall of the validators on both the entity itself as well as those on each of its properties.",
             "example": [
@@ -2989,7 +2989,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 553,
             "description": "Performs validation on a specific property of this entity, any errors encountered during the validation are available via the\n{{#crossLink \"EntityAspect.getValidationErrors\"}}{{/crossLink}} method. Validating a property means executing\nall of the validators on the specified property.  This call is also made automatically anytime a property\nof an entity is changed.",
             "example": [
@@ -3019,7 +3019,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 590,
             "description": "Returns the validation errors associated with either the entire entity or any specified property.",
             "example": [
@@ -3046,7 +3046,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 623,
             "description": "Adds a validation error.",
             "itemtype": "method",
@@ -3062,7 +3062,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 635,
             "description": "Removes a validation error.",
             "itemtype": "method",
@@ -3078,7 +3078,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 649,
             "description": "Removes all of the validation errors for a specified entity",
             "itemtype": "method",
@@ -3087,7 +3087,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 895,
             "description": "The complex object that this aspect is associated with.\n\n__readOnly__",
             "itemtype": "property",
@@ -3097,7 +3097,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 902,
             "description": "The parent object that to which this aspect belongs; this will either be an entity or another complex object.\n\n__readOnly__",
             "itemtype": "property",
@@ -3107,7 +3107,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 909,
             "description": "The {{#crossLink \"DataProperty\"}}{{/crossLink}} on the 'parent' that contains this complex object.\n\n__readOnly__",
             "itemtype": "property",
@@ -3117,7 +3117,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 916,
             "description": "The 'original values' of this complex object where they are different from the 'current values'.\nThis is a map where the key is a property name and the value is the 'original value' of the property.\n\n__readOnly__",
             "itemtype": "property",
@@ -3127,7 +3127,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 924,
             "description": "Returns the EntityAspect for the top level entity tht contains this complex object.",
             "itemtype": "method",
@@ -3140,7 +3140,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityAspect.js",
+            "file": "a30_entityAspect.js",
             "line": 941,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "itemtype": "method",
@@ -3160,7 +3160,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 15,
             "description": "Constructs a new EntityKey.  Each entity within an EntityManager will have a unique EntityKey.",
             "example": [
@@ -3186,7 +3186,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 64,
             "description": "The 'EntityType' that this is a key for.\n\n__readOnly__",
             "itemtype": "property",
@@ -3196,7 +3196,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 71,
             "description": "An array of the values for this key. This will usually only have a single element, unless the entity type has a multipart key.\n\n__readOnly__",
             "itemtype": "property",
@@ -3206,7 +3206,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 90,
             "description": "Used to compare EntityKeys are determine if they refer to the same Entity.\nThere is also an static version of 'equals' with the same functionality.",
             "example": [
@@ -3225,7 +3225,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityKey.js",
+            "file": "a30_entityKey.js",
             "line": 119,
             "description": "Used to compare EntityKeys are determine if they refer to the same Entity.\nThere is also an instance version of 'equals' with the same functionality.",
             "example": [
@@ -3250,7 +3250,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 13,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isUnchanged();\nis the same as",
@@ -3266,7 +3266,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 26,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isAdded();\nis the same as",
@@ -3282,7 +3282,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 39,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isModified();\nis the same as",
@@ -3298,7 +3298,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 52,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isDeleted();\nis the same as",
@@ -3314,7 +3314,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 65,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isDetached();\nis the same as",
@@ -3330,7 +3330,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 78,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isUnchangedOrModified();\nis the same as",
@@ -3346,7 +3346,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 91,
             "example": [
                 "\n    var es = anEntity.entityAspect.entityState;\n    return es.isAddedModifiedOrDeleted();\nis the same as",
@@ -3362,7 +3362,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 109,
             "description": "The 'Unchanged' state.",
             "itemtype": "property",
@@ -3374,7 +3374,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 117,
             "description": "The 'Added' state.",
             "itemtype": "property",
@@ -3386,7 +3386,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 125,
             "description": "The 'Modified' state.",
             "itemtype": "property",
@@ -3398,7 +3398,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 133,
             "description": "The 'Deleted' state.",
             "itemtype": "property",
@@ -3410,7 +3410,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_entityState.js",
+            "file": "a30_entityState.js",
             "line": 141,
             "description": "The 'Detached' state.",
             "itemtype": "property",
@@ -3422,7 +3422,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_primitiveArray.js",
+            "file": "a30_primitiveArray.js",
             "line": 21,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event\nis fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.\nAdds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual\ncollections are collected into a single notification event for each relation array.",
             "example": [
@@ -3443,11 +3443,11 @@
                 }
             ],
             "readonly": "",
-            "class": "ↈ_primitiveArray_",
+            "class": "~primitiveArray",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_relationArray.js",
+            "file": "a30_relationArray.js",
             "line": 13,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever the contents of this array changed.  This event\nis fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.\nAdds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual\ncollections are collected into a single notification event for each relation array.",
             "example": [
@@ -3468,11 +3468,11 @@
                 }
             ],
             "readonly": "",
-            "class": "ↈ_relationArray_",
+            "class": "~relationArray",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a30_relationArray.js",
+            "file": "a30_relationArray.js",
             "line": 32,
             "description": "Performs an asynchronous load of all other the entities associated with this relationArray.",
             "example": [
@@ -3498,11 +3498,11 @@
                 "description": "",
                 "type": "Promise"
             },
-            "class": "ↈ_relationArray_",
+            "class": "~relationArray",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 14,
             "description": "The default value of this DataType.",
             "itemtype": "property",
@@ -3512,7 +3512,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 19,
             "description": "Whether this is a 'numeric' DataType.",
             "itemtype": "property",
@@ -3522,7 +3522,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 198,
             "itemtype": "property",
             "name": "String",
@@ -3533,7 +3533,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 209,
             "itemtype": "property",
             "name": "Int64",
@@ -3544,7 +3544,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 220,
             "itemtype": "property",
             "name": "Int32",
@@ -3555,7 +3555,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 231,
             "itemtype": "property",
             "name": "Int16",
@@ -3566,7 +3566,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 242,
             "itemtype": "property",
             "name": "Byte",
@@ -3577,7 +3577,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 248,
             "itemtype": "property",
             "name": "Decimal",
@@ -3588,7 +3588,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 259,
             "itemtype": "property",
             "name": "Double",
@@ -3599,7 +3599,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 270,
             "itemtype": "property",
             "name": "Single",
@@ -3610,7 +3610,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 281,
             "itemtype": "property",
             "name": "DateTime",
@@ -3621,7 +3621,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 293,
             "itemtype": "property",
             "name": "DateTimeOffset",
@@ -3632,7 +3632,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 304,
             "itemtype": "property",
             "name": "Time",
@@ -3643,7 +3643,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 310,
             "itemtype": "property",
             "name": "Boolean",
@@ -3654,7 +3654,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 316,
             "itemtype": "property",
             "name": "Guid",
@@ -3665,7 +3665,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 328,
             "itemtype": "property",
             "name": "Binary",
@@ -3676,7 +3676,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 334,
             "itemtype": "property",
             "name": "Undefined",
@@ -3687,7 +3687,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a37_dataType.js",
+            "file": "a37_dataType.js",
             "line": 361,
             "description": "Returns the DataType for a specified EDM type name.",
             "itemtype": "method",
@@ -3708,7 +3708,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 22,
             "description": "DataService constructor",
             "example": [
@@ -3764,7 +3764,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 56,
             "description": "The serviceName for this DataService.\n\n__readOnly__",
             "itemtype": "property",
@@ -3774,7 +3774,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 63,
             "description": "The adapter name for the dataServiceAdapter to be used with this service.\n\n__readOnly__",
             "itemtype": "property",
@@ -3784,7 +3784,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 70,
             "description": "The \"dataService\" adapter implementation instance associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -3794,7 +3794,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 77,
             "description": "Whether the server can provide metadata for this service.\n\n__readOnly__",
             "itemtype": "property",
@@ -3804,7 +3804,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 84,
             "description": "The JsonResultsAdapter used to process the results of any query against this DataService.\n\n__readOnly__",
             "itemtype": "property",
@@ -3814,7 +3814,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 91,
             "description": "Whether to use JSONP when performing a 'GET' request against this service.\n\n__readOnly__",
             "itemtype": "property",
@@ -3824,7 +3824,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 98,
             "description": "Returns a copy of this DataService with the specified properties applied.",
             "itemtype": "method",
@@ -3845,7 +3845,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 174,
             "description": "Returns a url for this dataService with the specified suffix. This method handles dataService names either\nwith or without trailing '/'s.",
             "itemtype": "method",
@@ -3865,7 +3865,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_dataService.js",
+            "file": "a40_dataService.js",
             "line": 206,
             "description": "JsonResultsAdapter constructor",
             "example": [
@@ -3902,7 +3902,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 22,
             "description": "(Re)set Q with a promises implementation suitable for Breeze internal use.  Note: This API is likely to change.",
             "itemtype": "method",
@@ -3938,7 +3938,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 47,
             "description": "Constructs a new MetadataStore.",
             "example": [
@@ -3981,7 +3981,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 100,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires after a MetadataStore has completed fetching metadata from a remote service.",
             "example": [
@@ -4011,7 +4011,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 118,
             "description": "General purpose property set method",
             "example": [
@@ -4042,7 +4042,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 141,
             "description": "Adds a DataService to this MetadataStore. If a DataService with the same serviceName is already\nin the MetadataStore an exception will be thrown.",
             "itemtype": "method",
@@ -4065,7 +4065,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 169,
             "description": "Adds an EntityType to this MetadataStore.  No additional properties may be added to the EntityType after its has\nbeen added to the MetadataStore.",
             "itemtype": "method",
@@ -4081,7 +4081,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 225,
             "description": "The  {{#crossLink \"NamingConvention\"}}{{/crossLink}} associated with this MetadataStore.\n\n__readOnly__",
             "itemtype": "property",
@@ -4091,7 +4091,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 232,
             "description": "Exports this MetadataStore to a serialized string appropriate for local storage.   This operation is also called\ninternally when exporting an EntityManager.",
             "example": [
@@ -4107,7 +4107,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 259,
             "description": "Imports a previously exported serialized MetadataStore into this MetadataStore.",
             "example": [
@@ -4137,7 +4137,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 322,
             "description": "Creates a new MetadataStore from a previously exported serialized MetadataStore",
             "example": [
@@ -4161,7 +4161,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 343,
             "description": "Returns whether Metadata has been retrieved for a specified service name.",
             "example": [
@@ -4184,7 +4184,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 358,
             "description": "Returns the DataService for a specified service name",
             "example": [
@@ -4207,7 +4207,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 378,
             "description": "Fetches the metadata for a specified 'service'. This method is automatically called\ninternally by an EntityManager before its first query against a new service.",
             "example": [
@@ -4260,7 +4260,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 442,
             "description": "Used to register a constructor for an EntityType that is not known via standard Metadata discovery;\ni.e. an unmapped type.",
             "itemtype": "method",
@@ -4282,7 +4282,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 458,
             "description": "Provides a mechanism to register a 'custom' constructor to be used when creating new instances\nof the specified entity type.  If this call is not made, a default constructor is created for\nthe entity as needed.\nThis call may be made before or after the corresponding EntityType has been discovered via\nMetadata discovery.",
             "example": [
@@ -4334,7 +4334,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 504,
             "description": "Returns whether this MetadataStore contains any metadata yet.",
             "example": [
@@ -4350,7 +4350,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 518,
             "description": "Returns an  {{#crossLink \"EntityType\"}}{{/crossLink}} or a {{#crossLink \"ComplexType\"}}{{/crossLink}} given its name.",
             "example": [
@@ -4381,7 +4381,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 555,
             "description": "Returns an array containing all of the  {{#crossLink \"EntityType\"}}{{/crossLink}}s or {{#crossLink \"ComplexType\"}}{{/crossLink}}s in this MetadataStore.",
             "example": [
@@ -4397,7 +4397,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 573,
             "description": "Returns a fully qualified entityTypeName for a specified resource name.  The reverse of this operation\ncan be obtained via the  {{#crossLink \"EntityType\"}}{{/crossLink}} 'defaultResourceName' property",
             "itemtype": "method",
@@ -4413,7 +4413,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
+            "file": "a40_entityMetadata.js",
             "line": 584,
             "description": "Associates a resourceName with an entityType.\n\nThis method is only needed in those cases where multiple resources return the same\nentityType.  In this case Metadata discovery will only determine a single resource name for\neach entityType.",
             "itemtype": "method",
@@ -4434,8 +4434,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1142,
+            "file": "a40_entityMetadata.js",
+            "line": 1162,
             "example": [
                 "\n    var entityType = new EntityType( {\n        shortName: \"person\",\n        namespace: \"myAppNamespace\"\n    });"
             ],
@@ -4514,8 +4514,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1211,
+            "file": "a40_entityMetadata.js",
+            "line": 1231,
             "description": "The {{#crossLink \"MetadataStore\"}}{{/crossLink}} that contains this EntityType\n\n__readOnly__",
             "itemtype": "property",
             "name": "metadataStore",
@@ -4524,8 +4524,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1218,
+            "file": "a40_entityMetadata.js",
+            "line": 1238,
             "description": "The DataProperties (see {{#crossLink \"DataProperty\"}}{{/crossLink}}) associated with this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "dataProperties",
@@ -4534,8 +4534,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1225,
+            "file": "a40_entityMetadata.js",
+            "line": 1245,
             "description": "The NavigationProperties  (see {{#crossLink \"NavigationProperty\"}}{{/crossLink}}) associated with this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "navigationProperties",
@@ -4544,8 +4544,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1232,
+            "file": "a40_entityMetadata.js",
+            "line": 1252,
             "description": "The DataProperties for this EntityType that contain instances of a ComplexType (see {{#crossLink \"ComplexType\"}}{{/crossLink}}).\n\n__readOnly__",
             "itemtype": "property",
             "name": "complexProperties",
@@ -4554,8 +4554,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1239,
+            "file": "a40_entityMetadata.js",
+            "line": 1259,
             "description": "The DataProperties associated with this EntityType that make up it's {{#crossLink \"EntityKey\"}}{{/crossLink}}.\n\n__readOnly__",
             "itemtype": "property",
             "name": "keyProperties",
@@ -4564,8 +4564,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1246,
+            "file": "a40_entityMetadata.js",
+            "line": 1266,
             "description": "The DataProperties associated with this EntityType that are foreign key properties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "foreignKeyProperties",
@@ -4574,8 +4574,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1253,
+            "file": "a40_entityMetadata.js",
+            "line": 1273,
             "description": "The DataProperties associated with this EntityType that are concurrency properties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "concurrencyProperties",
@@ -4584,8 +4584,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1260,
+            "file": "a40_entityMetadata.js",
+            "line": 1280,
             "description": "The DataProperties associated with this EntityType that are not mapped to any backend datastore. These are effectively free standing\nproperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "unmappedProperties",
@@ -4594,8 +4594,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1268,
+            "file": "a40_entityMetadata.js",
+            "line": 1288,
             "description": "The default resource name associated with this EntityType.  An EntityType may be queried via a variety of 'resource names' but this one\nis used as the default when no resource name is provided.  This will occur when calling {{#crossLink \"EntityAspect/loadNavigationProperty\"}}{{/crossLink}}\nor when executing any {{#crossLink \"EntityQuery\"}}{{/crossLink}} that was created via an {{#crossLink \"EntityKey\"}}{{/crossLink}}.\n\n__readOnly__",
             "itemtype": "property",
             "name": "defaultResourceName",
@@ -4604,8 +4604,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1277,
+            "file": "a40_entityMetadata.js",
+            "line": 1297,
             "description": "The fully qualified name of this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "name",
@@ -4614,8 +4614,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1284,
+            "file": "a40_entityMetadata.js",
+            "line": 1304,
             "description": "The short, unqualified, name for this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "shortName",
@@ -4624,8 +4624,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1291,
+            "file": "a40_entityMetadata.js",
+            "line": 1311,
             "description": "The namespace for this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "namespace",
@@ -4634,8 +4634,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1298,
+            "file": "a40_entityMetadata.js",
+            "line": 1318,
             "description": "The base EntityType (if any) for this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "baseEntityType",
@@ -4644,8 +4644,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1305,
+            "file": "a40_entityMetadata.js",
+            "line": 1325,
             "description": "Whether this EntityType is abstract.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isAbstract",
@@ -4654,8 +4654,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1312,
+            "file": "a40_entityMetadata.js",
+            "line": 1332,
             "description": "The {{#crossLink \"AutoGeneratedKeyType\"}}{{/crossLink}} for this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "autoGeneratedKeyType",
@@ -4665,8 +4665,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1320,
+            "file": "a40_entityMetadata.js",
+            "line": 1340,
             "description": "The entity level validators associated with this EntityType. Validators can be added and\nremoved from this collection.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validators",
@@ -4675,8 +4675,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1328,
+            "file": "a40_entityMetadata.js",
+            "line": 1348,
             "description": "A free form object that can be used to define any custom metadata for this EntityType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "custom",
@@ -4685,8 +4685,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1335,
+            "file": "a40_entityMetadata.js",
+            "line": 1355,
             "description": "General purpose property set method",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    custType.setProperties( {\n        autoGeneratedKeyType: AutoGeneratedKeyType.Identity;\n        defaultResourceName: \"CustomersAndIncludedOrders\"\n    )};"
@@ -4728,8 +4728,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1363,
+            "file": "a40_entityMetadata.js",
+            "line": 1383,
             "description": "Returns whether this type is a subtype of a specified type.",
             "itemtype": "method",
             "name": "isSubtypeOf",
@@ -4743,8 +4743,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1379,
+            "file": "a40_entityMetadata.js",
+            "line": 1399,
             "description": "Returns an array containing this type and any/all subtypes of this type down thru the hierarchy.",
             "itemtype": "method",
             "name": "getSelfAndSubtypes",
@@ -4752,8 +4752,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1404,
+            "file": "a40_entityMetadata.js",
+            "line": 1424,
             "description": "Adds a  {{#crossLink \"DataProperty\"}}{{/crossLink}} or a {{#crossLink \"NavigationProperty\"}}{{/crossLink}} to this EntityType.",
             "example": [
                 "\n    // assume myEntityType is a newly constructed EntityType.\n    myEntityType.addProperty(dataProperty1);\n    myEntityType.addProperty(dataProperty2);\n    myEntityType.addProperty(navigationProperty1);"
@@ -4771,8 +4771,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1482,
+            "file": "a40_entityMetadata.js",
+            "line": 1502,
             "description": "Create a new entity of this type.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var cust1 = custType.createEntity();\n    em1.addEntity(cust1);"
@@ -4795,8 +4795,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1572,
+            "file": "a40_entityMetadata.js",
+            "line": 1592,
             "description": "Returns the constructor for this EntityType.",
             "itemtype": "method",
             "name": "getCtor ( or obsolete getEntityCtor)",
@@ -4808,8 +4808,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1638,
+            "file": "a40_entityMetadata.js",
+            "line": 1658,
             "description": "Adds either an entity or property level validator to this EntityType.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var countryProp = custType.getProperty(\"Country\");\n    var valFn = function (v) {\n            if (v == null) return true;\n            return (core.stringStartsWith(v, \"US\"));\n        };\n    var countryValidator = new Validator(\"countryIsUS\", valFn,\n    { displayName: \"Country\", messageTemplate: \"'%displayName%' must start with 'US'\" });\n    custType.addValidator(countryValidator, countryProp);\nThis is the same as adding an entity level validator via the 'validators' property of DataProperty or NavigationProperty",
@@ -4835,8 +4835,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1678,
+            "file": "a40_entityMetadata.js",
+            "line": 1698,
             "description": "Returns all of the properties ( dataProperties and navigationProperties) for this EntityType.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var arrayOfProps = custType.getProperties();"
@@ -4851,8 +4851,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1691,
+            "file": "a40_entityMetadata.js",
+            "line": 1711,
             "description": "Returns all of the property names ( for both dataProperties and navigationProperties) for this EntityType.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var arrayOfPropNames = custType.getPropertyNames();"
@@ -4867,8 +4867,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1704,
+            "file": "a40_entityMetadata.js",
+            "line": 1724,
             "description": "Returns a data property with the specified name or null.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var customerNameDataProp = custType.getDataProperty(\"CustomerName\");"
@@ -4890,8 +4890,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1718,
+            "file": "a40_entityMetadata.js",
+            "line": 1738,
             "description": "Returns a navigation property with the specified name or null.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var customerOrdersNavProp = custType.getDataProperty(\"Orders\");"
@@ -4913,8 +4913,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1732,
+            "file": "a40_entityMetadata.js",
+            "line": 1752,
             "description": "Returns either a DataProperty or a NavigationProperty with the specified name or null.\n\nThis method also accepts a '.' delimited property path and will return the 'property' at the\nend of the path.",
             "example": [
                 "\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var companyNameProp = custType.getProperty(\"CompanyName\");\nThis method can also walk a property path to return a property",
@@ -4944,8 +4944,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 1888,
+            "file": "a40_entityMetadata.js",
+            "line": 1908,
             "description": "Returns a string representation of this EntityType.",
             "itemtype": "method",
             "name": "toString",
@@ -4957,8 +4957,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2115,
+            "file": "a40_entityMetadata.js",
+            "line": 2135,
             "example": [
                 "\n    var complexType = new ComplexType( {\n        shortName: \"address\",\n        namespace: \"myAppNamespace\"\n    });"
             ],
@@ -5001,8 +5001,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2154,
+            "file": "a40_entityMetadata.js",
+            "line": 2174,
             "description": "The DataProperties (see {{#crossLink \"DataProperty\"}}{{/crossLink}}) associated with this ComplexType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "dataProperties",
@@ -5011,8 +5011,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2161,
+            "file": "a40_entityMetadata.js",
+            "line": 2181,
             "description": "The DataProperties for this ComplexType that contain instances of a ComplexType (see {{#crossLink \"ComplexType\"}}{{/crossLink}}).\n\n__readOnly__",
             "itemtype": "property",
             "name": "complexProperties",
@@ -5021,8 +5021,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2168,
+            "file": "a40_entityMetadata.js",
+            "line": 2188,
             "description": "The DataProperties associated with this ComplexType that are not mapped to any backend datastore. These are effectively free standing\nproperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "unmappedProperties",
@@ -5031,8 +5031,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2176,
+            "file": "a40_entityMetadata.js",
+            "line": 2196,
             "description": "The fully qualifed name of this ComplexType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "name",
@@ -5041,8 +5041,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2183,
+            "file": "a40_entityMetadata.js",
+            "line": 2203,
             "description": "The short, unqualified, name for this ComplexType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "shortName",
@@ -5051,8 +5051,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2190,
+            "file": "a40_entityMetadata.js",
+            "line": 2210,
             "description": "The namespace for this ComplexType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "namespace",
@@ -5061,8 +5061,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2197,
+            "file": "a40_entityMetadata.js",
+            "line": 2217,
             "description": "The entity level validators associated with this ComplexType. Validators can be added and\nremoved from this collection.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validators",
@@ -5071,8 +5071,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2205,
+            "file": "a40_entityMetadata.js",
+            "line": 2225,
             "description": "A free form object that can be used to define any custom metadata for this ComplexType.\n\n__readOnly__",
             "itemtype": "property",
             "name": "custom",
@@ -5081,8 +5081,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2212,
+            "file": "a40_entityMetadata.js",
+            "line": 2232,
             "description": "General purpose property set method",
             "example": [
                 "\n    // assume em1 is an EntityManager\n    var addresstType = em1.metadataStore.getEntityType(\"Address\");\n    addressType.setProperties( {\n        custom: { foo: 7, bar: \"test\" }\n    });"
@@ -5107,8 +5107,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2235,
+            "file": "a40_entityMetadata.js",
+            "line": 2255,
             "description": "Creates a new non-attached instance of this ComplexType.",
             "itemtype": "method",
             "name": "createInstance",
@@ -5123,8 +5123,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2259,
+            "file": "a40_entityMetadata.js",
+            "line": 2279,
             "description": "See  {{#crossLink \"EntityType.addValidator\"}}{{/crossLink}}",
             "itemtype": "method",
             "name": "addValidator",
@@ -5144,8 +5144,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2267,
+            "file": "a40_entityMetadata.js",
+            "line": 2287,
             "description": "See  {{#crossLink \"EntityType.getProperty\"}}{{/crossLink}}",
             "itemtype": "method",
             "name": "getProperty",
@@ -5153,8 +5153,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2272,
+            "file": "a40_entityMetadata.js",
+            "line": 2292,
             "description": "See  {{#crossLink \"EntityType.getPropertyNames\"}}{{/crossLink}}",
             "itemtype": "method",
             "name": "getPropertyNames",
@@ -5162,8 +5162,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2277,
+            "file": "a40_entityMetadata.js",
+            "line": 2297,
             "description": "See  {{#crossLink \"EntityType.getEntityCtor\"}}{{/crossLink}}",
             "itemtype": "method",
             "name": "getCtor",
@@ -5171,8 +5171,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2329,
+            "file": "a40_entityMetadata.js",
+            "line": 2349,
             "example": [
                 "\n    var lastNameProp = new DataProperty( {\n        name: \"lastName\",\n        dataType: DataType.String,\n        isNullable: true,\n        maxLength: 20\n    });\n    // assuming personEntityType is a newly constructed EntityType\n    personEntityType.addProperty(lastNameProperty);"
             ],
@@ -5274,8 +5274,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2442,
+            "file": "a40_entityMetadata.js",
+            "line": 2462,
             "description": "The name of this property\n\n__readOnly__",
             "itemtype": "property",
             "name": "name",
@@ -5284,8 +5284,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2449,
+            "file": "a40_entityMetadata.js",
+            "line": 2469,
             "description": "The parent type that this property belongs to - will be either a {{#crossLink \"EntityType\"}}{{/crossLink}} or a {{#crossLink \"ComplexType\"}}{{/crossLink}}.\n\n__readOnly__",
             "itemtype": "property",
             "name": "parentType",
@@ -5294,8 +5294,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2456,
+            "file": "a40_entityMetadata.js",
+            "line": 2476,
             "description": "The {{#crossLink \"DataType\"}}{{/crossLink}} of this property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "dataType",
@@ -5304,8 +5304,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2463,
+            "file": "a40_entityMetadata.js",
+            "line": 2483,
             "description": "The name of the {{#crossLink \"ComplexType\"}}{{/crossLink}} associated with this property; may be null.\n\n__readOnly__",
             "itemtype": "property",
             "name": "complexTypeName",
@@ -5314,8 +5314,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2470,
+            "file": "a40_entityMetadata.js",
+            "line": 2490,
             "description": "Whether the contents of this property is an instance of a {{#crossLink \"ComplexType\"}}{{/crossLink}}.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isComplexProperty",
@@ -5324,8 +5324,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2477,
+            "file": "a40_entityMetadata.js",
+            "line": 2497,
             "description": "Whether this property is nullable.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isNullable",
@@ -5334,8 +5334,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2484,
+            "file": "a40_entityMetadata.js",
+            "line": 2504,
             "description": "Whether this property is scalar (i.e., returns a single value).\n\n__readOnly__",
             "itemtype": "property",
             "name": "isScalar",
@@ -5344,8 +5344,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2491,
+            "file": "a40_entityMetadata.js",
+            "line": 2511,
             "description": "Property on the base type that this property is inherited from. Will be null if the property is not on the base type.\n\n__readOnly__",
             "itemtype": "property",
             "name": "baseProperty",
@@ -5354,8 +5354,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2498,
+            "file": "a40_entityMetadata.js",
+            "line": 2518,
             "description": "Whether this property is a 'key' property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isPartOfKey",
@@ -5364,8 +5364,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2505,
+            "file": "a40_entityMetadata.js",
+            "line": 2525,
             "description": "Whether this property is an 'unmapped' property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isUnmapped",
@@ -5374,8 +5374,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2512,
+            "file": "a40_entityMetadata.js",
+            "line": 2532,
             "description": "__Describe this__\n\n__readOnly__",
             "itemtype": "property",
             "name": "concurrencyMode",
@@ -5384,8 +5384,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2519,
+            "file": "a40_entityMetadata.js",
+            "line": 2539,
             "description": "The maximum length for the value of this property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "maxLength",
@@ -5394,8 +5394,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2526,
+            "file": "a40_entityMetadata.js",
+            "line": 2546,
             "description": "The {{#crossLink \"Validator\"}}{{/crossLink}}s that are associated with this property. Validators can be added and\nremoved from this collection.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validators",
@@ -5404,8 +5404,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2534,
+            "file": "a40_entityMetadata.js",
+            "line": 2554,
             "description": "The default value for this property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "defaultValue",
@@ -5414,8 +5414,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2541,
+            "file": "a40_entityMetadata.js",
+            "line": 2561,
             "description": "The navigation property related to this property.  Will only be set if this is a foreign key property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "relatedNavigationProperty",
@@ -5424,8 +5424,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2548,
+            "file": "a40_entityMetadata.js",
+            "line": 2568,
             "description": "A free form object that can be used to define any custom metadata for this DataProperty.\n\n__readOnly__",
             "itemtype": "property",
             "name": "custom",
@@ -5434,8 +5434,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2555,
+            "file": "a40_entityMetadata.js",
+            "line": 2575,
             "description": "Is this a DataProperty? - always true here\nAllows polymorphic treatment of DataProperties and NavigationProperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isDataProperty",
@@ -5444,8 +5444,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2563,
+            "file": "a40_entityMetadata.js",
+            "line": 2583,
             "description": "Is this a NavigationProperty? - always false here\nAllows polymorphic treatment of DataProperties and NavigationProperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isNavigationProperty",
@@ -5454,8 +5454,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2589,
+            "file": "a40_entityMetadata.js",
+            "line": 2609,
             "description": "General purpose property set method",
             "example": [
                 "\n    // assume em1 is an EntityManager\n    var prop = myEntityType.getProperty(\"myProperty\");\n    prop.setProperties( {\n        custom: { foo: 7, bar: \"test\" }\n    });"
@@ -5480,8 +5480,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2669,
+            "file": "a40_entityMetadata.js",
+            "line": 2689,
             "example": [
                 "\n    var homeAddressProp = new NavigationProperty( {\n        name: \"homeAddress\",\n        entityTypeName: \"Address:#myNamespace\",\n        isScalar: true,\n        associationName: \"address_person\",\n        foreignKeyNames: [\"homeAddressId\"]\n    });\n    var homeAddressIdProp = new DataProperty( {\n        name: \"homeAddressId\"\n        dataType: DataType.Integer\n    });\n    // assuming personEntityType is a newly constructed EntityType\n    personEntityType.addProperty(homeAddressProp);\n    personEntityType.addProperty(homeAddressIdProp);"
             ],
@@ -5548,8 +5548,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2727,
+            "file": "a40_entityMetadata.js",
+            "line": 2747,
             "description": "The {{#crossLink \"EntityType\"}}{{/crossLink}} that this property belongs to. ( same as parentEntityType).\n__readOnly__",
             "itemtype": "property",
             "name": "parentType",
@@ -5558,8 +5558,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2733,
+            "file": "a40_entityMetadata.js",
+            "line": 2753,
             "description": "The {{#crossLink \"EntityType\"}}{{/crossLink}} that this property belongs to.\n__readOnly__",
             "itemtype": "property",
             "name": "parentEntityType",
@@ -5568,8 +5568,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2739,
+            "file": "a40_entityMetadata.js",
+            "line": 2759,
             "description": "The name of this property\n\n__readOnly__",
             "itemtype": "property",
             "name": "name",
@@ -5578,8 +5578,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2746,
+            "file": "a40_entityMetadata.js",
+            "line": 2766,
             "description": "The {{#crossLink \"EntityType\"}}{{/crossLink}} returned by this property.\n\n__readOnly__",
             "itemtype": "property",
             "name": "entityType",
@@ -5588,8 +5588,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2753,
+            "file": "a40_entityMetadata.js",
+            "line": 2773,
             "description": "Whether this property returns a single entity or an array of entities.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isScalar",
@@ -5598,8 +5598,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2760,
+            "file": "a40_entityMetadata.js",
+            "line": 2780,
             "description": "Property on the base type that this property is inherited from. Will be null if the property is not on the base type.\n\n__readOnly__",
             "itemtype": "property",
             "name": "baseProperty",
@@ -5608,8 +5608,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2767,
+            "file": "a40_entityMetadata.js",
+            "line": 2787,
             "description": "The name of the association to which that this property belongs.  This associationName will be shared with this\nproperties 'inverse'.\n\n__readOnly__",
             "itemtype": "property",
             "name": "associationName",
@@ -5618,8 +5618,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2775,
+            "file": "a40_entityMetadata.js",
+            "line": 2795,
             "description": "The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated\nwith a Navigation property except in the case of entities with multipart keys.\n\n__readOnly__",
             "itemtype": "property",
             "name": "foreignKeyNames",
@@ -5628,8 +5628,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2783,
+            "file": "a40_entityMetadata.js",
+            "line": 2803,
             "description": "The 'foreign key' DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated\nwith a Navigation property except in the case of entities with multipart keys.\n\n__readOnly__",
             "itemtype": "property",
             "name": "relatedDataProperties",
@@ -5638,8 +5638,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2791,
+            "file": "a40_entityMetadata.js",
+            "line": 2811,
             "description": "The inverse of this NavigationProperty.  The NavigationProperty that represents a navigation in the opposite direction\nto this NavigationProperty.\n\n__readOnly__",
             "itemtype": "property",
             "name": "inverse",
@@ -5648,8 +5648,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2799,
+            "file": "a40_entityMetadata.js",
+            "line": 2819,
             "description": "The {{#crossLink \"Validator\"}}{{/crossLink}}s that are associated with this property. Validators can be added and\nremoved from this collection.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validators",
@@ -5658,8 +5658,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2807,
+            "file": "a40_entityMetadata.js",
+            "line": 2827,
             "description": "A free form object that can be used to define any custom metadata for this NavigationProperty.\n\n__readOnly__",
             "itemtype": "property",
             "name": "custom",
@@ -5668,8 +5668,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2814,
+            "file": "a40_entityMetadata.js",
+            "line": 2834,
             "description": "Is this a DataProperty? - always false here\nAllows polymorphic treatment of DataProperties and NavigationProperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isDataProperty",
@@ -5678,8 +5678,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2822,
+            "file": "a40_entityMetadata.js",
+            "line": 2842,
             "description": "Is this a NavigationProperty? - always true here\nAllows polymorphic treatment of DataProperties and NavigationProperties.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isNavigationProperty",
@@ -5688,8 +5688,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 2837,
+            "file": "a40_entityMetadata.js",
+            "line": 2857,
             "description": "General purpose property set method",
             "example": [
                 "\n    // assume myEntityType is an EntityType\n    var prop = myEntityType.getProperty(\"myProperty\");\n    prop.setProperties( {\n        custom: { foo: 7, bar: \"test\" }\n    });"
@@ -5720,8 +5720,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 3019,
+            "file": "a40_entityMetadata.js",
+            "line": 3039,
             "description": "This entity does not have an autogenerated key.\nThe client must set the key before adding the entity to the EntityManager",
             "itemtype": "property",
             "name": "None",
@@ -5732,8 +5732,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 3027,
+            "file": "a40_entityMetadata.js",
+            "line": 3047,
             "description": "This entity's key is an Identity column and is set by the backend database.\nKeys for new entities will be temporary until the entities are saved at which point the keys will\nbe converted to their 'real' versions.",
             "itemtype": "property",
             "name": "Identity",
@@ -5744,8 +5744,8 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_entityMetadata.js",
-            "line": 3036,
+            "file": "a40_entityMetadata.js",
+            "line": 3056,
             "description": "This entity's key is generated by a KeyGenerator and is set by the backend database.\nKeys for new entities will be temporary until the entities are saved at which point the keys will\nbe converted to their 'real' versions.",
             "itemtype": "property",
             "name": "KeyGenerator",
@@ -5756,7 +5756,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_localQueryComparisionOptions.js",
+            "file": "a40_localQueryComparisionOptions.js",
             "line": 18,
             "description": "LocalQueryComparisonOptions constructor",
             "example": [
@@ -5795,7 +5795,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_localQueryComparisionOptions.js",
+            "file": "a40_localQueryComparisionOptions.js",
             "line": 57,
             "description": "Case insensitive SQL compliant options - this is also the default unless otherwise changed.",
             "itemtype": "property",
@@ -5806,7 +5806,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_localQueryComparisionOptions.js",
+            "file": "a40_localQueryComparisionOptions.js",
             "line": 68,
             "description": "The default value whenever LocalQueryComparisonOptions are not specified. By default this is 'caseInsensitiveSQL'.",
             "itemtype": "property",
@@ -5817,7 +5817,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_localQueryComparisionOptions.js",
+            "file": "a40_localQueryComparisionOptions.js",
             "line": 75,
             "description": "Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.\nThe current instance is returned unchanged.",
             "itemtype": "method",
@@ -5830,7 +5830,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 15,
             "description": "NamingConvention constructor",
             "example": [
@@ -5861,7 +5861,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 50,
             "description": "The function used to convert server side property names to client side property names.",
             "itemtype": "method",
@@ -5887,7 +5887,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 59,
             "description": "The function used to convert client side property names to server side property names.",
             "itemtype": "method",
@@ -5913,7 +5913,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 68,
             "description": "A noop naming convention - This is the default unless another is specified.",
             "itemtype": "property",
@@ -5924,7 +5924,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 83,
             "description": "The \"camelCase\" naming convention - This implementation only lowercases the first character of the server property name\nbut leaves the rest of the property name intact.  If a more complicated version is needed then one should be created via the ctor.",
             "itemtype": "property",
@@ -5935,7 +5935,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 99,
             "description": "The default value whenever NamingConventions are not specified.",
             "itemtype": "property",
@@ -5946,7 +5946,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a40_namingConvention.js",
+            "file": "a40_namingConvention.js",
             "line": 106,
             "description": "Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.\nThe current instance is returned unchanged.",
             "itemtype": "method",
@@ -5959,7 +5959,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 10,
             "description": "Predicate constructor",
             "example": [
@@ -5989,7 +5989,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 64,
             "description": "Same as using the ctor.",
             "example": [
@@ -6019,7 +6019,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 86,
             "description": "Creates a 'composite' Predicate by 'and'ing a set of specified Predicates together.",
             "example": [
@@ -6041,7 +6041,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 108,
             "description": "Creates a 'composite' Predicate by 'or'ing a set of specified Predicates together.",
             "example": [
@@ -6063,7 +6063,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 129,
             "description": "Creates a 'composite' Predicate by 'negating' a specified predicate.",
             "example": [
@@ -6085,7 +6085,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 169,
             "description": "'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
@@ -6107,7 +6107,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 192,
             "description": "'Or's this Predicate with one or more other Predicates and returns a new 'composite' Predicate",
             "example": [
@@ -6129,7 +6129,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a44_predicate.js",
+            "file": "a44_predicate.js",
             "line": 215,
             "description": "Returns the 'negated' version of this Predicate",
             "example": [
@@ -6143,7 +6143,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 11,
             "example": [
                 "\n    var query = new EntityQuery(\"Customers\")\n\nUsually this constructor will be followed by calls to filtering, ordering or selection methods",
@@ -6163,7 +6163,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 50,
             "description": "The resource name used by this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6173,7 +6173,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 57,
             "description": "The entityType that is associated with the 'from' clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query\nhas been executed because it depends on the MetadataStore associated with the EntityManager that the query was executed against.\nThis value may be null if the entityType cannot be associated with a resourceName.\n\n__readOnly__",
             "itemtype": "property",
@@ -6183,7 +6183,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 66,
             "description": "The entityType that will be returned by this query. This property will only be set if the 'toType' method was called.\n\n__readOnly__",
             "itemtype": "property",
@@ -6193,7 +6193,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 73,
             "description": "The 'where' predicate used by this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6203,7 +6203,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 80,
             "description": "The {{#crossLink \"OrderByClause\"}}{{/crossLink}} used by this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6213,7 +6213,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 87,
             "description": "The number of entities to 'skip' for this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6223,7 +6223,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 94,
             "description": "The number of entities to 'take' for this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6233,7 +6233,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 101,
             "description": "Any additional parameters that were added to the query via the 'withParameters' method.\n\n__readOnly__",
             "itemtype": "property",
@@ -6243,7 +6243,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 108,
             "description": "The {{#crossLink \"QueryOptions\"}}{{/crossLink}} for this query.\n\n__readOnly__",
             "itemtype": "property",
@@ -6253,7 +6253,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 115,
             "description": "The {{#crossLink \"EntityManager\"}}{{/crossLink}} for this query. This may be null and can be set via the 'using' method.\n\n__readOnly__",
             "itemtype": "property",
@@ -6263,7 +6263,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 122,
             "description": "Specifies the resource to query for this EntityQuery.",
             "example": [
@@ -6288,7 +6288,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 141,
             "description": "This is a static version of the \"from\" method and it creates a 'base' entityQuery for the specified resource name.",
             "example": [
@@ -6314,7 +6314,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 159,
             "description": "Specifies the top level EntityType that this query will return.  Only needed when a query returns a json result that does not include type information.",
             "example": [
@@ -6338,7 +6338,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 178,
             "description": "Returns a new query with an added filter criteria; Can be called multiple times which means to 'and' with any existing\nPredicate or can be called with null to clear all predicates.",
             "example": [
@@ -6369,7 +6369,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 241,
             "description": "Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.\nOrderBy clauses may be chained.",
             "example": [
@@ -6402,7 +6402,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 285,
             "description": "Returns a new query that orders the results of the query by property name in descending order.",
             "example": [
@@ -6428,7 +6428,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 311,
             "description": "Returns a new query that selects a list of properties from the results of the original query and returns the values of just these properties. This\nwill be referred to as a projection.\nIf the result of this selection \"projection\" contains entities, these entities will automatically be added to EntityManager's cache and will\nbe made 'observable'.\nAny simple properties, i.e. strings, numbers or dates within a projection will not be cached are will NOT be made 'observable'.",
             "example": [
@@ -6456,7 +6456,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 352,
             "description": "Returns a new query that skips the specified number of entities when returning results.\nAny existing 'skip' can be cleared by calling 'skip' with no arguments.",
             "example": [
@@ -6480,7 +6480,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 369,
             "description": "Returns a new query that returns only the specified number of entities when returning results. - Same as 'take'.\nAny existing 'top' can be cleared by calling 'top' with no arguments.",
             "example": [
@@ -6504,7 +6504,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 385,
             "description": "Returns a new query that returns only the specified number of entities when returning results - Same as 'top'.\nAny existing take can be cleared by calling take with no arguments.",
             "example": [
@@ -6528,7 +6528,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 402,
             "description": "Returns a new query that will return related entities nested within its results. The expand method allows you to identify related entities, via navigation property\nnames such that a graph of entities may be retrieved with a single request. Any filtering occurs before the results are 'expanded'.",
             "example": [
@@ -6554,7 +6554,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 430,
             "description": "Returns a new query that includes a collection of parameters to pass to the server.",
             "example": [
@@ -6580,7 +6580,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 458,
             "description": "Returns a query with the 'inlineCount' capability either enabled or disabled.  With 'inlineCount' enabled, an additional 'inlineCount' property\nwill be returned with the query results that will contain the number of entities that would have been returned by this\nquery with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored.",
             "example": [
@@ -6604,7 +6604,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 487,
             "description": "Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query\nwill not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.",
             "example": [
@@ -6628,7 +6628,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 508,
             "description": "Returns a copy of this EntityQuery with the specified {{#crossLink \"EntityManager\"}}{{/crossLink}}, {{#crossLink \"DataService\"}}{{/crossLink}},\n{{#crossLink \"JsonResultsAdapter\"}}{{/crossLink}}, {{#crossLink \"MergeStrategy\"}}{{/crossLink}} or {{#crossLink \"FetchStrategy\"}}{{/crossLink}} applied.",
             "example": [
@@ -6654,7 +6654,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 552,
             "description": "Executes this query.  This method requires that an EntityManager has been previously specified via the \"using\" method.",
             "example": [
@@ -6742,7 +6742,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 618,
             "description": "Executes this query against the local cache.  This method requires that an EntityManager have been previously specified via the \"using\" method.",
             "example": [
@@ -6754,7 +6754,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 703,
             "description": "Static method that creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful\nto force a requery of selected entities, or to restrict an existing collection of entities according to some filter.\n\nWorks for a single entity or an array of entities of the SAME type.\nDoes not work for an array of entities of different types.",
             "example": [
@@ -6781,7 +6781,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 755,
             "description": "Creates an EntityQuery for the specified {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
@@ -6807,7 +6807,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 780,
             "description": "Creates an EntityQuery for the specified entity and {{#crossLink \"NavigationProperty\"}}{{/crossLink}}.",
             "example": [
@@ -6837,7 +6837,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 987,
             "description": "Aliases: \"eq\", \"==\"",
             "itemtype": "property",
@@ -6849,7 +6849,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 994,
             "description": "Aliases: \"ne\", \"!=\"",
             "itemtype": "property",
@@ -6861,7 +6861,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1001,
             "description": "Aliases: \"gt\", \">\"",
             "itemtype": "property",
@@ -6873,7 +6873,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1008,
             "description": "Aliases: \"lt\", \"<\"",
             "itemtype": "property",
@@ -6885,7 +6885,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1015,
             "description": "Aliases: \"ge\", \">=\"",
             "itemtype": "property",
@@ -6897,7 +6897,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1022,
             "description": "Aliases: \"le\", \"<=\"",
             "itemtype": "property",
@@ -6909,7 +6909,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1029,
             "description": "String operation: Is a string a substring of another string.\nAliases: \"substringof\"",
             "itemtype": "property",
@@ -6921,7 +6921,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1037,
             "itemtype": "property",
             "name": "StartsWith",
@@ -6932,7 +6932,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1043,
             "itemtype": "property",
             "name": "EndsWith",
@@ -6943,7 +6943,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1050,
             "description": "Aliases: \"some\"",
             "itemtype": "property",
@@ -6955,7 +6955,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_entityQuery.js",
+            "file": "a45_entityQuery.js",
             "line": 1058,
             "description": "Aliases: \"every\"",
             "itemtype": "property",
@@ -6967,7 +6967,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 13,
             "description": "MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed\nstate (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will\nremain {{#crossLink \"EntityState/Unchanged\"}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will\nbe that of the imported entities.",
             "itemtype": "property",
@@ -6979,7 +6979,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 24,
             "description": "MergeStrategy.OverwriteChanges always updates the cached entity with incoming values even if the entity is in\na changed state (added, modified, deleted). After the merge, the pending changes are lost.\nThe new EntityState will be  {{#crossLink \"EntityState/Unchanged\"}}{{/crossLink}} unless you’re importing entities\nin which case the new EntityState will be that of the imported entities.",
             "itemtype": "property",
@@ -6991,7 +6991,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 36,
             "description": "SkipMerge is used to ignore incoming values. Adds the incoming entity to the cache only if there is no cached entity with the same key.\nThis is the fastest merge strategy but your existing cached data will remain “stale”.",
             "itemtype": "property",
@@ -7003,7 +7003,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 46,
             "description": "Disallowed is used to throw an exception if there is an incoming entity with the same key as an entity already in the cache.\nUse this strategy when you want to be sure that the incoming entity is not already in cache.\nThis is the default strategy for EntityManager.attachEntity.",
             "itemtype": "property",
@@ -7015,7 +7015,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 68,
             "description": "FromServer is used to tell the query to execute the query against a remote data source on the server.",
             "itemtype": "property",
@@ -7027,7 +7027,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 75,
             "description": "FromLocalCache is used to tell the query to execute the query against a local EntityManager instead of going to a remote server.",
             "itemtype": "property",
@@ -7039,7 +7039,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 93,
             "description": "QueryOptions constructor",
             "example": [
@@ -7079,7 +7079,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 117,
             "description": "A {{#crossLink \"FetchStrategy\"}}{{/crossLink}}\n__readOnly__",
             "itemtype": "property",
@@ -7089,7 +7089,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 123,
             "description": "A {{#crossLink \"MergeStrategy\"}}{{/crossLink}}\n__readOnly__",
             "itemtype": "property",
@@ -7099,7 +7099,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 129,
             "description": "Whether to include cached deleted entities in a query result (false by default).\n\n__readOnly__",
             "itemtype": "property",
@@ -7109,7 +7109,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 140,
             "description": "The default value whenever QueryOptions are not specified.",
             "itemtype": "property",
@@ -7120,7 +7120,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 151,
             "description": "Returns a copy of this QueryOptions with the specified {{#crossLink \"MergeStrategy\"}}{{/crossLink}},\n{{#crossLink \"FetchStrategy\"}}{{/crossLink}}, or 'includeDeleted' option applied.",
             "example": [
@@ -7147,7 +7147,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a45_queryOptions.js",
+            "file": "a45_queryOptions.js",
             "line": 185,
             "description": "Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.\nThe current instance is returned unchanged.",
             "itemtype": "method",
@@ -7160,7 +7160,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 11,
             "description": "At its most basic an EntityManager can be constructed with just a service name",
             "example": [
@@ -7229,7 +7229,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 80,
             "description": "General purpose property set method.  Any of the properties documented below\nmay be set.",
             "example": [
@@ -7286,7 +7286,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 139,
             "description": "The service name associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7296,7 +7296,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 146,
             "description": "The DataService name associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7306,7 +7306,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 153,
             "description": "The {{#crossLink \"MetadataStore\"}}{{/crossLink}} associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7316,7 +7316,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 160,
             "description": "The {{#crossLink \"QueryOptions\"}}{{/crossLink}} associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7326,7 +7326,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 167,
             "description": "The {{#crossLink \"SaveOptions\"}}{{/crossLink}} associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7336,7 +7336,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 174,
             "description": "The {{#crossLink \"ValidationOptions\"}}{{/crossLink}} associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7346,7 +7346,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 181,
             "description": "The {{#crossLink \"KeyGenerator\"}}{{/crossLink}} constructor associated with this EntityManager.\n\n__readOnly__",
             "itemtype": "property",
@@ -7356,7 +7356,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 190,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever a change to any entity in this EntityManager occurs.",
             "example": [
@@ -7386,7 +7386,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 209,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever validationErrors change for any entity in this EntityManager.",
             "example": [
@@ -7416,7 +7416,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 233,
             "description": "Creates a new entity of a specified type and optionally initializes it. By default the new entity is created with an EntityState of Added\nbut you can also optionally specify an EntityState.  An EntityState of 'Detached' will insure that the entity is created but not yet added\nto the EntityManager.",
             "example": [
@@ -7460,7 +7460,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 274,
             "description": "Creates a new EntityManager and imports a previously exported result into it.",
             "example": [
@@ -7503,7 +7503,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 306,
             "description": "Calls EntityAspect.acceptChanges on every changed entity in this EntityManager.",
             "itemtype": "method",
@@ -7512,7 +7512,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 318,
             "description": "Exports selected entities, all entities of selected types, or an entire EntityManager cache.",
             "example": [
@@ -7564,7 +7564,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 416,
             "description": "Imports a previously exported result into this EntityManager.",
             "example": [
@@ -7608,7 +7608,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 512,
             "description": "Clears this EntityManager's cache but keeps all other settings. Note that this\nmethod is not as fast as creating a new EntityManager via 'new EntityManager'.\nThis is because clear actually detaches all of the entities from the EntityManager.",
             "example": [
@@ -7620,7 +7620,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 537,
             "description": "Creates an empty copy of this EntityManager",
             "example": [
@@ -7636,7 +7636,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 553,
             "description": "Attaches an entity to this EntityManager with an  {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Added'.",
             "example": [
@@ -7660,7 +7660,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 574,
             "description": "Attaches an entity to this EntityManager with a specified {{#crossLink \"EntityState\"}}{{/crossLink}}.",
             "example": [
@@ -7697,7 +7697,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 643,
             "description": "Detaches an entity from this EntityManager.",
             "example": [
@@ -7720,7 +7720,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 669,
             "description": "Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call\noccurs internally before the first query to any service if the metadata hasn't already been\nloaded.",
             "example": [
@@ -7768,7 +7768,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 717,
             "description": "Executes the specified query.",
             "example": [
@@ -7872,7 +7872,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 811,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "example": [
@@ -7897,7 +7897,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 889,
             "description": "Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities\nspecified then there will be no server side call made but a valid 'empty' saveResult will still be returned.",
             "example": [
@@ -7999,7 +7999,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1070,
             "description": "Run the \"saveChanges\" pre-save client validation logic.\n\nThis is NOT a general purpose validation method.\nIt is intended for utilities that must know if saveChanges\nwould reject the save due to client validation errors.\n\nIt only validates entities if the EntityManager's\n{{#crossLink \"ValidationOptions\"}}{{/crossLink}}.validateOnSave is true.",
             "itemtype": "method",
@@ -8019,7 +8019,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1184,
             "description": "Attempts to locate an entity within this EntityManager by its key.",
             "example": [
@@ -8047,7 +8047,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1196,
             "description": "Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
@@ -8070,7 +8070,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1222,
             "description": "Attempts to fetch an entity from the server by its key with\nan option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy\nwill be used to merge any server side entity returned by this method.",
             "example": [
@@ -8104,7 +8104,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1246,
             "description": "Attempts to fetch an entity from the server by its {{#crossLink \"EntityKey\"}}{{/crossLink}} with\nan option to check the local cache first.",
             "example": [
@@ -8133,7 +8133,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1309,
             "description": "[Deprecated] - Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
@@ -8158,7 +8158,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1326,
             "description": "Generates a temporary key for the specified entity.  This is used to insure that newly\ncreated entities have unique keys and to register that these keys are temporary and\nneed to be automatically replaced with 'real' key values once these entities are saved.\n\nThe EntityManager.keyGeneratorCtor property is used internally by this method to actually generate\nthe keys - See the  {{#crossLink \"_keyGenerator_interface\"}}{{/crossLink}} interface description to see\nhow a custom key generator can be plugged in.",
             "example": [
@@ -8181,7 +8181,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1366,
             "description": "Returns whether there are any changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
@@ -8208,7 +8208,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1402,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.",
             "example": [
@@ -8233,7 +8233,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1428,
             "description": "Returns a array of all changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
@@ -8260,7 +8260,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1457,
             "description": "Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.\nCalls EntityAspect.rejectChanges on every changed entity in this EntityManager.",
             "example": [
@@ -8276,7 +8276,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a50_entityManager.js",
+            "file": "a50_entityManager.js",
             "line": 1483,
             "description": "Returns a array of all entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s with the specified {{#crossLink \"EntityState\"}}{{/crossLink}}s.",
             "example": [
@@ -8310,7 +8310,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 12,
             "itemtype": "method",
             "name": "<ctor> SaveOptions",
@@ -8351,7 +8351,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 27,
             "description": "Sets the 'defaultInstance' by creating a copy of the current 'defaultInstance' and then applying all of the properties of the current instance.\nThe current instance is returned unchanged.",
             "itemtype": "method",
@@ -8361,7 +8361,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 37,
             "description": "Whether another save can be occuring at the same time as this one - default is false.\n\n__readOnly__",
             "itemtype": "property",
@@ -8371,7 +8371,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 44,
             "description": "A {{#crossLink \"DataService\"}}{{/crossLink}}.\n__readOnly__",
             "itemtype": "property",
@@ -8381,7 +8381,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 50,
             "description": "The resource name to call to perform the save.\n__readOnly__",
             "itemtype": "property",
@@ -8391,7 +8391,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 56,
             "description": "A free form value that will be sent to the server.\n\n__readOnly__",
             "itemtype": "property",
@@ -8401,7 +8401,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 63,
             "description": "The default value whenever SaveOptions are not specified.",
             "itemtype": "property",
@@ -8412,7 +8412,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a55_saveOptions.js",
+            "file": "a55_saveOptions.js",
             "line": 69,
             "description": "Returns a copy of this SaveOptions with the specified config options applied.",
             "example": [
@@ -8458,7 +8458,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a60_abstractDataServiceAdapter.js",
+            "file": "a60_abstractDataServiceAdapter.js",
             "line": 148,
             "description": "Returns a constructor function for a \"ChangeRequestInterceptor\"\nthat can tweak the saveBundle both as it is built and when it is completed\nby a concrete DataServiceAdapater.\n\nInitialized with a default, no-op implementation that developers can replace with a\nsubstantive implementation that changes the individual entity change requests\nor aspects of the entire 'saveBundle' without having to write their own DataService adapters.",
             "example": [
@@ -8482,11 +8482,11 @@
                 "description": "Constructor for a \"ChangeRequestInterceptor\".",
                 "type": "Function"
             },
-            "class": "ↈ_ajax_interface",
+            "class": "~ajax_interface",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a60_abstractDataServiceAdapter.js",
+            "file": "a60_abstractDataServiceAdapter.js",
             "line": 180,
             "description": "Prepare and return the save data for an entity change-set.\n\nThe adapter calls this method for each entity in the change-set,\nafter it has prepared a \"change request\" for that object.\n\nThe method can do anything to the request but it must return a valid, non-null request.",
             "example": [
@@ -8515,11 +8515,11 @@
                 "description": "The potentially revised request.",
                 "type": "Function"
             },
-            "class": "ↈ_ajax_interface",
+            "class": "~ajax_interface",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\a60_abstractDataServiceAdapter.js",
+            "file": "a60_abstractDataServiceAdapter.js",
             "line": 204,
             "description": "Last chance to change anything about the 'requests' array\nafter it has been built with requests for all of the entities-to-be-saved.\n\nThe 'requests' array is the same as 'saveBundle.entities' in many implementations\n\nThis method can do anything to the array including add and remove requests.\nIt's up to you to ensure that server will accept the requests array data as valid.\n\nReturned value is ignored.",
             "example": [
@@ -8534,11 +8534,11 @@
                     "type": "Array of Object"
                 }
             ],
-            "class": "ↈ_ajax_interface",
+            "class": "~ajax_interface",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 12,
             "description": "Performs an ajax request. This method takes a single argument — a configuration object — that is used to generate an HTTP request. The config object has two callback methods:\n'success' and 'error' in addition to a number of properties that may be used to configure the request itself. Higher level Breeze constructs will wrap calls to the ajax adapter\ninto Promises. Individual adapters may add additional properties to the basic config object described below.",
             "itemtype": "method",
@@ -8589,11 +8589,11 @@
                     ]
                 }
             ],
-            "class": "ↈ_ajax_interface",
+            "class": "~ajax_interface",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 36,
             "description": "The response body.",
             "itemtype": "property",
@@ -8603,7 +8603,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 41,
             "description": "HTTP status code of the response.",
             "itemtype": "property",
@@ -8613,7 +8613,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 46,
             "description": "The configuration object that was used to generate the request.",
             "itemtype": "property",
@@ -8623,7 +8623,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.ajaxInterface.js",
+            "file": "iface.ajaxInterface.js",
             "line": 51,
             "description": "A function to retrieve headers - a null headerName will return all headers.",
             "itemtype": "method",
@@ -8640,7 +8640,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.keyGeneratorInterface.js",
+            "file": "iface.keyGeneratorInterface.js",
             "line": 33,
             "description": "Returns a unique 'temporary' key for the specified {{#crossLink \"EntityType\"}}{{/crossLink}}.\nUniqueness is defined for this purpose as being unique within this KeyGenerator. This is sufficient\nbecause each EntityManager will have its own instance of a KeyGenerator and any entities imported into\nthe EntityManager with temporary keys will have them regenerated and remapped on import.",
             "itemtype": "method",
@@ -8652,11 +8652,11 @@
                     "type": "EntityType"
                 }
             ],
-            "class": "ↈ_keyGenerator_interface",
+            "class": "~keyGenerator_interface",
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.promise.js",
+            "file": "iface.promise.js",
             "line": 10,
             "description": "Used to handle the sucessfull return of data from a promise",
             "itemtype": "method",
@@ -8672,7 +8672,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.promise.js",
+            "file": "iface.promise.js",
             "line": 17,
             "description": "Used to handle any errors encountered wheh processing the promise.",
             "itemtype": "method",
@@ -8688,7 +8688,7 @@
             "module": "breeze"
         },
         {
-            "file": "..\\src\\iface.promise.js",
+            "file": "iface.promise.js",
             "line": 24,
             "description": "A callback that is called regardless of the success or failure of the promise.",
             "itemtype": "method",
