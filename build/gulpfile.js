@@ -50,7 +50,8 @@ gulp.task('copyForTests', ['minify'], function() {
 gulp.task('yuidoc-full', ['yuidoc-clean'], function() {
   return gulp.src( mapPath(srcDir, fileNames))
       .pipe(concat('foo'))  // just needed a method that would get n -> 1 would like something smaller.
-      .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));    
+      .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + "."], 
+         { cwd: srcDir}));
 });
 
 gulp.task('yuidoc-clean', function() {
@@ -74,7 +75,8 @@ gulp.task('yuidoc', function() {
         this.queue(null);
       }))
       */
-      .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + srcDir]));
+      .pipe(shell(['yuidoc --themedir ' + yuidocThemeDir + ' --outdir ' + yuidocDestDir + ' ' + "."], 
+         { cwd: srcDir}));
 });
 
 gulp.task('intellisense', ['yuidoc'], function() {
