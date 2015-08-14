@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.4",
+        version: "1.5.5",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -3206,7 +3206,7 @@ breeze.ValidationOptions = ValidationOptions;
    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
    are all provided as well as several special purpose methods.
-   @class ↈ_complexArray_
+   @class ~complexArray
    **/
 
   /**
@@ -4743,7 +4743,7 @@ breeze.EntityState = EntityState;
   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ↈ_primitiveArray_
+  @class ~primitiveArray
   **/
 
   /**
@@ -4818,7 +4818,7 @@ breeze.EntityState = EntityState;
   entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ↈ_relationArray_
+  @class ~relationArray
   **/
 
   /**
@@ -13578,7 +13578,10 @@ var EntityManager = (function () {
     var result = [];
     // TODO: mapMany
     groups.forEach(function (group) {
-      result.push.apply(result, group._entities.filter(newFilterFunc));
+      var entities = group._entities.filter(newFilterFunc);
+      if (entities.length) {
+          result = result.length ? result.concat(entities) : entities;
+      }
     });
 
     var orderByComparer = query.orderByClause && query.orderByClause.getComparer(entityType);

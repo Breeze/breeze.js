@@ -13578,7 +13578,10 @@ var EntityManager = (function () {
     var result = [];
     // TODO: mapMany
     groups.forEach(function (group) {
-      result.push.apply(result, group._entities.filter(newFilterFunc));
+      var entities = group._entities.filter(newFilterFunc);
+      if (entities.length) {
+          result = result.length ? result.concat(entities) : entities;
+      }
     });
 
     var orderByComparer = query.orderByClause && query.orderByClause.getComparer(entityType);

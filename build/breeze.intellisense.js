@@ -1,4 +1,4 @@
-// Generated on: Thu May 07 2015 14:06:22 GMT-0700 (Pacific Daylight Time)
+// Generated on: Thu Aug 13 2015 18:10:37 GMT-0700 (Pacific Daylight Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -210,6 +210,16 @@ intellisense.annotate(breeze.breeze, {
     ///   <param name="config" type="Object" optional="true"></param>
     /// </signature>
   },
+  '~complexArray': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of }
+    ///   complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails. }
+    ///   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice' }
+    ///   are all provided as well as several special purpose methods. }
+    ///   </summary>
+    /// </signature>
+  },
   'EntityAction': function() {
     /// <signature>
     ///   <summary>
@@ -244,6 +254,26 @@ intellisense.annotate(breeze.breeze, {
     /// <signature>
     ///   <summary>
     ///   EntityState is an 'Enum' containing all of the valid states for an 'Entity'. }
+    ///   </summary>
+    /// </signature>
+  },
+  '~primitiveArray': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of }
+    ///   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers. }
+    ///   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice' }
+    ///   are all provided as well as several special purpose methods. }
+    ///   </summary>
+    /// </signature>
+  },
+  '~relationArray': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of }
+    ///   entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails. }
+    ///   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice' }
+    ///   are all provided as well as several special purpose methods. }
     ///   </summary>
     /// </signature>
   },
@@ -405,10 +435,26 @@ intellisense.annotate(breeze.breeze, {
     ///   <param name="config" type="Object" optional="true"></param>
     /// </signature>
   },
+  '~ajax_interface': function() {
+    /// <signature>
+    ///   <summary>
+    ///   This is an interface description. Any class that implements the methods and properties defined here is considered a valid }
+    ///   implementation of this interface. }
+    ///   </summary>
+    /// </signature>
+  },
   'HttpResponse': function() {
     /// <signature>
     ///   <summary>
     ///   A generic wrapper for any Http response returned by a server. }
+    ///   </summary>
+    /// </signature>
+  },
+  '~keyGenerator_interface': function() {
+    /// <signature>
+    ///   <summary>
+    ///   This is an interface description. Any class that implements the methods and properties defined here is considered a valid }
+    ///   implementation of this interface. }
     ///   </summary>
     /// </signature>
   },
@@ -760,6 +806,12 @@ intellisense.annotate(breeze.breeze.ValidationOptions, {
   /// <field name="defaultInstance" type="breeze.breeze.ValidationOptions" >The default value whenever ValidationOptions are not specified.</field>
   'defaultInstance': null,
 });
+intellisense.annotate(breeze.breeze.~complexArray.prototype, {
+
+});
+intellisense.annotate(breeze.breeze.~complexArray, {
+
+});
 intellisense.annotate(breeze.breeze.EntityAction.prototype, {
 
 });
@@ -1077,6 +1129,27 @@ intellisense.annotate(breeze.breeze.EntityState, {
   'Deleted': null,
   /// <field name="Detached" type="breeze.breeze.EntityState" >The 'Detached' state.</field>
   'Detached': null,
+});
+intellisense.annotate(breeze.breeze.~primitiveArray.prototype, {
+
+});
+intellisense.annotate(breeze.breeze.~primitiveArray, {
+
+});
+intellisense.annotate(breeze.breeze.~relationArray.prototype, {
+  'load': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Performs an asynchronous load of all other the entities associated with this relationArray. }
+    ///   </summary>
+    ///   <param name="callback" type="Function" optional="true"></param>
+    ///   <param name="errorCallback" type="Function" optional="true"></param>
+    ///   <returns type="breeze.breeze.Promise" ></returns>
+    /// </signature>
+  },
+});
+intellisense.annotate(breeze.breeze.~relationArray, {
+
 });
 intellisense.annotate(breeze.breeze.DataType.prototype, {
 
@@ -2341,6 +2414,52 @@ intellisense.annotate(breeze.breeze.SaveOptions, {
   /// <field name="defaultInstance" type="breeze.breeze.SaveOptions" >The default value whenever SaveOptions are not specified.</field>
   'defaultInstance': null,
 });
+intellisense.annotate(breeze.breeze.~ajax_interface.prototype, {
+  'changeRequestInterceptor': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Returns a constructor function for a 'ChangeRequestInterceptor' }
+    ///   that can tweak the saveBundle both as it is built and when it is completed }
+    ///   by a concrete DataServiceAdapater. }
+    ///   </summary>
+    ///   <param name="saveContext" type="Object" optional="true">The BreezeJS 'context' for the save operation.</param>
+    ///   <param name="saveBundle" type="Object" optional="true">Contains the array of entities-to-be-saved (AKA, the entity change-set).</param>
+    ///   <returns type="Function" >Constructor for a 'ChangeRequestInterceptor'.</returns>
+    /// </signature>
+  },  'getRequest': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Prepare and return the save data for an entity change-set. }
+    ///   </summary>
+    ///   <param name="request" type="Object" optional="true">The object representing the adapter's request to save this entity.</param>
+    ///   <param name="entity" type="Entity" optional="true">The entity-to-be-save as it is in cache</param>
+    ///   <param name="index" type="Integer" optional="true">The zero-based index of this entity in the change-set array</param>
+    ///   <returns type="Function" >The potentially revised request.</returns>
+    /// </signature>
+  },  'done': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Last chance to change anything about the 'requests' array }
+    ///   after it has been built with requests for all of the entities-to-be-saved. }
+    ///   </summary>
+    ///   <param name="requests" type="Array" elementType="Object" optional="true">The adapter's array of request for this changeset.</param>
+    
+    /// </signature>
+  },  'ajax': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Performs an ajax request. This method takes a single argument — a configuration object — that is used to generate an HTTP request. The config object has two callback methods: }
+    ///   'success' and 'error' in addition to a number of properties that may be used to configure the request itself. Higher level Breeze constructs will wrap calls to the ajax adapter }
+    ///   into Promises. Individual adapters may add additional properties to the basic config object described below. }
+    ///   </summary>
+    ///   <param name="config" type="Object" optional="true"></param>
+    
+    /// </signature>
+  },
+});
+intellisense.annotate(breeze.breeze.~ajax_interface, {
+
+});
 intellisense.annotate(breeze.breeze.HttpResponse.prototype, {
   'getHeader': function() {
     /// <signature>
@@ -2359,6 +2478,23 @@ intellisense.annotate(breeze.breeze.HttpResponse.prototype, {
   'config': null,
 });
 intellisense.annotate(breeze.breeze.HttpResponse, {
+
+});
+intellisense.annotate(breeze.breeze.~keyGenerator_interface.prototype, {
+  'generateTempKeyValue': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Returns a unique 'temporary' key for the specified  'EntityType'. }
+    ///   Uniqueness is defined for this purpose as being unique within this KeyGenerator. This is sufficient }
+    ///   because each EntityManager will have its own instance of a KeyGenerator and any entities imported into }
+    ///   the EntityManager with temporary keys will have them regenerated and remapped on import. }
+    ///   </summary>
+    ///   <param name="entityType" type="breeze.breeze.EntityType" optional="true"></param>
+    
+    /// </signature>
+  },
+});
+intellisense.annotate(breeze.breeze.~keyGenerator_interface, {
 
 });
 intellisense.annotate(breeze.breeze.Promise.prototype, {
