@@ -187,6 +187,50 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("export null vs. []", function(assert) {
+      var done = assert.async();
+      var queryOptions = new QueryOptions({
+          mergeStrategy: MergeStrategy.OverwriteChanges,
+          fetchStrategy: FetchStrategy.FromServer
+      });
+      var em = newEm();
+      var pred = new breeze.Predicate("companyName", "!=", null).and("city", "!=", null);
+      var q = EntityQuery.from("Customers").where(pred).take(2)
+          .using(MergeStrategy.OverwriteChanges);
+      var val = Date.now().toString();
+
+      var exported;
+      em.executeQuery(q).then(function(data) {
+          // null
+          exported = em.exportEntities(null, { includeMetadata: false });
+          var em2 = newEm();
+          em2.importEntities(exported);
+
+          var all = new EntityQuery("Customers");
+          var customers = em2.executeQueryLocally(all);
+          ok(customers && customers.length === 2, "Export all (2) entities when param is null");
+
+          // []
+          exported = em.exportEntities([], { includeMetadata: false });
+          var em3 = newEm();
+          em3.importEntities(exported);
+
+          var customers = em3.executeQueryLocally(all);
+          ok(customers && customers.length === 0, "Export zero entities when param is []");
+
+          // [cust]
+          var cust = data.results[0];
+          exported = em.exportEntities([cust], { includeMetadata: false });
+          var em4 = newEm();
+          em4.importEntities(exported);
+
+          var customers = em4.executeQueryLocally(all);
+          ok(customers && customers.length === 1, "Export one entity when param is [cust]");
+
+      }).fail(testFns.handleFail).fin(done);
+  });
+
+
   testFns.skipIf("mongo", "does not support 'expand'").
   test("relationship not resolved after import", function (assert) {
     var done = assert.async();

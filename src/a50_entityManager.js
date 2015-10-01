@@ -1783,6 +1783,9 @@ var EntityManager = (function () {
           }
         })
       }
+    } else if (entities && entities.length === 0) {
+      // empty array = export nothing
+      entityGroupMap = {};
     } else {
       entityGroupMap = em._entityGroupMap;
     }
