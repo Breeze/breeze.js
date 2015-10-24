@@ -756,7 +756,8 @@ var CsdlMetadataParser = (function () {
   function parse(metadataStore, schemas, altMetadata) {
 
     metadataStore._entityTypeResourceMap = {};
-    __toArray(schemas).forEach(function (schema) {
+    schemas = __toArray(schemas);
+    schemas.forEach(function (schema) {
       if (schema.cSpaceOSpaceMapping) {
         // Web api only - not avail in OData.
         var mappings = JSON.parse(schema.cSpaceOSpaceMapping);
@@ -785,7 +786,7 @@ var CsdlMetadataParser = (function () {
       }
       if (schema.entityType) {
         __toArray(schema.entityType).forEach(function (et) {
-          var entityType = parseCsdlEntityType(et, schema, metadataStore);
+          var entityType = parseCsdlEntityType(et, schema, schemas, metadataStore);
 
         });
       }
@@ -793,8 +794,13 @@ var CsdlMetadataParser = (function () {
     });
     var badNavProps = metadataStore.getIncompleteNavigationProperties();
     if (badNavProps.length > 0) {
-      var msg = badNavProps.map(function (np) {
-        return np.parentType.name + ":" + np.name;
+      var msg = badNavProps.map(function(npa) {
+        if (Array.isArray(npa)) {
+          return npa.map(function(np) {
+            return np.parentType.name + ":" + np.name;
+          }).join(', ');
+        }
+        return npa.parentType.name + ":" + npa.name;
       }).join(', ');
       throw new Error("Incomplete navigation properties: " + msg);
     }
@@ -804,7 +810,7 @@ var CsdlMetadataParser = (function () {
     return metadataStore;
   }
 
-  function parseCsdlEntityType(csdlEntityType, schema, metadataStore) {
+  function parseCsdlEntityType(csdlEntityType, schema, schemas, metadataStore) {
     var shortName = csdlEntityType.name;
     var ns = getNamespaceFor(shortName, schema);
     var entityType = new EntityType({
@@ -817,7 +823,7 @@ var CsdlMetadataParser = (function () {
       entityType.baseTypeName = baseTypeName;
       var baseEntityType = metadataStore._getEntityType(baseTypeName, true);
       if (baseEntityType) {
-        completeParseCsdlEntityType(entityType, csdlEntityType, schema, metadataStore);
+        completeParseCsdlEntityType(entityType, csdlEntityType, schema, schemas, metadataStore);
       } else {
         var deferrals = metadataStore._deferredTypes[baseTypeName];
         if (!deferrals) {
@@ -827,14 +833,14 @@ var CsdlMetadataParser = (function () {
         deferrals.push({ entityType: entityType, csdlEntityType: csdlEntityType });
       }
     } else {
-      completeParseCsdlEntityType(entityType, csdlEntityType, schema, metadataStore);
+      completeParseCsdlEntityType(entityType, csdlEntityType, schema, schemas, metadataStore);
     }
     // entityType may or may not have been added to the metadataStore at this point.
     return entityType;
 
   }
 
-  function completeParseCsdlEntityType(entityType, csdlEntityType, schema, metadataStore) {
+  function completeParseCsdlEntityType(entityType, csdlEntityType, schema, schemas, metadataStore) {
     var keyNamesOnServer = csdlEntityType.key ? __toArray(csdlEntityType.key.propertyRef).map(__pluck("name")) : [];
 
     __toArray(csdlEntityType.property).forEach(function (prop) {
@@ -842,7 +848,7 @@ var CsdlMetadataParser = (function () {
     });
 
     __toArray(csdlEntityType.navigationProperty).forEach(function (prop) {
-      parseCsdlNavProperty(entityType, prop, schema);
+      parseCsdlNavProperty(entityType, prop, schema, schemas);
     });
 
     metadataStore.addEntityType(entityType);
@@ -852,7 +858,7 @@ var CsdlMetadataParser = (function () {
     var deferrals = deferredTypes[entityType.name];
     if (deferrals) {
       deferrals.forEach(function (d) {
-        completeParseCsdlEntityType(d.entityType, d.csdlEntityType, schema, metadataStore);
+        completeParseCsdlEntityType(d.entityType, d.csdlEntityType, schema, schemas, metadataStore);
       });
       delete deferredTypes[entityType.name];
     }
@@ -951,8 +957,11 @@ var CsdlMetadataParser = (function () {
     return dp;
   }
 
-  function parseCsdlNavProperty(entityType, csdlProperty, schema) {
-    var association = getAssociation(csdlProperty, schema);
+  function parseCsdlNavProperty(entityType, csdlProperty, schema, schemas) {
+    var association = getAssociation(csdlProperty, schema, schemas);
+    if (!association) {
+      throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+    }
     var toEnd = __arrayFirst(association.end, function (assocEnd) {
       return assocEnd.role === csdlProperty.toRole;
     });
@@ -1084,9 +1093,16 @@ var CsdlMetadataParser = (function () {
   //   match ( associationSet.name == schema.association[].name )
   //      -> association
 
-  function getAssociation(csdlNavProperty, schema) {
-    var assocName = parseTypeNameWithSchema(csdlNavProperty.relationship, schema).shortTypeName;
-    var assocs = schema.association;
+  function getAssociation(csdlNavProperty, containingSchema, schemas) {
+    var assocFullName = parseTypeNameWithSchema(csdlNavProperty.relationship, containingSchema);
+    var assocNamespace = assocFullName.namespace;
+    var assocSchema = __arrayFirst(schemas, function (schema) {
+      return schema.namespace === assocNamespace;
+    });
+    if (!assocSchema) return null;
+    
+    var assocName = assocFullName.shortTypeName;
+    var assocs = assocSchema.association;
     if (!assocs) return null;
     if (!Array.isArray(assocs)) {
       assocs = [assocs];
@@ -1100,7 +1116,7 @@ var CsdlMetadataParser = (function () {
   // schema is only needed for navProperty type name
   function parseTypeNameWithSchema(entityTypeName, schema) {
     var result = parseTypeName(entityTypeName);
-    if (schema) {
+    if (schema && schema.cSpaceOSpaceMapping) {
       var ns = getNamespaceFor(result.shortTypeName, schema);
       if (ns) {
         result = makeTypeHash(result.shortTypeName, ns);

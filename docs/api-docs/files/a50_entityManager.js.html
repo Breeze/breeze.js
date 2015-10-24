@@ -1061,7 +1061,10 @@ var EntityManager = (function () {
     var result = [];
     // TODO: mapMany
     groups.forEach(function (group) {
-      result.push.apply(result, group._entities.filter(newFilterFunc));
+      var entities = group._entities.filter(newFilterFunc);
+      if (entities.length) {
+          result = result.length ? result.concat(entities) : entities;
+      }
     });
 
     var orderByComparer = query.orderByClause &amp;&amp; query.orderByClause.getComparer(entityType);
@@ -1984,6 +1987,9 @@ var EntityManager = (function () {
           }
         })
       }
+    } else if (entities &amp;&amp; entities.length === 0) {
+      // empty array = export nothing
+      entityGroupMap = {};
     } else {
       entityGroupMap = em._entityGroupMap;
     }
