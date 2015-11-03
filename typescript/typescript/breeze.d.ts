@@ -706,7 +706,7 @@ declare module breeze {
         static importMetadata(exportedString: string): MetadataStore;
         importMetadata(exportedString: string, allowMerge?: boolean): MetadataStore;
         isEmpty(): boolean;
-        registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (entity: Entity) => Entity): void;
+        registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (node: Object, entityType: EntityType) => Object): void;
         trackUnmappedType(entityCtor: Function, interceptor?: Function): void;
         setEntityTypeForResourceName(resourceName: string, entityType: EntityType): void;
         setEntityTypeForResourceName(resourceName: string, entityTypeName: string): void;
