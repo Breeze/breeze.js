@@ -995,18 +995,16 @@ declare module breeze.config {
     var functionRegistry: Object;
     /**
     Returns the ctor function used to implement a specific interface with a specific adapter name.
-    @method getAdapter
     @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
-    @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
+    @param adapterName {String} The name of any previously registered adapter. If this parameter is omitted then
     this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
-    @return {Function|null} Returns either a ctor function or null.
+    @returns {Function|null} Returns either a ctor function or null.
     **/
     export function getAdapter(interfaceName: string, adapterName?: string): Function;
     /**
     Returns the adapter instance corresponding to the specified interface and adapter names.
-    @method getAdapterInstance
     @param interfaceName {String} The name of the interface.
-    @param [adapterName] {String} - The name of a previously registered adapter.  If this parameter is
+    @param adapterName {String} - The name of a previously registered adapter.  If this parameter is
     omitted then the default implementation of the specified interface is returned. If there is
     no defaultInstance of this interface, then the first registered instance of this interface is returned.
     @return {an instance of the specified adapter}
@@ -1016,31 +1014,35 @@ declare module breeze.config {
     Initializes a single adapter implementation. Initialization means either newing a instance of the 
     specified interface and then calling "initialize" on it or simply calling "initialize" on the instance
     if it already exists.
-    @method initializeAdapterInstance
     @param interfaceName {String} The name of the interface to which the adapter to initialize belongs.
     @param adapterName {String} - The name of a previously registered adapter to initialize.
-    @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface. 
+    @param isDefault=true {Boolean} - Whether to make this the default "adapter" for this interface. 
     @return {an instance of the specified adapter}
     **/
     export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault?: boolean): void;
+
+    export interface AdapterInstancesConfig {
+        /** the name of a previously registered "ajax" adapter */
+        ajax?: string;
+        /** the name of a previously registered "dataService" adapter */
+        dataService?: string;
+        /** the name of a previously registered "modelLibrary" adapter */
+        modelLibary?: string;
+        /** the name of a previously registered "uriBuilder" adapter */
+        uriBuilder?: string;
+    }
     /**
     Initializes a collection of adapter implementations and makes each one the default for its corresponding interface.
-    @method initializeAdapterInstances
-    @param config {Object}
-    @param [config.ajax] {String} - the name of a previously registered "ajax" adapter
-    @param [config.dataService] {String} - the name of a previously registered "dataService" adapter
-    @param [config.modelLibrary] {String} - the name of a previously registered "modelLibrary" adapter
-    @param [config.uriBuilder] {String} - the name of a previously registered "uriBuilder" adapter
+    @param config {AdapterInstancesConfig}
     @return [array of instances]
     **/
-    export function initializeAdapterInstances(config: Object): Object[];
+    export function initializeAdapterInstances(config: AdapterInstancesConfig): Object[];
     var interfaceInitialized: Event;
     var interfaceRegistry: Object;
     var objectRegistry: Object;
     /**
     Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
     made as the last step within an adapter implementation. 
-    @method registerAdapter
     @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
     @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.  
     **/
