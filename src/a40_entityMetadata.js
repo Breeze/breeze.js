@@ -473,13 +473,13 @@ var MetadataStore = (function () {
       // any queries or EntityType.create calls from this point on will call the Customer constructor
       // registered above.
   @method registerEntityTypeCtor
-  @param structuralTypeName {String} The name of the EntityType o0r ComplexType.
+  @param structuralTypeName {String} The name of the EntityType or ComplexType.
   @param aCtor {Function}  The constructor for this EntityType or ComplexType; may be null if all you want to do is set the next parameter.
   @param [initFn] {Function} A function or the name of a function on the entity that is to be executed immediately after the entity has been created
   and populated with any initial values.
   initFn(entity)
   @param initFn.entity {Entity} The entity being created or materialized.
-  @param [noTrackingFn} {Function} A function that is executed immediately after a noTracking entity has been created and whose return
+  @param [noTrackingFn] {Function} A function that is executed immediately after a noTracking entity has been created and whose return
   value will be used in place of the noTracking entity.
   @param noTrackingFn.entity {Object}
   @param noTrackingFn.entityType {EntityType} The entityType that the 'entity' parameter would be if we were tracking
