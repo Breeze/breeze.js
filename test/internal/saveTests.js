@@ -503,8 +503,10 @@
       ok(emp === savedEnts[0], "should be same emp");
       var empKeyValue = emp.getProperty(testFns.employeeKeyName);
       var empKey = emp.entityAspect.getKey();
+      var empVersion = emp.getProperty("rowVersion");
       similarEmp = em2.createEntity("Employee");
       similarEmp.setProperty(testFns.employeeKeyName, empKeyValue);
+      similarEmp.setProperty("rowVersion", empVersion);
       similarAspect = similarEmp.entityAspect;
       similarAspect.setUnchanged();
       similarAspect.setDeleted();
