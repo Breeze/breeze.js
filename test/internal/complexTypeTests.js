@@ -101,12 +101,27 @@
     };
     em.metadataStore.registerEntityTypeCtor("Location", null, locationInitializer);
 
-
     var locationType = em.metadataStore.getEntityType("Location");
     var newLocation = locationType.createInstance();
     var city = newLocation.getProperty("city");
     ok(city === "FOO", "city should === 'FOO'");
+  });
 
+  test("initializer on complexType adds new property", function() {
+
+    var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+    var Supplier = testFns.makeEntityCtor(function() {
+    });
+
+    var locationInitializer = function(location) {
+      location.setProperty("myProperty", "FOO");
+    };
+    em.metadataStore.registerEntityTypeCtor("Location", null, locationInitializer);
+
+    var locationType = em.metadataStore.getEntityType("Location");
+    var newLocation = locationType.createInstance();
+    var my = newLocation.getProperty("myProperty");
+    ok(my === "FOO", "my should === 'FOO'");
   });
 
   test("initializer on complexType during query", function (assert) {
@@ -119,6 +134,7 @@
       var city = location.getProperty("city");
       ok(city, "city name should not be null");
       location.setProperty("city", "Z" + city);
+      location.setProperty("myProperty", location.getProperty("city"));
     };
 
     em.metadataStore.registerEntityTypeCtor("Location", null, locationInitializer);
@@ -137,6 +153,8 @@
       ok(location, "location should exist");
       var city = location.getProperty("city");
       ok(city.indexOf("Z") === 0, "city should start with 'Z'");
+      var my = location.getProperty("myProperty");
+      ok(my.indexOf("Z") === 0, "my should start with 'Z'");
 
     }).fail(testFns.handleFail).fin(done);
   });

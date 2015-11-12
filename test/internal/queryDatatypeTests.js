@@ -147,8 +147,10 @@
       var em = newEm();
       var query = new EntityQuery("UnusualDates").take(10);
       var tlimitType = em.metadataStore.getEntityType("UnusualDate");
-      var dt1 = new Date(2001, 1, 1, 1, 1, 1);
-      var dt2 = new Date(2002, 2, 2, 2, 2, 2);
+      var dt1 = new Date(2001, 1, 1, 1, 1, 1, 135);
+      var dt2 = new Date(2002, 2, 2, 2, 2, 2, 246);
+      var dt3 = new Date(2003, 3, 3, 3, 3, 3, 345);
+      var dt4 = new Date(2004, 4, 4, 4, 4, 4, 456);
       var tlimit = tlimitType.createEntity();
       tlimit.setProperty("creationDate", dt1);
       tlimit.setProperty("modificationDate", dt2);
@@ -167,6 +169,20 @@
         var dt2a = tlimit3.getProperty("modificationDate");
         ok(dt1a.getTime() == dt1.getTime(), "creation dates should be the same - dateTimeOffset");
         ok(dt2a.getTime() === dt2.getTime(), "mod dates should be the same - dateTime2");
+
+        // change and save again
+        tlimit3.setProperty("creationDate", dt3);
+        tlimit3.setProperty("modificationDate", dt4);
+        tlimit3.entityAspect.originalValues.creationDate = "2001-02-01T09:01:01.135456+03:15";
+        tlimit3.entityAspect.setDeleted();
+        return em.saveChanges();
+      }).then(function(sr) {
+        var r = sr.entities;
+        var tlimit4 = r[0];
+        var dt3a = tlimit4.getProperty("creationDate");
+        var dt4a = tlimit4.getProperty("modificationDate");
+        ok(dt3a.getTime() == dt3.getTime(), "creation dates should be the same - dateTimeOffset");
+        ok(dt4a.getTime() === dt4.getTime(), "mod dates should be the same - dateTime2");
       }).fail(testFns.handleFail).fin(done);
 
     });
