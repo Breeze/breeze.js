@@ -220,6 +220,8 @@
             ok(Object.keys(a).length === 3, "should have 3 properties");
             if (testFns.DEBUG_DOTNET_WEBAPI) {
               ok(typeof (a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
+            } else if (testFns.DEBUG_SEQUELIZE) {
+              ok(typeof (a["customer.CompanyName"]) === 'string', "customer_CompanyName is not a string");
             } else {
               ok(typeof (a["customer.companyName"]) === 'string', "customer_CompanyName is not a string");
             }

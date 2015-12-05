@@ -485,9 +485,7 @@
 
   test("set foreign key property to null", function (assert) {
     var done = assert.async();
-    var productQuery = new EntityQuery("Products").take(1);
-
-
+    var productQuery = new EntityQuery("Products").where("supplierID", "ne", null).take(1);
     
     var em = newEm();
     em.executeQuery(productQuery).then(function (data) {
