@@ -72,7 +72,7 @@
         definition(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         // CommonJS or Node
-        var b = require('breeze');
+        var b = require("breeze-client");
         definition(b);
     } else if (typeof define === "function" && define["amd"] && !window.breeze) {
         // Requirejs / AMD
