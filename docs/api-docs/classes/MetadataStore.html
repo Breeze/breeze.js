@@ -2020,19 +2020,7 @@ if (em1.metadataStore.isEmpty()) {
             
                 <li class="arg">
                     
-                        <code>[noTrackingFn}</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>noTrackingFn.entity</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>noTrackingFn.entityType</code>
+                        <code class="optional">[noTrackingFn]</code>
                     
                 </li>
             
@@ -2099,7 +2087,7 @@ Metadata discovery.</p>
                     
 
                     <div class="param-description">
-                        <p>The name of the EntityType o0r ComplexType.</p>
+                        <p>The name of the EntityType or ComplexType.</p>
 
                     </div>
 
@@ -2161,8 +2149,9 @@ initFn(entity)</p>
             
                 <li class="param">
                     
-                        <code class="param-name">[noTrackingFn}</code>
+                        <code class="param-name optional">[noTrackingFn]</code>
                         <span class="type">Function</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
                     
@@ -2174,36 +2163,36 @@ value will be used in place of the noTracking entity.</p>
                     </div>
 
                     
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">noTrackingFn.entity</code>
-                        <span class="type">Object</span>
-                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name">entity</code>
+                                    <span class="type">Object</span>
+                                
 
-                    
+                                <div class="param-description">
+                                    
+                                </div>
 
-                    <div class="param-description">
-                         
-                    </div>
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name">entityType</code>
+                                    <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
+                                
 
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">noTrackingFn.entityType</code>
-                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
-                    
+                                <div class="param-description">
+                                    <p>The entityType that the &#39;entity&#39; parameter would be if we were tracking</p>
 
-                    
+                                </div>
 
-                    <div class="param-description">
-                        <p>The entityType that the &#39;entity&#39; parameter would be if we were tracking</p>
-
-                    </div>
-
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             

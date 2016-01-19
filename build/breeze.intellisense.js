@@ -1,4 +1,4 @@
-// Generated on: Wed Sep 30 2015 22:47:37 GMT-0700 (Pacific Daylight Time)
+// Generated on: Mon Jan 18 2016 17:09:32 GMT-0800 (Pacific Standard Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -1366,12 +1366,58 @@ intellisense.annotate(breeze.breeze.~relationArray, {
 
 intellisense.annotate(breeze.breeze.DataType.prototype, {
   
+  'parse': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Function to convert a value from string to this DataType. }
+    ///   </summary>
+    ///   <param name="value" type="" optional="true"></param>
+    ///   <returns type="" >value appropriate for this DataType</returns>
+    /// </signature>
+  },
+  'fmtOData': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Function to format this DataType for OData queries. }
+    ///   </summary>
+    ///   <returns type="" >value appropriate for OData query</returns>
+    /// </signature>
+  },
+  'getNext': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values. }
+    ///   </summary>
+    ///   <returns type="" >value appropriate for this DataType</returns>
+    /// </signature>
+  },
+  'normalize': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast. }
+    ///   </summary>
+    ///   <param name="value" type="" optional="true"></param>
+    ///   <returns type="" >value appropriate for this DataType</returns>
+    /// </signature>
+  },
+  'getConcurrencyValue': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this. }
+    ///   </summary>
+    ///   <param name="previousValue" type="" optional="true"></param>
+    ///   <returns type="" >the next concurrency value, which is a function of the previousValue.</returns>
+    /// </signature>
+  },
   
   /// <field name="defaultValue" type="Any" >The default value of this DataType.</field>
   'defaultValue': null,
   
   /// <field name="isNumeric" type="Boolean" >Whether this is a 'numeric' DataType.</field>
   'isNumeric': null,
+  
+  /// <field name="isInteger" type="Boolean" >Whether this is an 'integer' DataType.</field>
+  'isInteger': null,
   
 });
 intellisense.annotate(breeze.breeze.DataType, {
@@ -1598,12 +1644,10 @@ intellisense.annotate(breeze.breeze.MetadataStore.prototype, {
     ///   This call may be made before or after the corresponding EntityType has been discovered via }
     ///   Metadata discovery. }
     ///   </summary>
-    ///   <param name="structuralTypeName" type="String" optional="true">The name of the EntityType o0r ComplexType.</param>
+    ///   <param name="structuralTypeName" type="String" optional="true">The name of the EntityType or ComplexType.</param>
     ///   <param name="aCtor" type="Function" optional="true">The constructor for this EntityType or ComplexType; may be null if all you want to do is set the next parameter.</param>
     ///   <param name="initFn" type="Function" optional="true">A function or the name of a function on the entity that is to be executed immediately after the entity has been created and populated with any initial values. initFn(entity)</param>
-    ///   <param name="[noTrackingFn}" type="Function" optional="true">A function that is executed immediately after a noTracking entity has been created and whose return value will be used in place of the noTracking entity.</param>
-    ///   <param name="noTrackingFn.entity" type="Object" optional="true"></param>
-    ///   <param name="noTrackingFn.entityType" type="breeze.breeze.EntityType" optional="true">The entityType that the 'entity' parameter would be if we were tracking</param>
+    ///   <param name="noTrackingFn" type="Function" optional="true">A function that is executed immediately after a noTracking entity has been created and whose return value will be used in place of the noTracking entity.</param>
     
     /// </signature>
   },
@@ -2630,7 +2674,6 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   </summary>
     ///   <param name="exportedString" type="String|Json" optional="true">The result of a previous 'export' call.</param>
     ///   <param name="config" type="Object" optional="true">A configuration object.</param>
-    ///   <param name="[config.metadataVersionFn}" type="Function" optional="true">A function that takes two arguments ( the current metadataVersion and the imported store's 'name'} and may be used to perform version checking.</param>
     ///   <returns type="Object" >result </returns>
     /// </signature>
   },
@@ -2869,7 +2912,6 @@ intellisense.annotate(breeze.breeze.EntityManager, {
     ///   </summary>
     ///   <param name="exportedString" type="String" optional="true">The result of a previous 'exportEntities' call.</param>
     ///   <param name="config" type="Object" optional="true">A configuration object.</param>
-    ///   <param name="[config.metadataVersionFn}" type="Function" optional="true">A function that takes two arguments ( the current metadataVersion and the imported store's 'name'} and may be used to perform version checking.</param>
     ///   <returns type="breeze.breeze.EntityManager >A new EntityManager.  Note that the return value of this method call is different from that provided by the same named method on an EntityManager instance. Use that method if you need additional information regarding the imported entities.</returns>
     /// </signature>
   },

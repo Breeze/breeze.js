@@ -253,10 +253,45 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
+                                <a href="#method_fmtOData">fmtOData</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_fromEdmDataType">fromEdmDataType</a>
 
                                 
                                     <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getConcurrencyValue">getConcurrencyValue</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getNext">getNext</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_normalize">normalize</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_parse">parse</a>
+
                                 
                                 
                             </li>
@@ -378,6 +413,13 @@
                             </li>
                         
                             <li class="index-item property">
+                                <a href="#property_isInteger">isInteger</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property">
                                 <a href="#property_isNumeric">isNumeric</a>
 
                                 
@@ -434,6 +476,77 @@
                 <h2 class="off-left">Methods</h2>
 
                 
+                    <div id="method_fmtOData" class="method item">
+    <h3 class="name"><code>fmtOData</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l36"><code>a37_dataType.js:36</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Function to format this DataType for OData queries.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>value appropriate for OData query</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method_fromEdmDataType" class="method item">
     <h3 class="name"><code>fromEdmDataType</code></h3>
 
@@ -482,7 +595,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l361"><code>a37_dataType.js:361</code></a>
+        <a href="../files/a37_dataType.js.html#l398"><code>a37_dataType.js:398</code></a>
         
         </p>
 
@@ -542,6 +655,389 @@
 </div>
 
                 
+                    <div id="method_getConcurrencyValue" class="method item">
+    <h3 class="name"><code>getConcurrencyValue</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>previousValue</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l55"><code>a37_dataType.js:55</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">previousValue</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>the next concurrency value, which is a function of the previousValue.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getNext" class="method item">
+    <h3 class="name"><code>getNext</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l42"><code>a37_dataType.js:42</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values.</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>value appropriate for this DataType</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_normalize" class="method item">
+    <h3 class="name"><code>normalize</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l48"><code>a37_dataType.js:48</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>value appropriate for this DataType</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_parse" class="method item">
+    <h3 class="name"><code>parse</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l29"><code>a37_dataType.js:29</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Function to convert a value from string to this DataType.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>value appropriate for this DataType</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
             </div>
         
 
@@ -577,7 +1073,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l328"><code>a37_dataType.js:328</code></a>
+        <a href="../files/a37_dataType.js.html#l368"><code>a37_dataType.js:368</code></a>
         
         </p>
 
@@ -625,7 +1121,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l310"><code>a37_dataType.js:310</code></a>
+        <a href="../files/a37_dataType.js.html#l350"><code>a37_dataType.js:350</code></a>
         
         </p>
 
@@ -673,7 +1169,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l242"><code>a37_dataType.js:242</code></a>
+        <a href="../files/a37_dataType.js.html#l280"><code>a37_dataType.js:280</code></a>
         
         </p>
 
@@ -721,7 +1217,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l281"><code>a37_dataType.js:281</code></a>
+        <a href="../files/a37_dataType.js.html#l319"><code>a37_dataType.js:319</code></a>
         
         </p>
 
@@ -769,7 +1265,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l293"><code>a37_dataType.js:293</code></a>
+        <a href="../files/a37_dataType.js.html#l332"><code>a37_dataType.js:332</code></a>
         
         </p>
 
@@ -817,7 +1313,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l248"><code>a37_dataType.js:248</code></a>
+        <a href="../files/a37_dataType.js.html#l286"><code>a37_dataType.js:286</code></a>
         
         </p>
 
@@ -910,7 +1406,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l259"><code>a37_dataType.js:259</code></a>
+        <a href="../files/a37_dataType.js.html#l297"><code>a37_dataType.js:297</code></a>
         
         </p>
 
@@ -958,7 +1454,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l316"><code>a37_dataType.js:316</code></a>
+        <a href="../files/a37_dataType.js.html#l356"><code>a37_dataType.js:356</code></a>
         
         </p>
 
@@ -1006,7 +1502,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l231"><code>a37_dataType.js:231</code></a>
+        <a href="../files/a37_dataType.js.html#l269"><code>a37_dataType.js:269</code></a>
         
         </p>
 
@@ -1054,7 +1550,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l220"><code>a37_dataType.js:220</code></a>
+        <a href="../files/a37_dataType.js.html#l258"><code>a37_dataType.js:258</code></a>
         
         </p>
 
@@ -1102,7 +1598,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l209"><code>a37_dataType.js:209</code></a>
+        <a href="../files/a37_dataType.js.html#l247"><code>a37_dataType.js:247</code></a>
         
         </p>
 
@@ -1113,6 +1609,51 @@
 
     <div class="description">
         
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_isInteger" class="property item">
+    <h3 class="name"><code>isInteger</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l24"><code>a37_dataType.js:24</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Whether this is an &#39;integer&#39; DataType.</p>
+
     </div>
 
     
@@ -1195,7 +1736,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l270"><code>a37_dataType.js:270</code></a>
+        <a href="../files/a37_dataType.js.html#l308"><code>a37_dataType.js:308</code></a>
         
         </p>
 
@@ -1243,7 +1784,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l198"><code>a37_dataType.js:198</code></a>
+        <a href="../files/a37_dataType.js.html#l236"><code>a37_dataType.js:236</code></a>
         
         </p>
 
@@ -1291,7 +1832,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l304"><code>a37_dataType.js:304</code></a>
+        <a href="../files/a37_dataType.js.html#l344"><code>a37_dataType.js:344</code></a>
         
         </p>
 
@@ -1339,7 +1880,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l334"><code>a37_dataType.js:334</code></a>
+        <a href="../files/a37_dataType.js.html#l374"><code>a37_dataType.js:374</code></a>
         
         </p>
 

@@ -109,6 +109,7 @@
         config: config,
         data: data,
         getHeaders: headers,
+        ngConfig: xconfig,
         status: status,
         statusText: statusText
       };
@@ -125,6 +126,7 @@
         config: config,
         data: data,
         getHeaders: headers,
+        ngConfig: xconfig,
         status: status,
         statusText: statusText
       };

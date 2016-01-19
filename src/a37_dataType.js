@@ -21,6 +21,44 @@ var DataType = (function () {
   @property isNumeric {Boolean}
   **/
 
+  /**
+  Whether this is an 'integer' DataType.
+  @property isInteger {Boolean}
+  **/
+
+  /**
+  Function to convert a value from string to this DataType.
+  @method parse {Function}
+  @param value
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Function to format this DataType for OData queries.
+  @method fmtOData {Function}
+  @return value appropriate for OData query
+  **/
+
+  /**
+  Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values.
+  @method getNext {Function}
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast.
+  @method normalize {Function}
+  @param value
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.  
+  @method getConcurrencyValue {Function}
+  @param previousValue
+  @return the next concurrency value, which is a function of the previousValue.
+  **/
+
   var dataTypeMethods = {
     // default
   };
@@ -286,6 +324,7 @@ var DataType = (function () {
   DataType.DateTime = DataType.addSymbol({
   defaultValue: new Date(1900, 0, 1), isDate: true,
   parse: coerceToDate,
+  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
   fmtOData: fmtDateTime,
   getNext: getNextDateTime
   });
@@ -298,6 +337,7 @@ var DataType = (function () {
   DataType.DateTimeOffset = DataType.addSymbol({
   defaultValue: new Date(1900, 0, 1), isDate: true,
   parse: coerceToDate,
+  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
   fmtOData: fmtDateTimeOffset,
   getNext: getNextDateTime
   });
@@ -339,12 +379,9 @@ var DataType = (function () {
   DataType.Undefined = DataType.addSymbol({ defaultValue: undefined, fmtOData: fmtUndefined});
   DataType.resolveSymbols();
 
-  DataType.getComparableFn = function (dataType) {
-    if (dataType && dataType.isDate) {
-      // dates don't perform equality comparisons properly
-      return function (value) {
-        return value && value.getTime();
-      };
+  DataType.getComparableFn = function(dataType) {
+    if (dataType && dataType.normalize) {
+      return dataType.normalize;
     } else if (dataType === DataType.Time) {
       // durations must be converted to compare them
       return function (value) {

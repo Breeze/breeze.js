@@ -1895,7 +1895,7 @@ var EntityType = (function () {
         return coEquals(v1, v2);
       } else {
         var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
-        return (v1 === v2 || (dataType && dataType.isDate && v1 && v2 && v1.valueOf() === v2.valueOf()));
+        return (v1 === v2 || (dataType && dataType.normalize && v1 && v2 && dataType.normalize(v1) === dataType.normalize(v2)));
       }
     });
     return areEqual;

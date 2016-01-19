@@ -3523,7 +3523,100 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 198,
+            "line": 24,
+            "description": "Whether this is an 'integer' DataType.",
+            "itemtype": "property",
+            "name": "isInteger",
+            "type": "Boolean",
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 29,
+            "description": "Function to convert a value from string to this DataType.",
+            "itemtype": "method",
+            "name": "parse",
+            "type": "Function",
+            "params": [
+                {
+                    "name": "value",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "value appropriate for this DataType"
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 36,
+            "description": "Function to format this DataType for OData queries.",
+            "itemtype": "method",
+            "name": "fmtOData",
+            "type": "Function",
+            "return": {
+                "description": "value appropriate for OData query"
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 42,
+            "description": "Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values.",
+            "itemtype": "method",
+            "name": "getNext",
+            "type": "Function",
+            "return": {
+                "description": "value appropriate for this DataType"
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 48,
+            "description": "Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast.",
+            "itemtype": "method",
+            "name": "normalize",
+            "type": "Function",
+            "params": [
+                {
+                    "name": "value",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "value appropriate for this DataType"
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 55,
+            "description": "Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.",
+            "itemtype": "method",
+            "name": "getConcurrencyValue",
+            "type": "Function",
+            "params": [
+                {
+                    "name": "previousValue",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "the next concurrency value, which is a function of the previousValue."
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 236,
             "itemtype": "property",
             "name": "String",
             "type": "DataType",
@@ -3534,7 +3627,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 209,
+            "line": 247,
             "itemtype": "property",
             "name": "Int64",
             "type": "DataType",
@@ -3545,7 +3638,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 220,
+            "line": 258,
             "itemtype": "property",
             "name": "Int32",
             "type": "DataType",
@@ -3556,7 +3649,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 231,
+            "line": 269,
             "itemtype": "property",
             "name": "Int16",
             "type": "DataType",
@@ -3567,7 +3660,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 242,
+            "line": 280,
             "itemtype": "property",
             "name": "Byte",
             "type": "DataType",
@@ -3578,7 +3671,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 248,
+            "line": 286,
             "itemtype": "property",
             "name": "Decimal",
             "type": "DataType",
@@ -3589,7 +3682,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 259,
+            "line": 297,
             "itemtype": "property",
             "name": "Double",
             "type": "DataType",
@@ -3600,7 +3693,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 270,
+            "line": 308,
             "itemtype": "property",
             "name": "Single",
             "type": "DataType",
@@ -3611,7 +3704,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 281,
+            "line": 319,
             "itemtype": "property",
             "name": "DateTime",
             "type": "DataType",
@@ -3622,7 +3715,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 293,
+            "line": 332,
             "itemtype": "property",
             "name": "DateTimeOffset",
             "type": "DataType",
@@ -3633,7 +3726,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 304,
+            "line": 344,
             "itemtype": "property",
             "name": "Time",
             "type": "DataType",
@@ -3644,7 +3737,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 310,
+            "line": 350,
             "itemtype": "property",
             "name": "Boolean",
             "type": "DataType",
@@ -3655,7 +3748,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 316,
+            "line": 356,
             "itemtype": "property",
             "name": "Guid",
             "type": "DataType",
@@ -3666,7 +3759,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 328,
+            "line": 368,
             "itemtype": "property",
             "name": "Binary",
             "type": "DataType",
@@ -3677,7 +3770,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 334,
+            "line": 374,
             "itemtype": "property",
             "name": "Undefined",
             "type": "DataType",
@@ -3688,7 +3781,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 361,
+            "line": 398,
             "description": "Returns the DataType for a specified EDM type name.",
             "itemtype": "method",
             "name": "fromEdmDataType",
@@ -4293,7 +4386,7 @@
             "params": [
                 {
                     "name": "structuralTypeName",
-                    "description": "The name of the EntityType o0r ComplexType.",
+                    "description": "The name of the EntityType or ComplexType.",
                     "type": "String"
                 },
                 {
@@ -4315,19 +4408,22 @@
                     ]
                 },
                 {
-                    "name": "[noTrackingFn}",
+                    "name": "noTrackingFn",
                     "description": "A function that is executed immediately after a noTracking entity has been created and whose return\nvalue will be used in place of the noTracking entity.",
-                    "type": "Function"
-                },
-                {
-                    "name": "noTrackingFn.entity",
-                    "description": "",
-                    "type": "Object"
-                },
-                {
-                    "name": "noTrackingFn.entityType",
-                    "description": "The entityType that the 'entity' parameter would be if we were tracking",
-                    "type": "EntityType"
+                    "type": "Function",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "entity",
+                            "description": "",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "entityType",
+                            "description": "The entityType that the 'entity' parameter would be if we were tracking",
+                            "type": "EntityType"
+                        }
+                    ]
                 }
             ],
             "class": "MetadataStore",
@@ -7486,13 +7582,14 @@
                             "description": "A  {{#crossLink \"MergeStrategy\"}}{{/crossLink}} to use when\nmerging into an existing EntityManager.",
                             "type": "MergeStrategy",
                             "optional": true
+                        },
+                        {
+                            "name": "metadataVersionFn",
+                            "description": "A function that takes two arguments (the current metadataVersion and the imported store's 'name')\nand may be used to perform version checking.",
+                            "type": "Function",
+                            "optional": true
                         }
                     ]
-                },
-                {
-                    "name": "[config.metadataVersionFn}",
-                    "description": "A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}\nand may be used to perform version checking.",
-                    "type": "Function"
                 }
             ],
             "return": {
@@ -7591,13 +7688,14 @@
                             "description": "A  {{#crossLink \"MergeStrategy\"}}{{/crossLink}} to use when\nmerging into an existing EntityManager.",
                             "type": "MergeStrategy",
                             "optional": true
+                        },
+                        {
+                            "name": "metadataVersionFn",
+                            "description": "A function that takes two arguments (the current metadataVersion and the imported store's 'name')\nand may be used to perform version checking.",
+                            "type": "Function",
+                            "optional": true
                         }
                     ]
-                },
-                {
-                    "name": "[config.metadataVersionFn}",
-                    "description": "A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}\nand may be used to perform version checking.",
-                    "type": "Function"
                 }
             ],
             "return": {

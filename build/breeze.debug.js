@@ -5006,7 +5006,7 @@ breeze.EntityState = EntityState;
   }
 
   // exit if no change - extra cruft is because dateTimes don't compare cleanly.
-  if (newValue === oldValue || (dataType && dataType.isDate && newValue && oldValue && newValue.valueOf() === oldValue.valueOf())) {
+  if (newValue === oldValue || (dataType && dataType.normalize && newValue && oldValue && dataType.normalize(newValue) === dataType.normalize(oldValue))) {
     return;
   }
 
@@ -5453,6 +5453,44 @@ var DataType = (function () {
   @property isNumeric {Boolean}
   **/
 
+  /**
+  Whether this is an 'integer' DataType.
+  @property isInteger {Boolean}
+  **/
+
+  /**
+  Function to convert a value from string to this DataType.
+  @method parse {Function}
+  @param value
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Function to format this DataType for OData queries.
+  @method fmtOData {Function}
+  @return value appropriate for OData query
+  **/
+
+  /**
+  Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values.
+  @method getNext {Function}
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast.
+  @method normalize {Function}
+  @param value
+  @return value appropriate for this DataType
+  **/
+
+  /**
+  Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.  
+  @method getConcurrencyValue {Function}
+  @param previousValue
+  @return the next concurrency value, which is a function of the previousValue.
+  **/
+
   var dataTypeMethods = {
     // default
   };
@@ -5718,6 +5756,7 @@ var DataType = (function () {
   DataType.DateTime = DataType.addSymbol({
   defaultValue: new Date(1900, 0, 1), isDate: true,
   parse: coerceToDate,
+  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
   fmtOData: fmtDateTime,
   getNext: getNextDateTime
   });
@@ -5730,6 +5769,7 @@ var DataType = (function () {
   DataType.DateTimeOffset = DataType.addSymbol({
   defaultValue: new Date(1900, 0, 1), isDate: true,
   parse: coerceToDate,
+  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
   fmtOData: fmtDateTimeOffset,
   getNext: getNextDateTime
   });
@@ -5771,12 +5811,9 @@ var DataType = (function () {
   DataType.Undefined = DataType.addSymbol({ defaultValue: undefined, fmtOData: fmtUndefined});
   DataType.resolveSymbols();
 
-  DataType.getComparableFn = function (dataType) {
-    if (dataType && dataType.isDate) {
-      // dates don't perform equality comparisons properly
-      return function (value) {
-        return value && value.getTime();
-      };
+  DataType.getComparableFn = function(dataType) {
+    if (dataType && dataType.normalize) {
+      return dataType.normalize;
     } else if (dataType === DataType.Time) {
       // durations must be converted to compare them
       return function (value) {
@@ -6698,13 +6735,13 @@ var MetadataStore = (function () {
       // any queries or EntityType.create calls from this point on will call the Customer constructor
       // registered above.
   @method registerEntityTypeCtor
-  @param structuralTypeName {String} The name of the EntityType o0r ComplexType.
+  @param structuralTypeName {String} The name of the EntityType or ComplexType.
   @param aCtor {Function}  The constructor for this EntityType or ComplexType; may be null if all you want to do is set the next parameter.
   @param [initFn] {Function} A function or the name of a function on the entity that is to be executed immediately after the entity has been created
   and populated with any initial values.
   initFn(entity)
   @param initFn.entity {Entity} The entity being created or materialized.
-  @param [noTrackingFn} {Function} A function that is executed immediately after a noTracking entity has been created and whose return
+  @param [noTrackingFn] {Function} A function that is executed immediately after a noTracking entity has been created and whose return
   value will be used in place of the noTracking entity.
   @param noTrackingFn.entity {Object}
   @param noTrackingFn.entityType {EntityType} The entityType that the 'entity' parameter would be if we were tracking
@@ -8120,7 +8157,7 @@ var EntityType = (function () {
         return coEquals(v1, v2);
       } else {
         var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
-        return (v1 === v2 || (dataType && dataType.isDate && v1 && v2 && v1.valueOf() === v2.valueOf()));
+        return (v1 === v2 || (dataType && dataType.normalize && v1 && v2 && dataType.normalize(v1) === dataType.normalize(v2)));
       }
     });
     return areEqual;
@@ -13026,7 +13063,7 @@ var EntityManager = (function () {
   @param [config] {Object} A configuration object.
   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
   merging into an existing EntityManager.
-  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  @param [config.metadataVersionFn] {Function} A function that takes two arguments (the current metadataVersion and the imported store's 'name')
   and may be used to perform version checking.
   @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that
   provided by the same named method on an EntityManager instance. Use that method if you need additional information
@@ -13179,7 +13216,7 @@ var EntityManager = (function () {
   @param [config] {Object} A configuration object.
   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
   merging into an existing EntityManager.
-  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  @param [config.metadataVersionFn] {Function} A function that takes two arguments (the current metadataVersion and the imported store's 'name')
   and may be used to perform version checking.
   @return result {Object}
 
@@ -14972,6 +15009,10 @@ var EntityManager = (function () {
       entity.setProperty(property.name, dt2);
     } else if (property.dataType === DataType.Guid) {
       entity.setProperty(property.name, __getUuid());
+    } else if (property.dataType.getConcurrencyValue) {
+      // DataType has its own implementation
+      var nextValue = property.dataType.getConcurrencyValue(value);
+      entity.setProperty(property.name, nextValue);
     } else if (property.dataType === DataType.Binary) {
       // best guess - that this is a timestamp column and is computed on the server during save
       // - so no need to set it here.
@@ -16152,6 +16193,7 @@ breeze.SaveOptions = SaveOptions;
         config: config,
         data: data,
         getHeaders: headers,
+        ngConfig: xconfig,
         status: status,
         statusText: statusText
       };
@@ -16168,6 +16210,7 @@ breeze.SaveOptions = SaveOptions;
         config: config,
         data: data,
         getHeaders: headers,
+        ngConfig: xconfig,
         status: status,
         statusText: statusText
       };

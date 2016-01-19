@@ -289,7 +289,7 @@ var EntityManager = (function () {
   @param [config] {Object} A configuration object.
   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
   merging into an existing EntityManager.
-  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  @param [config.metadataVersionFn] {Function} A function that takes two arguments (the current metadataVersion and the imported store's 'name')
   and may be used to perform version checking.
   @return {EntityManager} A new EntityManager.  Note that the return value of this method call is different from that
   provided by the same named method on an EntityManager instance. Use that method if you need additional information
@@ -442,7 +442,7 @@ var EntityManager = (function () {
   @param [config] {Object} A configuration object.
   @param [config.mergeStrategy] {MergeStrategy} A  {{#crossLink "MergeStrategy"}}{{/crossLink}} to use when
   merging into an existing EntityManager.
-  @param [config.metadataVersionFn} {Function} A function that takes two arguments ( the current metadataVersion and the imported store's 'name'}
+  @param [config.metadataVersionFn] {Function} A function that takes two arguments (the current metadataVersion and the imported store's 'name')
   and may be used to perform version checking.
   @return result {Object}
 
@@ -2235,6 +2235,10 @@ var EntityManager = (function () {
       entity.setProperty(property.name, dt2);
     } else if (property.dataType === DataType.Guid) {
       entity.setProperty(property.name, __getUuid());
+    } else if (property.dataType.getConcurrencyValue) {
+      // DataType has its own implementation
+      var nextValue = property.dataType.getConcurrencyValue(value);
+      entity.setProperty(property.name, nextValue);
     } else if (property.dataType === DataType.Binary) {
       // best guess - that this is a timestamp column and is computed on the server during save
       // - so no need to set it here.

@@ -3788,12 +3788,6 @@ if ( em1.hasChanges( [custType, orderType]) {
                     
                 </li>
             
-                <li class="arg">
-                    
-                        <code>[config.metadataVersionFn}</code>
-                    
-                </li>
-            
             </ul><span class="paren">)</span>
         </div>
     
@@ -3899,24 +3893,23 @@ merging into an existing EntityManager.</p>
                                 
                             </li>
                             
-                        </ul>
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">[config.metadataVersionFn}</code>
-                        <span class="type">Function</span>
-                    
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[metadataVersionFn]</code>
+                                    <span class="type">Function</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
 
-                    
-
-                    <div class="param-description">
-                        <p>A function that takes two arguments ( the current metadataVersion and the imported store&#39;s &#39;name&#39;}
+                                <div class="param-description">
+                                    <p>A function that takes two arguments (the current metadataVersion and the imported store&#39;s &#39;name&#39;)
 and may be used to perform version checking.</p>
 
-                    </div>
+                                </div>
 
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -3979,12 +3972,6 @@ var em2 = EntityManager.importEntities(bundleFromStorage);
                 <li class="arg">
                     
                         <code class="optional">[config]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>[config.metadataVersionFn}</code>
                     
                 </li>
             
@@ -4091,24 +4078,23 @@ merging into an existing EntityManager.</p>
                                 
                             </li>
                             
-                        </ul>
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">[config.metadataVersionFn}</code>
-                        <span class="type">Function</span>
-                    
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[metadataVersionFn]</code>
+                                    <span class="type">Function</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
 
-                    
-
-                    <div class="param-description">
-                        <p>A function that takes two arguments ( the current metadataVersion and the imported store&#39;s &#39;name&#39;}
+                                <div class="param-description">
+                                    <p>A function that takes two arguments (the current metadataVersion and the imported store&#39;s &#39;name&#39;)
 and may be used to perform version checking.</p>
 
-                    </div>
+                                </div>
 
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
