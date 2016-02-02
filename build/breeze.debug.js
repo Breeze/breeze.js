@@ -5459,9 +5459,10 @@ var DataType = (function () {
   **/
 
   /**
-  Function to convert a value from string to this DataType.
+  Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast.
   @method parse {Function}
-  @param value
+  @param value {any}
+  @param sourceTypeName {String}
   @return value appropriate for this DataType
   **/
 
@@ -5485,10 +5486,17 @@ var DataType = (function () {
   **/
 
   /**
-  Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.  
+  Optional function to get the next value when the datatype is used as a concurrency property.
   @method getConcurrencyValue {Function}
   @param previousValue
-  @return the next concurrency value, which is a function of the previousValue.
+  @return the next concurrency value, which may be a function of the previousValue.
+  **/
+
+  /**
+  Optional function to convert a raw (server) value from string to this DataType.
+  @method parseRawValue {Function}
+  @param value {any}
+  @return value appropriate for this DataType
   **/
 
   var dataTypeMethods = {
@@ -5522,6 +5530,16 @@ var DataType = (function () {
 
   var getNextDateTime = function () {
     return new Date();
+  };
+
+  var getConcurrencyDateTime = function(val) {
+    // use the current datetime but insure that it is different from previous call.
+    var dt = new Date();
+    var dt2 = new Date();
+    while (dt.getTime() === dt2.getTime()) {
+      dt2 = new Date();
+    }
+    return dt2;
   };
 
   var coerceToString = function (source, sourceTypeName) {
@@ -5662,6 +5680,20 @@ var DataType = (function () {
     throw new Error(msg);
   }
 
+  var parseRawDate = function(val) {
+    if (!__isDate(val)) {
+      val = DataType.parseDateFromServer(val);
+    }
+    return val;
+  }
+
+  var parseRawBinary = function(val) {
+    if (val && val.$value !== undefined) {
+      val = val.$value; // this will be a byte[] encoded as a string
+    }
+    return val;
+  }
+
   var DataType = new Enum("DataType", dataTypeMethods);
 
 
@@ -5671,10 +5703,10 @@ var DataType = (function () {
   @static
   **/
   DataType.String = DataType.addSymbol({
-  defaultValue: "",
-  parse: coerceToString,
-  fmtOData: fmtString,
-  getNext: getNextString
+    defaultValue: "",
+    parse: coerceToString,
+    fmtOData: fmtString,
+    getNext: getNextString
   });
   /**
   @property Int64 {DataType}
@@ -5682,10 +5714,13 @@ var DataType = (function () {
   @static
   **/
   DataType.Int64 = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, isInteger: true, quoteJsonOData: true,
-  parse: coerceToInt,
-  fmtOData: makeFloatFmt("L"),
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    isInteger: true,
+    quoteJsonOData: true,
+    parse: coerceToInt,
+    fmtOData: makeFloatFmt("L"),
+    getNext: getNextNumber
   });
   /**
   @property Int32 {DataType}
@@ -5693,10 +5728,12 @@ var DataType = (function () {
   @static
   **/
   DataType.Int32 = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, isInteger: true,
-  parse: coerceToInt,
-  fmtOData: fmtInt,
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    isInteger: true,
+    parse: coerceToInt,
+    fmtOData: fmtInt,
+    getNext: getNextNumber
   });
   /**
   @property Int16 {DataType}
@@ -5704,27 +5741,38 @@ var DataType = (function () {
   @static
   **/
   DataType.Int16 = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, isInteger: true,
-  parse: coerceToInt,
-  fmtOData: fmtInt,
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    isInteger: true,
+    parse: coerceToInt,
+    fmtOData: fmtInt,
+    getNext: getNextNumber
   });
   /**
   @property Byte {DataType}
   @final
   @static
   **/
-  DataType.Byte = DataType.addSymbol({ defaultValue: 0, isNumeric: true, isInteger: true, parse: coerceToInt, fmtOData: fmtInt });
+  DataType.Byte = DataType.addSymbol({
+    defaultValue: 0,
+    isNumeric: true,
+    isInteger: true,
+    parse: coerceToInt,
+    fmtOData: fmtInt
+  });
   /**
   @property Decimal {DataType}
   @final
   @static
   **/
   DataType.Decimal = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, quoteJsonOData: true, isFloat: true,
-  parse: coerceToFloat,
-  fmtOData: makeFloatFmt("m"),
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    quoteJsonOData: true,
+    isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("m"),
+    getNext: getNextNumber
   });
   /**
   @property Double {DataType}
@@ -5732,10 +5780,12 @@ var DataType = (function () {
   @static
   **/
   DataType.Double = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, isFloat: true,
-  parse: coerceToFloat,
-  fmtOData: makeFloatFmt("d"),
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("d"),
+    getNext: getNextNumber
   });
   /**
   @property Single {DataType}
@@ -5743,10 +5793,12 @@ var DataType = (function () {
   @static
   **/
   DataType.Single = DataType.addSymbol({
-  defaultValue: 0, isNumeric: true, isFloat: true,
-  parse: coerceToFloat,
-  fmtOData: makeFloatFmt("f"),
-  getNext: getNextNumber
+    defaultValue: 0,
+    isNumeric: true,
+    isFloat: true,
+    parse: coerceToFloat,
+    fmtOData: makeFloatFmt("f"),
+    getNext: getNextNumber
   });
   /**
   @property DateTime {DataType}
@@ -5754,11 +5806,14 @@ var DataType = (function () {
   @static
   **/
   DataType.DateTime = DataType.addSymbol({
-  defaultValue: new Date(1900, 0, 1), isDate: true,
-  parse: coerceToDate,
-  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
-  fmtOData: fmtDateTime,
-  getNext: getNextDateTime
+    defaultValue: new Date(1900, 0, 1),
+    isDate: true,
+    parse: coerceToDate,
+    parseRawValue: parseRawDate,
+    normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
+    fmtOData: fmtDateTime,
+    getNext: getNextDateTime,
+    getConcurrencyValue: getConcurrencyDateTime
   });
 
   /**
@@ -5767,34 +5822,47 @@ var DataType = (function () {
   @static
   **/
   DataType.DateTimeOffset = DataType.addSymbol({
-  defaultValue: new Date(1900, 0, 1), isDate: true,
-  parse: coerceToDate,
-  normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
-  fmtOData: fmtDateTimeOffset,
-  getNext: getNextDateTime
+    defaultValue: new Date(1900, 0, 1),
+    isDate: true,
+    parse: coerceToDate,
+    parseRawValue: parseRawDate,
+    normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
+    fmtOData: fmtDateTimeOffset,
+    getNext: getNextDateTime,
+    getConcurrencyValue: getConcurrencyDateTime
   });
   /**
   @property Time {DataType}
   @final
   @static
   **/
-  DataType.Time = DataType.addSymbol({ defaultValue: "PT0S", fmtOData: fmtTime });
+  DataType.Time = DataType.addSymbol({
+    defaultValue: "PT0S",
+    fmtOData: fmtTime,
+    parseRawValue: DataType.parseTimeFromServer
+  });
   /**
   @property Boolean {DataType}
   @final
   @static
   **/
-  DataType.Boolean = DataType.addSymbol({ defaultValue: false, parse: coerceToBool, fmtOData: fmtBoolean });
+  DataType.Boolean = DataType.addSymbol({
+    defaultValue: false,
+    parse: coerceToBool,
+    fmtOData: fmtBoolean
+  });
   /**
   @property Guid {DataType}
   @final
   @static
   **/
   DataType.Guid = DataType.addSymbol({
-  defaultValue: "00000000-0000-0000-0000-000000000000",
-  parse: coerceToGuid,
-  fmtOData: fmtGuid,
-  getNext: getNextGuid
+    defaultValue: "00000000-0000-0000-0000-000000000000",
+    parse: coerceToGuid,
+    fmtOData: fmtGuid,
+    getNext: getNextGuid,
+    parseRawValue: function(val) { return val.toLowerCase(); },
+    getConcurrencyValue: __getUuid
   });
 
   /**
@@ -5802,13 +5870,20 @@ var DataType = (function () {
   @final
   @static
   **/
-  DataType.Binary = DataType.addSymbol({ defaultValue: null, fmtOData: fmtBinary });
+  DataType.Binary = DataType.addSymbol({
+    defaultValue: null,
+    fmtOData: fmtBinary,
+    parseRawValue: parseRawBinary
+  });
   /**
   @property Undefined {DataType}
   @final
   @static
   **/
-  DataType.Undefined = DataType.addSymbol({ defaultValue: undefined, fmtOData: fmtUndefined});
+  DataType.Undefined = DataType.addSymbol({
+    defaultValue: undefined,
+    fmtOData: fmtUndefined
+  });
   DataType.resolveSymbols();
 
   DataType.getComparableFn = function(dataType) {
@@ -5921,18 +5996,9 @@ var DataType = (function () {
     // undefined values will be the default for most unmapped properties EXCEPT when they are set
     // in a jsonResultsAdapter ( an unusual use case).
     if (val === undefined) return undefined;
-    if (dataType.isDate && val) {
-      if (!__isDate(val)) {
-        val = DataType.parseDateFromServer(val);
-      }
-    } else if (dataType === DataType.Binary) {
-      if (val && val.$value !== undefined) {
-        val = val.$value; // this will be a byte[] encoded as a string
-      }
-    } else if (dataType === DataType.Time) {
-      val = DataType.parseTimeFromServer(val);
-    } else if (val && dataType === DataType.Guid) {
-      val = val.toLowerCase();
+    if (!val) return val;
+    if (dataType && dataType.parseRawValue) {
+      val = dataType.parseRawValue(val);
     }
     return val;
   }
@@ -8919,9 +8985,9 @@ var DataProperty = (function () {
 
   ctor.fromJSON = function (json) {
     json.dataType = DataType.fromName(json.dataType);
-    // dateTime instances require 'extra' work to deserialize properly.
-    if (json.defaultValue && json.dataType && json.dataType.isDate) {
-      json.defaultValue = new Date(Date.parse(json.defaultValue));
+    // Parse default value into correct data type. (dateTime instances require extra work to deserialize properly.)
+    if (json.defaultValue && json.dataType && json.dataType.parse) {
+      json.defaultValue = json.dataType.parse(json.defaultValue, typeof json.defaultValue);
     }
 
     if (json.validators) {
@@ -14998,17 +15064,6 @@ var EntityManager = (function () {
     if (!value) value = property.dataType.defaultValue;
     if (property.dataType.isNumeric) {
       entity.setProperty(property.name, value + 1);
-    } else if (property.dataType.isDate) {
-      // use the current datetime but insure that it
-      // is different from previous call.
-      var dt = new Date();
-      var dt2 = new Date();
-      while (dt.getTime() === dt2.getTime()) {
-        dt2 = new Date();
-      }
-      entity.setProperty(property.name, dt2);
-    } else if (property.dataType === DataType.Guid) {
-      entity.setProperty(property.name, __getUuid());
     } else if (property.dataType.getConcurrencyValue) {
       // DataType has its own implementation
       var nextValue = property.dataType.getConcurrencyValue(value);

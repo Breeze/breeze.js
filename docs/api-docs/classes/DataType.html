@@ -296,6 +296,13 @@
                                 
                             </li>
                         
+                            <li class="index-item method">
+                                <a href="#method_parseRawValue">parseRawValue</a>
+
+                                
+                                
+                            </li>
+                        
                     </ul>
                 </div>
             
@@ -512,7 +519,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l36"><code>a37_dataType.js:36</code></a>
+        <a href="../files/a37_dataType.js.html#l37"><code>a37_dataType.js:37</code></a>
         
         </p>
 
@@ -595,7 +602,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l398"><code>a37_dataType.js:398</code></a>
+        <a href="../files/a37_dataType.js.html#l473"><code>a37_dataType.js:473</code></a>
         
         </p>
 
@@ -701,7 +708,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l55"><code>a37_dataType.js:55</code></a>
+        <a href="../files/a37_dataType.js.html#l56"><code>a37_dataType.js:56</code></a>
         
         </p>
 
@@ -712,7 +719,7 @@
     </div>
 
     <div class="description">
-        <p>Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.</p>
+        <p>Optional function to get the next value when the datatype is used as a concurrency property.</p>
 
     </div>
 
@@ -748,7 +755,7 @@
             <div class="returns-description">
                 
                     
-                    <p>the next concurrency value, which is a function of the previousValue.</p>
+                    <p>the next concurrency value, which may be a function of the previousValue.</p>
 
                 
             </div>
@@ -795,7 +802,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l42"><code>a37_dataType.js:42</code></a>
+        <a href="../files/a37_dataType.js.html#l43"><code>a37_dataType.js:43</code></a>
         
         </p>
 
@@ -876,7 +883,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l48"><code>a37_dataType.js:48</code></a>
+        <a href="../files/a37_dataType.js.html#l49"><code>a37_dataType.js:49</code></a>
         
         </p>
 
@@ -947,6 +954,12 @@
                     
                 </li>
             
+                <li class="arg">
+                    
+                        <code>sourceTypeName</code>
+                    
+                </li>
+            
             </ul><span class="paren">)</span>
         </div>
     
@@ -991,7 +1004,7 @@
     </div>
 
     <div class="description">
-        <p>Function to convert a value from string to this DataType.</p>
+        <p>Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast.</p>
 
     </div>
 
@@ -1004,7 +1017,126 @@
                 <li class="param">
                     
                         <code class="param-name">value</code>
-                        <span class="type">Object</span>
+                        <span class="type">Any</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">sourceTypeName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                    <p>value appropriate for this DataType</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_parseRawValue" class="method item">
+    <h3 class="name"><code>parseRawValue</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a37_dataType.js.html#l63"><code>a37_dataType.js:63</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Optional function to convert a raw (server) value from string to this DataType.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
+                        <span class="type">Any</span>
                     
 
                     
@@ -1073,7 +1205,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l368"><code>a37_dataType.js:368</code></a>
+        <a href="../files/a37_dataType.js.html#l436"><code>a37_dataType.js:436</code></a>
         
         </p>
 
@@ -1121,7 +1253,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l350"><code>a37_dataType.js:350</code></a>
+        <a href="../files/a37_dataType.js.html#l412"><code>a37_dataType.js:412</code></a>
         
         </p>
 
@@ -1169,7 +1301,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l280"><code>a37_dataType.js:280</code></a>
+        <a href="../files/a37_dataType.js.html#l319"><code>a37_dataType.js:319</code></a>
         
         </p>
 
@@ -1217,7 +1349,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l319"><code>a37_dataType.js:319</code></a>
+        <a href="../files/a37_dataType.js.html#l371"><code>a37_dataType.js:371</code></a>
         
         </p>
 
@@ -1265,7 +1397,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l332"><code>a37_dataType.js:332</code></a>
+        <a href="../files/a37_dataType.js.html#l387"><code>a37_dataType.js:387</code></a>
         
         </p>
 
@@ -1313,7 +1445,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l286"><code>a37_dataType.js:286</code></a>
+        <a href="../files/a37_dataType.js.html#l331"><code>a37_dataType.js:331</code></a>
         
         </p>
 
@@ -1406,7 +1538,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l297"><code>a37_dataType.js:297</code></a>
+        <a href="../files/a37_dataType.js.html#l345"><code>a37_dataType.js:345</code></a>
         
         </p>
 
@@ -1454,7 +1586,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l356"><code>a37_dataType.js:356</code></a>
+        <a href="../files/a37_dataType.js.html#l422"><code>a37_dataType.js:422</code></a>
         
         </p>
 
@@ -1502,7 +1634,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l269"><code>a37_dataType.js:269</code></a>
+        <a href="../files/a37_dataType.js.html#l306"><code>a37_dataType.js:306</code></a>
         
         </p>
 
@@ -1550,7 +1682,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l258"><code>a37_dataType.js:258</code></a>
+        <a href="../files/a37_dataType.js.html#l293"><code>a37_dataType.js:293</code></a>
         
         </p>
 
@@ -1598,7 +1730,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l247"><code>a37_dataType.js:247</code></a>
+        <a href="../files/a37_dataType.js.html#l279"><code>a37_dataType.js:279</code></a>
         
         </p>
 
@@ -1736,7 +1868,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l308"><code>a37_dataType.js:308</code></a>
+        <a href="../files/a37_dataType.js.html#l358"><code>a37_dataType.js:358</code></a>
         
         </p>
 
@@ -1784,7 +1916,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l236"><code>a37_dataType.js:236</code></a>
+        <a href="../files/a37_dataType.js.html#l268"><code>a37_dataType.js:268</code></a>
         
         </p>
 
@@ -1832,7 +1964,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l344"><code>a37_dataType.js:344</code></a>
+        <a href="../files/a37_dataType.js.html#l402"><code>a37_dataType.js:402</code></a>
         
         </p>
 
@@ -1880,7 +2012,7 @@
             
         
         
-        <a href="../files/a37_dataType.js.html#l374"><code>a37_dataType.js:374</code></a>
+        <a href="../files/a37_dataType.js.html#l446"><code>a37_dataType.js:446</code></a>
         
         </p>
 

@@ -259,10 +259,30 @@ declare module breeze {
         String: DataTypeSymbol;
         Time: DataTypeSymbol;
         Undefined: DataTypeSymbol;
+
         toDataType(typeName: string): DataTypeSymbol;
         parseDateFromServer(date: any): Date;
         defaultValue: any;
         isNumeric: boolean;
+        isInteger: boolean;
+
+        /** Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast. */
+        parse: (val: any, sourceTypeName: string) => any;
+
+        /** Function to format this DataType for OData queries. */
+        fmtOData: (val: any) => any;
+
+        /** Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values. */
+        getNext?: () => any;
+
+        /** Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast. */
+        normalize?: (val: any) => any;
+
+        /** Optional function to get the next value when the datatype is used as a concurrency property. */
+        getConcurrencyValue?: (val: any) => any;
+
+        /** Optional function to convert a raw (server) value from string to this DataType. */
+        parseRawValue?: (val: any) => any;
     }
     var DataType: DataType;
 

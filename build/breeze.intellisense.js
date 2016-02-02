@@ -1,4 +1,4 @@
-// Generated on: Mon Jan 18 2016 17:09:32 GMT-0800 (Pacific Standard Time)
+// Generated on: Tue Feb 02 2016 12:49:47 GMT-0800 (Pacific Standard Time)
 
 intellisense.annotate(breeze.core, {
 
@@ -1369,9 +1369,10 @@ intellisense.annotate(breeze.breeze.DataType.prototype, {
   'parse': function() {
     /// <signature>
     ///   <summary>
-    ///   Function to convert a value from string to this DataType. }
+    ///   Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast. }
     ///   </summary>
-    ///   <param name="value" type="" optional="true"></param>
+    ///   <param name="value" type="Any" optional="true"></param>
+    ///   <param name="sourceTypeName" type="String" optional="true"></param>
     ///   <returns type="" >value appropriate for this DataType</returns>
     /// </signature>
   },
@@ -1403,10 +1404,19 @@ intellisense.annotate(breeze.breeze.DataType.prototype, {
   'getConcurrencyValue': function() {
     /// <signature>
     ///   <summary>
-    ///   Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this. }
+    ///   Optional function to get the next value when the datatype is used as a concurrency property. }
     ///   </summary>
     ///   <param name="previousValue" type="" optional="true"></param>
-    ///   <returns type="" >the next concurrency value, which is a function of the previousValue.</returns>
+    ///   <returns type="" >the next concurrency value, which may be a function of the previousValue.</returns>
+    /// </signature>
+  },
+  'parseRawValue': function() {
+    /// <signature>
+    ///   <summary>
+    ///   Optional function to convert a raw (server) value from string to this DataType. }
+    ///   </summary>
+    ///   <param name="value" type="Any" optional="true"></param>
+    ///   <returns type="" >value appropriate for this DataType</returns>
     /// </signature>
   },
   

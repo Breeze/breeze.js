@@ -3534,14 +3534,20 @@
         {
             "file": "a37_dataType.js",
             "line": 29,
-            "description": "Function to convert a value from string to this DataType.",
+            "description": "Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast.",
             "itemtype": "method",
             "name": "parse",
             "type": "Function",
             "params": [
                 {
                     "name": "value",
-                    "description": ""
+                    "description": "",
+                    "type": "Any"
+                },
+                {
+                    "name": "sourceTypeName",
+                    "description": "",
+                    "type": "String"
                 }
             ],
             "return": {
@@ -3552,7 +3558,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 36,
+            "line": 37,
             "description": "Function to format this DataType for OData queries.",
             "itemtype": "method",
             "name": "fmtOData",
@@ -3565,7 +3571,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 42,
+            "line": 43,
             "description": "Optional function to get the next value for key generation, if this datatype is used as a key.  Uses an internal table of previous values.",
             "itemtype": "method",
             "name": "getNext",
@@ -3578,7 +3584,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 48,
+            "line": 49,
             "description": "Optional function to normalize a data value for comparison, if its value cannot be used directly.  Note that this will be called each time a property is changed, so make it fast.",
             "itemtype": "method",
             "name": "normalize",
@@ -3597,8 +3603,8 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 55,
-            "description": "Optional function to get the next value when the datatype is used as a concurrency property.  Some built-in datatypes have separate code in the EntityManager to handle this.",
+            "line": 56,
+            "description": "Optional function to get the next value when the datatype is used as a concurrency property.",
             "itemtype": "method",
             "name": "getConcurrencyValue",
             "type": "Function",
@@ -3609,14 +3615,34 @@
                 }
             ],
             "return": {
-                "description": "the next concurrency value, which is a function of the previousValue."
+                "description": "the next concurrency value, which may be a function of the previousValue."
             },
             "class": "DataType",
             "module": "breeze"
         },
         {
             "file": "a37_dataType.js",
-            "line": 236,
+            "line": 63,
+            "description": "Optional function to convert a raw (server) value from string to this DataType.",
+            "itemtype": "method",
+            "name": "parseRawValue",
+            "type": "Function",
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Any"
+                }
+            ],
+            "return": {
+                "description": "value appropriate for this DataType"
+            },
+            "class": "DataType",
+            "module": "breeze"
+        },
+        {
+            "file": "a37_dataType.js",
+            "line": 268,
             "itemtype": "property",
             "name": "String",
             "type": "DataType",
@@ -3627,7 +3653,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 247,
+            "line": 279,
             "itemtype": "property",
             "name": "Int64",
             "type": "DataType",
@@ -3638,7 +3664,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 258,
+            "line": 293,
             "itemtype": "property",
             "name": "Int32",
             "type": "DataType",
@@ -3649,7 +3675,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 269,
+            "line": 306,
             "itemtype": "property",
             "name": "Int16",
             "type": "DataType",
@@ -3660,7 +3686,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 280,
+            "line": 319,
             "itemtype": "property",
             "name": "Byte",
             "type": "DataType",
@@ -3671,7 +3697,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 286,
+            "line": 331,
             "itemtype": "property",
             "name": "Decimal",
             "type": "DataType",
@@ -3682,7 +3708,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 297,
+            "line": 345,
             "itemtype": "property",
             "name": "Double",
             "type": "DataType",
@@ -3693,7 +3719,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 308,
+            "line": 358,
             "itemtype": "property",
             "name": "Single",
             "type": "DataType",
@@ -3704,7 +3730,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 319,
+            "line": 371,
             "itemtype": "property",
             "name": "DateTime",
             "type": "DataType",
@@ -3715,7 +3741,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 332,
+            "line": 387,
             "itemtype": "property",
             "name": "DateTimeOffset",
             "type": "DataType",
@@ -3726,7 +3752,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 344,
+            "line": 402,
             "itemtype": "property",
             "name": "Time",
             "type": "DataType",
@@ -3737,7 +3763,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 350,
+            "line": 412,
             "itemtype": "property",
             "name": "Boolean",
             "type": "DataType",
@@ -3748,7 +3774,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 356,
+            "line": 422,
             "itemtype": "property",
             "name": "Guid",
             "type": "DataType",
@@ -3759,7 +3785,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 368,
+            "line": 436,
             "itemtype": "property",
             "name": "Binary",
             "type": "DataType",
@@ -3770,7 +3796,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 374,
+            "line": 446,
             "itemtype": "property",
             "name": "Undefined",
             "type": "DataType",
@@ -3781,7 +3807,7 @@
         },
         {
             "file": "a37_dataType.js",
-            "line": 398,
+            "line": 473,
             "description": "Returns the DataType for a specified EDM type name.",
             "itemtype": "method",
             "name": "fromEdmDataType",

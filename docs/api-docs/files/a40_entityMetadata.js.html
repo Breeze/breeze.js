@@ -2861,9 +2861,9 @@ var DataProperty = (function () {
 
   ctor.fromJSON = function (json) {
     json.dataType = DataType.fromName(json.dataType);
-    // dateTime instances require &#x27;extra&#x27; work to deserialize properly.
-    if (json.defaultValue &amp;&amp; json.dataType &amp;&amp; json.dataType.isDate) {
-      json.defaultValue = new Date(Date.parse(json.defaultValue));
+    // Parse default value into correct data type. (dateTime instances require extra work to deserialize properly.)
+    if (json.defaultValue &amp;&amp; json.dataType &amp;&amp; json.dataType.parse) {
+      json.defaultValue = json.dataType.parse(json.defaultValue, typeof json.defaultValue);
     }
 
     if (json.validators) {
