@@ -37,7 +37,10 @@ gulp.task('copyBreezeExtns', function() {
       .pipe(gulp.dest(destDir + 'adapters')),
     // copy the external adapters
     gulp.src( mapPath(srcDir, [ 'breeze.*.*.js' ]))
-      .pipe(gulp.dest(destDir + 'adapters'))
+      .pipe(gulp.dest(destDir + 'adapters')),
+    // copy the typescript definitions
+    gulp.src( mapPath('../typescript/typescript/', [ 'breeze.d.ts' ]))
+      .pipe(gulp.dest(destDir + 'typings'))
   );
 });
 
