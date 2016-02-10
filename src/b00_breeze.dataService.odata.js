@@ -55,7 +55,7 @@
 
   proto.executeQuery = function (mappingContext) {
 
-    var deferred = Q.defer();
+    var deferred = breeze.Q.defer();
     var url = this.getAbsoluteUrl(mappingContext.dataService, mappingContext.getUrl());
 
     OData.read({
@@ -80,7 +80,7 @@
 
   proto.fetchMetadata = function (metadataStore, dataService) {
 
-    var deferred = Q.defer();
+    var deferred = breeze.Q.defer();
 
     var serviceName = dataService.serviceName;
     //var url = dataService.qualifyUrl('$metadata');
@@ -129,7 +129,7 @@
 
   proto.saveChanges = function (saveContext, saveBundle) {
     var adapter = saveContext.adapter = this;
-    var deferred = Q.defer();
+    var deferred = breeze.Q.defer();
     //saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
     //var url = saveContext.dataService.qualifyUrl("$batch");
     saveContext.routePrefix = adapter.getAbsoluteUrl(saveContext.dataService, ''); 
