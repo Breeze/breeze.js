@@ -1,4 +1,4 @@
-﻿breeze.makeRelationArray = (function () {
+breeze.makeRelationArray = (function () {
 
   var relationArrayMixin = {};
 
@@ -7,7 +7,7 @@
   entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ~relationArray
+  @class {relationArray}
   **/
 
   /**

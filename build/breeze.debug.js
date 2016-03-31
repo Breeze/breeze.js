@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.5",
+        version: "1.5.6",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -3206,7 +3206,7 @@ breeze.ValidationOptions = ValidationOptions;
    complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
    This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
    are all provided as well as several special purpose methods.
-   @class ~complexArray
+   @class {complexArray}
    **/
 
   /**
@@ -3227,7 +3227,7 @@ breeze.ValidationOptions = ValidationOptions;
   @readOnly
   **/
 
-    // virtual impls 
+    // virtual impls
   complexArrayMixin._getGoodAdds = function (adds) {
     return getGoodAdds(this, adds);
   };
@@ -4743,7 +4743,7 @@ breeze.EntityState = EntityState;
   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ~primitiveArray
+  @class {primitiveArray}
   **/
 
   /**
@@ -4764,7 +4764,7 @@ breeze.EntityState = EntityState;
   @readOnly
   **/
 
-    // virtual impls 
+    // virtual impls
   primitiveArrayMixin._getGoodAdds = function (adds) {
     return adds;
   };
@@ -4818,7 +4818,7 @@ breeze.EntityState = EntityState;
   entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class ~relationArray
+  @class {relationArray}
   **/
 
   /**
@@ -17530,6 +17530,8 @@ breeze.SaveOptions = SaveOptions;
   }
 }(function (breeze) {
   "use strict";
+
+  var EntityType = breeze.EntityType;
 
   var ctor = function UriBuilderJsonAdapter() {
     this.name = "json";

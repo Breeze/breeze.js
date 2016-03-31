@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>~relationArray</title>
+    <title>{keyGenerator_interface}</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 
 	<link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
@@ -145,15 +145,15 @@
             
                 <li><a href="../classes/Validator.html">Validator</a></li>
             
-                <li><a href="../classes/~ajax_interface.html">~ajax_interface</a></li>
+                <li><a href="../classes/{ajax_interface}.html">{ajax_interface}</a></li>
             
-                <li><a href="../classes/~complexArray.html">~complexArray</a></li>
+                <li><a href="../classes/{complexArray}.html">{complexArray}</a></li>
             
-                <li><a href="../classes/~keyGenerator_interface.html">~keyGenerator_interface</a></li>
+                <li><a href="../classes/{keyGenerator_interface}.html">{keyGenerator_interface}</a></li>
             
-                <li><a href="../classes/~primitiveArray.html">~primitiveArray</a></li>
+                <li><a href="../classes/{primitiveArray}.html">{primitiveArray}</a></li>
             
-                <li><a href="../classes/~relationArray.html">~relationArray</a></li>
+                <li><a href="../classes/{relationArray}.html">{relationArray}</a></li>
             
             </ul>
 
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>~relationArray Class</h1>
+                        <h1>{keyGenerator_interface} Class</h1>
 <div class="box meta">
     
 
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/a30_relationArray.js.html#l5"><code>a30_relationArray.js:5</code></a>
+            Defined in: <a href="../files/iface.keyGeneratorInterface.js.html#l5"><code>iface.keyGeneratorInterface.js:5</code></a>
         </div>
     
 
@@ -222,10 +222,24 @@
 
 
 <div class="box intro">
-    <p>Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of
-entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
-This collection looks like an array in that the basic methods on arrays such as &#39;push&#39;, &#39;pop&#39;, &#39;shift&#39;, &#39;unshift&#39;, &#39;splice&#39;
-are all provided as well as several special purpose methods.</p>
+    <p>This is an interface description. Any class that implements the methods and properties defined here is considered a valid
+implementation of this interface.</p>
+<p>Each EntityManager can have a single KeyGenerator implementation that it will use to manage the generation of all &#39;temporary&#39; keys.</p>
+<p>A KeyGenerator implementation is assigned to an EntityManager via the <a href="../classes/EntityManager.html#method_setProperties" class="crosslink">setProperties</a>
+method with a config parameter of &#39;keyGeneratorCtor&#39;.</p>
+<pre class="code prettyprint"><code>MyKeyGenerator = function() {
+    // your code here
+}
+MyKeyGenerator.prototype.generateTempKeyValue = function(entityType) {
+    // your implementation here.
+}
+em.setProperties( {keyGeneratorCtor: MyKeyGenerator });</code></pre>
+<p>The assigned KeyGenerator is then called whenever the
+EntityManager.generateTempKeyValue method is called.  The EntityManager internally keeps track of all of the generated keys
+and handles all of the mapping of these temporary keys to real keys after any save.</p>
+<p>The KeyGenerator implementation only needs to do one thing.  Return a unique key value of the correct datatype for each
+call to the generateTempKeyValue method.  Note, that KeyGeneration is NOT supported for multipart keys.</p>
+<p>If no KeyGenerator is supplied, a default KeyGenerator will be automatically provided.</p>
 
 </div>
 
@@ -241,8 +255,6 @@ are all provided as well as several special purpose methods.</p>
         
         
         
-            <li class="api-class-tab events"><a href="#events">Events</a></li>
-        
     </ul>
 
     <div>
@@ -256,7 +268,7 @@ are all provided as well as several special purpose methods.</p>
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_load">load</a>
+                                <a href="#method_generateTempKeyValue">generateTempKeyValue</a>
 
                                 
                                 
@@ -270,21 +282,6 @@ are all provided as well as several special purpose methods.</p>
 
             
 
-            
-                <div class="index-section events">
-                    <h3>Events</h3>
-
-                    <ul class="index-list events">
-                        
-                            <li class="index-item event">
-                                <a href="#event_arrayChanged">arrayChanged</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
             
         </div>
 
@@ -293,8 +290,8 @@ are all provided as well as several special purpose methods.</p>
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_load" class="method item">
-    <h3 class="name"><code>load</code></h3>
+                    <div id="method_generateTempKeyValue" class="method item">
+    <h3 class="name"><code>generateTempKeyValue</code></h3>
 
     
         <div class="args">
@@ -302,13 +299,7 @@ are all provided as well as several special purpose methods.</p>
             
                 <li class="arg">
                     
-                        <code class="optional">[callback]</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code class="optional">[errorCallback]</code>
+                        <code>entityType</code>
                     
                 </li>
             
@@ -316,10 +307,6 @@ are all provided as well as several special purpose methods.</p>
         </div>
     
 
-    
-        <span class="returns-inline">
-            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
-        </span>
     
 
     
@@ -345,7 +332,7 @@ are all provided as well as several special purpose methods.</p>
             
         
         
-        <a href="../files/a30_relationArray.js.html#l32"><code>a30_relationArray.js:32</code></a>
+        <a href="../files/iface.keyGeneratorInterface.js.html#l33"><code>iface.keyGeneratorInterface.js:33</code></a>
         
         </p>
 
@@ -356,7 +343,10 @@ are all provided as well as several special purpose methods.</p>
     </div>
 
     <div class="description">
-        <p>Performs an asynchronous load of all other the entities associated with this relationArray.</p>
+        <p>Returns a unique &#39;temporary&#39; key for the specified <a href="../classes/EntityType.html" class="crosslink">EntityType</a>.
+Uniqueness is defined for this purpose as being unique within this KeyGenerator. This is sufficient
+because each EntityManager will have its own instance of a KeyGenerator and any entities imported into
+the EntityManager with temporary keys will have them regenerated and remapped on import.</p>
 
     </div>
 
@@ -368,25 +358,8 @@ are all provided as well as several special purpose methods.</p>
             
                 <li class="param">
                     
-                        <code class="param-name optional">[callback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                         
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[errorCallback]</code>
-                        <span class="type">Function</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                        <code class="param-name">entityType</code>
+                        <span class="type"><a href="../classes/EntityType.html" class="crosslink">EntityType</a></span>
                     
 
                     
@@ -403,30 +376,7 @@ are all provided as well as several special purpose methods.</p>
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
 
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
-                    
-                
-            </div>
-        </div>
-    
-
-    
-        <div class="example">
-            <h4>Example:</h4>
-
-            <div class="example-content">
-                <pre class="code prettyprint"><code>// assume orders is an empty, as yet unpopulated, relation array of orders
-// associated with a specific customer.
-orders.load().then(...)</code></pre>
-
-            </div>
-        </div>
     
 </div>
 
@@ -438,113 +388,6 @@ orders.load().then(...)</code></pre>
 
         
 
-        
-            <div id="events" class="api-class-tabpanel">
-                <h2 class="off-left">Events</h2>
-
-                
-                    <div id="event_arrayChanged" class="events item">
-    <h3 class="name"><code>arrayChanged</code></h3>
-    <span class="type"></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/a30_relationArray.js.html#l13"><code>a30_relationArray.js:13</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>An <a href="../classes/Event.html" class="crosslink">Event</a> that fires whenever the contents of this array changed.  This event
-is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-collections are collected into a single notification event for each relation array.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Event Payload:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">added</code>
-                        <span class="type">Array of Entity</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>An array of all of the entities added to this collection.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">removed</code>
-                        <span class="type">Array of Entity</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>An array of all of the removed from this collection.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-
-    
-        <div class="example">
-            <h4>Example:</h4>
-
-            <div class="example-content">
-                <pre class="code prettyprint"><code>// assume order is an order entity attached to an EntityManager.
-orders.arrayChanged.subscribe(
-function (arrayChangedArgs) {
-    var addedEntities = arrayChangedArgs.added;
-    var removedEntities = arrayChanged.removed;
-});</code></pre>
-
-            </div>
-        </div>
-    
-</div>
-
-                
-            </div>
         
     </div>
 </div>

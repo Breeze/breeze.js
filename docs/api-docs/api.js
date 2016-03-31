@@ -34,11 +34,11 @@ YUI.add("yuidoc-meta", function(Y) {
         "ValidationOptions",
         "Validator",
         "config",
-        "~ajax_interface",
-        "~complexArray",
-        "~keyGenerator_interface",
-        "~primitiveArray",
-        "~relationArray"
+        "{ajax_interface}",
+        "{complexArray}",
+        "{keyGenerator_interface}",
+        "{primitiveArray}",
+        "{relationArray}"
     ],
     "modules": [
         "breeze",

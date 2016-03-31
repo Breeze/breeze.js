@@ -70,7 +70,7 @@
             "name": "a30_complexArray.js",
             "modules": {},
             "classes": {
-                "~complexArray": 1
+                "{complexArray}": 1
             },
             "fors": {},
             "namespaces": {}
@@ -116,7 +116,7 @@
             "name": "a30_primitiveArray.js",
             "modules": {},
             "classes": {
-                "~primitiveArray": 1
+                "{primitiveArray}": 1
             },
             "fors": {},
             "namespaces": {}
@@ -125,7 +125,7 @@
             "name": "a30_relationArray.js",
             "modules": {},
             "classes": {
-                "~relationArray": 1
+                "{relationArray}": 1
             },
             "fors": {},
             "namespaces": {}
@@ -261,7 +261,7 @@
             "name": "iface.ajaxInterface.js",
             "modules": {},
             "classes": {
-                "~ajax_interface": 1,
+                "{ajax_interface}": 1,
                 "HttpResponse": 1
             },
             "fors": {},
@@ -271,7 +271,7 @@
             "name": "iface.keyGeneratorInterface.js",
             "modules": {},
             "classes": {
-                "~keyGenerator_interface": 1
+                "{keyGenerator_interface}": 1
             },
             "fors": {},
             "namespaces": {}
@@ -309,14 +309,14 @@
                 "Validator": 1,
                 "ValidationError": 1,
                 "ValidationOptions": 1,
-                "~complexArray": 1,
+                "{complexArray}": 1,
                 "EntityAction": 1,
                 "EntityAspect": 1,
                 "ComplexAspect": 1,
                 "EntityKey": 1,
                 "EntityState": 1,
-                "~primitiveArray": 1,
-                "~relationArray": 1,
+                "{primitiveArray}": 1,
+                "{relationArray}": 1,
                 "DataType": 1,
                 "DataService": 1,
                 "JsonResultsAdapter": 1,
@@ -336,9 +336,9 @@
                 "QueryOptions": 1,
                 "EntityManager": 1,
                 "SaveOptions": 1,
-                "~ajax_interface": 1,
+                "{ajax_interface}": 1,
                 "HttpResponse": 1,
-                "~keyGenerator_interface": 1,
+                "{keyGenerator_interface}": 1,
                 "Promise": 1
             },
             "fors": {},
@@ -456,9 +456,9 @@
             "line": 7,
             "description": "A ValidationOptions instance is used to specify the conditions under which validation will be executed."
         },
-        "~complexArray": {
-            "name": "~complexArray",
-            "shortname": "~complexArray",
+        "{complexArray}": {
+            "name": "{complexArray}",
+            "shortname": "{complexArray}",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -548,9 +548,9 @@
             "description": "EntityState is an 'Enum' containing all of the valid states for an 'Entity'.",
             "static": 1
         },
-        "~primitiveArray": {
-            "name": "~primitiveArray",
-            "shortname": "~primitiveArray",
+        "{primitiveArray}": {
+            "name": "{primitiveArray}",
+            "shortname": "{primitiveArray}",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -562,9 +562,9 @@
             "line": 13,
             "description": "Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of\nprimitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.\nThis collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'\nare all provided as well as several special purpose methods."
         },
-        "~relationArray": {
-            "name": "~relationArray",
-            "shortname": "~relationArray",
+        "{relationArray}": {
+            "name": "{relationArray}",
+            "shortname": "{relationArray}",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -848,9 +848,9 @@
             "line": 6,
             "description": "A SaveOptions instance is used to specify the 'options' under which a save will occur."
         },
-        "~ajax_interface": {
-            "name": "~ajax_interface",
-            "shortname": "~ajax_interface",
+        "{ajax_interface}": {
+            "name": "{ajax_interface}",
+            "shortname": "{ajax_interface}",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -876,9 +876,9 @@
             "line": 30,
             "description": "A generic wrapper for any Http response returned by a server."
         },
-        "~keyGenerator_interface": {
-            "name": "~keyGenerator_interface",
-            "shortname": "~keyGenerator_interface",
+        "{keyGenerator_interface}": {
+            "name": "{keyGenerator_interface}",
+            "shortname": "{keyGenerator_interface}",
             "classitems": [],
             "plugins": [],
             "extensions": [],
@@ -2483,7 +2483,7 @@
                 }
             ],
             "readonly": "",
-            "class": "~complexArray",
+            "class": "{complexArray}",
             "module": "breeze"
         },
         {
@@ -3443,7 +3443,7 @@
                 }
             ],
             "readonly": "",
-            "class": "~primitiveArray",
+            "class": "{primitiveArray}",
             "module": "breeze"
         },
         {
@@ -3468,7 +3468,7 @@
                 }
             ],
             "readonly": "",
-            "class": "~relationArray",
+            "class": "{relationArray}",
             "module": "breeze"
         },
         {
@@ -3498,7 +3498,7 @@
                 "description": "",
                 "type": "Promise"
             },
-            "class": "~relationArray",
+            "class": "{relationArray}",
             "module": "breeze"
         },
         {
@@ -8606,7 +8606,7 @@
                 "description": "Constructor for a \"ChangeRequestInterceptor\".",
                 "type": "Function"
             },
-            "class": "~ajax_interface",
+            "class": "{ajax_interface}",
             "module": "breeze"
         },
         {
@@ -8639,7 +8639,7 @@
                 "description": "The potentially revised request.",
                 "type": "Function"
             },
-            "class": "~ajax_interface",
+            "class": "{ajax_interface}",
             "module": "breeze"
         },
         {
@@ -8658,7 +8658,7 @@
                     "type": "Array of Object"
                 }
             ],
-            "class": "~ajax_interface",
+            "class": "{ajax_interface}",
             "module": "breeze"
         },
         {
@@ -8713,7 +8713,7 @@
                     ]
                 }
             ],
-            "class": "~ajax_interface",
+            "class": "{ajax_interface}",
             "module": "breeze"
         },
         {
@@ -8776,7 +8776,7 @@
                     "type": "EntityType"
                 }
             ],
-            "class": "~keyGenerator_interface",
+            "class": "{keyGenerator_interface}",
             "module": "breeze"
         },
         {

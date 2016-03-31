@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>~complexArray</title>
+    <title>{relationArray}</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 
 	<link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
@@ -145,15 +145,15 @@
             
                 <li><a href="../classes/Validator.html">Validator</a></li>
             
-                <li><a href="../classes/~ajax_interface.html">~ajax_interface</a></li>
+                <li><a href="../classes/{ajax_interface}.html">{ajax_interface}</a></li>
             
-                <li><a href="../classes/~complexArray.html">~complexArray</a></li>
+                <li><a href="../classes/{complexArray}.html">{complexArray}</a></li>
             
-                <li><a href="../classes/~keyGenerator_interface.html">~keyGenerator_interface</a></li>
+                <li><a href="../classes/{keyGenerator_interface}.html">{keyGenerator_interface}</a></li>
             
-                <li><a href="../classes/~primitiveArray.html">~primitiveArray</a></li>
+                <li><a href="../classes/{primitiveArray}.html">{primitiveArray}</a></li>
             
-                <li><a href="../classes/~relationArray.html">~relationArray</a></li>
+                <li><a href="../classes/{relationArray}.html">{relationArray}</a></li>
             
             </ul>
 
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>~complexArray Class</h1>
+                        <h1>{relationArray} Class</h1>
 <div class="box meta">
     
 
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/a30_complexArray.js.html#l13"><code>a30_complexArray.js:13</code></a>
+            Defined in: <a href="../files/a30_relationArray.js.html#l5"><code>a30_relationArray.js:5</code></a>
         </div>
     
 
@@ -222,8 +222,8 @@
 
 
 <div class="box intro">
-    <p>Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of
-complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
+    <p>Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of
+entities associated with a navigation property on a single entity. i.e. customer.orders or order.orderDetails.
 This collection looks like an array in that the basic methods on arrays such as &#39;push&#39;, &#39;pop&#39;, &#39;shift&#39;, &#39;unshift&#39;, &#39;splice&#39;
 are all provided as well as several special purpose methods.</p>
 
@@ -236,6 +236,8 @@ are all provided as well as several special purpose methods.</p>
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
         
         
         
@@ -247,6 +249,21 @@ are all provided as well as several special purpose methods.</p>
         <div id="index" class="api-class-tabpanel index">
             <h2 class="off-left">Item Index</h2>
 
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_load">load</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
 
             
@@ -271,6 +288,150 @@ are all provided as well as several special purpose methods.</p>
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_load" class="method item">
+    <h3 class="name"><code>load</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code class="optional">[callback]</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code class="optional">[errorCallback]</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/a30_relationArray.js.html#l32"><code>a30_relationArray.js:32</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Performs an asynchronous load of all other the entities associated with this relationArray.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[callback]</code>
+                        <span class="type">Function</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name optional">[errorCallback]</code>
+                        <span class="type">Function</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Promise.html" class="crosslink">Promise</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+        <div class="example">
+            <h4>Example:</h4>
+
+            <div class="example-content">
+                <pre class="code prettyprint"><code>// assume orders is an empty, as yet unpopulated, relation array of orders
+// associated with a specific customer.
+orders.load().then(...)</code></pre>
+
+            </div>
+        </div>
+    
+</div>
+
+                
+            </div>
         
 
         
@@ -305,7 +466,7 @@ are all provided as well as several special purpose methods.</p>
             
         
         
-        <a href="../files/a30_complexArray.js.html#l21"><code>a30_complexArray.js:21</code></a>
+        <a href="../files/a30_relationArray.js.html#l13"><code>a30_relationArray.js:13</code></a>
         
         </p>
 

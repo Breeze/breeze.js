@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>~primitiveArray</title>
+    <title>{complexArray}</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.5.1/build/cssgrids/cssgrids-min.css">
 
 	<link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
@@ -145,15 +145,15 @@
             
                 <li><a href="../classes/Validator.html">Validator</a></li>
             
-                <li><a href="../classes/~ajax_interface.html">~ajax_interface</a></li>
+                <li><a href="../classes/{ajax_interface}.html">{ajax_interface}</a></li>
             
-                <li><a href="../classes/~complexArray.html">~complexArray</a></li>
+                <li><a href="../classes/{complexArray}.html">{complexArray}</a></li>
             
-                <li><a href="../classes/~keyGenerator_interface.html">~keyGenerator_interface</a></li>
+                <li><a href="../classes/{keyGenerator_interface}.html">{keyGenerator_interface}</a></li>
             
-                <li><a href="../classes/~primitiveArray.html">~primitiveArray</a></li>
+                <li><a href="../classes/{primitiveArray}.html">{primitiveArray}</a></li>
             
-                <li><a href="../classes/~relationArray.html">~relationArray</a></li>
+                <li><a href="../classes/{relationArray}.html">{relationArray}</a></li>
             
             </ul>
 
@@ -198,7 +198,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>~primitiveArray Class</h1>
+                        <h1>{complexArray} Class</h1>
 <div class="box meta">
     
 
@@ -206,7 +206,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/a30_primitiveArray.js.html#l13"><code>a30_primitiveArray.js:13</code></a>
+            Defined in: <a href="../files/a30_complexArray.js.html#l13"><code>a30_complexArray.js:13</code></a>
         </div>
     
 
@@ -222,8 +222,8 @@
 
 
 <div class="box intro">
-    <p>Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of
-primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
+    <p>Complex arrays are not actually classes, they are objects that mimic arrays. A complex array is collection of
+complexTypes associated with a data property on a single entity or other complex object. i.e. customer.orders or order.orderDetails.
 This collection looks like an array in that the basic methods on arrays such as &#39;push&#39;, &#39;pop&#39;, &#39;shift&#39;, &#39;unshift&#39;, &#39;splice&#39;
 are all provided as well as several special purpose methods.</p>
 
@@ -305,7 +305,7 @@ are all provided as well as several special purpose methods.</p>
             
         
         
-        <a href="../files/a30_primitiveArray.js.html#l21"><code>a30_primitiveArray.js:21</code></a>
+        <a href="../files/a30_complexArray.js.html#l21"><code>a30_complexArray.js:21</code></a>
         
         </p>
 
@@ -331,13 +331,13 @@ collections are collected into a single notification event for each relation arr
                 <li class="param">
                     
                         <code class="param-name">added</code>
-                        <span class="type">Array of Primitives</span>
+                        <span class="type">Array of Entity</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>An array of all of the items added to this collection.</p>
+                        <p>An array of all of the entities added to this collection.</p>
 
                     </div>
 
@@ -347,13 +347,13 @@ collections are collected into a single notification event for each relation arr
                 <li class="param">
                     
                         <code class="param-name">removed</code>
-                        <span class="type">Array of Primitives</span>
+                        <span class="type">Array of Entity</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>An array of all of the items removed from this collection.</p>
+                        <p>An array of all of the removed from this collection.</p>
 
                     </div>
 

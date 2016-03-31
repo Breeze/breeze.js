@@ -1,4 +1,4 @@
-﻿/**
+/**
  @module breeze
  **/
 
@@ -27,7 +27,7 @@
  call to the generateTempKeyValue method.  Note, that KeyGeneration is NOT supported for multipart keys.
 
  If no KeyGenerator is supplied, a default KeyGenerator will be automatically provided.
- @class ~keyGenerator_interface
+ @class {keyGenerator_interface}
  **/
 
 /**
