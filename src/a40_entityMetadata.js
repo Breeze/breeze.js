@@ -4,7 +4,7 @@
 
 // Get the promises library called Q
 // define a quick failing version if not found.
-var Q = __requireLibCore("Q");
+var Q = core.requireLib("Q;q");
 
 if (!Q) {
   // No Q.js! Substitute a placeholder Q which always fails

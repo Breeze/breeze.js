@@ -22,7 +22,7 @@
   var protoFn = ctor.prototype;
 
   protoFn.initialize = function () {
-    ko = core.requireLib("ko", "The Knockout library");
+    ko = core.requireLib("ko;knockout", "The Knockout library");
     ko.extenders.intercept = function (target, interceptorOptions) {
       var instance = interceptorOptions.instance;
       var property = interceptorOptions.property;

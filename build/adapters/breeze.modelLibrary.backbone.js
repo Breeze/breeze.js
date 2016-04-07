@@ -27,7 +27,7 @@
   var protoFn = ctor.prototype;
 
   protoFn.initialize = function () {
-    Backbone = core.requireLib("Backbone");
+    Backbone = core.requireLib("Backbone;backbone");
     _ = core.requireLib("_;underscore");
     bbSet = Backbone.Model.prototype.set;
     bbGet = Backbone.Model.prototype.get;

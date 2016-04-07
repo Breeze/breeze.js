@@ -26,7 +26,7 @@
 
   proto.initialize = function () {
     // look for the jQuery lib but don't fail immediately if not found
-    jQuery = core.requireLib("jQuery");
+    jQuery = core.requireLib("jQuery;jquery");
   };
 
   proto.ajax = function (config) {
