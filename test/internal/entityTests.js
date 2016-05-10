@@ -283,6 +283,35 @@
 
   });
 
+
+  test("attaching entities in ctor makes fk values update", function () {
+
+      var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
+
+      var initializer = testFns.makeEntityCtor(function (sup) {
+          
+          var prod1 = em.createEntity("Product");
+          sup.products.push(prod1);
+          
+          var prod2 = em.createEntity("Product");
+          sup.products.push(prod2);
+
+          // problem occurs because em._unattachedChildrenMap gets entries for old SupplierID:#Foo-0 and new SupplierID:#Foo--3
+      });
+
+      em.metadataStore.registerEntityTypeCtor("Supplier", null, initializer);
+
+      var sup = em.createEntity("Supplier");
+
+      ok(sup.getProperty("supplierID") < 0, "Got " + sup.getProperty("supplierID"));
+      var prods = sup.getProperty("products");
+      ok(prods[0].getProperty("productID") < 0, "Got " + prods[0].getProperty("productID"));
+      ok(prods[0].getProperty("supplierID") < 0, "Got " + prods[0].getProperty("supplierID"));
+      ok(prods[1].getProperty("productID") < 0, "Got " + prods[1].getProperty("productID"));
+      ok(prods[1].getProperty("supplierID") < 0, "Got " + prods[1].getProperty("supplierID"));
+  })
+
+
   test("event token is the same for different entities", function () {
     var em = newEm();
 
