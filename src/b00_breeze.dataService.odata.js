@@ -111,6 +111,14 @@
             // OData can return data.__count as a string
             inlineCount = parseInt(data.__count, 10);
           }
+          // Odata returns different result structure when it returns multiple entities (data.results) vs single entity (data directly).
+          // @see http://www.odata.org/documentation/odata-version-2-0/json-format/#RepresentingCollectionsOfEntries
+          // and http://www.odata.org/documentation/odata-version-2-0/json-format/#RepresentingEntries
+          if (data.results) {
+            results = data.results ;
+          }else{
+            results = data ;
+          }
           return deferred.resolve({ results: data.results, inlineCount: inlineCount, httpResponse: response });
         },
         function (error) {
@@ -217,7 +225,11 @@
           }
 
           var contentId = cr.headers["Content-ID"];
-
+          // Olingo sends differnt case of 'ID' for the header name.
+          if(!contentId){
+            contentId = cr.headers["Content-Id"];
+          }
+          
           var rawEntity = cr.data;
           if (rawEntity) {
             var tempKey = tempKeys[contentId];

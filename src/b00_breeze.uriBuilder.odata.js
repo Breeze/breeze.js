@@ -47,7 +47,7 @@
       queryOptions["$inlinecount"] = "allpages";
     }
 
-    var qoText = toQueryOptionsString(queryOptions);
+	var qoText = toQueryOptionsString(queryOptions, this.parameters);
     return entityQuery.resourceName + qoText;
 
     // private methods to this func.
@@ -87,7 +87,7 @@
       return frag;
     }
 
-    function toQueryOptionsString(queryOptions) {
+    function toQueryOptionsString(queryOptions, params) {
       var qoStrings = [];
       for (var qoName in queryOptions) {
         var qoValue = queryOptions[qoName];
@@ -100,6 +100,12 @@
             qoStrings.push(qoName + "=" + encodeURIComponent(qoValue));
           }
         }
+      }
+      
+	  // Allow for custom params ( withParameters call ) to be sent to server.
+      // If there are custom params .. add them directly into qoStrings.
+      if(params){
+        qoStrings.push(encodeParams(params));
       }
 
       if (qoStrings.length > 0) {
