@@ -37,6 +37,20 @@
   proto._createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
   proto.headers = { "DataServiceVersion": "2.0" };
 
+  // Absolute URL is the default as of Breeze 1.5.5.  
+  // To use relative URL (like pre-1.5.5), add adapterInstance.relativeUrl = true:
+  //
+  //     var ds = breeze.config.initializeAdapterInstance("dataService", "webApiOData");
+  //     ds.relativeUrl = true; 
+  //
+  // To use custom url construction, add adapterInstance.relativeUrl = myfunction(dataService, url):
+  //
+  //     var ds = breeze.config.initializeAdapterInstance("dataService", "webApiOData");
+  //     ds.relativeUrl = function(dataService, url) {
+  //        return somehowConvert(url);
+  //     }
+  //
+
   proto.getAbsoluteUrl = function (dataService, url){
     var serviceName = dataService.qualifyUrl('');
     // only prefix with serviceName if not already on the url
@@ -51,14 +65,41 @@
     return base + url;
   };
 
-  // getRoutePrefix deprecated in favor of getAbsoluteUrl which seems to work for all OData providers; doubt anyone ever changed it; we'll see
-  // TODO: Remove from code base soon (15 June 2015)
-  // proto.getRoutePrefix = function (dataService) { return '';}   
+  proto.getRoutePrefix = function (dataService) {
+      // Get the routePrefix from a Web API OData service name.
+      // The routePrefix is presumed to be the pathname within the dataService.serviceName
+      // Examples of servicename -> routePrefix:
+      //   'http://localhost:55802/odata/' -> 'odata/'
+      //   'http://198.154.121.75/service/odata/' -> 'service/odata/'
+      var parser;
+      if (typeof document === 'object') { // browser
+          parser = document.createElement('a');
+          parser.href = dataService.serviceName;
+      } else { // node
+          parser = url.parse(dataService.serviceName);
+      }
+      var prefix = parser.pathname;
+      if (prefix[0] === '/') {
+          prefix = prefix.substr(1);
+      } // drop leading '/'  (all but IE)
+      if (prefix.substr(-1) !== '/') {
+          prefix += '/';
+      }      // ensure trailing '/'
+      return prefix;
+  };
+
 
   proto.executeQuery = function (mappingContext) {
 
     var deferred = breeze.Q.defer();
-    var url = this.getAbsoluteUrl(mappingContext.dataService, mappingContext.getUrl());
+    var url;
+    if (this.relativeUrl === true) {
+      url = mappingContext.getUrl();
+    } else if (core.isFunction(this.relativeUrl)) {
+      url = this.relativeUrl(mappingContext.dataService, mappingContext.getUrl());
+    } else {
+      url = this.getAbsoluteUrl(mappingContext.dataService, mappingContext.getUrl());
+    }
 
     OData.read({
           requestUri: url,
@@ -85,8 +126,16 @@
     var deferred = breeze.Q.defer();
 
     var serviceName = dataService.serviceName;
-    //var url = dataService.qualifyUrl('$metadata');
-    var url = this.getAbsoluteUrl(dataService, '$metadata');
+
+    var url;
+    if (this.relativeUrl === true) {
+      url = dataService.qualifyUrl('$metadata');
+    } else if (core.isFunction(this.relativeUrl)) {
+      url = this.relativeUrl(dataService, '$metadata');
+    } else {
+      url = this.getAbsoluteUrl(dataService, '$metadata');
+    }
+
     // OData.read(url,
     OData.read({
           requestUri: url,
@@ -132,10 +181,18 @@
   proto.saveChanges = function (saveContext, saveBundle) {
     var adapter = saveContext.adapter = this;
     var deferred = breeze.Q.defer();
-    //saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
-    //var url = saveContext.dataService.qualifyUrl("$batch");
-    saveContext.routePrefix = adapter.getAbsoluteUrl(saveContext.dataService, ''); 
-    var url = saveContext.routePrefix + '$batch';                   
+
+    var url;
+    if (this.relativeUrl === true) {
+      saveContext.routePrefix = adapter.getRoutePrefix(saveContext.dataService);
+      url = saveContext.dataService.qualifyUrl("$batch");
+    } else if (core.isFunction(adapter.relativeUrl)) {
+      saveContext.routePrefix = adapter.relativeUrl(saveContext.dataService, '');
+      url = saveContext.routePrefix + '$batch';
+    } else {
+      saveContext.routePrefix = adapter.getAbsoluteUrl(saveContext.dataService, '');
+      url = saveContext.routePrefix + '$batch';
+    }
 
     var requestData = createChangeRequests(saveContext, saveBundle);
     var tempKeys = saveContext.tempKeys;
@@ -392,33 +449,6 @@
   }
 
   breeze.core.extend(webApiODataCtor.prototype, proto);
-
-/*
-  // Deprecated in favor of getAbsoluteUrl
-  // TODO: Remove from code base soon (15 June 2015)
-  webApiODataCtor.prototype.getRoutePrefix = function (dataService) {
-    // Get the routePrefix from a Web API OData service name.
-    // The routePrefix is presumed to be the pathname within the dataService.serviceName
-    // Examples of servicename -> routePrefix:
-    //   'http://localhost:55802/odata/' -> 'odata/'
-    //   'http://198.154.121.75/service/odata/' -> 'service/odata/'
-    var parser;
-    if (typeof document === 'object') { // browser
-      parser = document.createElement('a');
-      parser.href = dataService.serviceName;
-    } else { // node
-      parser = url.parse(dataService.serviceName);
-    }
-    var prefix = parser.pathname;
-    if (prefix[0] === '/') {
-      prefix = prefix.substr(1);
-    } // drop leading '/'  (all but IE)
-    if (prefix.substr(-1) !== '/') {
-      prefix += '/';
-    }      // ensure trailing '/'
-    return prefix;
-  };
-  */
 
   breeze.config.registerAdapter("dataService", webApiODataCtor);
   // OData 4 adapter

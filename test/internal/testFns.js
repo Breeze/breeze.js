@@ -223,7 +223,9 @@
       testFns.defaultServiceName = "http://localhost:8080/breeze-webtest/northwind"
     }
 
-    testFns.dataService = core.config.initializeAdapterInstance("dataService", dataServiceAdapterName).name;
+    var ds = core.config.initializeAdapterInstance("dataService", dataServiceAdapterName);
+    //ds.relativeUrl = true; // for testing relative URL in webApiOData adapter
+    testFns.dataService = ds.name;
 
     if (testFns.TEST_RECOMPOSITION && testFns.DEBUG_DOTNET_WEBAPI) {
       var oldAjaxCtor = core.config.getAdapter("ajax");

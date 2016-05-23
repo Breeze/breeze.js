@@ -50,8 +50,10 @@
     var order = em.createEntity('Order', {
       customerID: wellKnownData.alfredsID,
       employeeID: wellKnownData.nancyID,
-      shipAddress: testAddress
+      shipAddress: testAddress,
+      shipName: '2014-11-02T18:00:00'
     });
+
     var saveOptions = new SaveOptions({ resourceName: resourceName, tag: "CommentOrderShipAddress.Before" });
     
     em.saveChanges(null, saveOptions).then(function (data) {
