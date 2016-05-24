@@ -16520,6 +16520,16 @@ breeze.SaveOptions = SaveOptions;
       return prefix;
   };
 
+  // crude serializer.  Doesn't recurse
+  function toQueryString(obj) {
+    var parts = [];
+    for (var i in obj) {
+      if (obj.hasOwnProperty(i)) {
+        parts.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
+      }
+    }
+    return parts.join("&");
+  }
 
   proto.executeQuery = function (mappingContext) {
 
@@ -16533,6 +16543,13 @@ breeze.SaveOptions = SaveOptions;
       url = this.getAbsoluteUrl(mappingContext.dataService, mappingContext.getUrl());
     }
 
+    // Add query params if .withParameters was used
+    if (mappingContext.query.parameters) {
+      var paramString = toQueryString(mappingContext.query.parameters);
+      var sep = url.indexOf("?") < 0 ? "?" : "&";
+      url = url + sep + paramString;
+    }
+
     OData.read({
           requestUri: url,
           headers: this.headers
@@ -16543,7 +16560,16 @@ breeze.SaveOptions = SaveOptions;
             // OData can return data.__count as a string
             inlineCount = parseInt(data.__count, 10);
           }
-          return deferred.resolve({ results: data.results, inlineCount: inlineCount, httpResponse: response });
+          // Odata returns different result structure when it returns multiple entities (data.results) vs single entity (data directly).
+          // @see http://www.odata.org/documentation/odata-version-2-0/json-format/#RepresentingCollectionsOfEntries
+          // and http://www.odata.org/documentation/odata-version-2-0/json-format/#RepresentingEntries
+          var results;
+          if (data.results) {
+            results = data.results;
+          } else {
+            results = data;
+          }
+          return deferred.resolve({ results: results, inlineCount: inlineCount, httpResponse: response });
         },
         function (error) {
           return deferred.reject(createError(error, url));
@@ -16649,6 +16675,10 @@ breeze.SaveOptions = SaveOptions;
           }
 
           var contentId = cr.headers["Content-ID"];
+          // Olingo sends different case of 'ID' for the header name.
+          if (!contentId) {
+            contentId = cr.headers["Content-Id"];
+          }
 
           var rawEntity = cr.data;
           if (rawEntity) {
