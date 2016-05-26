@@ -7089,6 +7089,28 @@
             "module": "breeze"
         },
         {
+            "file": "a45_entityQuery.js",
+            "line": 1066,
+            "itemtype": "property",
+            "name": "In",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
+            "file": "a45_entityQuery.js",
+            "line": 1073,
+            "itemtype": "property",
+            "name": "IsTypeOf",
+            "type": "FilterQueryOp",
+            "final": 1,
+            "static": 1,
+            "class": "FilterQueryOp",
+            "module": "breeze"
+        },
+        {
             "file": "a45_queryOptions.js",
             "line": 13,
             "description": "MergeStrategy.PreserveChanges updates the cached entity with the incoming values unless the cached entity is in a changed\nstate (added, modified, deleted) in which case the incoming values are ignored. The updated cached entity’s EntityState will\nremain {{#crossLink \"EntityState/Unchanged\"}}{{/crossLink}} unless you’re importing entities in which case the new EntityState will\nbe that of the imported entities.",

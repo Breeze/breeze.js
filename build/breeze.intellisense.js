@@ -1,4 +1,4 @@
-// Generated on: Mon May 23 2016 22:53:44 GMT-0700 (Pacific Daylight Time)
+// Generated on: Wed May 25 2016 23:52:27 GMT-0700 (Pacific Daylight Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -2112,6 +2112,10 @@ intellisense.annotate(breeze.breeze.FilterQueryOp, {
   'Any': null,
   /// <field name="All" type="breeze.breeze.FilterQueryOp" >Aliases: 'every'</field>
   'All': null,
+  /// <field name="In" type="breeze.breeze.FilterQueryOp" ></field>
+  'In': null,
+  /// <field name="IsTypeOf" type="breeze.breeze.FilterQueryOp" ></field>
+  'IsTypeOf': null,
 });
 intellisense.annotate(breeze.breeze.MergeStrategy.prototype, {
 

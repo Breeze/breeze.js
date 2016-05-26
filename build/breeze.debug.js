@@ -12176,7 +12176,19 @@ var FilterQueryOp = (function () {
    @static
    **/
   aEnum.All = aEnum.addSymbol({ operator: "all" });
-  
+
+  /**
+   @property In {FilterQueryOp}
+   @final
+   @static
+   **/
+  aEnum.In = aEnum.addSymbol({ operator: "in" });
+
+  /**
+   @property IsTypeOf {FilterQueryOp}
+   @final
+   @static
+   **/
   aEnum.IsTypeOf = aEnum.addSymbol({ operator: "isof" });
   
   aEnum.resolveSymbols();
