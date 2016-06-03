@@ -141,6 +141,40 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("dateTime w/invalid value", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var query = new EntityQuery("Users").take(1);
+
+    em.executeQuery(query).then(function (data) {
+      var user = data.results[0];
+      var oldDate = user.getProperty("modifiedDate");
+      user.setProperty("modifiedDate", "whatever");
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(false, "should not succeed");
+    }).fail(function(err) {
+      ok(err.message == "Client side validation errors encountered - see the entityErrors collection on this object for more detail")
+    }).fin(done);
+  });
+
+  test("dateTimeOffset w/invalid value", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+    var query = new EntityQuery("UnusualDates").take(1);
+
+    em.executeQuery(query).then(function (data) {
+      var ud = data.results[0];
+      var oldDate = ud.getProperty("creationDate");
+      ud.setProperty("creationDate", "whatever");
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(false, "should not succeed");
+    }).fail(function (err) {
+      ok(err.message == "Client side validation errors encountered - see the entityErrors collection on this object for more detail")
+    }).fin(done);
+  });
+
   testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
   test("dateTimeOffset & dateTime2 w/save", function(assert) {
       var done = assert.async();
