@@ -477,6 +477,32 @@
 
   });
 
+  testFns.skipIf(true, "Re-use ctor not supported yet.  Need to wrap user-provided ctor.  See https://github.com/Breeze/breeze.js/issues/133 ").
+  test("attempt to re-use ctor", function () {
+    var em = newEmX();
+    var ctor = function () { this.myname = "myname" };
+
+    try {
+      em.metadataStore.registerEntityTypeCtor("Fruit", ctor);
+      em.metadataStore.registerEntityTypeCtor("Apple", ctor);
+      em.metadataStore.registerEntityTypeCtor("Strawberry", ctor);
+
+      var apple = em.createEntity("Apple", { id: "12" });
+      var straw = em.createEntity("Strawberry", { id: "13" });
+      var fruit = em.createEntity("Fruit", { id: "14" });
+
+      ok(apple.myname == "myname", "Apple myname=" + apple.myname);
+      ok(straw.myname == "myname", "Strawberry myname=" + straw.myname);
+      ok(fruit.myname == "myname", "Fruit myname=" + fruit.myname);
+
+      ok(apple.entityType.shortName == "Apple", "Apple:" + apple.entityType.shortName);
+      ok(straw.entityType.shortName == "Strawberry", "Strawberry:" + straw.entityType.shortName);
+      ok(fruit.entityType.shortName == "Fruit", "Fruit:" + fruit.entityType.shortName);
+    } catch (err) {
+      ok(err.message.indexOf("Cannot register the same constructor") >= 0, err.message);
+    }
+  });
+
   function registerWithAdditionalBaseClass(em, baseTypeName) {
     var rootCtor = testFns.makeEntityCtor(function () {
     });

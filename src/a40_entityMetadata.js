@@ -1617,6 +1617,9 @@ var EntityType = (function () {
     this.initFn = r.initFn;
     this.noTrackingFn = r.noTrackingFn;
 
+    if (aCtor.prototype._$typeName && aCtor.prototype._$typeName != this.name) {
+      console.warn("Registering a constructor for " + this.name + " that is already used for " + aCtor.prototype._$typeName + ".");
+    }
     aCtor.prototype._$typeName = this.name;
     this._setCtor(aCtor);
     return aCtor;
