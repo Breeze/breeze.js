@@ -396,7 +396,14 @@ var Validator = (function () {
   ctor.maxLength = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
-      if (typeof (v) !== "string") return false;
+      if (typeof (v) !== "string") {
+        if (!ctx.property.isScalar && Array.isArray(v)) {
+          return !v.some(function (aValue) {
+            return aValue.length > ctx.maxLength;
+          });
+        }
+        return false;
+      }
       return v.length <= ctx.maxLength;
     };
     return new ctor("maxLength", valFn, context);
