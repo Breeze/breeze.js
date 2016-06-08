@@ -3355,7 +3355,7 @@
             "itemtype": "method",
             "name": "isAddedModifiedOrDeleted",
             "return": {
-                "description": "Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.",
+                "description": "Whether an entityState instance is EntityState.Added or EntityState.Modified or EntityState.Deleted.",
                 "type": "Boolean"
             },
             "class": "EntityState",

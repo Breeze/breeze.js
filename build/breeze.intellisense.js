@@ -1,4 +1,4 @@
-// Generated on: Mon Jun 06 2016 15:44:16 GMT-0700 (Pacific Daylight Time)
+// Generated on: Wed Jun 08 2016 14:55:21 GMT-0700 (Pacific Daylight Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -1113,7 +1113,7 @@ intellisense.annotate(breeze.breeze.EntityState.prototype, {
     /// <signature>
     ///   <summary>
     ///   </summary>
-    ///   <returns type="Boolean" >Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.</returns>
+    ///   <returns type="Boolean" >Whether an entityState instance is EntityState.Added or EntityState.Modified or EntityState.Deleted.</returns>
     /// </signature>
   },
 });
