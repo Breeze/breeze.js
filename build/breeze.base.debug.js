@@ -1420,7 +1420,7 @@ var Event = (function () {
     // subscribers from outer scope.
     subscribers.forEach(function (s) {
       try {
-        s.callback(data);
+        s.callback(data, s.unsubKey);
       } catch (e) {
         e.context = "unable to publish on topic: " + that.name;
         if (errorCallback) {
@@ -1624,7 +1624,8 @@ var Event = (function () {
 
 })();
 
-core.Event = Event;;/**
+core.Event = Event;
+;/**
 @module breeze
 **/
 
@@ -2465,7 +2466,14 @@ var Validator = (function () {
   ctor.maxLength = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
-      if (typeof (v) !== "string") return false;
+      if (typeof (v) !== "string") {
+        if (!ctx.property.isScalar && Array.isArray(v)) {
+          return !v.some(function (aValue) {
+            return aValue.length > ctx.maxLength;
+          });
+        }
+        return false;
+      }
       return v.length <= ctx.maxLength;
     };
     return new ctor("maxLength", valFn, context);
@@ -4858,6 +4866,15 @@ breeze.EntityState = EntityState;
     return em.executeQuery(query, callback, errorCallback);
   };
 
+  relationArrayMixin.create = function (init) {
+    var parent = this.parentEntity;
+    var em = parent.entityAspect.entityManager;
+    var navPropEntityType = this.navigationProperty.entityType;
+    var newNavPropEntity = em.createEntity(navPropEntityType, init);
+    this.push(newNavPropEntity);
+    return newNavPropEntity;
+  };
+
   relationArrayMixin._getEventParent = function () {
     return this.parentEntity.entityAspect;
   };
@@ -4912,6 +4929,12 @@ breeze.EntityState = EntityState;
 
     var invNp = np.inverse;
     var startIx = addsInProcess.length;
+
+    var sortable = relationArray.sortable;
+    if (sortable) {
+      var sortableIndexes = relationArray.sortableIndexes;
+    }
+
     try {
       adds.forEach(function (childEntity) {
         addsInProcess.push(childEntity);
@@ -4925,18 +4948,32 @@ breeze.EntityState = EntityState;
             childEntity.setProperty(fk, parentEntity.getProperty(pks[i].name));
           });
         }
+        if (sortable) {
+          if (childEntity.entityAspect.entityManager && !childEntity.entityAspect.entityManager.isLoading && !childEntity.entityAspect._isRejecting) {
+            sortableIndexes.add(childEntity.uniqueKey);
+          }
+        }
+
       });
     } finally {
       addsInProcess.splice(startIx, adds.length);
     }
-
   }
 
   function processRemoves(relationArray, removes) {
     var inp = relationArray.navigationProperty.inverse;
     if (inp) {
+      var sortable = relationArray.sortable;
+      if (sortable) {
+        var sortableIndexes = relationArray.sortableIndexes;
+      }
       removes.forEach(function (childEntity) {
         childEntity.setProperty(inp.name, null);
+        if (sortable) {
+          if (!relationArray.parentEntity.entityAspect.entityState.isDeleted() && (childEntity.entityAspect.entityManager && !childEntity.entityAspect.entityManager.isLoading || childEntity.entityAspect._isDeleting)) {
+            sortableIndexes.del(childEntity.uniqueKey);
+          }
+        }
       });
     }
   }
@@ -4981,13 +5018,80 @@ breeze.EntityState = EntityState;
     arr.arrayChanged = new Event("arrayChanged", arr);
     // array of pushes currently in process on this relation array - used to prevent recursion.
     arr._addsInProcess = [];
+
+    arr.sortable = (navigationProperty.custom.sortable) ? true : false;
+    arr.refreshSort = function() {
+      var parent = this.parentEntity;
+      var navPropEntityType = this.navigationProperty.entityType;
+      var em = parent.entityAspect.entityManager;
+      this._sorted.length = 0;
+      this.sortableIndexes.forEach(function (uniqueKey) {
+        this._sorted.push(em.getEntityByKey(navPropEntityType, uniqueKey));
+      }, this);
+    };
+    arr._sorted = [];
+    arr._sorted.parentEntity = parentEntity;
+    arr._sorted.create = relationArrayMixin.create.bind(arr);
+    arr._sorted.splice = function() {
+      var args = Array.prototype.slice.call(arguments);
+      var removedEntities = Array.prototype.splice.apply(this, args);
+      removedEntities.forEach(function(childEntity) {
+        arr.sortableIndexes.del(childEntity.uniqueKey);
+      });
+      if (args.length > 2) {
+        var start = args[0];
+        args.slice(2).forEach(function(childEntity) {
+          arr.sortableIndexes.add(childEntity.uniqueKey, start);
+        });
+      }
+      arr.refreshSort();
+      return removedEntities;
+    };
+    Object.defineProperty(arr, 'sorted', {
+      enumerable:   true,
+      configurable: true,
+      get: function() {
+        var refresh = false;
+        if (this.length !== arr._sorted.length) {
+          refresh = true;
+        }
+        if (parentEntity[navigationProperty.custom.sortable] !== this._sortableCopy) {
+          var sortableString = parentEntity[navigationProperty.custom.sortable];
+          this._sortableCopy = sortableString;
+          this.sortableIndexes.length = 0;
+          if (sortableString) {
+            sortableString.split(',').forEach(function(value) {
+              this.sortableIndexes.push(parseInt(value));
+              return ;
+            }, this);
+          }
+          refresh = true;
+        }
+        if (refresh) {
+          arr.refreshSort();
+        }
+        return this._sorted;
+      }
+    });
+    arr.sortableIndexes = [];
+    arr.sortableIndexes.add = function(uniqueKey, position) {
+      position = (position === undefined) ? Infinity: position;
+      this.splice(position, 0, uniqueKey);
+      parentEntity[navigationProperty.custom.sortable] = this.toString();
+    };
+    arr.sortableIndexes.del = function(uniqueKey) {
+      this.splice(this.indexOf(uniqueKey), 1);
+      parentEntity[navigationProperty.custom.sortable] = this.toString();
+    };
+
     // need to use mixins here instead of inheritance because we are starting from an existing array object.
     __extend(arr, observableArray.mixin);
     return __extend(arr, relationArrayMixin);
   }
 
   return makeRelationArray;
-})();;function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
+})();
+;function defaultPropertyInterceptor(property, newValue, rawAccessorFn) {
   // 'this' is the entity itself in this context.
 
   if (newValue === undefined) newValue = null;
@@ -5507,8 +5611,8 @@ var DataType = (function () {
   var resetConstants = function () {
     constants = {
       stringPrefix: "K_",
-      nextNumber: -1,
-      nextNumberIncrement: -1
+      nextNumber: 1,
+      nextNumberIncrement: 1
     };
   };
 
@@ -6052,7 +6156,6 @@ var DataType = (function () {
 })();
 
 breeze.DataType = DataType;
-
 ;/**
 @module breeze
 **/

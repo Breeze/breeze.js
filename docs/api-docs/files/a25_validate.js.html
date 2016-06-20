@@ -600,7 +600,14 @@ var Validator = (function () {
   ctor.maxLength = function (context) {
     var valFn = function (v, ctx) {
       if (v == null) return true;
-      if (typeof (v) !== &quot;string&quot;) return false;
+      if (typeof (v) !== &quot;string&quot;) {
+        if (!ctx.property.isScalar &amp;&amp; Array.isArray(v)) {
+          return !v.some(function (aValue) {
+            return aValue.length &gt; ctx.maxLength;
+          });
+        }
+        return false;
+      }
       return v.length &lt;= ctx.maxLength;
     };
     return new ctor(&quot;maxLength&quot;, valFn, context);

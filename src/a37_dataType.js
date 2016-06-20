@@ -75,8 +75,8 @@ var DataType = (function () {
   var resetConstants = function () {
     constants = {
       stringPrefix: "K_",
-      nextNumber: -1,
-      nextNumberIncrement: -1
+      nextNumber: 1,
+      nextNumberIncrement: 1
     };
   };
 
@@ -620,4 +620,3 @@ var DataType = (function () {
 })();
 
 breeze.DataType = DataType;
-
