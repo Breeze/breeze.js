@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.6",
+        version: "1.5.7",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -4671,7 +4671,7 @@ var EntityState = (function () {
     @example
         return es === EntityState.Added || es === EntityState.Modified || es === EntityState.Deleted
     @method isAddedModifiedOrDeleted
-    @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.
+    @return {Boolean} Whether an entityState instance is EntityState.Added or EntityState.Modified or EntityState.Deleted.
     **/
     isAddedModifiedOrDeleted: function () {
       return this === EntityState.Added ||
@@ -5810,7 +5810,7 @@ var DataType = (function () {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
+    normalize: function(value) { return value && value.getTime && value.getTime(); }, // dates don't perform equality comparisons properly
     fmtOData: fmtDateTime,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
@@ -5826,7 +5826,7 @@ var DataType = (function () {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function(value) { return value && value.getTime(); }, // dates don't perform equality comparisons properly
+    normalize: function (value) { return value && value.getTime && value.getTime(); }, // dates don't perform equality comparisons properly
     fmtOData: fmtDateTimeOffset,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
@@ -7945,6 +7945,9 @@ var EntityType = (function () {
     this.initFn = r.initFn;
     this.noTrackingFn = r.noTrackingFn;
 
+    if (aCtor.prototype._$typeName && aCtor.prototype._$typeName != this.name) {
+      console.warn("Registering a constructor for " + this.name + " that is already used for " + aCtor.prototype._$typeName + ".");
+    }
     aCtor.prototype._$typeName = this.name;
     this._setCtor(aCtor);
     return aCtor;

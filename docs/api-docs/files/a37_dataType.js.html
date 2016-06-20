@@ -582,7 +582,7 @@ var DataType = (function () {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function(value) { return value &amp;&amp; value.getTime(); }, // dates don&#x27;t perform equality comparisons properly
+    normalize: function(value) { return value &amp;&amp; value.getTime &amp;&amp; value.getTime(); }, // dates don&#x27;t perform equality comparisons properly
     fmtOData: fmtDateTime,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
@@ -598,7 +598,7 @@ var DataType = (function () {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function(value) { return value &amp;&amp; value.getTime(); }, // dates don&#x27;t perform equality comparisons properly
+    normalize: function (value) { return value &amp;&amp; value.getTime &amp;&amp; value.getTime(); }, // dates don&#x27;t perform equality comparisons properly
     fmtOData: fmtDateTimeOffset,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime

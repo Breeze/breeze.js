@@ -300,7 +300,7 @@ var EntityState = (function () {
     @example
         return es === EntityState.Added || es === EntityState.Modified || es === EntityState.Deleted
     @method isAddedModifiedOrDeleted
-    @return {Boolean} Whether an entityState instance is EntityState.Unchanged or EntityState.Modified or EntityState.Deleted.
+    @return {Boolean} Whether an entityState instance is EntityState.Added or EntityState.Modified or EntityState.Deleted.
     **/
     isAddedModifiedOrDeleted: function () {
       return this === EntityState.Added ||
