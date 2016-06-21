@@ -205,9 +205,16 @@ breeze.makeRelationArray = (function () {
       var parent = this.parentEntity;
       var navPropEntityType = this.navigationProperty.entityType;
       var em = parent.entityAspect.entityManager;
+      var previousEntities = this._sorted.slice();
       this._sorted.length = 0;
       this.sortableIndexes.forEach(function (uniqueKey) {
-        this._sorted.push(em.getEntityByKey(navPropEntityType, uniqueKey));
+        var entity = em.getEntityByKey(navPropEntityType, uniqueKey);
+        if (!entity) {
+          entity = previousEntities.find(function(previousEntity) {
+            return (previousEntity.uniqueKey === uniqueKey);
+          });
+        }
+        this._sorted.push(entity);
       }, this);
     };
     arr._sorted = [];
