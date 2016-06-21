@@ -80,7 +80,7 @@ var Event = (function () {
     // subscribers from outer scope.
     subscribers.forEach(function (s) {
       try {
-        s.callback(data);
+        s.callback(data, s.unsubKey);
       } catch (e) {
         e.context = "unable to publish on topic: " + that.name;
         if (errorCallback) {

@@ -439,7 +439,7 @@
             "module": "breeze",
             "namespace": "",
             "file": "a25_validate.js",
-            "line": 890,
+            "line": 897,
             "description": "A ValidationError is used to describe a failed validation."
         },
         "ValidationOptions": {
@@ -1793,7 +1793,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 405,
+            "line": 412,
             "description": "Returns a standard string length Validator; both minimum and maximum lengths must be specified.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var regionProperty - custType.getProperty(\"Region\");\n    // Validates that the value of the Region property on Customer will be\n    // between 2 and 5 characters\n    regionProperty.validators.push(Validator.stringLength( {minLength: 2, maxLength: 5});"
@@ -1829,7 +1829,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 432,
+            "line": 439,
             "description": "Returns a standard string dataType Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var regionProperty - custType.getProperty(\"Region\");\n    // Validates that the value of the Region property on Customer is a string.\n    regionProperty.validators.push(Validator.string());"
@@ -1846,7 +1846,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 452,
+            "line": 459,
             "description": "Returns a Guid data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var customerIdProperty - custType.getProperty(\"CustomerID\");\n    // Validates that the value of the CustomerID property on Customer is a Guid.\n    customerIdProperty.validators.push(Validator.guid());"
@@ -1863,7 +1863,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 472,
+            "line": 479,
             "description": "Returns a ISO 8601 duration string  Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var eventType = em1.metadataStore.getEntityType(\"Event\");\n    var elapsedTimeProperty - eventType.getProperty(\"ElapsedTime\");\n    // Validates that the value of the ElapsedTime property on Customer is a duration.\n    elapsedTimeProperty.validators.push(Validator.duration());"
@@ -1880,7 +1880,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 492,
+            "line": 499,
             "description": "Returns a standard numeric data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var freightProperty - orderType.getProperty(\"Freight\");\n    // Validates that the value of the Freight property on Order is a number.\n    freightProperty.validators.push(Validator.number());"
@@ -1897,7 +1897,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 517,
+            "line": 524,
             "description": "Returns a standard large integer data type - 64 bit - Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var freightProperty - orderType.getProperty(\"Freight\");\n    // Validates that the value of the Freight property on Order is within the range of a 64 bit integer.\n    freightProperty.validators.push(Validator.int64());"
@@ -1914,7 +1914,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 540,
+            "line": 547,
             "description": "Returns a standard 32 bit integer data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var freightProperty - orderType.getProperty(\"Freight\");\n    freightProperty.validators.push(Validator.int32());"
@@ -1931,7 +1931,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 555,
+            "line": 562,
             "description": "Returns a standard 16 bit integer data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var freightProperty - orderType.getProperty(\"Freight\");\n    // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.\n    freightProperty.validators.push(Validator.int16());"
@@ -1948,7 +1948,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 571,
+            "line": 578,
             "description": "Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var freightProperty - orderType.getProperty(\"Freight\");\n    // Validates that the value of the Freight property on Order is within the range of a 16 bit integer.\n    // Probably not a very good validation to place on the Freight property.\n    regionProperty.validators.push(Validator.byte());"
@@ -1965,7 +1965,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 588,
+            "line": 595,
             "description": "Returns a standard boolean data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var productType = em1.metadataStore.getEntityType(\"Product\");\n    var discontinuedProperty - productType.getProperty(\"Discontinued\");\n    // Validates that the value of the Discontinued property on Product is a boolean\n    discontinuedProperty.validators.push(Validator.bool());"
@@ -1982,7 +1982,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 615,
+            "line": 622,
             "description": "Returns a standard date data type Validator.",
             "example": [
                 "\n    // Assume em1 is a preexisting EntityManager.\n    var orderType = em1.metadataStore.getEntityType(\"Order\");\n    var orderDateProperty - orderType.getProperty(\"OrderDate\");\n    // Validates that the value of the OrderDate property on Order is a date\n    // Probably not a very good validation to place on the Freight property.\n    orderDateProperty.validators.push(Validator.date());"
@@ -1999,7 +1999,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 646,
+            "line": 653,
             "description": "Returns a credit card number validator\nPerforms a luhn algorithm checksum test for plausability\ncatches simple mistakes; only service knows for sure",
             "example": [
                 "\n    // Assume em is a preexisting EntityManager.\n    var personType = em.metadataStore.getEntityType(\"Person\");\n    var creditCardProperty = personType.getProperty(\"creditCard\");\n    // Validates that the value of the Person.creditCard property is credit card.\n    creditCardProperty.validators.push(Validator.creditCard());"
@@ -2024,7 +2024,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 679,
+            "line": 686,
             "description": "Returns a regular expression validator; the expression must be specified",
             "example": [
                 "\n    // Add validator to a property. Assume em is a preexisting EntityManager.\n    var customerType = em.metadataStore.getEntityType(\"Customer\");\n    var regionProperty = customerType.getProperty(\"Region\");\n    // Validates that the value of Customer.Region is 2 char uppercase alpha.\n    regionProperty.validators.push(Validator.regularExpression( {expression: '^[A-Z]{2}$'} );"
@@ -2055,7 +2055,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 708,
+            "line": 715,
             "description": "Returns the email address validator",
             "example": [
                 "\n    // Assume em is a preexisting EntityManager.\n    var personType = em.metadataStore.getEntityType(\"Person\");\n    var emailProperty = personType.getProperty(\"email\");\n    // Validates that the value of the Person.email property is an email address.\n    emailProperty.validators.push(Validator.emailAddress());"
@@ -2080,7 +2080,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 727,
+            "line": 734,
             "description": "Returns the phone validator\nProvides basic assertions on the format and will help to eliminate most nonsense input\nMatches:\nInternational dialing prefix: {{}, +, 0, 0000} (with or without a trailing break character, if not '+': [-/. ])\n> ((\\+)|(0(\\d+)?[-/.\\s]))\nCountry code: {{}, 1, ..., 999} (with or without a trailing break character: [-/. ])\n> [1-9]\\d{,2}[-/.\\s]?\nArea code: {(0), ..., (000000), 0, ..., 000000} (with or without a trailing break character: [-/. ])\n> ((\\(\\d{1,6}\\)|\\d{1,6})[-/.\\s]?)?\nLocal: {0, ...}+ (with or without a trailing break character: [-/. ])\n> (\\d+[-/.\\s]?)+\\d+",
             "example": [
                 "\n    // Assume em is a preexisting EntityManager.\n    var customerType = em.metadataStore.getEntityType(\"Customer\");\n    var phoneProperty = customerType.getProperty(\"phone\");\n    // Validates that the value of the Customer.phone property is phone.\n    phoneProperty.validators.push(Validator.phone());"
@@ -2105,7 +2105,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 756,
+            "line": 763,
             "description": "Returns the URL (protocol required) validator",
             "example": [
                 "\n    // Assume em is a preexisting EntityManager.\n    var personType = em.metadataStore.getEntityType(\"Person\");\n    var websiteProperty = personType.getProperty(\"website\");\n    // Validates that the value of the Person.website property is a URL.\n    websiteProperty.validators.push(Validator.url());"
@@ -2130,7 +2130,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 775,
+            "line": 782,
             "description": "Creates a regular expression validator with a fixed expression.\nMany of the stock validators are built with this factory method.\nTheir expressions are often derived from\nhttps://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions\nYou can try many of them at http://dataannotationsextensions.org/",
             "example": [
                 "\n    // Make a zipcode validator\n    function zipValidator = Validator.makeRegExpValidator(\n    \"zipVal,\n    /^\\d{5}([\\-]\\d{4})?$/,\n    \"The %displayName% '%value%' is not a valid U.S. zipcode\");\n    // Register it.\n    Validator.register(zipValidator);\n    // Add it to a data property. Assume em is a preexisting EntityManager.\n    var custType = em.metadataStore.getEntityType(\"Customer\");\n    var zipProperty = custType.getProperty(\"PostalCode\");\n    zipProperty.validators.push(zipValidator);"
@@ -2171,7 +2171,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 896,
+            "line": 903,
             "description": "Constructs a new ValidationError",
             "itemtype": "method",
             "name": "<ctor> ValidationError",
@@ -2203,7 +2203,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 926,
+            "line": 933,
             "description": "The Validator associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "validator",
@@ -2213,7 +2213,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 933,
+            "line": 940,
             "description": "A 'context' object associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "context",
@@ -2223,7 +2223,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 940,
+            "line": 947,
             "description": "The DataProperty or NavigationProperty associated with this ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "property",
@@ -2233,7 +2233,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 947,
+            "line": 954,
             "description": "The property name associated with this ValidationError. This will be a \"property path\" for any properties of a complex object.\n\n__readOnly__",
             "itemtype": "property",
             "name": "propertyName",
@@ -2243,7 +2243,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 954,
+            "line": 961,
             "description": "The error message associated with the ValidationError.\n\n__readOnly__",
             "itemtype": "property",
             "name": "errorMessage",
@@ -2253,7 +2253,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 961,
+            "line": 968,
             "description": "The key by which this validation error may be removed from a collection of ValidationErrors.\n\n__readOnly__",
             "itemtype": "property",
             "name": "key",
@@ -2263,7 +2263,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 968,
+            "line": 975,
             "description": "Whether this is a server error.\n\n__readOnly__",
             "itemtype": "property",
             "name": "isServerError",
@@ -2273,7 +2273,7 @@
         },
         {
             "file": "a25_validate.js",
-            "line": 976,
+            "line": 983,
             "description": "Composes a ValidationError 'key' given a validator or an errorName and an optional propertyName",
             "itemtype": "method",
             "name": "getKey",
