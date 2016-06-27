@@ -1,7 +1,7 @@
 // Type definitions for Breeze 1.5.x
 // Project: http://www.breezejs.com/
-// Definitions by: Boris Yankov <https://github.com/borisyankov/>
-// Definitions: https://github.com/borisyankov/DefinitelyTyped
+// Definitions by: Boris Yankov <https://github.com/borisyankov/>, IdeaBlade <https://github.com/IdeaBlade/Breeze/>
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 // Updated Jan 14 2011 - Jay Traband ( www.ideablade.com).
 // Updated Aug 13 2013 - Steve Schmitt ( www.ideablade.com).
@@ -11,8 +11,9 @@
 // Updated Jan 16 2015 for Breeze 1.4.17 to add support for noimplicitany - Kevin Wilson ( www.kwilson.me.uk )
 // Updated Jan 20 2015 for Breeze 1.5.2 and merging changes from DefinitelyTyped
 // Updated Feb 28 2015 add any/all clause on Predicate
+// Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
 
-declare module breeze.core {
+declare namespace breeze.core {
 
     interface ErrorCallback {
         (error: Error): void;
@@ -89,7 +90,7 @@ declare module breeze.core {
     export function formatString(format: string, ...args: any[]): string;
 }
 
-declare module breeze {
+declare namespace breeze {
 
     interface Entity {
         entityAspect: EntityAspect;
@@ -103,6 +104,7 @@ declare module breeze {
 
     interface IProperty {
         name: string;
+        nameOnServer: string;
         parentType: IStructuralType;
         validators: Validator[];
         isDataProperty: boolean;
@@ -412,6 +414,7 @@ declare module breeze {
         constructor(config?: EntityManagerOptions);
         constructor(config?: string);
 
+        acceptChanges(): void;
         addEntity(entity: Entity): Entity;
         attachEntity(entity: Entity, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         clear(): void;
@@ -769,6 +772,7 @@ declare module breeze {
         isNavigationProperty: boolean;
         isScalar: boolean;
         name: string;
+        nameOnServer: string;
         parentType: IStructuralType;
         relatedDataProperties: DataProperty[];
         validators: Validator[];
@@ -1009,7 +1013,7 @@ declare module breeze {
     var version: string;
 }
 
-declare module breeze.config {
+declare namespace breeze.config {
     var ajax: string;
     var dataService: string;
     var functionRegistry: Object;
@@ -1081,7 +1085,7 @@ declare module breeze.config {
 }
 
 /** Promises interface used by Breeze.  Usually implemented by Q (https://github.com/kriskowal/q) or angular.$q using breeze.config.setQ(impl) */
-declare module breeze.promises {
+declare namespace breeze.promises {
     interface IPromise<T> {
         then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U): IPromise<U>;
         then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => U): IPromise<U>;
