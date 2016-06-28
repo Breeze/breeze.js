@@ -105,6 +105,7 @@ declare namespace breeze {
     interface IProperty {
         name: string;
         nameOnServer: string;
+        displayName: string;
         parentType: IStructuralType;
         validators: Validator[];
         isDataProperty: boolean;
@@ -164,6 +165,7 @@ declare namespace breeze {
         maxLength: number;
         name: string;
         nameOnServer: string;
+        displayName: string;
         parentType: IStructuralType;
         relatedNavigationProperty: NavigationProperty;
         validators: Validator[];
@@ -773,6 +775,7 @@ declare namespace breeze {
         isScalar: boolean;
         name: string;
         nameOnServer: string;
+        displayName: string;
         parentType: IStructuralType;
         relatedDataProperties: DataProperty[];
         validators: Validator[];
