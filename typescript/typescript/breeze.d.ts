@@ -795,14 +795,16 @@ declare namespace breeze {
     }
 
     class Predicate {
+        constructor();
         constructor(property: string, operator: string, value: any);
         constructor(property: string, operator: FilterQueryOpSymbol, value: any);
         constructor(property: string, operator: string, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
         constructor(property: string, operator: FilterQueryOpSymbol, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
         constructor(property: string, filterop: FilterQueryOpSymbol, property2: string, filterop2: FilterQueryOpSymbol, value: any);  // for any/all clauses
         constructor(property: string, filterop: string, property2: string, filterop2: string, value: any);  // for any/all clauses
-        /** Create predicate from an expression tree */
-        constructor(tree: Object);
+        constructor(tree: Object);  /** Create predicate from an expression tree/json object */
+        constructor(passthru: string);
+        constructor(predicate: Predicate);
 
         and: PredicateMethod;
         static and: PredicateMethod;
