@@ -794,6 +794,10 @@ declare namespace breeze {
         validators?: Validator[];
     }
 
+    interface IRecursiveArray<T> {
+        [i: number]: T | IRecursiveArray<T>;
+    }
+    
     class Predicate {
         constructor();
         constructor(property: string, operator: string, value: any);
@@ -802,9 +806,9 @@ declare namespace breeze {
         constructor(property: string, operator: FilterQueryOpSymbol, value: { value: any; isLiteral?: boolean; dataType?: breeze.DataType });
         constructor(property: string, filterop: FilterQueryOpSymbol, property2: string, filterop2: FilterQueryOpSymbol, value: any);  // for any/all clauses
         constructor(property: string, filterop: string, property2: string, filterop2: string, value: any);  // for any/all clauses
-        constructor(tree: Object);  /** Create predicate from an expression tree/json object */
         constructor(passthru: string);
         constructor(predicate: Predicate);
+        constructor(anArray: IRecursiveArray<string | number | FilterQueryOpSymbol | Predicate>);
 
         and: PredicateMethod;
         static and: PredicateMethod;
