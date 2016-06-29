@@ -13,7 +13,12 @@
 // Updated Feb 28 2015 add any/all clause on Predicate
 // Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
 
+//~{{#unless modules}}
 declare namespace breeze.core {
+//~{{/unless}}
+//~{{#if modules}}
+//~export namespace core {
+//~{{/if}}
 
     export interface ErrorCallback {
         (error: Error): void;
@@ -90,7 +95,9 @@ declare namespace breeze.core {
     export function formatString(format: string, ...args: any[]): string;
 }
 
+//~{{#unless modules}}
 declare namespace breeze {
+//~{{/unless}}
 
     export interface Entity {
         entityAspect: EntityAspect;
@@ -1019,9 +1026,16 @@ declare namespace breeze {
     export var remoteAccess_webApi: string;
     export var version: string;
 
+//~{{#unless modules}}
 }
+//~{{/unless}}
 
+//~{{#unless modules}}
 declare namespace breeze.config {
+//~{{/unless}}
+//~{{#if modules}}
+//~export namespace config {
+//~{{/if}}
 
     export var ajax: string;
     export var dataService: string;
@@ -1094,7 +1108,12 @@ declare namespace breeze.config {
 }
 
 /** Promises interface used by Breeze.  Usually implemented by Q (https://github.com/kriskowal/q) or angular.$q using breeze.config.setQ(impl) */
+//~{{#unless modules}}
 declare namespace breeze.promises {
+//~{{/unless}}
+//~{{#if modules}}
+//~export namespace promises {
+//~{{/if}}
 
     export interface IPromise<T> {
         then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U): IPromise<U>;
@@ -1120,6 +1139,8 @@ declare namespace breeze.promises {
     }
 }
 
+//~{{#unless modules}}
 declare module "breeze" {
     export = breeze;
 }
+//~{{/unless}}
