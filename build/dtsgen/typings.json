@@ -1,0 +1,6 @@
+{
+  "globalDependencies": {
+    "handlebars": "registry:dt/handlebars#3.0.3+20160317120654",
+    "node": "registry:dt/node#4.0.0+20160509154515"
+  }
+}

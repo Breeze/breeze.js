@@ -1,0 +1,20 @@
+{
+  "name": "dtsgen",
+  "version": "1.0.0",
+  "description": "Node script to convert annotated breeze.d.ts file to module definitions.",
+  "main": "dtsgen.js",
+  "scripts": {
+    "typings": "typings",
+    "postinstall": "typings install"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typings": "^1.0.4"
+  },
+  "dependencies": {
+    "fs": "0.0.2",
+    "handlebars": "^4.0.5",
+    "path": "^0.12.7"
+  }
+}
