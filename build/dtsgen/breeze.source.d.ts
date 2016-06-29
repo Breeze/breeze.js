@@ -12,6 +12,7 @@
 // Updated Jan 20 2015 for Breeze 1.5.2 and merging changes from DefinitelyTyped
 // Updated Feb 28 2015 add any/all clause on Predicate
 // Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
+// Updated Jun 29 2016 - Marcel Good (www.ideablade.com)
 
 //~{{#unless modules}}
 declare namespace breeze.core {
@@ -597,6 +598,8 @@ declare namespace breeze {
         where(property: string, filterop: FilterQueryOpSymbol, property2: string, filterop2: FilterQueryOpSymbol, value: any): EntityQuery;  // for any/all clauses
         where(property: string, filterop: string, property2: string, filterop2: string, value: any): EntityQuery;  // for any/all clauses
         where(predicate: FilterQueryOpSymbol): EntityQuery;
+        where(anArray: IRecursiveArray<string | number | FilterQueryOpSymbol | Predicate>): EntityQuery;
+
         withParameters(params: Object): EntityQuery;
 
         toJSON(): string;
