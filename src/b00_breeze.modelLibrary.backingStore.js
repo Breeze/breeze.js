@@ -86,7 +86,7 @@
 
       } else if (prop.isNavigationProperty) {
         if (val !== undefined) {
-          throw new Error("Cannot assign a navigation property in an entity ctor.: " + prop.Name);
+          throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
         }
         if (prop.isScalar) {
           // TODO: change this to nullstob later.

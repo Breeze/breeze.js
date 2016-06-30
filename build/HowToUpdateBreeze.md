@@ -32,6 +32,6 @@
 
 1. Update `breeze.github.io/doc-js/release-notes.md` with version information
 1. Make a zip file, `breeze-client-x.x.x.zip` in breeze.js/build and copy it to breeze.github.io/downloads
-1. Update `breeze.github.io/doc-js/download.html` with new zip file link (line 9)
+1. Update `breeze.github.io/doc-js/download.html` with new zip file link (line 9 and 10)
 1. Update `breeze.github.io/doc-js/download.html` with commit SHA (line 31 and 32) from https://github.com/Breeze/breeze.js
 
