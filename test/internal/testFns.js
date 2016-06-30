@@ -226,6 +226,10 @@
     var ds = core.config.initializeAdapterInstance("dataService", dataServiceAdapterName);
     //ds.relativeUrl = true; // for testing relative URL in webApiOData adapter
     testFns.dataService = ds.name;
+    if (version == "odata") {
+      ds.headers = ds.headers || {};
+      ds.headers["X-Test-Header"] = "foo-odata";
+    }
 
     if (testFns.TEST_RECOMPOSITION && testFns.DEBUG_DOTNET_WEBAPI) {
       var oldAjaxCtor = core.config.getAdapter("ajax");

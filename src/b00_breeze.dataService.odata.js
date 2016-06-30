@@ -162,11 +162,14 @@
       url = this.getAbsoluteUrl(dataService, '$metadata');
     }
 
+    var mheaders = __extend({}, this.headers);
+    mheaders.Accept = 'application/json;odata.metadata=full';
+
     // OData.read(url,
     OData.read({
           requestUri: url,
           // headers: { "Accept": "application/json"}
-          headers: { Accept: 'application/json;odata.metadata=full' }
+          headers: mheaders
         },
         function (data) {
           // data.dataServices.schema is an array of schemas. with properties of
@@ -225,7 +228,7 @@
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: { "DataServiceVersion": "2.0" },
+      headers: this.headers,
       requestUri: url,
       method: "POST",
       data: requestData
