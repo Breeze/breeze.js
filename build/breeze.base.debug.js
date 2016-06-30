@@ -8794,6 +8794,20 @@ var DataProperty = (function () {
   **/
 
   /**
+  The display name of this property
+
+  __readOnly__
+  @property displayName {String} 
+  **/
+  
+  /**
+  The name of this property on the server
+
+  __readOnly__
+  @property nameOnServer {String} 
+  **/
+  
+  /**
   The parent type that this property belongs to - will be either a {{#crossLink "EntityType"}}{{/crossLink}} or a {{#crossLink "ComplexType"}}{{/crossLink}}.
 
   __readOnly__
@@ -9090,6 +9104,20 @@ var NavigationProperty = (function () {
   @property name {String}
   **/
 
+  /**
+  The display name of this property
+
+  __readOnly__
+  @property displayName {String} 
+  **/
+  
+  /**
+  The name of this property on the server
+
+  __readOnly__
+  @property nameOnServer {String} 
+  **/
+  
   /**
   The {{#crossLink "EntityType"}}{{/crossLink}} returned by this property.
 

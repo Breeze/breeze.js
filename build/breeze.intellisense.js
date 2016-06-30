@@ -1,4 +1,4 @@
-// Generated on: Wed Jun 08 2016 16:35:07 GMT-0700 (Pacific Daylight Time)
+// Generated on: Thu Jun 30 2016 10:12:23 GMT-0700 (Pacific Daylight Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -1671,6 +1671,10 @@ intellisense.annotate(breeze.breeze.DataProperty.prototype, {
   },
   /// <field name="name" type="String" >The name of this property</field>
   'name': null,
+  /// <field name="displayName" type="String" >The display name of this property</field>
+  'displayName': null,
+  /// <field name="nameOnServer" type="String" >The name of this property on the server</field>
+  'nameOnServer': null,
   /// <field name="parentType" type="EntityType|ComplexType" >The parent type that this property belongs to - will be either a  'EntityType' or a  'ComplexType'.</field>
   'parentType': null,
   /// <field name="dataType" type="breeze.breeze.DataType" >The  'DataType' of this property.</field>
@@ -1725,6 +1729,10 @@ intellisense.annotate(breeze.breeze.NavigationProperty.prototype, {
   'parentEntityType': null,
   /// <field name="name" type="String" >The name of this property</field>
   'name': null,
+  /// <field name="displayName" type="String" >The display name of this property</field>
+  'displayName': null,
+  /// <field name="nameOnServer" type="String" >The name of this property on the server</field>
+  'nameOnServer': null,
   /// <field name="entityType" type="breeze.breeze.EntityType" >The  'EntityType' returned by this property.</field>
   'entityType': null,
   /// <field name="isScalar" type="Boolean" >Whether this property returns a single entity or an array of entities.</field>
