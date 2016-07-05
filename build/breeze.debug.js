@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.7",
+        version: "1.5.8",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -16637,11 +16637,14 @@ breeze.SaveOptions = SaveOptions;
       url = this.getAbsoluteUrl(dataService, '$metadata');
     }
 
+    var mheaders = __extend({}, this.headers);
+    mheaders.Accept = 'application/json;odata.metadata=full';
+
     // OData.read(url,
     OData.read({
           requestUri: url,
           // headers: { "Accept": "application/json"}
-          headers: { Accept: 'application/json;odata.metadata=full' }
+          headers: mheaders
         },
         function (data) {
           // data.dataServices.schema is an array of schemas. with properties of
@@ -16700,7 +16703,7 @@ breeze.SaveOptions = SaveOptions;
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: { "DataServiceVersion": "2.0" },
+      headers: this.headers,
       requestUri: url,
       method: "POST",
       data: requestData
@@ -17158,7 +17161,7 @@ breeze.SaveOptions = SaveOptions;
 
       } else if (prop.isNavigationProperty) {
         if (val !== undefined) {
-          throw new Error("Cannot assign a navigation property in an entity ctor.: " + prop.Name);
+          throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
         }
         if (prop.isScalar) {
           // TODO: change this to nullstob later.
