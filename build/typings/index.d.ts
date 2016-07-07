@@ -13,6 +13,7 @@
 // Updated Feb 28 2015 add any/all clause on Predicate
 // Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
 // Updated Jun 29 2016 - Marcel Good (www.ideablade.com)
+// Updated Jul 07 2016 - Marcel Good (www.ideablade.com)
 
 export namespace core {
 
@@ -729,6 +730,7 @@ export namespace core {
         getEntityTypes(): IStructuralType[];
         hasMetadataFor(serviceName: string): boolean;
         static importMetadata(exportedString: string): MetadataStore;
+        static normalizeTypeName(typeName: string): string;
         importMetadata(exportedString: string, allowMerge?: boolean): MetadataStore;
         isEmpty(): boolean;
         registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (node: Object, entityType: EntityType) => Object): void;

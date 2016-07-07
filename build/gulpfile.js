@@ -120,7 +120,7 @@ function mapPath(dir, fileNames) {
 };
 
 function buildTypescriptDefinition(filename, modules) {
-  var stream = gulp.src( mapPath('../typescript/', [ 'breeze.d.ts' ]))
+  var stream = gulp.src( mapPath('../typescript/', [ 'breeze.source.d.ts' ]))
       .pipe(replace(/\/\/~/g, ''))
       .pipe(handlebars({ modules: modules }));
 
