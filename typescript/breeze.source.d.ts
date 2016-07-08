@@ -249,6 +249,7 @@ declare namespace breeze {
 
     export interface NodeContext {
         nodeType: string;
+        propertyName: string;
     }
 
     export class DataTypeSymbol extends breeze.core.EnumSymbol {

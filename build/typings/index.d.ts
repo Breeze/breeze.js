@@ -241,6 +241,7 @@ export namespace core {
 
     export interface NodeContext {
         nodeType: string;
+        propertyName: string;
     }
 
     export class DataTypeSymbol extends core.EnumSymbol {
