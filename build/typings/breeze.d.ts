@@ -13,6 +13,7 @@
 // Updated Feb 28 2015 add any/all clause on Predicate
 // Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
 // Updated Jun 29 2016 - Marcel Good (www.ideablade.com)
+// Updated Jul 07 2016 - Marcel Good (www.ideablade.com)
 
 declare namespace breeze.core {
 
