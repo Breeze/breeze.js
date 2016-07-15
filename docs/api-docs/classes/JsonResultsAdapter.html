@@ -374,8 +374,40 @@ This facility makes it possible for breeze to talk to virtually any web service 
                                 
 
                                 <div class="param-description">
-                                    <p>Called once per service operation to extract the &#39;payload&#39; from any json received over the wire.
+                                    <p>Called once per query operation to extract the &#39;payload&#39; from any json received over the wire.
 This method has a default implementation which to simply return the &quot;results&quot; property from any json returned as a result of executing the query.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[extractSaveResults]</code>
+                                    <span class="type">Function</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>Called once per save operation to extract the entities from any json received over the wire.  Must return an array.
+This method has a default implementation which to simply return the &quot;entities&quot; property from any json returned as a result of executing the save.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[extractKeyMappings]</code>
+                                    <span class="type">Function</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>Called once per save operation to extract the key mappings from any json received over the wire.  Must return an array.
+This method has a default implementation which to simply return the &quot;keyMappings&quot; property from any json returned as a result of executing the save.</p>
 
                                 </div>
 

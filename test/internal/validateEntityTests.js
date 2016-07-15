@@ -336,7 +336,7 @@
     ok(cust1.entityAspect.getValidationErrors().length === 1);
     var valErrors = cust1.entityAspect.getValidationErrors();
     var errMessage = valErrors[0].errorMessage;
-    ok(errMessage.indexOf("companyName") >= 0, errMessage);
+    ok(errMessage.indexOf("must be a string with 40 characters or less") >= 0, errMessage);
     cust1.setProperty("companyName", "much shorter");
     valErrors = cust1.entityAspect.getValidationErrors();
     ok(valErrors.length === 0, "should be no validation errors now");

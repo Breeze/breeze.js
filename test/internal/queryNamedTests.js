@@ -404,7 +404,7 @@
         var results = data.results;
         ok(results.length === 5);
         ok(results[0].name);
-        ok(results[0].namespace);
+        ok(results[0].namespace !== undefined);
         ok(results[0].fullName);
       }).fail(testFns.handleFail).fin(done);
     });
@@ -455,7 +455,7 @@
       var em = newEm();
 
       var query = EntityQuery.from("CustomersWithBigOrders")
-          .where("companyName", "startsWith", "A")
+          .where("Customer.companyName", "startsWith", "A")
           .using(em);
 
       query.execute().then(function (data) {

@@ -85,7 +85,7 @@
       ba1.setProperty("owner", "test value that is too long");
       ves = ba1.entityAspect.getValidationErrors();
       ok(ves.length == 1);
-      ok(ves[0].errorMessage == "<Owner> must be > 0 and <= 25 in length.");
+      ok(ves[0].errorMessage == "<Owner> must be > 0 and <= 25 in length.", ves[0].errorMessage);
     }).fail(testFns.handleFail).fin(done);
   });
 

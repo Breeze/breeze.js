@@ -223,10 +223,14 @@ declare namespace breeze {
     export class JsonResultsAdapter {
         name: string;
         extractResults: (data: {}) => {};
+        extractSaveResults: (data: {}) => any[];
+        extractKeyMappings: (data: {}) => KeyMapping[];
         visitNode: (node: {}, queryContext: QueryContext, nodeContext: NodeContext) => { entityType?: EntityType; nodeId?: any; nodeRefId?: any; ignore?: boolean; };
         constructor(config: {
             name: string;
             extractResults?: (data: {}) => {};
+            extractSaveResults: (data: {}) => any[];
+            extractKeyMappings: (data: {}) => KeyMapping[];
             visitNode: (node: {}, queryContext: QueryContext, nodeContext: NodeContext) => { entityType?: EntityType; nodeId?: any; nodeRefId?: any; ignore?: boolean; };
         });
     }
@@ -241,6 +245,7 @@ declare namespace breeze {
 
     export interface NodeContext {
         nodeType: string;
+        propertyName: string;
     }
 
     export class DataTypeSymbol extends breeze.core.EnumSymbol {
@@ -730,6 +735,7 @@ declare namespace breeze {
         getEntityTypes(): IStructuralType[];
         hasMetadataFor(serviceName: string): boolean;
         static importMetadata(exportedString: string): MetadataStore;
+        static normalizeTypeName(typeName: string): string;
         importMetadata(exportedString: string, allowMerge?: boolean): MetadataStore;
         isEmpty(): boolean;
         registerEntityTypeCtor(entityTypeName: string, entityCtor: Function, initializationFn?: (entity: Entity) => void, noTrackingFn?: (node: Object, entityType: EntityType) => Object): void;
@@ -906,8 +912,14 @@ declare namespace breeze {
 
     export interface SaveResult {
         entities: Entity[];
-        keyMappings: any;
+        keyMappings: KeyMapping[];
         XHR: XMLHttpRequest;
+    }
+
+    export interface KeyMapping {
+        entityTypeName: string;
+        tempValue: any;
+        realValue: any;
     }
 
     export class ValidationError {

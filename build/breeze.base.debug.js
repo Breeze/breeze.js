@@ -633,6 +633,15 @@ function __formatString(string) {
   });
 }
 
+// Change text to title case with spaces, e.g. 'myPropertyName12' to 'My Property Name 12'
+// See http://stackoverflow.com/questions/7225407/convert-camelcasetext-to-camel-case-text
+var __camelEdges = /([A-Z](?=[A-Z][a-z])|[^A-Z](?=[A-Z])|[a-zA-Z](?=[^a-zA-Z]))/g;
+function __titleCaseSpace(text) {
+  text = text.replace(__camelEdges, '$1 ');
+  text = text.charAt(0).toUpperCase() + text.slice(1);
+  return text;
+}
+
 // end of string functions
 
 // See Mark Miller’s explanation of what this does.
@@ -689,6 +698,7 @@ core.isNumeric = __isNumeric;
 core.stringStartsWith = __stringStartsWith;
 core.stringEndsWith = __stringEndsWith;
 core.formatString = __formatString;
+core.titleCase = __titleCaseSpace;
 
 core.getPropertyDescriptor = __getPropDescriptor;
 
@@ -6295,8 +6305,12 @@ var JsonResultsAdapter = (function () {
   @method <ctor> JsonResultsAdapter
   @param config {Object}
   @param config.name {String} The name of this adapter.  This name is used to uniquely identify and locate this instance when an 'exported' JsonResultsAdapter is later imported.
-  @param [config.extractResults] {Function} Called once per service operation to extract the 'payload' from any json received over the wire.
+  @param [config.extractResults] {Function} Called once per query operation to extract the 'payload' from any json received over the wire.
   This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query.
+  @param [config.extractSaveResults] {Function} Called once per save operation to extract the entities from any json received over the wire.  Must return an array.
+  This method has a default implementation which to simply return the "entities" property from any json returned as a result of executing the save.
+  @param [config.extractKeyMappings] {Function} Called once per save operation to extract the key mappings from any json received over the wire.  Must return an array.
+  This method has a default implementation which to simply return the "keyMappings" property from any json returned as a result of executing the save.
   @param config.visitNode {Function} A visitor method that will be called on each node of the returned payload.
   **/
   var ctor = function JsonResultsAdapter(config) {
@@ -6307,6 +6321,8 @@ var JsonResultsAdapter = (function () {
     assertConfig(config)
         .whereParam("name").isNonEmptyString()
         .whereParam("extractResults").isFunction().isOptional().withDefault(extractResultsDefault)
+        .whereParam("extractSaveResults").isFunction().isOptional().withDefault(extractSaveResultsDefault)
+        .whereParam("extractKeyMappings").isFunction().isOptional().withDefault(extractKeyMappingsDefault)
         .whereParam("visitNode").isFunction()
         .applyAll(this);
     __config._storeObject(this, proto._$typeName, this.name);
@@ -6318,7 +6334,15 @@ var JsonResultsAdapter = (function () {
   function extractResultsDefault(data) {
     return data.results;
   }
-  
+
+  function extractSaveResultsDefault(data) {
+    return data.entities || data.Entities || [];
+  }
+
+  function extractKeyMappingsDefault(data) {
+    return data.keyMappings || data.KeyMappings || [];
+  }
+
   return ctor;
 })();
 

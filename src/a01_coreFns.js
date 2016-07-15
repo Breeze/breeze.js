@@ -605,6 +605,15 @@ function __formatString(string) {
   });
 }
 
+// Change text to title case with spaces, e.g. 'myPropertyName12' to 'My Property Name 12'
+// See http://stackoverflow.com/questions/7225407/convert-camelcasetext-to-camel-case-text
+var __camelEdges = /([A-Z](?=[A-Z][a-z])|[^A-Z](?=[A-Z])|[a-zA-Z](?=[^a-zA-Z]))/g;
+function __titleCaseSpace(text) {
+  text = text.replace(__camelEdges, '$1 ');
+  text = text.charAt(0).toUpperCase() + text.slice(1);
+  return text;
+}
+
 // end of string functions
 
 // See Mark Miller’s explanation of what this does.
@@ -661,6 +670,7 @@ core.isNumeric = __isNumeric;
 core.stringStartsWith = __stringStartsWith;
 core.stringEndsWith = __stringEndsWith;
 core.formatString = __formatString;
+core.titleCase = __titleCaseSpace;
 
 core.getPropertyDescriptor = __getPropDescriptor;
 

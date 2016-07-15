@@ -4005,7 +4005,19 @@
                         },
                         {
                             "name": "extractResults",
-                            "description": "Called once per service operation to extract the 'payload' from any json received over the wire.\nThis method has a default implementation which to simply return the \"results\" property from any json returned as a result of executing the query.",
+                            "description": "Called once per query operation to extract the 'payload' from any json received over the wire.\nThis method has a default implementation which to simply return the \"results\" property from any json returned as a result of executing the query.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "extractSaveResults",
+                            "description": "Called once per save operation to extract the entities from any json received over the wire.  Must return an array.\nThis method has a default implementation which to simply return the \"entities\" property from any json returned as a result of executing the save.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "extractKeyMappings",
+                            "description": "Called once per save operation to extract the key mappings from any json received over the wire.  Must return an array.\nThis method has a default implementation which to simply return the \"keyMappings\" property from any json returned as a result of executing the save.",
                             "type": "Function",
                             "optional": true
                         },
