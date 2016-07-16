@@ -229,8 +229,8 @@ export namespace core {
         constructor(config: {
             name: string;
             extractResults?: (data: {}) => {};
-            extractSaveResults: (data: {}) => any[];
-            extractKeyMappings: (data: {}) => KeyMapping[];
+            extractSaveResults?: (data: {}) => any[];
+            extractKeyMappings?: (data: {}) => KeyMapping[];
             visitNode: (node: {}, queryContext: QueryContext, nodeContext: NodeContext) => { entityType?: EntityType; nodeId?: any; nodeRefId?: any; ignore?: boolean; };
         });
     }
