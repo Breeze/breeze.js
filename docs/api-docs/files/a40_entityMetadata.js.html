@@ -697,6 +697,13 @@ var MetadataStore = (function () {
     var qualifiedTypeName = getQualifiedTypeName(this, structuralTypeName, false);
     var typeName = qualifiedTypeName || structuralTypeName;
 
+    if (aCtor) {
+      if (aCtor._$typeName &amp;&amp; aCtor._$typeName != typeName) {
+        console.warn(&quot;Registering a constructor for &quot; + typeName + &quot; that is already used for &quot; + aCtor._$typeName + &quot;.&quot;);
+      }
+      aCtor._$typeName = typeName;
+    }
+
     this._ctorRegistry[typeName] = { ctor: aCtor, initFn: initFn, noTrackingFn: noTrackingFn };
     if (qualifiedTypeName) {
       var stype = this._structuralTypeMap[qualifiedTypeName];
@@ -1821,9 +1828,6 @@ var EntityType = (function () {
     this.initFn = r.initFn;
     this.noTrackingFn = r.noTrackingFn;
 
-    if (aCtor.prototype._$typeName &amp;&amp; aCtor.prototype._$typeName != this.name) {
-      console.warn(&quot;Registering a constructor for &quot; + this.name + &quot; that is already used for &quot; + aCtor.prototype._$typeName + &quot;.&quot;);
-    }
     aCtor.prototype._$typeName = this.name;
     this._setCtor(aCtor);
     return aCtor;
