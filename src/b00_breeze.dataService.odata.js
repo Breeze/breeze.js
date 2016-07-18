@@ -120,7 +120,7 @@
 
     OData.read({
           requestUri: url,
-          headers: this.headers
+          headers: __extend({}, this.headers)
         },
         function (data, response) {
           var inlineCount;
@@ -228,7 +228,7 @@
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: this.headers,
+      headers: __extend({}, this.headers),
       requestUri: url,
       method: "POST",
       data: requestData
