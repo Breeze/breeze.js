@@ -357,6 +357,9 @@
             eto.navigationProperties.push(np);
 
             et = new breeze.EntityType(eto);
+            if (testFns.DEBUG_ODATA) {
+              et.defaultResourceName = "TimeGroups"; // required for resolving batch urls
+            }
 
             et.guid = breeze.core.getUuid(); // to see distinct entity types while debugging
             store.addEntityType(et);

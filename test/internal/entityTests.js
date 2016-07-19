@@ -1288,7 +1288,7 @@
     });
   });
 
-  testFns.skipIf("mongo,efcodefirst,nhibernate,hibernate", "does not support 'defaultValues'").
+  testFns.skipIf("mongo,efcodefirst,nhibernate,hibernate,odata", "does not support 'defaultValues'").
   test("category default rowversion value", function () {
 
     var em = newEm();

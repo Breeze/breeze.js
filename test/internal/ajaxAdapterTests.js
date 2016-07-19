@@ -3,6 +3,11 @@
   var breeze = testFns.breeze;
   var core = breeze.core;
   var expectedError = new Error('deliberate error');
+  if (testFns.DEBUG_ODATA) {
+    // because ajax adapter is not used for OData
+    expectedError = new Error('Metadata query failed for: http://localhost:9011/bad/address/$metadata; Not Found');
+  }
+
   var originalAjaxAdapter;
 
   module("ajaxAdapter", {
@@ -34,7 +39,7 @@
     try {
       breeze.EntityQuery.from("Todos").using(em).execute()
           .catch(function (err) {
-            equal(err, expectedError, "ajax adapter threw expected error");
+            equal(err.message, expectedError.message, "ajax adapter threw expected error");
             ok(true, "the exception was passed to the promise's catch");
           })
           .finally(fin);
@@ -54,6 +59,7 @@
   /*********************************************************
    * jQuery ajax adapter default settings are inherited
    *********************************************************/
+  testFns.skipIf("odata", "does not use ajax adapter").
   test("jQuery ajax adapter default settings are inherited", 3, function (assert) {
     var done = assert.async();
     // get jQuery ajax adapter and ensure it is the default adapter for this test
@@ -68,6 +74,7 @@
   /*********************************************************
    * Angular ajax adapter default settings are inherited
    *********************************************************/
+  testFns.skipIf("odata", "does not use ajax adapter").
   test("Angular ajax adapter default settings are inherited", 3, function (assert) {
     var done = assert.async();
     // get Angular ajax adapter and ensure it is the default adapter for this test

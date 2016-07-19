@@ -15550,6 +15550,10 @@ var MappingContext = (function () {
 
   function updateEntityRef(mc, targetEntity, node) {
     var nodeId = node._$meta.nodeId;
+    if (!nodeId && node._$meta.extraMetadata) {
+      // odata case.  refMap isn't really used, but is returned as data.retrievedEntities, so we populated it anyway.
+      nodeId = node._$meta.extraMetadata.uriKey;
+    }
     if (nodeId != null) {
       mc.refMap[nodeId] = targetEntity;
     }
@@ -16623,7 +16627,7 @@ breeze.SaveOptions = SaveOptions;
 
     OData.read({
           requestUri: url,
-          headers: this.headers
+          headers: __extend({}, this.headers)
         },
         function (data, response) {
           var inlineCount;
@@ -16666,7 +16670,7 @@ breeze.SaveOptions = SaveOptions;
     }
 
     var mheaders = __extend({}, this.headers);
-    mheaders.Accept = 'application/json;odata.metadata=full';
+    mheaders.Accept = 'application/*; odata.metadata=full';
 
     // OData.read(url,
     OData.read({
@@ -16731,7 +16735,7 @@ breeze.SaveOptions = SaveOptions;
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: this.headers,
+      headers: __extend({}, this.headers),
       requestUri: url,
       method: "POST",
       data: requestData

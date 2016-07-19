@@ -190,6 +190,10 @@ var MappingContext = (function () {
 
   function updateEntityRef(mc, targetEntity, node) {
     var nodeId = node._$meta.nodeId;
+    if (!nodeId && node._$meta.extraMetadata) {
+      // odata case.  refMap isn't really used, but is returned as data.retrievedEntities, so we populated it anyway.
+      nodeId = node._$meta.extraMetadata.uriKey;
+    }
     if (nodeId != null) {
       mc.refMap[nodeId] = targetEntity;
     }

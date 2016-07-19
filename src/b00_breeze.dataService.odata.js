@@ -163,7 +163,7 @@
     }
 
     var mheaders = __extend({}, this.headers);
-    mheaders.Accept = 'application/json;odata.metadata=full';
+    mheaders.Accept = 'application/*; odata.metadata=full';
 
     // OData.read(url,
     OData.read({
