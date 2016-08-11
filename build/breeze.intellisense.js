@@ -1,4 +1,4 @@
-// Generated on: Mon Jul 18 2016 23:44:55 GMT-0700 (Pacific Daylight Time)
+// Generated on: Thu Aug 11 2016 15:17:52 GMT+1000 (AEST)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>

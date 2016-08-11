@@ -6,6 +6,13 @@
  * Author: Jay Traband
  */
 
+ (function(global){
+    if (typeof window === "undefined") {
+        window = this;
+        window.require = require;
+    }
+})(this);
+
 (function (global, definition) {
     var def = function(){ return definition(global); };
 
@@ -413,7 +420,7 @@ function __requireLib(libNames, errMessage) {
 
 // Returns the 'libName' module if loaded or else returns undefined
 function __requireLibCore(libName) {
-  var window = global.window;
+  // var window = global.window;
   if (!window) return; // Must run in a browser. Todo: add commonjs support
 
   // get library from browser globals if we can
@@ -16534,7 +16541,14 @@ breeze.SaveOptions = SaveOptions;
   var proto = ctor.prototype; // minifies better (as seen in jQuery)
 
   proto.initialize = function () {
-    OData = core.requireLib("OData", "Needed to support remote OData services");
+    // if OData is null, it is either not included in the html file or it is run in the node
+    // so we try to load datajs, if this is run in browser, it trigger the error
+    // if it is in node, we load it from window.OData
+    if (!OData) {
+      core.requireLib("datajs", "Needed to support remote OData services");
+      
+      OData = window.OData;
+    }
     OData.jsonHandler.recognizeDates = true;
   };
   // borrow from AbstractDataServiceAdapter
