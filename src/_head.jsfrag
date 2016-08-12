@@ -6,12 +6,14 @@
  * Author: Jay Traband
  */
 
- (function(global){
+(function(global){
     if (typeof window === "undefined") {
         window = this;
         window.require = require;
+        window.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+        window.DOMParser = require('xmldom').DOMParser;
     }
-})(this);
+})(global);
 
 (function (global, definition) {
     var def = function(){ return definition(global); };
