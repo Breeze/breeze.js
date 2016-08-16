@@ -6,6 +6,13 @@
  * Author: Jay Traband
  */
 
+ (function(global){
+    if (typeof window === "undefined") {
+        window = this;
+        window.require = require;
+    }
+})(this);
+
 (function (global, definition) {
     var def = function(){ return definition(global); };
 
@@ -413,7 +420,7 @@ function __requireLib(libNames, errMessage) {
 
 // Returns the 'libName' module if loaded or else returns undefined
 function __requireLibCore(libName) {
-  var window = global.window;
+  // var window = global.window;
   if (!window) return; // Must run in a browser. Todo: add commonjs support
 
   // get library from browser globals if we can

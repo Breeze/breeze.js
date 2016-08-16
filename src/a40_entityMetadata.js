@@ -848,7 +848,19 @@ var CsdlMetadataParser = (function () {
   }
 
   function completeParseCsdlEntityType(entityType, csdlEntityType, schema, schemas, metadataStore) {
-    var keyNamesOnServer = csdlEntityType.key ? __toArray(csdlEntityType.key.propertyRef).map(__pluck("name")) : [];
+    // from v4 EntityType can has * keys
+    var keyNamesOnServer = [];
+    
+    if (csdlEntityType.key) {
+      if (Array.isArray(csdlEntityType.key)) {
+        csdlEntityType.key.forEach(function (key) {
+          keyNamesOnServer = keyNamesOnServer.concat(__toArray(key.propertyRef).map(__pluck("name")));
+        });
+      }
+      else {
+        keyNamesOnServer = __toArray(csdlEntityType.key.propertyRef).map(__pluck("name"));
+      }
+    } 
 
     __toArray(csdlEntityType.property).forEach(function (prop) {
       parseCsdlDataProperty(entityType, prop, schema, keyNamesOnServer);
@@ -967,7 +979,10 @@ var CsdlMetadataParser = (function () {
   function parseCsdlNavProperty(entityType, csdlProperty, schema, schemas) {
     var association = getAssociation(csdlProperty, schema, schemas);
     if (!association) {
-      throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+      if (csdlProperty.relationship)
+        throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+      else
+        return;
     }
     var toEnd = __arrayFirst(association.end, function (assocEnd) {
       return assocEnd.role === csdlProperty.toRole;
@@ -1102,6 +1117,7 @@ var CsdlMetadataParser = (function () {
 
   function getAssociation(csdlNavProperty, containingSchema, schemas) {
     var assocFullName = parseTypeNameWithSchema(csdlNavProperty.relationship, containingSchema);
+    if (!assocFullName) return null;
     var assocNamespace = assocFullName.namespace;
     var assocSchema = __arrayFirst(schemas, function (schema) {
       return schema.namespace === assocNamespace;
@@ -2427,7 +2443,8 @@ var DataProperty = (function () {
           this.defaultValue = "AAAAAAAAJ3U="; // hack for all binary fields but value is specifically valid for timestamp fields - arbitrary valid 8 byte base64 value.
         } else {
           this.defaultValue = this.dataType.defaultValue;
-          if (this.defaultValue == null) {
+          // cannot be too harsh, if it is not defined type, there is no way we can know the default value
+          if (this.defaultValue === null && this.dataType.name !== 'Undefined') {
             throw new Error("A nonnullable DataProperty cannot have a null defaultValue. Name: " + (this.name || this.nameOnServer));
           }
         }
