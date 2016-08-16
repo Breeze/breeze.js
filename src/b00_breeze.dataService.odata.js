@@ -27,8 +27,10 @@
   var proto = ctor.prototype; // minifies better (as seen in jQuery)
 
   proto.initialize = function () {
-    // first attempt to require the OData library (datajs)
-    core.requireLib("OData");
+    if (!OData) {
+      // first attempt to require the OData library (datajs)
+      OData = core.requireLib("OData");
+    }
 
     // if OData is null, it is either not included in the html file or it is run in the node
     // so we try to load datajs, if this is run in browser, it trigger the error
