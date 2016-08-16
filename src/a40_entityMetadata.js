@@ -979,7 +979,10 @@ var CsdlMetadataParser = (function () {
   function parseCsdlNavProperty(entityType, csdlProperty, schema, schemas) {
     var association = getAssociation(csdlProperty, schema, schemas);
     if (!association) {
-      throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+      if (csdlProperty.relationship)
+        throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+      else
+        return;
     }
     var toEnd = __arrayFirst(association.end, function (assocEnd) {
       return assocEnd.role === csdlProperty.toRole;
@@ -1114,6 +1117,7 @@ var CsdlMetadataParser = (function () {
 
   function getAssociation(csdlNavProperty, containingSchema, schemas) {
     var assocFullName = parseTypeNameWithSchema(csdlNavProperty.relationship, containingSchema);
+    if (!assocFullName) return null;
     var assocNamespace = assocFullName.namespace;
     var assocSchema = __arrayFirst(schemas, function (schema) {
       return schema.namespace === assocNamespace;
