@@ -19,6 +19,7 @@
     "yuidocjs": "^0.3.50"
   },
   "dependencies": {
+    "odatajs": "^4.0.0",
     "datajs": "^1.0.3",
     "jquery": "^3.1.0",
     "xmldom": "^0.1.22",
