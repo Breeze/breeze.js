@@ -76,7 +76,7 @@
         definition(b);
     } else if (typeof define === "function" && define["amd"] && !window.breeze) {
         // Requirejs / AMD
-        define(['breeze'], definition);
+        define(['breeze-client'], definition);
     } else {
         throw new Error("Can't find breeze");
     }
