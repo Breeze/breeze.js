@@ -14733,6 +14733,12 @@ var EntityManager = (function () {
       var dpName = dp.name;
       var value = so.getProperty(dpName);
       if (value == null && dp.defaultValue == null) return;
+      // Fix MG 8/19/2016
+      if (value && value.entityType  || 
+          (value instanceof Array && value.filter(function(item) { return !!item.entityType}).length > 0)) {
+        // This appears to be a calculated navigation property that was added by the constructor. Must ignore.
+        return;
+      }
 
       if (value && dp.isComplexProperty) {
         var coDps = dp.dataType.dataProperties;
