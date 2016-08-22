@@ -1,4 +1,5 @@
-var CsdlMetadataParser = (function () {
+var CsdlMetadataParser = function () {
+  var _this = this;
 
   this.parse = function (metadataStore, schemas, altMetadata) {
 
@@ -18,7 +19,7 @@ var CsdlMetadataParser = (function () {
       if (schema.entityContainer) {
         __toArray(schema.entityContainer).forEach(function (container) {
           __toArray(container.entitySet).forEach(function (entitySet) {
-            var entityTypeName = this.parseTypeNameWithSchema(entitySet.entityType, schema).typeName;
+            var entityTypeName =  _this.parseTypeNameWithSchema(entitySet.entityType, schema).typeName;
             metadataStore.setEntityTypeForResourceName(entitySet.name, entityTypeName);
             metadataStore._entityTypeResourceMap[entityTypeName] = entitySet.name;
           });
@@ -28,12 +29,12 @@ var CsdlMetadataParser = (function () {
       // process complextypes before entity types.
       if (schema.complexType) {
         __toArray(schema.complexType).forEach(function (ct) {
-          var complexType = this.parseCsdlComplexType(ct, schema, metadataStore);
+          var complexType =  _this.parseCsdlComplexType(ct, schema, metadataStore);
         });
       }
       if (schema.entityType) {
         __toArray(schema.entityType).forEach(function (et) {
-          var entityType = this.parseCsdlEntityType(et, schema, schemas, metadataStore);
+          var entityType =  _this.parseCsdlEntityType(et, schema, schemas, metadataStore);
 
         });
       }
@@ -55,7 +56,7 @@ var CsdlMetadataParser = (function () {
       metadataStore.importMetadata(altMetadata, true);
     }
     return metadataStore;
-  }
+  };
 
   this.parseCsdlEntityType = function (csdlEntityType, schema, schemas, metadataStore) {
     var shortName = csdlEntityType.name;
@@ -103,11 +104,11 @@ var CsdlMetadataParser = (function () {
     } 
 
     __toArray(csdlEntityType.property).forEach(function (prop) {
-      this.parseCsdlDataProperty(entityType, prop, schema, keyNamesOnServer);
+       _this.parseCsdlDataProperty(entityType, prop, schema, keyNamesOnServer);
     });
 
     __toArray(csdlEntityType.navigationProperty).forEach(function (prop) {
-      this.parseCsdlNavProperty(entityType, prop, schema, schemas);
+       _this.parseCsdlNavProperty(entityType, prop, schema, schemas);
     });
 
     metadataStore.addEntityType(entityType);
@@ -133,7 +134,7 @@ var CsdlMetadataParser = (function () {
     });
 
     __toArray(csdlComplexType.property).forEach(function (prop) {
-      this.parseCsdlDataProperty(complexType, prop, schema);
+       _this.parseCsdlDataProperty(complexType, prop, schema);
     });
 
     metadataStore.addEntityType(complexType);
@@ -402,12 +403,82 @@ var CsdlMetadataParser = (function () {
       return schema.namespace;
     }
     return null;
-  }
-
-  return {
-    parse: this.parse
   };
 
-})();
+  // functions that can be called by other classes
+  this.parseTypeName = function (entityTypeName) {
+    if (!entityTypeName) {
+      return null;
+    }
 
-breeze.CsdlMetadataParser = CsdlMetadataParser; // export the parser too for version 4 parser overriding
+    var typeParts = entityTypeName.split(":#");
+    if (typeParts.length > 1) {
+      return makeTypeHash(typeParts[0], typeParts[1]);
+    }
+
+    if (__stringStartsWith(entityTypeName, MetadataStore.ANONTYPE_PREFIX)) {
+      var typeHash = makeTypeHash(entityTypeName);
+      typeHash.isAnonymous = true
+      return typeHash;
+    }
+    var entityTypeNameNoAssembly = entityTypeName.split(",")[0];
+    typeParts = entityTypeNameNoAssembly.split(".");
+    if (typeParts.length > 1) {
+      var shortName = typeParts[typeParts.length - 1];
+      var namespaceParts = typeParts.slice(0, typeParts.length - 1);
+      var ns = namespaceParts.join(".");
+      return makeTypeHash(shortName, ns);
+    } else {
+      return makeTypeHash(entityTypeName);
+    }
+  };
+
+  this.makeTypeHash = function (shortName, namespace) {
+    return {
+      shortTypeName: shortName,
+      namespace: namespace,
+      typeName: qualifyTypeName(shortName, namespace)
+    };
+  };
+
+  this.isQualifiedTypeName = function (entityTypeName) {
+    return entityTypeName.indexOf(":#") >= 0;
+  };
+
+  this.qualifyTypeName = function (shortName, namespace) {
+    if (namespace && namespace.length > 0) {
+      return shortName + ":#" + namespace;
+    } else {
+      return shortName;
+    }
+  };
+
+  // Used by both ComplexType and EntityType
+  this.addProperties = function (entityType, propObj, ctor) {
+
+    if (!propObj) return;
+    if (Array.isArray(propObj)) {
+      propObj.forEach(entityType._addPropertyCore.bind(entityType));
+    } else if (typeof (propObj) === 'object') {
+      for (var key in propObj) {
+        if (__hasOwnProperty(propObj, key)) {
+          var value = propObj[key];
+          value.name = key;
+          var prop = new ctor(value);
+          entityType._addPropertyCore(prop);
+        }
+      }
+    } else {
+      throw new Error("The 'dataProperties' or 'navigationProperties' values must be either an array of data/nav properties or an object where each property defines a data/nav property");
+    }
+  };
+
+  // return {
+  //   parse: this.parse
+  // };
+
+};
+
+// export the parser too for version 4 parser overriding
+breeze.CsdlMetadataParserV3 = new CsdlMetadataParser(); 
+breeze.CsdlMetadataParser = breeze.CsdlMetadataParserV3; 

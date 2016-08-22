@@ -33,14 +33,74 @@
   };
   breeze.config.registerAdapter("dataService", odata4Ctor);
 
-  // Now override that parser
-  
-  var CsdlMetadataParserV3 = breeze.CsdlMetadataParser;
+}));
 
-  var CsdlMetadataParserV4 = function () {
-    this.version = 4;
+// Now override that parser
+
+var CsdlMetadataParserV3 = breeze.CsdlMetadataParserV3;
+
+var CsdlMetadataParserV4Ctor = function () {
+  this.version = 4;
+};
+
+var CsdlMetadataParserV4 = new CsdlMetadataParserV4Ctor();
+
+breeze.core.extend(CsdlMetadataParserV4, CsdlMetadataParserV3);
+
+CsdlMetadataParserV4.parseCsdlNavProperty = function (entityType, csdlProperty, schema, schemas) {
+  var association = this.getAssociation(csdlProperty, schema, schemas);
+  if (!association) {
+    if (csdlProperty.relationship)
+      throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+    else
+      return;
+  }
+  var toEnd = __arrayFirst(association.end, function (assocEnd) {
+    return assocEnd.role === csdlProperty.toRole;
+  });
+
+  var isScalar = toEnd.multiplicity !== "*";
+  var dataType = this.parseTypeNameWithSchema(toEnd.type, schema).typeName;
+
+  var constraint = association.referentialConstraint;
+  if (!constraint) {
+    // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
+
+    // Think about adding this back later.
+    if (association.end[0].multiplicity == "*" && association.end[1].multiplicity == "*") {
+      // ignore many to many relations for now
+      return;
+    } else {
+      // For now assume it will be set later directly on the client.
+      // other alternative is to throw an error:
+      // throw new Error("Foreign Key Associations must be turned on for this model");
+    }
+  }
+
+  var cfg = {
+    nameOnServer: csdlProperty.name,
+    entityTypeName: dataType,
+    isScalar: isScalar,
+    associationName: association.name
   };
 
-  breeze.core.extend(CsdlMetadataParserV4.prototype, CsdlMetadataParserV3);
+  if (constraint) {
+    var principal = constraint.principal;
+    var dependent = constraint.dependent;
 
-}));
+    var propRefs = __toArray(dependent.propertyRef);
+    var fkNames = propRefs.map(__pluck("name"));
+    if (csdlProperty.fromRole === principal.role) {
+      cfg.invForeignKeyNamesOnServer = fkNames;
+    } else {
+      // will be used later by np._update
+      cfg.foreignKeyNamesOnServer = fkNames;
+    }
+  }
+
+  var np = new NavigationProperty(cfg);
+  entityType._addPropertyCore(np);
+  return np;
+}; // End of parseCsdlNavProperty
+
+breeze.CsdlMetadataParserV4 = CsdlMetadataParserV4;
