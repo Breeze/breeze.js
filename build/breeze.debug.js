@@ -14737,7 +14737,6 @@ var EntityManager = (function () {
       if (value && value.entityType  || 
           (value instanceof Array && value.filter(function(item) { return !!item.entityType}).length > 0)) {
         // This appears to be a calculated navigation property that was added by the constructor. Must ignore.
-        console.warn('Potentially incorrect metadata detected. Data property ' + so.entityType.shortName + '.' + dpName + ' returns entity types. Only navigation properties should return entity types. Property value is ignored during export.');
         return;
       }
 
