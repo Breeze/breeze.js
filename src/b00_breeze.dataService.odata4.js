@@ -11,6 +11,7 @@
 }(function (breeze) {
   "use strict";
 
+  // OData v2 / v3 adapter
   var odataAdapterCtor = breeze.config.getAdapter("dataService", "odata");
   // OData 4 adapter
   var odata4Ctor = function () {
@@ -31,5 +32,15 @@
       "Prefer": "odata.allow-entityreferences"
   };
   breeze.config.registerAdapter("dataService", odata4Ctor);
+
+  // Now override that parser
+  
+  var CsdlMetadataParserV3 = breeze.CsdlMetadataParser;
+
+  var CsdlMetadataParserV4 = function () {
+    this.version = 4;
+  };
+
+  breeze.core.extend(CsdlMetadataParserV4.prototype, CsdlMetadataParserV3);
 
 }));
