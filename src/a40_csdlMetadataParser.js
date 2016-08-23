@@ -1,4 +1,4 @@
-var CsdlMetadataParser = function () {
+function CsdlMetadataParser () {
   var _this = this;
 
   this.parse = function (metadataStore, schemas, altMetadata) {
@@ -217,62 +217,6 @@ var CsdlMetadataParser = function () {
     return dp;
   };
 
-  this.parseCsdlNavProperty = function (entityType, csdlProperty, schema, schemas) {
-    var association = this.getAssociation(csdlProperty, schema, schemas);
-    if (!association) {
-      if (csdlProperty.relationship)
-        throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
-      else
-        return;
-    }
-    var toEnd = __arrayFirst(association.end, function (assocEnd) {
-      return assocEnd.role === csdlProperty.toRole;
-    });
-
-    var isScalar = toEnd.multiplicity !== "*";
-    var dataType = this.parseTypeNameWithSchema(toEnd.type, schema).typeName;
-
-    var constraint = association.referentialConstraint;
-    if (!constraint) {
-      // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
-
-      // Think about adding this back later.
-      if (association.end[0].multiplicity == "*" && association.end[1].multiplicity == "*") {
-        // ignore many to many relations for now
-        return;
-      } else {
-        // For now assume it will be set later directly on the client.
-        // other alternative is to throw an error:
-        // throw new Error("Foreign Key Associations must be turned on for this model");
-      }
-    }
-
-    var cfg = {
-      nameOnServer: csdlProperty.name,
-      entityTypeName: dataType,
-      isScalar: isScalar,
-      associationName: association.name
-    };
-
-    if (constraint) {
-      var principal = constraint.principal;
-      var dependent = constraint.dependent;
-
-      var propRefs = __toArray(dependent.propertyRef);
-      var fkNames = propRefs.map(__pluck("name"));
-      if (csdlProperty.fromRole === principal.role) {
-        cfg.invForeignKeyNamesOnServer = fkNames;
-      } else {
-        // will be used later by np._update
-        cfg.foreignKeyNamesOnServer = fkNames;
-      }
-    }
-
-    var np = new NavigationProperty(cfg);
-    entityType._addPropertyCore(np);
-    return np;
-  };
-
   this.isEnumType = function (csdlProperty, schema) {
     if (schema.enumType) return this.isEdmxEnumType(csdlProperty, schema);
     else if (schema.extensions) return this.isODataEnumType(csdlProperty, schema);
@@ -477,8 +421,66 @@ var CsdlMetadataParser = function () {
   //   parse: this.parse
   // };
 
-};
+}
+
+// Parse NavigationProperty
+CsdlMetadataParser.prototype.parseCsdlNavProperty = function (entityType, csdlProperty, schema, schemas) {
+    var association = this.getAssociation(csdlProperty, schema, schemas);
+    if (!association) {
+      if (csdlProperty.relationship)
+        throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+      else
+        return;
+    }
+    var toEnd = __arrayFirst(association.end, function (assocEnd) {
+      return assocEnd.role === csdlProperty.toRole;
+    });
+
+    var isScalar = toEnd.multiplicity !== "*";
+    var dataType = this.parseTypeNameWithSchema(toEnd.type, schema).typeName;
+
+    var constraint = association.referentialConstraint;
+    if (!constraint) {
+      // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
+
+      // Think about adding this back later.
+      if (association.end[0].multiplicity == "*" && association.end[1].multiplicity == "*") {
+        // ignore many to many relations for now
+        return;
+      } else {
+        // For now assume it will be set later directly on the client.
+        // other alternative is to throw an error:
+        // throw new Error("Foreign Key Associations must be turned on for this model");
+      }
+    }
+
+    var cfg = {
+      nameOnServer: csdlProperty.name,
+      entityTypeName: dataType,
+      isScalar: isScalar,
+      associationName: association.name
+    };
+
+    if (constraint) {
+      var principal = constraint.principal;
+      var dependent = constraint.dependent;
+
+      var propRefs = __toArray(dependent.propertyRef);
+      var fkNames = propRefs.map(__pluck("name"));
+      if (csdlProperty.fromRole === principal.role) {
+        cfg.invForeignKeyNamesOnServer = fkNames;
+      } else {
+        // will be used later by np._update
+        cfg.foreignKeyNamesOnServer = fkNames;
+      }
+    }
+
+    var np = new NavigationProperty(cfg);
+    entityType._addPropertyCore(np);
+    return np;
+  };
 
 // export the parser too for version 4 parser overriding
-breeze.CsdlMetadataParserV3 = new CsdlMetadataParser(); 
-breeze.CsdlMetadataParser = breeze.CsdlMetadataParserV3; 
+breeze.CsdlMetadataParserCtorV3 = CsdlMetadataParser; 
+breeze.csdlMetadataParserV3 = new CsdlMetadataParser(); 
+breeze.csdlMetadataParser = breeze.csdlMetadataParserV3; 

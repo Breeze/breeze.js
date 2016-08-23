@@ -278,7 +278,7 @@ var MetadataStore = (function () {
     var json = (typeof (exportedMetadata) === "string") ? JSON.parse(exportedMetadata) : exportedMetadata;
 
     if (json.schema) {
-      var parser = this.csdlMetadataParser || breeze.CsdlMetadataParser;
+      var parser = this.csdlMetadataParser || breeze.csdlMetadataParser;
       return parser.parse.call(parser, this, json.schema, json.altMetadata);
     }
 

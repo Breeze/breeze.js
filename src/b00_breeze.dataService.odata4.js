@@ -37,32 +37,16 @@
 
 // Now override that parser
 
-var CsdlMetadataParserV3 = breeze.CsdlMetadataParserV3;
+var CsdlMetadataParserCtorV3 = breeze.CsdlMetadataParser;
 
 var CsdlMetadataParserV4Ctor = function () {
   this.version = 4;
 };
 
-var CsdlMetadataParserV4 = new CsdlMetadataParserV4Ctor();
+breeze.core.extend(CsdlMetadataParserV4Ctor.prototype, breeze.csdlMetadataParser);
 
-breeze.core.extend(CsdlMetadataParserV4, CsdlMetadataParserV3);
-
-CsdlMetadataParserV4.parseCsdlNavProperty = function (entityType, csdlProperty, schema, schemas) {
-  var association = this.getAssociation(csdlProperty, schema, schemas);
-  if (!association) {
-    if (csdlProperty.relationship)
-      throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
-    else
-      return;
-  }
-  var toEnd = __arrayFirst(association.end, function (assocEnd) {
-    return assocEnd.role === csdlProperty.toRole;
-  });
-
-  var isScalar = toEnd.multiplicity !== "*";
-  var dataType = this.parseTypeNameWithSchema(toEnd.type, schema).typeName;
-
-  var constraint = association.referentialConstraint;
+CsdlMetadataParserV4Ctor.prototype.parseCsdlNavProperty = function (entityType, csdlProperty, schema, schemas) {
+  var constraint = csdlProperty.referentialConstraint;
   if (!constraint) {
     // TODO: Revisit this later - right now we just ignore many-many and assocs with missing constraints.
 
@@ -103,4 +87,6 @@ CsdlMetadataParserV4.parseCsdlNavProperty = function (entityType, csdlProperty, 
   return np;
 }; // End of parseCsdlNavProperty
 
-breeze.CsdlMetadataParserV4 = CsdlMetadataParserV4;
+var csdlMetadataParserV4 = new CsdlMetadataParserV4Ctor();
+
+breeze.csdlMetadataParserV4 = csdlMetadataParserV4;
