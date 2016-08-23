@@ -2650,14 +2650,16 @@ var NavigationProperty = (function () {
     var fkPropCollection = parentEntityType.foreignKeyProperties;
 
     fkProps.forEach(function (dp) {
-      __arrayAddItemUnique(fkPropCollection, dp);
-      dp.relatedNavigationProperty = np;
-      // now update the inverse
-      __arrayAddItemUnique(np.entityType.inverseForeignKeyProperties, dp);
-      if (np.relatedDataProperties) {
-        __arrayAddItemUnique(np.relatedDataProperties, dp);
-      } else {
-        np.relatedDataProperties = [dp];
+      if (dp) { // possible a bug somewhere when parsing OData v4 navigation property
+        __arrayAddItemUnique(fkPropCollection, dp);
+        dp.relatedNavigationProperty = np;
+        // now update the inverse
+        __arrayAddItemUnique(np.entityType.inverseForeignKeyProperties, dp);
+        if (np.relatedDataProperties) {
+          __arrayAddItemUnique(np.relatedDataProperties, dp);
+        } else {
+          np.relatedDataProperties = [dp];
+        }
       }
     });
   }

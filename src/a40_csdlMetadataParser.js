@@ -1,7 +1,7 @@
 function CsdlMetadataParser () {
-  var _this = this;
 
   this.parse = function (metadataStore, schemas, altMetadata) {
+    var that = this;
 
     metadataStore._entityTypeResourceMap = {};
     schemas = __toArray(schemas);
@@ -19,7 +19,7 @@ function CsdlMetadataParser () {
       if (schema.entityContainer) {
         __toArray(schema.entityContainer).forEach(function (container) {
           __toArray(container.entitySet).forEach(function (entitySet) {
-            var entityTypeName =  _this.parseTypeNameWithSchema(entitySet.entityType, schema).typeName;
+            var entityTypeName =  that.parseTypeNameWithSchema(entitySet.entityType, schema).typeName;
             metadataStore.setEntityTypeForResourceName(entitySet.name, entityTypeName);
             metadataStore._entityTypeResourceMap[entityTypeName] = entitySet.name;
           });
@@ -29,12 +29,12 @@ function CsdlMetadataParser () {
       // process complextypes before entity types.
       if (schema.complexType) {
         __toArray(schema.complexType).forEach(function (ct) {
-          var complexType =  _this.parseCsdlComplexType(ct, schema, metadataStore);
+          var complexType =  that.parseCsdlComplexType(ct, schema, metadataStore);
         });
       }
       if (schema.entityType) {
         __toArray(schema.entityType).forEach(function (et) {
-          var entityType =  _this.parseCsdlEntityType(et, schema, schemas, metadataStore);
+          var entityType =  that.parseCsdlEntityType(et, schema, schemas, metadataStore);
 
         });
       }
@@ -89,6 +89,7 @@ function CsdlMetadataParser () {
   };
 
   this.completeParseCsdlEntityType = function (entityType, csdlEntityType, schema, schemas, metadataStore) {
+    var that = this;
     // from v4 EntityType can has * keys
     var keyNamesOnServer = [];
     
@@ -104,11 +105,11 @@ function CsdlMetadataParser () {
     } 
 
     __toArray(csdlEntityType.property).forEach(function (prop) {
-       _this.parseCsdlDataProperty(entityType, prop, schema, keyNamesOnServer);
+       that.parseCsdlDataProperty(entityType, prop, schema, keyNamesOnServer);
     });
 
     __toArray(csdlEntityType.navigationProperty).forEach(function (prop) {
-       _this.parseCsdlNavProperty(entityType, prop, schema, schemas);
+       that.parseCsdlNavProperty(entityType, prop, schema, schemas);
     });
 
     metadataStore.addEntityType(entityType);
@@ -126,6 +127,7 @@ function CsdlMetadataParser () {
   }
 
   this.parseCsdlComplexType = function (csdlComplexType, schema, metadataStore) {
+    var that = this;
     var shortName = csdlComplexType.name;
     var ns = this.getNamespaceFor(shortName, schema);
     var complexType = new ComplexType({
@@ -134,7 +136,7 @@ function CsdlMetadataParser () {
     });
 
     __toArray(csdlComplexType.property).forEach(function (prop) {
-       _this.parseCsdlDataProperty(complexType, prop, schema);
+       that.parseCsdlDataProperty(complexType, prop, schema);
     });
 
     metadataStore.addEntityType(complexType);
@@ -362,19 +364,35 @@ function CsdlMetadataParser () {
 
     if (__stringStartsWith(entityTypeName, MetadataStore.ANONTYPE_PREFIX)) {
       var typeHash = makeTypeHash(entityTypeName);
-      typeHash.isAnonymous = true
+      typeHash.isAnonymous = true;
       return typeHash;
     }
-    var entityTypeNameNoAssembly = entityTypeName.split(",")[0];
+    var typeName;
+    var isCollection = false;
+    var nameToParse = entityTypeName;
+    if (nameToParse.indexOf('Collection') === 0) {
+      var matches = nameToParse.match(/\(([^)]+)\)/);
+      if (matches && matches.length > 1) {
+        nameToParse = matches[1];
+      }
+      isCollection = true;
+    }
+
+    var entityTypeNameNoAssembly = nameToParse.split(",")[0];
     typeParts = entityTypeNameNoAssembly.split(".");
     if (typeParts.length > 1) {
       var shortName = typeParts[typeParts.length - 1];
       var namespaceParts = typeParts.slice(0, typeParts.length - 1);
       var ns = namespaceParts.join(".");
-      return makeTypeHash(shortName, ns);
+      typeName = makeTypeHash(shortName, ns);
     } else {
-      return makeTypeHash(entityTypeName);
+      typeName = makeTypeHash(nameToParse);
     }
+
+    if (isCollection) {
+      typeName.isCollection = true;
+    }
+    return typeName;
   };
 
   this.makeTypeHash = function (shortName, namespace) {

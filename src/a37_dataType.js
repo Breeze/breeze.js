@@ -444,6 +444,16 @@ var DataType = (function () {
     parseRawValue: parseRawBinary
   });
   /**
+  @property Collection {DataType}
+  @final
+  @static
+  **/
+  DataType.Collection = DataType.addSymbol({
+    defaultValue: [],
+    isCollection: true,
+    dataType: null
+  });
+  /**
   @property Undefined {DataType}
   @final
   @static
