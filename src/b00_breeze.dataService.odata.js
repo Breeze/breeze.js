@@ -24,6 +24,7 @@
   var ctor = function DataServiceODataAdapter() {
     this.name = "OData";
     this.OData = null;
+    this.ODataLibrary = "datajs";
   };
 
   var proto = ctor.prototype; // minifies better (as seen in jQuery)

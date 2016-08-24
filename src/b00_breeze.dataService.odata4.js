@@ -21,7 +21,7 @@
   breeze.core.extend(odata4Ctor.prototype, odataAdapterCtor.prototype);
   odata4Ctor.prototype.initialize = function () {
       if (!window.odatajs) {
-          breeze.core.requireLib("odatajs", "Needed to support remote OData v4 services");
+          breeze.core.requireLib(breeze.odatajsLib || "odatajs", "Needed to support remote OData v4 services");
       }
       this.OData = window.odatajs.oData;
   };
