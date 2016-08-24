@@ -24,7 +24,6 @@
   var ctor = function DataServiceODataAdapter() {
     this.name = "OData";
     this.OData = null;
-    this.ODataLibrary = "datajs";
   };
 
   var proto = ctor.prototype; // minifies better (as seen in jQuery)
@@ -40,7 +39,7 @@
     // so we try to load datajs, if this is run in browser, it trigger the error
     // if it is in node, we load it from window.OData
     if (!this.OData) {
-      core.requireLib("datajs", "Needed to support remote OData services");
+      core.requireLib(breeze.datajsLib || "datajs", "Needed to support remote OData services");
       
       this.OData = window.OData;
     }
