@@ -29,6 +29,11 @@
   var proto = ctor.prototype; // minifies better (as seen in jQuery)
 
   proto.initialize = function () {
+    // maybe the OData is loaded
+    if (window && window.OData) {
+      this.OData = window.OData;
+    }
+
     if (!this.OData) {
       // first attempt to require the OData library (datajs)
       core.requireLib("OData");
