@@ -1,4 +1,11 @@
-﻿(function (factory) {
+﻿/**
+ * Consider merge code from : https://github.com/metavine/breezejs-odata4-adapter/blob/master/breezeOdataV4Adapter.js
+ * 
+ * which is the results of:
+ * 
+ *  Michael and Travis Schettler 
+ */
+(function (factory) {
   if (typeof breeze === "object") {
     factory(breeze);
   } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -9,13 +16,73 @@
     define(["breeze"], factory);
   }
 }(function (breeze) {
-  "use strict";
+    "use strict";
+    var core = breeze.core;
+
+    var DataType = {};
+    core.extend(DataType, breeze.DataType);
+
+    function fmtFloatV4(val) {
+        if (val === null) return null;
+        if (typeof val === "string") {
+            val = parseFloat(val);
+        }
+        return val;
+    }
+
+    function fmtDateTimeV4(val) {
+        if (val === null) return null;
+        try {
+            return val.toISOString();
+        } catch (e) {
+            throwError("'%1' is not a valid dateTime", val);
+        }
+    }
+
+    function fmtDateTimeOffsetV4(val) {
+        if (val === null) return null;
+        try {
+            return val.toISOString();
+        } catch (e) {
+            throwError("'%1' is not a valid dateTime", val);
+        }
+    }
+
+    function fmtTimeV4(val) {
+        if (val === null) return null;
+        if (!core.isDuration(val)) {
+            throwError("'%1' is not a valid ISO 8601 duration", val);
+        }
+        return val;
+    }
+
+    function fmtGuidV4(val) {
+        if (val === null) return null;
+        if (!core.isGuid(val)) {
+            throwError("'%1' is not a valid guid", val);
+        }
+        return val;
+    }
+
+    function throwError(msg, val) {
+        msg = core.formatString(msg, val);
+        throw new Error(msg);
+    }
+
+    DataType.Int64.fmtOData = fmtFloatV4;
+    DataType.Decimal.fmtOData = fmtFloatV4;
+    DataType.Double.fmtOData = fmtFloatV4;
+    DataType.DateTime.fmtOData = fmtDateTimeV4;
+    DataType.DateTimeOffset.fmtOData = fmtDateTimeOffsetV4;
+    DataType.Time.fmtOData = fmtTimeV4;
+    DataType.Guid.fmtOData = fmtGuidV4;
 
   // OData v2 / v3 adapter
   var odataAdapterCtor = breeze.config.getAdapter("dataService", "odata");
   // OData 4 adapter
   var odata4Ctor = function () {
       this.name = "OData4";
+      this.DataType = DataType;
   };
 
   breeze.core.extend(odata4Ctor.prototype, odataAdapterCtor.prototype);
@@ -25,6 +92,7 @@
       }
       this.OData = window.odatajs.oData;
   };
+
   odata4Ctor.prototype.headers = {
       'Accept': 'text/html,application/xhtml+xml,application/xml,application/json;odata.metadata=minimal',
       "Odata-Version": "4.0",
