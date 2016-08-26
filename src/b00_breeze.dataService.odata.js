@@ -160,7 +160,7 @@
           return deferred.resolve({ results: results, inlineCount: inlineCount, httpResponse: response });
         },
         function (error) {
-          return deferred.reject(that.createError(error, url));
+          return deferred.reject(createError(error, url));
         }
     );
     return deferred.promise;
@@ -214,7 +214,7 @@
           return deferred.resolve(csdlMetadata);
 
         }, function (error) {
-          var err = that.createError(error, url);
+          var err = createError(error, url);
           err.message = "Metadata query failed for: " + url + "; " + (err.message || "");
           return deferred.reject(err);
         },
@@ -262,7 +262,7 @@
           var response = cr.response || cr;
           var statusCode = response.statusCode;
           if ((!statusCode) || statusCode >= 400) {
-            deferred.reject(that.createError(cr, url));
+            deferred.reject(createError(cr, url));
             return;
           }
 
@@ -293,7 +293,7 @@
       });
       return deferred.resolve(saveResult);
     }, function (err) {
-      return deferred.reject(that.createError(err, url));
+      return deferred.reject(createError(err, url));
     }, this.OData.batchHandler);
 
     return deferred.promise;
@@ -359,6 +359,7 @@
   };
 
   proto.createChangeRequests = function (saveContext, saveBundle) {
+    var that = this;
     var changeRequestInterceptor = saveContext.adapter._createChangeRequestInterceptor(saveContext, saveBundle);
     var changeRequests = [];
     var tempKeys = [];
@@ -376,12 +377,12 @@
       if (aspect.entityState.isAdded()) {
         request.requestUri = routePrefix + entity.entityType.defaultResourceName;
         request.method = "POST";
-        request.data = helper.unwrapInstance(entity, this.transformValue);
+        request.data = helper.unwrapInstance(entity, that.transformValue.bind(that));
         tempKeys[id] = aspect.getKey();
       } else if (aspect.entityState.isModified()) {
         updateDeleteMergeRequest(request, aspect, routePrefix);
         request.method = "MERGE";
-        request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, this.transformValue);
+        request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, that.transformValue.bind(that));
         // should be a PATCH/MERGE
       } else if (aspect.entityState.isDeleted()) {
         updateDeleteMergeRequest(request, aspect, routePrefix);
@@ -446,7 +447,7 @@
     return prop.dataType.fmtOData(aspect.getPropertyValue(prop.name));
   };
 
-  proto.createError = function (error, url) {
+  function createError (error, url) {
     // OData errors can have the message buried very deeply - and nonobviously
     // this code is tricky so be careful changing the response.body parsing.
     var result = new Error();
@@ -488,7 +489,7 @@
     }
     proto._catchNoConnectionError(result);
     return result;
-  };
+  }
 
   proto.getMessage = function (body) {
     var msg = body.message || "";
