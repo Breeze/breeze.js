@@ -372,7 +372,9 @@
     saveBundle.entities.forEach(function (entity, index) {
       var aspect = entity.entityAspect;
       id = id + 1; // we are deliberately skipping id=0 because Content-ID = 0 seems to be ignored.
-      var request = { headers: { "Content-ID": id, "DataServiceVersion": "2.0" } };
+      var headers = that.headers || {};
+      headers["Content-ID"] = id;
+      var request = { headers: headers }; //{ headers: { "Content-ID": id, "DataServiceVersion": "3.0" } };
       contentKeys[id] = entity;
       if (aspect.entityState.isAdded()) {
         request.requestUri = routePrefix + entity.entityType.defaultResourceName;
@@ -381,7 +383,7 @@
         tempKeys[id] = aspect.getKey();
       } else if (aspect.entityState.isModified()) {
         updateDeleteMergeRequest(request, aspect, routePrefix);
-        request.method = "MERGE";
+        request.method = "PATCH";
         request.data = helper.unwrapChangedValues(entity, entityManager.metadataStore, that.transformValue.bind(that));
         // should be a PATCH/MERGE
       } else if (aspect.entityState.isDeleted()) {

@@ -999,6 +999,10 @@ var EntityManager = (function () {
       resourceName: saveOptions.resourceName || this.saveOptions.resourceName || "SaveChanges"
     };
 
+    if (dataService.adapterInstance && dataService.adapterInstance.headers) {
+      saveContext.headers = dataService.adapterInstance.headers;
+    }
+
     // TODO: need to check that if we are doing a partial save that all entities whose temp keys
     // are referenced are also in the partial save group
 
