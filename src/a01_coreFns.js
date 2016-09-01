@@ -574,7 +574,7 @@ function __isPrimitive(obj) {
   if (obj == null) return false;
   // true for numbers, strings, booleans and null, false for objects
   if (obj != Object(obj)) return true;
-  return _isDate(obj);
+  return __isDate(obj);
 }
 
 // end of is Functions
