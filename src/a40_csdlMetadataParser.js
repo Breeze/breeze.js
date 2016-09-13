@@ -58,6 +58,49 @@ function CsdlMetadataParser () {
     return metadataStore;
   };
 
+  this.parseCsdlFunctionType = function (csdlFunctionType, schema, schemas, metadataStore, isFunctionImport) {
+    var that = this;
+
+    var shortName = csdlFunctionType.name;
+    var ns = this.getNamespaceFor(shortName, schema);
+    var functionType = new FunctionType({
+      shortName: shortName,
+      namespace: ns,
+      isBindable: csdlFunctionType.isBindable,
+      isFunctionImport : isFunctionImport,
+      isBound: csdlFunctionType.isBound,
+      isComposable: csdlFunctionType.isComposable,
+      functionName: csdlFunctionType.function,
+      httpMethod: csdlFunctionType.httpMethod
+    });
+
+    // related / bound entity type
+    if (csdlFunctionType.entitySet) {
+      var baseTypeName = metadataStore.getEntityTypeNameForResourceName(csdlFunctionType.entitySet); 
+      var baseEntityType = metadataStore._getEntityType(baseTypeName, false);
+      if (baseEntityType) {
+        functionType.entityType = baseEntityType;
+      } 
+    } 
+
+    // parameter
+    if (csdlFunctionType.parameter) {
+      __toArray(csdlFunctionType.parameter).forEach(function (param) {
+        that.parseCsdlDataProperty(entityType, param, schema);
+      });
+    }
+
+    // return type
+    if (csdlFunctionType.returnType) {
+      var tempEntityType = new EntityType({shortName:"tempEntityType"});
+      this.parseCsdlDataProperty(tempEntityType, csdlFunctionType.returnType, schema);
+      functionType.returnType = tempEntityType.dataProperties[0];
+    }
+
+    // entityType may or may not have been added to the metadataStore at this point.
+    return functionType;
+  };
+
   this.parseCsdlEntityType = function (csdlEntityType, schema, schemas, metadataStore) {
     var shortName = csdlEntityType.name;
     var ns = this.getNamespaceFor(shortName, schema);
@@ -124,7 +167,7 @@ function CsdlMetadataParser () {
       delete deferredTypes[entityType.name];
     }
 
-  }
+  };
 
   this.parseCsdlComplexType = function (csdlComplexType, schema, metadataStore) {
     var that = this;

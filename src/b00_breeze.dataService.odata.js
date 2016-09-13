@@ -372,9 +372,7 @@
     saveBundle.entities.forEach(function (entity, index) {
       var aspect = entity.entityAspect;
       id = id + 1; // we are deliberately skipping id=0 because Content-ID = 0 seems to be ignored.
-      var headers = that.headers || {};
-      headers["Content-ID"] = id;
-      var request = { headers: headers }; //{ headers: { "Content-ID": id, "DataServiceVersion": "3.0" } };
+      var request = { headers: { "Content-ID": id, "DataServiceVersion": that.dataServiceVersion || "3.0" } };
       contentKeys[id] = entity;
       if (aspect.entityState.isAdded()) {
         request.requestUri = routePrefix + entity.entityType.defaultResourceName;
