@@ -66,10 +66,10 @@ function CsdlMetadataParser () {
     var functionType = new FunctionType({
       shortName: shortName,
       namespace: ns,
-      isBindable: csdlFunctionType.isBindable,
-      isFunctionImport : isFunctionImport,
-      isBound: csdlFunctionType.isBound,
-      isComposable: csdlFunctionType.isComposable,
+      isBindable: !!csdlFunctionType.isBindable,
+      isFunctionImport : !!isFunctionImport,
+      isBound: !!csdlFunctionType.isBound,
+      isComposable: !!csdlFunctionType.isComposable,
       functionName: csdlFunctionType.function,
       httpMethod: csdlFunctionType.httpMethod
     });
@@ -86,15 +86,27 @@ function CsdlMetadataParser () {
     // parameter
     if (csdlFunctionType.parameter) {
       __toArray(csdlFunctionType.parameter).forEach(function (param) {
-        that.parseCsdlDataProperty(entityType, param, schema);
+        that.parseCsdlDataProperty(functionType, param, schema);
       });
     }
 
     // return type
     if (csdlFunctionType.returnType) {
-      var tempEntityType = new EntityType({shortName:"tempEntityType"});
-      this.parseCsdlDataProperty(tempEntityType, csdlFunctionType.returnType, schema);
-      functionType.returnType = tempEntityType.dataProperties[0];
+      var returnType;
+      try {
+        if (__isString(csdlFunctionType.returnType)) {
+          returnType = {type: csdlFunctionType.returnType};
+        }
+        else {
+          returnType = csdlFunctionType.returnType;
+        }
+        csdlFunctionType.returnType.name = "return";
+        var tempEntityType = new EntityType({shortName:"tempEntityType"});
+        tempEntityType.name = "tempEntityType";
+        this.parseCsdlDataProperty(tempEntityType, csdlFunctionType.returnType, schema);
+        functionType.returnType = tempEntityType.dataProperties[0];
+      }
+    catch (exception) {}
     }
 
     // entityType may or may not have been added to the metadataStore at this point.
