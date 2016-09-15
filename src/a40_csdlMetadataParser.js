@@ -100,10 +100,10 @@ function CsdlMetadataParser () {
         else {
           returnType = csdlFunctionType.returnType;
         }
-        csdlFunctionType.returnType.name = "return";
+        returnType.name = "return";
         var tempEntityType = new EntityType({shortName:"tempEntityType"});
         tempEntityType.name = "tempEntityType";
-        this.parseCsdlDataProperty(tempEntityType, csdlFunctionType.returnType, schema);
+        this.parseCsdlDataProperty(tempEntityType, returnType, schema);
         functionType.returnType = tempEntityType.dataProperties[0];
       }
     catch (exception) {}
