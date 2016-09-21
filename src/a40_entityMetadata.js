@@ -1661,8 +1661,10 @@ var EntityType = (function () {
   function resolveCp(cp, metadataStore) {
     var complexType = metadataStore._getEntityType(cp.complexTypeName, true);
     if (!complexType) return false;
-    if (!(complexType instanceof ComplexType)) {
-      throw new Error("Unable to resolve ComplexType with the name: " + cp.complexTypeName + " for the property: " + property.name);
+    // allow a bit flexibity, in theory, a data property could not be a entity type, but in pratice
+    // if we have an embedded entity for an entity as for the expand operation, won't it be useful?
+    if (!(complexType instanceof ComplexType) && !(complexType instanceof EntityType)) {
+      throw new Error("Unable to resolve ComplexType with the name: " + cp.complexTypeName);
     }
     cp.dataType = complexType;
     cp.defaultValue = null;

@@ -475,10 +475,9 @@
         }
         var msg = "";
         do {
-          nextErr = body.error || body.innererror;
-          if (!nextErr) msg = msg + getMessage(body);
-          nextErr = nextErr || body.internalexception;
-          body = nextErr || body;
+          nextErr = body.error || body.innererror || body.internalexception;
+          body = nextErr;
+          msg += getMessage(body);
         } while (nextErr);
         if (msg.length > 0) {
           result.message = msg;

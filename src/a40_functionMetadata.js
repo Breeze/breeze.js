@@ -3,9 +3,11 @@
  * 
  * data properties will be the parameters
  * 
- * and
+ * and return (if return type is not empty) is a data property
  * 
- * return data property
+ * ==== IMPORTANT ====
+ * 
+ * FunctionType member isAbstract has to be true, because at lease one key property is mandatory for EntityType 
  */
 var FunctionType = (function () {
   var __nextAnonIx = 0;
@@ -23,6 +25,7 @@ var FunctionType = (function () {
       assertConfig(config)
           .whereParam("shortName").isNonEmptyString()
           .whereParam("namespace").isString().isOptional().withDefault("")
+          .whereParam("isAbstract").isBoolean().isOptional().withDefault(true)
           .whereParam("isBindable").isBoolean().isOptional().withDefault(false)
           .whereParam("isBound").isBoolean().isOptional().withDefault(false)
           .whereParam("isComposable").isBoolean().isOptional().withDefault(false)
@@ -46,11 +49,20 @@ var FunctionType = (function () {
 
     // for return type
     // this.returnType = null;
+
+    // we gonna keep exact copies of fields as EntityType, otherwise, lots of things will be unexpected
     this.dataProperties = [];
+    this.navigationProperties = [];
     this.complexProperties = [];
     this.keyProperties = [];
+    this.foreignKeyProperties = [];
+    this.inverseForeignKeyProperties = [];
     this.concurrencyProperties = [];
     this.unmappedProperties = []; // will be updated later.
+    this.validators = [];
+    this.warnings = [];
+    this._mappedPropertiesCount = 0;
+    this.subtypes = [];
     
     // the real function that will be called
     this.callFunction = null;
@@ -66,3 +78,5 @@ var FunctionType = (function () {
 
   return ctor;
 })();
+
+breeze.FunctionType = FunctionType;
