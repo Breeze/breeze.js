@@ -1436,7 +1436,7 @@ var EntityType = (function () {
       if (dp.isComplexProperty) {
         if (rawVal === null) return; // rawVal may be null in nosql dbs where it was never defined for the given row.
         oldVal = target.getProperty(dp.name);
-        if (dp.isScalar) {
+        if (dp.isScalar && dataType) {
           dataType._updateTargetFromRaw(oldVal, rawVal, rawValueFn);
         } else {
           if (Array.isArray(rawVal)) {

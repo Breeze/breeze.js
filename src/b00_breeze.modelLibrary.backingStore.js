@@ -73,7 +73,7 @@
 
       if (prop.isDataProperty) {
         if (prop.isComplexProperty) {
-          if (prop.isScalar) {
+          if (prop.isScalar && prop.dataType) {
             val = prop.dataType._createInstanceCore(entity, prop);
           } else {
             val = breeze.makeComplexArray([], entity, prop);

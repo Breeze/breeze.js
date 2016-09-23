@@ -134,8 +134,10 @@
     // Add query params if .withParameters was used
     if (mappingContext.query.parameters) {
       var paramString = toQueryString(mappingContext.query.parameters);
-      var sep = url.indexOf("?") < 0 ? "?" : "&";
-      url = url + sep + paramString;
+      if (paramString.length > 0) {
+        var sep = url.indexOf("?") < 0 ? "?" : "&";
+        url = url + sep + paramString;
+      }
     }
 
     this.OData.read({
@@ -483,7 +485,24 @@
           result.message = msg;
         }
       } catch (e) {
+        // obviously if body is not a valid JSON object, it fails, but we can't just leave out the error message
+        // we have to provide some information back to user, for example: "<html><head><title>Object moved</title></head><body>\r\n<h2>Object moved to <a href=\"/TripPinRESTierService/(S(jesfo0vklxwsa1zz1240hltc))/$metadata\">here</a>.</h2>\r\n</body></html>\r\n"
+        // try parse with xml parser again
+        try {
+          if (window.DOMParser) {
+            var parser = new window.DOMParser();
+            var xmlDoc = parser.parseFromString(response.body, "text/xml");
+            var x = xmlDoc.getElementsByTagName("body")[0];
+            result.message = x.textContent;
+          }
+        }
+        catch (e2) {
+          console.log(e2);
+        }
+      }
 
+      if (!result.message || result.message.length === 0) {
+        result.message = result.body;
       }
     }
     proto._catchNoConnectionError(result);
