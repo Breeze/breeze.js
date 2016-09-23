@@ -14,6 +14,7 @@
 // Updated Jun 27 2016 - Marcel Good (www.ideablade.com)
 // Updated Jun 29 2016 - Marcel Good (www.ideablade.com)
 // Updated Jul 15 2016 - Added methods to JsonResultsAdapter - Steve Schmitt
+// Updated Sep 23 2016 - Added core methods
 
 export namespace core {
 
@@ -90,6 +91,19 @@ export namespace core {
     export function stringStartsWith(str: string, prefix: string): boolean;
     export function stringEndsWith(str: string, suffix: string): boolean;
     export function formatString(format: string, ...args: any[]): string;
+
+    /** Change text to title case with spaces, e.g. 'myPropertyName12' to 'My Property Name 12' */
+    export function titleCase(str: string): string;
+
+    /** Return the ES5 property descriptor for the property, which may be on a prototype of the object */
+    export function getPropertyDescriptor(obj: any, propertyName: string): PropertyDescriptor
+
+    /** safely perform toJSON logic on objects with cycles.  Replacer function can map or exclude properties. */
+    export function toJSONSafe(obj: any, replacer: (prop: string, val: any) => any): any
+
+    /** Default value replacer for toJSONSafe.  Replaces entityAspect and other internal properties with undefined. */
+    export function toJSONSafeReplacer(prop: string, val: any): any
+    
 }
 
 

@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.11",
+        version: "1.5.12",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -205,14 +205,22 @@ function __toJson(source, template, target) {
   return target;
 }
 
+// default replacer function for __toJSONSafe.  Excludes entityAspect and other internal properties
+function __safeReplacer(prop, val) {
+	if (prop === "entityAspect" || prop === "complexAspect" || prop === "entityType" || prop === "complexType"
+	|| prop === "constructor" || prop.charAt(0) === '_' || prop.charAt(0) === '$') return;
+	return val;
+}
+
 // safely perform toJSON logic on objects with cycles.
 function __toJSONSafe(obj, replacer) {
   if (obj !== Object(obj)) return obj; // primitive value
   if (obj._$visited) return undefined;
+  replacer = replacer || __safeReplacer;
   if (obj.toJSON) {
     var newObj = obj.toJSON();
     if (newObj !== Object(newObj)) return newObj; // primitive value
-    if (newObj !== obj) return __toJSONSafe(newObj);
+    if (newObj !== obj) return __toJSONSafe(newObj, replacer);
     // toJSON returned the object unchanged.
     obj = newObj;
   }
@@ -233,7 +241,7 @@ function __toJSONSafe(obj, replacer) {
         val = replacer(prop, val);
         if (val === undefined) continue;
       }
-      val = __toJSONSafe(val);
+      val = __toJSONSafe(val, replacer);
       if (val === undefined) continue;
       result[prop] = val;
     }
@@ -602,7 +610,7 @@ function __isPrimitive(obj) {
   if (obj == null) return false;
   // true for numbers, strings, booleans and null, false for objects
   if (obj != Object(obj)) return true;
-  return _isDate(obj);
+  return __isDate(obj);
 }
 
 // end of is Functions
@@ -703,6 +711,7 @@ core.titleCase = __titleCaseSpace;
 core.getPropertyDescriptor = __getPropDescriptor;
 
 core.toJSONSafe = __toJSONSafe;
+core.toJSONSafeReplacer = __safeReplacer;
 
 core.parent = breeze;
 breeze.core = core;
