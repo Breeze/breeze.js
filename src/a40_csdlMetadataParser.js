@@ -200,7 +200,16 @@ function CsdlMetadataParser () {
 
   this.parseCsdlDataProperty = function (parentType, csdlProperty, schema, keyNamesOnServer) {
     var dp;
-    var typeParts = csdlProperty.type.split(".");
+    var typeToParse = csdlProperty.type;
+    var isCollection = false;
+    if (typeToParse.indexOf('Collection') === 0) {
+      var matches = typeToParse.match(/\(([^)]+)\)/);
+      if (matches && matches.length > 1) {
+        typeToParse = matches[1];
+      }
+      isCollection = true;
+    }
+    var typeParts = typeToParse.split(".");
     // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
     if (typeParts[0] === "Edm" && typeParts.length === 2) {
       dp = this.parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
@@ -217,6 +226,9 @@ function CsdlMetadataParser () {
     if (dp) {
       parentType._addPropertyCore(dp);
       this.addValidators(dp);
+
+      // is it a collection of data type
+      dp.isCollection = isCollection;
     }
     return dp;
   }
@@ -443,10 +455,8 @@ function CsdlMetadataParser () {
     } else {
       typeName = makeTypeHash(nameToParse);
     }
-
-    if (isCollection) {
-      typeName.isCollection = true;
-    }
+    
+    typeName.isCollection = isCollection;
     return typeName;
   };
 

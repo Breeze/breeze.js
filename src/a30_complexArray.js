@@ -107,11 +107,12 @@ breeze.makeComplexArray = (function () {
 
   function setAspect(co, arr) {
     var coAspect = co.complexAspect;
-    // if already attached - exit
-    if (coAspect.parent === arr.parent) return null;
-    coAspect.parent = arr.parent;
-    coAspect.parentProperty = arr.parentProperty;
-
+    if (coAspect) {
+        // if already attached - exit
+        if (coAspect.parent === arr.parent) return null;
+        coAspect.parent = arr.parent;
+        coAspect.parentProperty = arr.parentProperty;
+    }
     return coAspect;
   }
 

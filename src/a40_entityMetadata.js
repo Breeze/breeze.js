@@ -1181,14 +1181,17 @@ var EntityType = (function () {
       }
       initFn(instance);
     }
+    // for v4, somehonw the datatype of a complex property isn't assigned properly
     this.complexProperties && this.complexProperties.forEach(function (cp) {
-      var ctInstance = instance.getProperty(cp.name);
-      if (Array.isArray(ctInstance)) {
-        ctInstance.forEach(function (ctInst) {
-          cp.dataType._initializeInstance(ctInst);
-        });
-      } else {
-        cp.dataType._initializeInstance(ctInstance);
+      if (cp.dataType) {
+        var ctInstance = instance.getProperty(cp.name);
+        if (Array.isArray(ctInstance)) {
+          ctInstance.forEach(function (ctInst) {
+            cp.dataType._initializeInstance(ctInst);
+          });
+        } else {
+          cp.dataType._initializeInstance(ctInstance);
+        }
       }
     });
     // not needed for complexObjects
@@ -1441,9 +1444,12 @@ var EntityType = (function () {
         } else {
           if (Array.isArray(rawVal)) {
             var newVal = rawVal.map(function (rawCo) {
-              var newCo = dataType._createInstanceCore(target, dp);
-              dataType._updateTargetFromRaw(newCo, rawCo, rawValueFn);
-              dataType._initializeInstance(newCo);
+              var newCo = rawCo;
+              if (dataType) {
+                dataType._createInstanceCore(target, dp);
+                dataType._updateTargetFromRaw(newCo, rawCo, rawValueFn);
+                dataType._initializeInstance(newCo);
+              }
               return newCo;
             });
             if (!__arrayEquals(oldVal, newVal, coEquals)) {
@@ -1459,7 +1465,7 @@ var EntityType = (function () {
         }
       } else {
         var val;
-        if (dp.isScalar) {
+        if (dp.isScalar && dataType) {
           var newVal = parseRawValue(rawVal, dataType);
           target.setProperty(dp.name, newVal);
         } else {
@@ -1467,7 +1473,7 @@ var EntityType = (function () {
           if (Array.isArray(rawVal)) {
             // need to compare values
             var newVal = rawVal.map(function (rv) {
-              return parseRawValue(rv, dataType);
+              return dataType ? parseRawValue(rv, dataType) : rv;
             });
             if (!__arrayEquals(oldVal, newVal)) {
               // clear the old array and push new objects into it.
@@ -1498,6 +1504,9 @@ var EntityType = (function () {
   }
 
   function coEquals(co1, co2) {
+    if (!co1.complexAspect || !co1.complexAspect) {
+      return !co1.complexAspect && !co1.complexAspect;
+    }
     var dataProps = co1.complexAspect.parentProperty.dataType.dataProperties;
     var areEqual = dataProps.every(function (dp) {
       if (!dp.isSettable) return true;
@@ -1660,7 +1669,9 @@ var EntityType = (function () {
 
   function resolveCp(cp, metadataStore) {
     var complexType = metadataStore._getEntityType(cp.complexTypeName, true);
-    if (!complexType) return false;
+    if (!complexType) {
+        return false;
+    }
     // allow a bit flexibity, in theory, a data property could not be a entity type, but in pratice
     // if we have an embedded entity for an entity as for the expand operation, won't it be useful?
     if (!(complexType instanceof ComplexType) && !(complexType instanceof EntityType)) {
