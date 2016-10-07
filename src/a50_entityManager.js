@@ -1568,9 +1568,14 @@ var EntityManager = (function () {
       var unattachedMap = em._unattachedChildrenMap;
       var entityKey = entityAspect.getKey();
 
+    var entityType = entityKey.entityType;
+    while (entityType) {
+      var keystring = entityKey.toString(entityType);
+
       // attach any unattachedChildren
-      var tuples = unattachedMap.getTuples(entityKey);
-      if (tuples) {
+      var tuples = unattachedMap.getTuplesByString(keystring);
+
+      if (tuples && tuples.length) {
         tuples.slice(0).forEach(function (tpl) {
 
           var unattachedChildren = tpl.children.filter(function (e) {
@@ -1595,7 +1600,7 @@ var EntityManager = (function () {
             } else {
               var currentChildren = entity.getProperty(parentToChildNp.name);
               unattachedChildren.forEach(function (child) {
-                currentChildren.push(child);
+                if (currentChildren.indexOf(child) < 0) currentChildren._push(child);
                 child.setProperty(childToParentNp.name, entity);
               });
             }
@@ -1620,9 +1625,11 @@ var EntityManager = (function () {
               });
             }
           }
-          unattachedMap.removeChildren(entityKey, childToParentNp);
+          unattachedMap.removeChildrenByString(keystring, childToParentNp);
         });
       }
+      entityType = entityType.baseEntityType;
+    }
 
 
       // now add to unattachedMap if needed.
@@ -2396,28 +2403,39 @@ var EntityManager = (function () {
     tuple.children.push(child);
   };
 
-  UnattachedChildrenMap.prototype.removeChildren = function (parentEntityKey, navigationProperty) {
-    var tuples = this.getTuples(parentEntityKey);
+  // UnattachedChildrenMap.prototype.removeChildren = function (parentEntityKey, navigationProperty) {
+  //   var tuples = this.getTuples(parentEntityKey);
+  //   if (!tuples) return;
+  //   __arrayRemoveItem(tuples, function (t) {
+  //     return t.navigationProperty === navigationProperty;
+  //   });
+  //   if (!tuples.length) {
+  //     delete this.map[parentEntityKey.toString()];
+  //   }
+  // };
+
+  UnattachedChildrenMap.prototype.removeChildrenByString = function (parentEntityKeyString, navigationProperty) {
+    var tuples = this.map[parentEntityKeyString];
     if (!tuples) return;
     __arrayRemoveItem(tuples, function (t) {
       return t.navigationProperty === navigationProperty;
     });
     if (!tuples.length) {
-      delete this.map[parentEntityKey.toString()];
+      delete this.map[parentEntityKeyString];
     }
   };
 
-  UnattachedChildrenMap.prototype.getChildren = function (parentEntityKey, navigationProperty) {
-    var tuple = this.getTuple(parentEntityKey, navigationProperty);
-    if (tuple) {
-      return tuple.children.filter(function (child) {
-        // it may have later been detached.
-        return !child.entityAspect.entityState.isDetached();
-      });
-    } else {
-      return null;
-    }
-  };
+  // UnattachedChildrenMap.prototype.getChildren = function (parentEntityKey, navigationProperty) {
+  //   var tuple = this.getTuple(parentEntityKey, navigationProperty);
+  //   if (tuple) {
+  //     return tuple.children.filter(function (child) {
+  //       // it may have later been detached.
+  //       return !child.entityAspect.entityState.isDetached();
+  //     });
+  //   } else {
+  //     return null;
+  //   }
+  // };
 
   UnattachedChildrenMap.prototype.getTuple = function (parentEntityKey, navigationProperty) {
     var tuples = this.getTuples(parentEntityKey);
@@ -2438,6 +2456,10 @@ var EntityManager = (function () {
       tuples = this.map[baseKey];
     }
     return tuples;
+  };
+
+  UnattachedChildrenMap.prototype.getTuplesByString = function (parentEntityKeyString) {
+    return this.map[parentEntityKeyString];
   };
 
   return ctor;
