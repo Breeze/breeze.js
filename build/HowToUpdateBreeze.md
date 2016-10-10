@@ -1,5 +1,15 @@
 # How to release a new version of breeze.js client
 
+Before starting, get the latest from the following github repositories:
+
+ - breeze.js
+ - bower-breeze-client
+ - breeze.server.node
+ - breeze.server.net
+ - breeze.github.io
+ 
+ Also make sure you have user access in npm and have installed the nuget API key.
+
 ## breeze.js
 
 1. Update and test, test, test
