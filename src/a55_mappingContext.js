@@ -234,7 +234,7 @@ var MappingContext = (function () {
             targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
           }
           targetEntity.entityAspect.entityState = EntityState.Unchanged;
-          targetEntity.entityAspect.originalValues = {};
+          clearOriginalValues(targetEntity);
           targetEntity.entityAspect.propertyChanged.publish({ entity: targetEntity, propertyName: null });
           var action = isSaving ? EntityAction.MergeOnSave : EntityAction.MergeOnQuery;
           em.entityChanged.publish({ entityAction: action, entity: targetEntity });
@@ -264,6 +264,22 @@ var MappingContext = (function () {
       em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
     }
     return targetEntity;
+  }
+
+  // copied from entityAspect
+  function clearOriginalValues(target) {
+    var aspect = target.entityAspect || target.complexAspect;
+    aspect.originalValues = {};
+    var stype = target.entityType || target.complexType;
+    stype.complexProperties.forEach(function (cp) {
+      var cos = target.getProperty(cp.name);
+      if (cp.isScalar) {
+        clearOriginalValues(cos);
+      } else {
+        cos._acceptChanges();
+        cos.forEach(clearOriginalValues);
+      }
+    });
   }
 
   function updateEntityNoMerge(mc, targetEntity, node) {

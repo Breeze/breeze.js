@@ -69,6 +69,37 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("rejectChanges after 2nd save of new entity", function (assert) {
+      var done = assert.async();
+      var em = newEm();
+      var locationType = em.metadataStore.getEntityType("Location");
+      var supplier = em.createEntity("Supplier", { companyName: "Test1" });
+      var location = supplier.getProperty("location");
+      location.setProperty("city", "LA")
+
+      em.saveChanges().then(function (sr) {
+          var saved = sr.entities;
+          ok(saved.length === 1, "should have saved one record");
+          location = supplier.getProperty("location");
+          ok(location.getProperty("city") === "LA", "location.city should be 'LA'");
+          return em.fetchEntityByKey(supplier.entityAspect.getKey());
+      }).then(function (fr) {
+          var supplier2 = fr.entity;
+          ok(supplier === supplier2, "should be the same supplier");
+          location = supplier.getProperty("location");
+          location.setProperty("city", "SAVED");
+          return em.saveChanges();
+      }).then(function (sr) {
+          location = supplier.getProperty("location");
+          var savedCity = location.getProperty("city");
+          ok(savedCity === "SAVED", "location.city should be 'SAVED'");
+          location.setProperty("city", "BARR");
+          supplier.entityAspect.rejectChanges();
+          var rejectCity = location.getProperty("city");
+          ok(rejectCity === "SAVED", "location.city should be 'SAVED'");
+      }).fail(testFns.handleFail).fin(done);
+  });
+
   test("create entity with complexType property", function () {
     var em = newEm(MetadataStore.importMetadata(testFns.metadataStore.exportMetadata()));
 
