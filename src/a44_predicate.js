@@ -1186,6 +1186,9 @@
         var predVals = this.preds.map(function(pred) {
           return pred.visit(context);
         });
+        if (!predVals || !predVals.length) {
+          return {};
+        }
         var json;
         // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
