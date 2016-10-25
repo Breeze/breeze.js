@@ -1600,7 +1600,7 @@ var EntityManager = (function () {
             } else {
               var currentChildren = entity.getProperty(parentToChildNp.name);
               unattachedChildren.forEach(function (child) {
-                if (currentChildren.indexOf(child) < 0) currentChildren._push(child);
+                currentChildren.push(child);
                 child.setProperty(childToParentNp.name, entity);
               });
             }
