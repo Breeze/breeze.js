@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.5.14",
+        version: "1.5.15",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -4964,7 +4964,7 @@ breeze.EntityState = EntityState;
     // don't allow dups in this array. - also prevents recursion
     var parentEntity = relationArray.parentEntity;
     var navProp = relationArray.navigationProperty;
-    var inverseProp = navProp.inverse;
+    var inverseProp = navProp.inverse || (navProp.baseProperty && navProp.baseProperty.inverse); // TODO climb hierarchy
     var goodAdds;
     if (inverseProp) {
       goodAdds = adds.filter(function (a) {
@@ -4978,6 +4978,7 @@ breeze.EntityState = EntityState;
       // This occurs with a unidirectional 1->N relation ( where there is no n -> 1)
       // in this case we compare fks.
       var fkPropNames = navProp.invForeignKeyNames;
+      if (navProp.baseProperty && (!fkPropNames.length)) fkPropNames = navProp.baseProperty.invForeignKeyNames; // TODO climb hierarchy
       var keyProps = parentEntity.entityType.keyProperties;
       goodAdds = adds.filter(function (a) {
         if (relationArray._addsInProcess.indexOf(a) >= 0) {
@@ -11116,6 +11117,9 @@ breeze.NamingConvention = NamingConvention;
         var predVals = this.preds.map(function(pred) {
           return pred.visit(context);
         });
+        if (!predVals || !predVals.length) {
+          return {};
+        }
         var json;
         // normalizeAnd clauses if possible.
         // passthru predicate will appear as string and their 'ands' can't be 'normalized'
@@ -14534,7 +14538,7 @@ var EntityManager = (function () {
             } else {
               var currentChildren = entity.getProperty(parentToChildNp.name);
               unattachedChildren.forEach(function (child) {
-                if (currentChildren.indexOf(child) < 0) currentChildren._push(child);
+                currentChildren.push(child);
                 child.setProperty(childToParentNp.name, entity);
               });
             }
@@ -15639,7 +15643,7 @@ var MappingContext = (function () {
             targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
           }
           targetEntity.entityAspect.entityState = EntityState.Unchanged;
-          targetEntity.entityAspect.originalValues = {};
+          clearOriginalValues(targetEntity);
           targetEntity.entityAspect.propertyChanged.publish({ entity: targetEntity, propertyName: null });
           var action = isSaving ? EntityAction.MergeOnSave : EntityAction.MergeOnQuery;
           em.entityChanged.publish({ entityAction: action, entity: targetEntity });
@@ -15669,6 +15673,22 @@ var MappingContext = (function () {
       em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
     }
     return targetEntity;
+  }
+
+  // copied from entityAspect
+  function clearOriginalValues(target) {
+    var aspect = target.entityAspect || target.complexAspect;
+    aspect.originalValues = {};
+    var stype = target.entityType || target.complexType;
+    stype.complexProperties.forEach(function (cp) {
+      var cos = target.getProperty(cp.name);
+      if (cp.isScalar) {
+        clearOriginalValues(cos);
+      } else {
+        cos._acceptChanges();
+        cos.forEach(clearOriginalValues);
+      }
+    });
   }
 
   function updateEntityNoMerge(mc, targetEntity, node) {

@@ -162,6 +162,9 @@
 
       anyAllPredicate: function (context) {
         var exprVal = this.expr.visit(context);
+        if (!this.pred.op) {
+          return exprVal + "/" + odataOpFrom(this) + "()";
+        }
         var prefix = context.prefix;
         if (prefix) {
           exprVal = prefix + "/" + exprVal;

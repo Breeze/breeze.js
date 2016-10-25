@@ -338,7 +338,7 @@ breeze.makeRelationArray = (function () {
     // don&#x27;t allow dups in this array. - also prevents recursion
     var parentEntity = relationArray.parentEntity;
     var navProp = relationArray.navigationProperty;
-    var inverseProp = navProp.inverse;
+    var inverseProp = navProp.inverse || (navProp.baseProperty &amp;&amp; navProp.baseProperty.inverse); // TODO climb hierarchy
     var goodAdds;
     if (inverseProp) {
       goodAdds = adds.filter(function (a) {
@@ -352,6 +352,7 @@ breeze.makeRelationArray = (function () {
       // This occurs with a unidirectional 1-&gt;N relation ( where there is no n -&gt; 1)
       // in this case we compare fks.
       var fkPropNames = navProp.invForeignKeyNames;
+      if (navProp.baseProperty &amp;&amp; (!fkPropNames.length)) fkPropNames = navProp.baseProperty.invForeignKeyNames; // TODO climb hierarchy
       var keyProps = parentEntity.entityType.keyProperties;
       goodAdds = adds.filter(function (a) {
         if (relationArray._addsInProcess.indexOf(a) &gt;= 0) {
