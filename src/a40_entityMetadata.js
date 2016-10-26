@@ -2933,6 +2933,14 @@ var NavigationProperty = (function () {
 
   };
 
+  proto.getInverse = function() {
+    var np = this;
+    while(!np.inverse && np.baseProperty) {
+      np = np.baseProperty;
+    }
+    return np.inverse;
+  }
+
   proto.setInverse = function (inverseNp) {
     var invNp;
     if (typeof (inverseNp) === "string") {

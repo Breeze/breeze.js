@@ -99,7 +99,7 @@ breeze.makeRelationArray = (function () {
     var np = relationArray.navigationProperty;
     var addsInProcess = relationArray._addsInProcess;
 
-    var invNp = np.inverse;
+    var invNp = np.getInverse();
     var startIx = addsInProcess.length;
     try {
       adds.forEach(function (childEntity) {
@@ -122,7 +122,7 @@ breeze.makeRelationArray = (function () {
   }
 
   function processRemoves(relationArray, removes) {
-    var inp = relationArray.navigationProperty.inverse;
+    var inp = relationArray.navigationProperty.getInverse();
     if (inp) {
       removes.forEach(function (childEntity) {
         childEntity.setProperty(inp.name, null);
@@ -134,7 +134,7 @@ breeze.makeRelationArray = (function () {
     // don't allow dups in this array. - also prevents recursion
     var parentEntity = relationArray.parentEntity;
     var navProp = relationArray.navigationProperty;
-    var inverseProp = navProp.inverse || (navProp.baseProperty && navProp.baseProperty.inverse); // TODO climb hierarchy
+    var inverseProp = navProp.getInverse();
     var goodAdds;
     if (inverseProp) {
       goodAdds = adds.filter(function (a) {

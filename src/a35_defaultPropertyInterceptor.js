@@ -215,7 +215,7 @@ function setDpValueSimple(context, rawAccessorFn) {
     // but won't handle product.productId => orderDetail.productId because product
     // doesn't have an orderDetails property.
     entityType.navigationProperties.forEach(function (np) {
-      var inverseNp = np.inverse;
+      var inverseNp = np.getInverse();
       var fkNames = inverseNp ? inverseNp.foreignKeyNames : np.invForeignKeyNames;
 
       if (fkNames.length === 0) return;
@@ -289,7 +289,7 @@ function setNpValue(context, rawAccessorFn) {
   }
 
   var entityManager = entityAspect.entityManager;
-  var inverseProp = property.inverse;
+  var inverseProp = property.getInverse();
 
   // manage attachment -
   if (newValue != null) {

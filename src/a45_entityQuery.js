@@ -961,7 +961,7 @@
       var entityKey = new EntityKey(navigationProperty.entityType, relatedKeyValues);
       return buildKeyPredicate(entityKey);
     } else {
-      var inverseNp = navigationProperty.inverse;
+      var inverseNp = navigationProperty.getInverse();
       var foreignKeyNames = inverseNp ? inverseNp.foreignKeyNames : navigationProperty.invForeignKeyNames;
       if (foreignKeyNames.length === 0) return null;
       var keyValues = entity.entityAspect.getKey().values;

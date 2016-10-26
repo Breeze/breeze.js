@@ -1588,10 +1588,10 @@ var EntityManager = (function () {
           // except with unidirectional 1-n where it is parentToChildNp;
           var np = tpl.navigationProperty;
 
-          if (np.inverse) {
+          if (np.getInverse()) {
             // bidirectional
             childToParentNp = np;
-            parentToChildNp = np.inverse;
+            parentToChildNp = np.getInverse();
 
             if (parentToChildNp.isScalar) {
               var onlyChild = unattachedChildren[0];

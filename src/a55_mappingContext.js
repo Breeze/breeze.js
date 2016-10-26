@@ -326,7 +326,7 @@ var MappingContext = (function () {
     var relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
     if (relatedEntities == null) return;
 
-    var inverseProperty = navigationProperty.inverse;
+    var inverseProperty = navigationProperty.getInverse();
     if (!inverseProperty) return;
 
     var originalRelatedEntities = targetEntity.getProperty(navigationProperty.name);
@@ -378,7 +378,7 @@ var MappingContext = (function () {
     if (currentRelatedEntity !== relatedEntity) {
       // if not hook up both directions.
       targetEntity.setProperty(propName, relatedEntity);
-      var inverseProperty = navigationProperty.inverse;
+      var inverseProperty = navigationProperty.getInverse();
       if (!inverseProperty) return;
       if (inverseProperty.isScalar) {
         relatedEntity.setProperty(inverseProperty.name, targetEntity);
