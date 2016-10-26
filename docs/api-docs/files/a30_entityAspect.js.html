@@ -986,7 +986,7 @@ var EntityAspect = (function () {
 
   function removeFromRelationsCore(entity) {
     entity.entityType.navigationProperties.forEach(function (np) {
-      var inverseNp = np.inverse;
+      var inverseNp = np.getInverse();
       var npValue = entity.getProperty(np.name);
       if (np.isScalar) {
         if (npValue) {
