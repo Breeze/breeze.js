@@ -826,7 +826,7 @@
 
   testFns.skipIf("mongo", "does not support 'expand'").
   test("nested expand 3 level", function(assert) {
-    
+
     var done = assert.async();
     var em = newEm();
     var em2 = newEm();
@@ -1254,7 +1254,7 @@
 
   testFns.skipIf("mongo", "does not support nested navigation thru joins").
   test("with inlineCount 2", function(assert) {
-  
+
     var done = assert.async();
     var em = newEm();
     var q = EntityQuery.from("Orders")
@@ -1487,7 +1487,7 @@
       return successCount++;
     }).fail(queryFailed);
 
-    Q.all([prom1, prom2]).then(function () {
+    Promise.all([prom1, prom2]).then(function () {
       ok(successCount === 2, "two queries should succeed");
     }).fail(queryFailed).fin(done);
 
@@ -2103,7 +2103,7 @@
           ok(od.getProperty("product") === product, "product should be set");
         });
       });
-      return Q.all(promises);
+      return Promise.all(promises);
     }).then(function () {
       ok(true, "all promises completed");
     }).fail(testFns.handleFail).fin(done);
@@ -2705,7 +2705,7 @@
         var custs3 = data3.results;
         equal(custs3.length, skipTakeCount);
       })
-      return Q.all([p1, p2, p3]);
+      return Promise.all([p1, p2, p3]);
     }).fail(testFns.handleFail).fin(done);
   });
 

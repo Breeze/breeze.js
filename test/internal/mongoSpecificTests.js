@@ -329,7 +329,7 @@
       var orderPromises = custs.map(function (cust) {
         return cust.getProperty("orders").load();
       });
-      return Q.all(orderPromises);
+      return Promise.all(orderPromises);
     }).then(function () {
       custs.forEach(function (cust) {
         cust.entityAspect.setDeleted();

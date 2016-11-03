@@ -728,7 +728,7 @@
   //test("check if save requeried saved entities", function(assert) {
   //    var em = newEm();
   //    var c1 = em.createEntity("TimeGroup", { comment: "trigger" });
-  //    
+  //
   //    em.saveChanges().then(function (sr) {
   //        var comment = sr.entities[0].comment;
   //        ok(comment === "happy", "should have requeried the value updated by trigger");
@@ -1800,7 +1800,7 @@
       var cust = data.results[0];
       testFns.morphStringProp(cust, "companyName");
 
-      return Q.all([em.saveChanges(), em.saveChanges()]);
+      return Promise.all([em.saveChanges(), em.saveChanges()]);
     }).then(function (x) {
       ok(false, "one save should have failed for concurrency reasons");
     }).fail(function (e) {
@@ -1837,7 +1837,7 @@
       var price = prod.getProperty("unitPrice");
       prod.setProperty("unitPrice", price + .01);
 
-      return Q.all([em.saveChanges(), em.saveChanges()]);
+      return Promise.all([em.saveChanges(), em.saveChanges()]);
     }).then(function (x) {
       ok(true, "expected both to succeed");
     }).fail(function (e) {
@@ -1864,7 +1864,7 @@
       var price = prod.getProperty("unitPrice");
       prod.setProperty("unitPrice", price + .01);
 
-      return Q.all([em.saveChanges(), em.saveChanges()]);
+      return Promise.all([em.saveChanges(), em.saveChanges()]);
     }).then(function (x) {
       ok(false, "expected only one to complete");
     }).fail(function (e) {
@@ -2508,7 +2508,7 @@
         //var pr = em.saveChanges();
         //promises.push(pr);
       });
-      // return Q.all(promises);
+      // return Promise.all(promises);
       return em.saveChanges();
 
     }).then(function (sr) {

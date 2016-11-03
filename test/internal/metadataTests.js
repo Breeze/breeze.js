@@ -564,7 +564,7 @@
       ok(true, "should also get here");
 
     });
-    Q.all([p1, p2]).fail(errFn).fin(done);
+    Promise.all([p1, p2]).fail(errFn).fin(done);
   });
 
   function importMetadataWithInheritance(metadataJson) {

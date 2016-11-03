@@ -1,10 +1,18 @@
-﻿// Poor mans Promise.finally and Q replacement shim
+// Poor mans Promise.finally and Q replacement shim
 if (Promise) {
     Promise.prototype.fail = Promise.prototype.catch;
-    Promise.prototype.finally = function (onResolveOrReject) {
-        return this.catch(function (reason) {
-            return reason;
-        }).then(onResolveOrReject);
+    Promise.prototype.finally = function finallyPolyfill(callback) {
+        var constructor = this.constructor;
+
+        return this.then(function(value) {
+            return constructor.resolve(callback()).then(function() {
+                return value;
+            });
+        }, function(reason) {
+            return constructor.resolve(callback()).then(function() {
+                throw reason;
+            });
+        });
     };
     Promise.prototype.fin = Promise.prototype.finally;
 }
@@ -188,7 +196,7 @@ breezeTestFns = (function (breeze) {
     version = (version || "").toLowerCase();
     // servername
     testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF, NHIBERNATE, or ODATA
-    
+
     testFns.DEBUG_MONGO = serverName === "mongo";
     testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
     testFns.DEBUG_HIBERNATE = serverName == "hibernate";
@@ -302,7 +310,7 @@ breezeTestFns = (function (breeze) {
         dummyOrderID: 999,
         dummyEmployeeID: 9999,
         chaiProductID: 1,
-        alfredsOrderDetailKey: { OrderID: 10643, ProductID: 28 /*R�ssle Sauerkraut*/ }
+        alfredsOrderDetailKey: { OrderID: 10643, ProductID: 28 /*R?ssle Sauerkraut*/ }
       }
       testFns.orderKeyName = "orderID";
       testFns.customerKeyName = "customerID";
@@ -338,7 +346,7 @@ breezeTestFns = (function (breeze) {
     } else {
       modelLibrary = "backingStore";
     }
-    
+
     core.config.initializeAdapterInstance("modelLibrary", modelLibrary, true);
     testFns.modelLibrary = core.config.getAdapterInstance("modelLibrary").name;
 

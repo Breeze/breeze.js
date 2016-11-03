@@ -191,7 +191,7 @@
 
     var query = EntityQuery.from("CustomersWithHttpError")
         .using(em);
-    
+
     query.execute().then(function (data) {
       ok(false, "should not get here");
     }).fail(function (e) {
@@ -585,7 +585,7 @@
           orderKeys.sort(entityKeyCompare);
           ok(core.arrayEquals(orderKeys, order3Keys, EntityKey.equals), "orders query do not return the correct entities");
         });
-        return Q.all([p1, p2]);
+        return Promise.all([p1, p2]);
       }).fail(testFns.handleFail).fin(done);
     });
 
