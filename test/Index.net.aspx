@@ -32,7 +32,8 @@
     <!-- Test helper scripts  -->
     <!-- These two must come first -->
     <script src="breeze/breeze.debug.js"></script>
-    <script src="breeze/breeze.modelLibrary.backbone.js"></script>
+    <%--<script src="breeze/promise-finally-shim.js"></script>--%>
+    <%--<script src="breeze/breeze.modelLibrary.backbone.js"></script>--%>
     <script src="internal/testFns.js"></script>
 
     <script>

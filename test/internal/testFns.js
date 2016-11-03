@@ -1,4 +1,15 @@
-﻿breezeTestFns = (function (breeze) {
+﻿// Poor mans Promise.finally and Q replacement shim
+if (Promise) {
+    Promise.prototype.fail = Promise.prototype.catch;
+    Promise.prototype.finally = function (onResolveOrReject) {
+        return this.catch(function (reason) {
+            return reason;
+        }).then(onResolveOrReject);
+    };
+    Promise.prototype.fin = Promise.prototype.finally;
+}
+
+breezeTestFns = (function (breeze) {
 
   "use strict";
 
