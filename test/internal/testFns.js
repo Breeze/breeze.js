@@ -1,4 +1,4 @@
-// Poor mans Promise.finally and Q replacement shim
+﻿// Poor mans Promise.finally and Q replacement shim
 if (Promise) {
     Promise.prototype.fail = Promise.prototype.catch;
     Promise.prototype.finally = function finallyPolyfill(callback) {
@@ -977,7 +977,7 @@ breezeTestFns = (function (breeze) {
           xhr.status + "' with message: " + data;
       })
       .error(function (xhr, textStatus, errorThrown) {
-        return Q.reject(getjQueryError(xhr, textStatus, errorThrown));
+        return Promise.reject(getjQueryError(xhr, textStatus, errorThrown));
       });
   }
 

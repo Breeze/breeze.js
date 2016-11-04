@@ -413,7 +413,7 @@
     }).then(function (sr) {
       var ents = sr.entities;
       ok(ents.length === 1, "should have saved 1 entity");
-      return Q.resolve(sr);
+      return Promise.resolve(sr);
     });
 
   }

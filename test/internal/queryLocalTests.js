@@ -713,10 +713,12 @@
   function executeComboQueryWithExecuteLocally(em, query) {
     query = query.using(em);
     return query.execute().then(function () {
-      return Q.fcall(function () {
-        var results = query.executeLocally();
-        return { results: results };
-      });
+      var results = query.executeLocally();
+      return { results: results };
+      //return Q.fcall(function () {
+      //  var results = query.executeLocally();
+      //  return { results: results };
+      //});
     });
   }
 
