@@ -462,6 +462,7 @@ var JsonResultsAdapter = (function () {
         .whereParam(&quot;extractResults&quot;).isFunction().isOptional().withDefault(extractResultsDefault)
         .whereParam(&quot;extractSaveResults&quot;).isFunction().isOptional().withDefault(extractSaveResultsDefault)
         .whereParam(&quot;extractKeyMappings&quot;).isFunction().isOptional().withDefault(extractKeyMappingsDefault)
+        .whereParam(&quot;extractDeletedKeys&quot;).isFunction().isOptional().withDefault(extractDeletedKeysDefault)
         .whereParam(&quot;visitNode&quot;).isFunction()
         .applyAll(this);
     __config._storeObject(this, proto._$typeName, this.name);
@@ -477,9 +478,13 @@ var JsonResultsAdapter = (function () {
   function extractSaveResultsDefault(data) {
     return data.entities || data.Entities || [];
   }
-
+  
   function extractKeyMappingsDefault(data) {
     return data.keyMappings || data.KeyMappings || [];
+  }
+
+  function extractDeletedKeysDefault(data) {
+    return data.deletedKeys || data.DeletedKeys || [];
   }
 
   return ctor;

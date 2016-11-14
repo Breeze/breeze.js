@@ -1239,8 +1239,8 @@ var EntityManager = (function () {
     function processSavedEntities(saveResult) {
 
       var savedEntities = saveResult.entities;
-
-      if (savedEntities.length === 0) {
+      var deletedKeys = saveResult.deletedKeys || [];
+      if (savedEntities.length === 0 &amp;&amp; deletedKeys.length == 0) {
         return [];
       }
       var keyMappings = saveResult.keyMappings;
@@ -1262,6 +1262,17 @@ var EntityManager = (function () {
         // the save operation did not actually return the entity - i.e. during OData and Mongo updates and deletes.
         savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: &quot;root&quot; });
       });
+
+      // detach any entities found in the em that appear in the deletedKeys list. 
+      
+      deletedKeys.forEach(key =&gt; {
+        var entityType = em.metadataStore._getEntityType(key.entityTypeName);
+        var ekey = new EntityKey(entityType, key.keyValues);
+        var entity = em.findEntityByKey(ekey);
+        if (entity) {
+          entity.entityAspect.setDetached();
+        }
+      })
 
       return savedEntities;
     }
