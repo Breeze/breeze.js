@@ -1059,6 +1059,17 @@ var EntityManager = (function () {
         savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: "root" });
       });
 
+      // detach any entities found in the em that appear in the deletedKeys list. 
+      var deletedKeys = saveResult.deletedKeys || [];
+      deletedKeys.forEach(key => {
+        var entityType = metadataStore._getEntityType(key.entityTypeName);
+        var ekey = new EntityKey(entityType, key.keyValues);
+        var entity = entityManager.findEntityByKey(ekey);
+        if (entity) {
+          entity.entityAspect.setDetached();
+        }
+      })
+
       return savedEntities;
     }
 

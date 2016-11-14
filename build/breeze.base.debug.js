@@ -6333,6 +6333,7 @@ var JsonResultsAdapter = (function () {
         .whereParam("extractResults").isFunction().isOptional().withDefault(extractResultsDefault)
         .whereParam("extractSaveResults").isFunction().isOptional().withDefault(extractSaveResultsDefault)
         .whereParam("extractKeyMappings").isFunction().isOptional().withDefault(extractKeyMappingsDefault)
+        .whereParam("extractDeletedKeys").isFunction().isOptional().withDefault(extractDeletedKeysDefault)
         .whereParam("visitNode").isFunction()
         .applyAll(this);
     __config._storeObject(this, proto._$typeName, this.name);
@@ -6348,9 +6349,13 @@ var JsonResultsAdapter = (function () {
   function extractSaveResultsDefault(data) {
     return data.entities || data.Entities || [];
   }
-
+  
   function extractKeyMappingsDefault(data) {
     return data.keyMappings || data.KeyMappings || [];
+  }
+
+  function extractDeletedKeysDefault(data) {
+    return data.deletedKeys || data.DeletedKeys || [];
   }
 
   return ctor;
@@ -14004,6 +14009,17 @@ var EntityManager = (function () {
         // the save operation did not actually return the entity - i.e. during OData and Mongo updates and deletes.
         savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: "root" });
       });
+
+      // detach any entities found in the em that appear in the deletedKeys list. 
+      var deletedKeys = saveResult.deletedKeys || [];
+      deletedKeys.forEach(key => {
+        var entityType = metadataStore._getEntityType(key.entityTypeName);
+        var ekey = new EntityKey(entityType, key.keyValues);
+        var entity = entityManager.findEntityByKey(ekey);
+        if (entity) {
+          entity.entityAspect.setDetached();
+        }
+      })
 
       return savedEntities;
     }

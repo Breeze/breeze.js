@@ -6333,6 +6333,7 @@ var JsonResultsAdapter = (function () {
         .whereParam("extractResults").isFunction().isOptional().withDefault(extractResultsDefault)
         .whereParam("extractSaveResults").isFunction().isOptional().withDefault(extractSaveResultsDefault)
         .whereParam("extractKeyMappings").isFunction().isOptional().withDefault(extractKeyMappingsDefault)
+        .whereParam("extractDeletedKeys").isFunction().isOptional().withDefault(extractDeletedKeysDefault)
         .whereParam("visitNode").isFunction()
         .applyAll(this);
     __config._storeObject(this, proto._$typeName, this.name);
@@ -6348,9 +6349,13 @@ var JsonResultsAdapter = (function () {
   function extractSaveResultsDefault(data) {
     return data.entities || data.Entities || [];
   }
-
+  
   function extractKeyMappingsDefault(data) {
     return data.keyMappings || data.KeyMappings || [];
+  }
+
+  function extractDeletedKeysDefault(data) {
+    return data.deletedKeys || data.DeletedKeys || [];
   }
 
   return ctor;
@@ -14005,6 +14010,17 @@ var EntityManager = (function () {
         savedEntities = mappingContext.visitAndMerge(savedEntities, { nodeType: "root" });
       });
 
+      // detach any entities found in the em that appear in the deletedKeys list. 
+      var deletedKeys = saveResult.deletedKeys || [];
+      deletedKeys.forEach(key => {
+        var entityType = metadataStore._getEntityType(key.entityTypeName);
+        var ekey = new EntityKey(entityType, key.keyValues);
+        var entity = entityManager.findEntityByKey(ekey);
+        if (entity) {
+          entity.entityAspect.setDetached();
+        }
+      })
+
       return savedEntities;
     }
 
@@ -17140,6 +17156,7 @@ breeze.SaveOptions = SaveOptions;
     var jra = saveContext.dataService.jsonResultsAdapter || this.jsonResultsAdapter;
     var entities = jra.extractSaveResults(data) || [];
     var keyMappings = jra.extractKeyMappings(data) || [];
+    var deletedKeys = jra.extractDeletedKeys ? (jra.extractDeletedKeys(data)) || [] : [];
 
     if (keyMappings.length) {
       // HACK: need to change the 'case' of properties in the saveResult
@@ -17151,7 +17168,16 @@ breeze.SaveOptions = SaveOptions;
         return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
       });
     }
-    return { entities: entities, keyMappings: keyMappings };
+
+    if (deletedKeys.length) {
+      deletedKeys = deletedKeys.map(function(dk) {
+        if (dk.entityTypeName) return dk; // it's already lower case
+        var entityTypeName = MetadataStore.normalizeTypeName(dk.EntityTypeName);
+        return { entityTypeName: entityTypeName, keyValues: dk.KeyValues };
+      });
+    }
+    
+    return { entities: entities, keyMappings: keyMappings, deletedKeys: deletedKeys };
   };
 
   proto.jsonResultsAdapter = new JsonResultsAdapter({

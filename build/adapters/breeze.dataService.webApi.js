@@ -59,6 +59,7 @@
     var jra = saveContext.dataService.jsonResultsAdapter || this.jsonResultsAdapter;
     var entities = jra.extractSaveResults(data) || [];
     var keyMappings = jra.extractKeyMappings(data) || [];
+    var deletedKeys = jra.extractDeletedKeys ? (jra.extractDeletedKeys(data)) || [] : [];
 
     if (keyMappings.length) {
       // HACK: need to change the 'case' of properties in the saveResult
@@ -70,7 +71,16 @@
         return { entityTypeName: entityTypeName, tempValue: km.TempValue, realValue: km.RealValue };
       });
     }
-    return { entities: entities, keyMappings: keyMappings };
+
+    if (deletedKeys.length) {
+      deletedKeys = deletedKeys.map(function(dk) {
+        if (dk.entityTypeName) return dk; // it's already lower case
+        var entityTypeName = MetadataStore.normalizeTypeName(dk.EntityTypeName);
+        return { entityTypeName: entityTypeName, keyValues: dk.KeyValues };
+      });
+    }
+    
+    return { entities: entities, keyMappings: keyMappings, deletedKeys: deletedKeys };
   };
 
   proto.jsonResultsAdapter = new JsonResultsAdapter({
