@@ -48,7 +48,7 @@
     var em = newEm();
     var product = createSupplierAndProduct(em);
     var supplier = product.getProperty("supplier");
-    var saveOptions = new SaveOptions({ tag: "deleteProdOnServer" });
+    var saveOptions = new SaveOptions({ tag: "deleteProductOnServer" });
 
     em.saveChanges(null, saveOptions).then(function(sr) {
       ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
@@ -65,11 +65,16 @@
 
     var em = newEm();
     var product = createSupplierAndProduct(em);
-    product.entityAspect.setUnchanged();
     var supplier = product.getProperty("supplier");
-    var saveOptions = new SaveOptions({ tag: "deleteProdOnServer" });
 
-    em.saveChanges(null, saveOptions).then(function(sr) {
+    em.saveChanges().then(function(sr) {
+      ok(product.entityAspect.entityState.isUnchanged(), "Product should be unchanged");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+      supplier.setProperty("contactName", "Harry Arms");
+  
+      var saveOptions = new SaveOptions({ tag: "deleteProductOnServer:" + product.getProperty("productID") });
+      return em.saveChanges(null, saveOptions);
+    }).then(function(sr) {
       ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
       ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
       var addedProducts = em.getEntities(["Product"]);
@@ -102,12 +107,44 @@
 
     var em = newEm();
     var product = createSupplierAndProduct(em);
-    product.entityAspect.setUnchanged();
     var supplier = product.getProperty("supplier");
-    supplier.entityAspect.setUnchanged();
-    var saveOptions = new SaveOptions({ tag: "deleteSupplierAndProductOnServer" });
 
-    em.saveChanges([supplier, product], saveOptions).then(function(sr) {
+    em.saveChanges().then(function(sr) {
+      ok(product.entityAspect.entityState.isUnchanged(), "Product should be unchanged");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+
+      var saveOptions = new SaveOptions({ tag: "deleteSupplierAndProductOnServer" });
+          // supplier.getProperty("supplierID") + ":" + product.getProperty("productID") });
+      return em.saveChanges([supplier, product], saveOptions);
+    }).then(function(sr) {
+
+      ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
+      ok(supplier.entityAspect.entityState.isDetached(), "Supplier should be detached");
+      var addedProducts = em.getEntities(["Product"]);
+      ok(addedProducts.length === 0, "There should be no Products");
+      var addedSuppliers = em.getEntities(["Supplier"]);
+      ok(addedSuppliers.length === 0, "There should be no Suppliers");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
+  test("delete modified supplier and product on server", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var product = createSupplierAndProduct(em);
+    var supplier = product.getProperty("supplier");
+
+    em.saveChanges().then(function(sr) {
+      ok(product.entityAspect.entityState.isUnchanged(), "Product should be unchanged");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+      supplier.setProperty("contactName", "Harry Arms");
+      product.setProperty("unitsInStock", 25);
+
+      var saveOptions = new SaveOptions({ tag: "deleteSupplierAndProductOnServer" }); 
+          // supplier.getProperty("supplierID") + ":" + product.getProperty("productID") });
+      return em.saveChanges(null, saveOptions);
+    }).then(function(sr) {
+
       ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
       ok(supplier.entityAspect.entityState.isDetached(), "Supplier should be detached");
       var addedProducts = em.getEntities(["Product"]);
