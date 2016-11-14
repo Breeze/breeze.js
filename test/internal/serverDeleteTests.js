@@ -172,4 +172,54 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("delete supplier on client and product on server", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var product = createSupplierAndProduct(em);
+    var supplier = product.getProperty("supplier");
+
+    em.saveChanges().then(function(sr) {
+      ok(product.entityAspect.entityState.isUnchanged(), "Product should be unchanged");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+      supplier.entityAspect.setDeleted();
+
+      var saveOptions = new SaveOptions({ tag: "deleteProductOnServer:" + product.getProperty("productID") });
+      return em.saveChanges(null, saveOptions);
+    }).then(function(sr) {
+
+      ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
+      ok(supplier.entityAspect.entityState.isDetached(), "Supplier should be detached");
+      var addedProducts = em.getEntities(["Product"]);
+      ok(addedProducts.length === 0, "There should be no Products");
+      var addedSuppliers = em.getEntities(["Supplier"]);
+      ok(addedSuppliers.length === 0, "There should be no Suppliers");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
+  test("delete product on client and supplier on server before save", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var product = createSupplierAndProduct(em);
+    var supplier = product.getProperty("supplier");
+
+    em.saveChanges().then(function(sr) {
+      ok(product.entityAspect.entityState.isUnchanged(), "Product should be unchanged");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+      product.entityAspect.setDeleted();
+
+      var saveOptions = new SaveOptions({ tag: "deleteSupplierOnServer.Before" });
+      return em.saveChanges(null, saveOptions);
+    }).then(function(sr) {
+
+      ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
+      ok(supplier.entityAspect.entityState.isDetached(), "Supplier should be detached");
+      var addedProducts = em.getEntities(["Product"]);
+      ok(addedProducts.length === 0, "There should be no Products");
+      var addedSuppliers = em.getEntities(["Supplier"]);
+      ok(addedSuppliers.length === 0, "There should be no Suppliers");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
 })(breezeTestFns);
