@@ -13986,8 +13986,8 @@ var EntityManager = (function () {
     function processSavedEntities(saveResult) {
 
       var savedEntities = saveResult.entities;
-
-      if (savedEntities.length === 0) {
+      var deletedKeys = saveResult.deletedKeys || [];
+      if (savedEntities.length === 0 && deletedKeys.length == 0) {
         return [];
       }
       var keyMappings = saveResult.keyMappings;
@@ -14011,7 +14011,7 @@ var EntityManager = (function () {
       });
 
       // detach any entities found in the em that appear in the deletedKeys list. 
-      var deletedKeys = saveResult.deletedKeys || [];
+      
       deletedKeys.forEach(key => {
         var entityType = em.metadataStore._getEntityType(key.entityTypeName);
         var ekey = new EntityKey(entityType, key.keyValues);
