@@ -14013,9 +14013,9 @@ var EntityManager = (function () {
       // detach any entities found in the em that appear in the deletedKeys list. 
       var deletedKeys = saveResult.deletedKeys || [];
       deletedKeys.forEach(key => {
-        var entityType = metadataStore._getEntityType(key.entityTypeName);
+        var entityType = em.metadataStore._getEntityType(key.entityTypeName);
         var ekey = new EntityKey(entityType, key.keyValues);
-        var entity = entityManager.findEntityByKey(ekey);
+        var entity = em.findEntityByKey(ekey);
         if (entity) {
           entity.entityAspect.setDetached();
         }
@@ -17173,7 +17173,8 @@ breeze.SaveOptions = SaveOptions;
       deletedKeys = deletedKeys.map(function(dk) {
         if (dk.entityTypeName) return dk; // it's already lower case
         var entityTypeName = MetadataStore.normalizeTypeName(dk.EntityTypeName);
-        return { entityTypeName: entityTypeName, keyValues: dk.KeyValues };
+        // NOTE the dk.KeyValue => keyValues transition - needed because we are deserializing an .NET EntityKey
+        return { entityTypeName: entityTypeName, keyValues: dk.KeyValue }; 
       });
     }
     

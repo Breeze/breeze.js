@@ -76,7 +76,8 @@
       deletedKeys = deletedKeys.map(function(dk) {
         if (dk.entityTypeName) return dk; // it's already lower case
         var entityTypeName = MetadataStore.normalizeTypeName(dk.EntityTypeName);
-        return { entityTypeName: entityTypeName, keyValues: dk.KeyValues };
+        // NOTE the dk.KeyValue => keyValues transition - needed because we are deserializing an .NET EntityKey
+        return { entityTypeName: entityTypeName, keyValues: dk.KeyValue }; 
       });
     }
     
