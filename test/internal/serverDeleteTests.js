@@ -42,7 +42,25 @@
     return product;
   }
 
-  test("delete new product on server", function (assert) {
+  test("delete new product on server before", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var product = createSupplierAndProduct(em);
+    var supplier = product.getProperty("supplier");
+    var saveOptions = new SaveOptions({ tag: "deleteProductOnServer.Before" });
+
+    em.saveChanges(null, saveOptions).then(function(sr) {
+      ok(product.entityAspect.entityState.isDetached(), "Product should be detached");
+      ok(supplier.entityAspect.entityState.isUnchanged(), "Supplier should be unchanged");
+      var addedProducts = em.getEntities(["Product"]);
+      ok(addedProducts.length === 0, "There should be no Products");
+      var addedSuppliers = em.getEntities(["Supplier"]);
+      ok(addedSuppliers.length === 1, "There should be one Supplier");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
+  test("delete new product on server after", function (assert) {
     var done = assert.async();
 
     var em = newEm();
