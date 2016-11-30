@@ -1,5 +1,5 @@
 ﻿// Poor mans Promise.finally and Q replacement shim
-if (Promise) {
+if (window.Promise) {
     Promise.prototype.fail = Promise.prototype.catch;
     Promise.prototype.finally = function finallyPolyfill(callback) {
         var constructor = this.constructor;
@@ -15,6 +15,8 @@ if (Promise) {
         });
     };
     Promise.prototype.fin = Promise.prototype.finally;
+} else {
+    window.Promise = window.Q;
 }
 
 breezeTestFns = (function (breeze) {
