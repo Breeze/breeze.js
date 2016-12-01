@@ -14012,7 +14012,7 @@ var EntityManager = (function () {
 
       // detach any entities found in the em that appear in the deletedKeys list. 
       
-      deletedKeys.forEach(key => {
+      deletedKeys.forEach(function(key) {
         var entityType = em.metadataStore._getEntityType(key.entityTypeName);
         var ekey = new EntityKey(entityType, key.keyValues);
         var entity = em.findEntityByKey(ekey);
