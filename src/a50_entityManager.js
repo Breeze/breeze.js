@@ -2459,14 +2459,21 @@ var EntityManager = (function () {
 
 
   UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
+    var allTuples = [];
     var tuples = this.map[parentEntityKey.toString()];
+    if (tuples) {
+      allTuples = allTuples.concat(tuples);
+    }
     var entityType = parentEntityKey.entityType;
-    while (!tuples && entityType.baseEntityType) {
+    while (entityType.baseEntityType) {
       entityType = entityType.baseEntityType;
       var baseKey = parentEntityKey.toString(entityType);
       tuples = this.map[baseKey];
+      if (tuples) {
+        allTuples = allTuples.concat(tuples);
+      }
     }
-    return tuples;
+    return (allTuples.length) ? allTuples : undefined;
   };
 
   UnattachedChildrenMap.prototype.getTuplesByString = function (parentEntityKeyString) {
