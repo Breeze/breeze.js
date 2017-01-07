@@ -494,7 +494,9 @@ var EntityManager = (function () {
         var entityType = that.metadataStore._getEntityType(entityTypeName, true);
         var targetEntityGroup = findOrCreateEntityGroup(that, entityType);
         var entities = importEntityGroup(targetEntityGroup, jsonGroup, config);
-        Array.prototype.push.apply(entitiesToLink, entities);
+        if (entities && entities.length) {
+          entitiesToLink = entitiesToLink.concat(entities);
+        }
       });
       entitiesToLink.forEach(function (entity) {
         if (!entity.entityAspect.entityState.isDeleted()) {
@@ -1723,8 +1725,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getChanges();
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
@@ -1741,8 +1743,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getEntities(entityStates);
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
