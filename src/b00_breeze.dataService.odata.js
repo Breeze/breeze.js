@@ -112,7 +112,7 @@
     }
 
     // Add query params if .withParameters was used
-    if (mappingContext.query.parameters) {
+    if (! __isEmpty(mappingContext.query.parameters)) {
       var paramString = toQueryString(mappingContext.query.parameters);
       var sep = url.indexOf("?") < 0 ? "?" : "&";
       url = url + sep + paramString;
