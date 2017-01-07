@@ -27,11 +27,13 @@
     <script src="vendor/backbone.min.js"></script>
     <script src="vendor/jquery-2.0.3.min.js"></script>
     <script src="vendor/angular.min.js"></script>
+    <%--<script src="vendor/angular1.6.min.js"></script>--%>
     <script src="vendor/changesets.js"></script>
 
     <!-- Test helper scripts  -->
     <!-- These two must come first -->
     <script src="breeze/breeze.debug.js"></script>
+    <%--<script src="breeze/breeze.bridge.angular.js"></script>--%>
     <%--<script src="breeze/promise-finally-shim.js"></script>--%>
     <%--<script src="breeze/breeze.modelLibrary.backbone.js"></script>--%>
     <script src="internal/testFns.js"></script>
