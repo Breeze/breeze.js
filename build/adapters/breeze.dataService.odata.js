@@ -112,7 +112,7 @@
     }
 
     // Add query params if .withParameters was used
-    if (mappingContext.query.parameters) {
+    if (!core.isEmpty(mappingContext.query.parameters)) {
       var paramString = toQueryString(mappingContext.query.parameters);
       var sep = url.indexOf("?") < 0 ? "?" : "&";
       url = url + sep + paramString;
@@ -120,7 +120,7 @@
 
     OData.read({
           requestUri: url,
-          headers: __extend({}, this.headers)
+          headers: core.extend({}, this.headers)
         },
         function (data, response) {
           var inlineCount;
@@ -162,7 +162,7 @@
       url = this.getAbsoluteUrl(dataService, '$metadata');
     }
 
-    var mheaders = __extend({}, this.headers);
+    var mheaders = core.extend({}, this.headers);
     mheaders.Accept = 'application/*; odata.metadata=full';
 
     // OData.read(url,
@@ -228,7 +228,7 @@
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: __extend({}, this.headers),
+      headers: core.extend({}, this.headers),
       requestUri: url,
       method: "POST",
       data: requestData

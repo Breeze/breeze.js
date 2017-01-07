@@ -85,7 +85,9 @@
       config: ngConfig,   // angular's $http configuration object
       dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
-      error: errorFn      // adapter's error callback
+      error: errorFn,     // adapter's error callback
+      responseSuccess: responseSuccessFn, // adapter's success callback (ng 1.6+)
+      responseError: responseErrorFn      // adapter's error callback (ng 1.6+)
     }
 
     if (core.isFunction(this.requestInterceptor)) {
@@ -96,10 +98,19 @@
     }
 
     if (requestInfo.config) { // exists unless requestInterceptor killed it.
-      this.$http(requestInfo.config)
-          .success(requestInfo.success)
-          .error(requestInfo.error);
+      var prom = this.$http(requestInfo.config);
+      if (prom.success) {
+        // response for ng < 1.6        
+        prom.success(requestInfo.success).error(requestInfo.error);
+      } else {
+        // response for ng 1.6+
+        prom.then(requestInfo.responseSuccess).catch(requestInfo.responseError);
+      }
       this.$rootScope && this.$rootScope.$digest();
+    }
+
+    function responseSuccessFn(response) {
+      return successFn(response.data, response.status, response.headers, response.config, response.statusText);
     }
 
     function successFn(data, status, headers, xconfig, statusText) {
@@ -114,6 +125,10 @@
         statusText: statusText
       };
       config.success(httpResponse);
+    }
+
+    function responseErrorFn(response) {
+      return errorFn(response.data, response.status, response.headers, response.config, response.statusText);
     }
 
     function errorFn(data, status, headers, xconfig, statusText) {

@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.6.0",
+        version: "1.6.1",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -13445,7 +13445,9 @@ var EntityManager = (function () {
         var entityType = that.metadataStore._getEntityType(entityTypeName, true);
         var targetEntityGroup = findOrCreateEntityGroup(that, entityType);
         var entities = importEntityGroup(targetEntityGroup, jsonGroup, config);
-        Array.prototype.push.apply(entitiesToLink, entities);
+        if (entities && entities.length) {
+          entitiesToLink = entitiesToLink.concat(entities);
+        }
       });
       entitiesToLink.forEach(function (entity) {
         if (!entity.entityAspect.entityState.isDeleted()) {
@@ -14674,8 +14676,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getChanges();
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
@@ -14692,8 +14694,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getEntities(entityStates);
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
@@ -15410,14 +15412,21 @@ var EntityManager = (function () {
 
 
   UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
+    var allTuples = [];
     var tuples = this.map[parentEntityKey.toString()];
+    if (tuples) {
+      allTuples = allTuples.concat(tuples);
+    }
     var entityType = parentEntityKey.entityType;
-    while (!tuples && entityType.baseEntityType) {
+    while (entityType.baseEntityType) {
       entityType = entityType.baseEntityType;
       var baseKey = parentEntityKey.toString(entityType);
       tuples = this.map[baseKey];
+      if (tuples) {
+        allTuples = allTuples.concat(tuples);
+      }
     }
-    return tuples;
+    return (allTuples.length) ? allTuples : undefined;
   };
 
   UnattachedChildrenMap.prototype.getTuplesByString = function (parentEntityKeyString) {
@@ -16388,7 +16397,9 @@ breeze.SaveOptions = SaveOptions;
       config: ngConfig,   // angular's $http configuration object
       dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
-      error: errorFn      // adapter's error callback
+      error: errorFn,     // adapter's error callback
+      responseSuccess: responseSuccessFn, // adapter's success callback (ng 1.6+)
+      responseError: responseErrorFn      // adapter's error callback (ng 1.6+)
     }
 
     if (core.isFunction(this.requestInterceptor)) {
@@ -16399,10 +16410,19 @@ breeze.SaveOptions = SaveOptions;
     }
 
     if (requestInfo.config) { // exists unless requestInterceptor killed it.
-      this.$http(requestInfo.config)
-          .success(requestInfo.success)
-          .error(requestInfo.error);
+      var prom = this.$http(requestInfo.config);
+      if (prom.success) {
+        // response for ng < 1.6        
+        prom.success(requestInfo.success).error(requestInfo.error);
+      } else {
+        // response for ng 1.6+
+        prom.then(requestInfo.responseSuccess).catch(requestInfo.responseError);
+      }
       this.$rootScope && this.$rootScope.$digest();
+    }
+
+    function responseSuccessFn(response) {
+      return successFn(response.data, response.status, response.headers, response.config, response.statusText);
     }
 
     function successFn(data, status, headers, xconfig, statusText) {
@@ -16417,6 +16437,10 @@ breeze.SaveOptions = SaveOptions;
         statusText: statusText
       };
       config.success(httpResponse);
+    }
+
+    function responseErrorFn(response) {
+      return errorFn(response.data, response.status, response.headers, response.config, response.statusText);
     }
 
     function errorFn(data, status, headers, xconfig, statusText) {
@@ -16708,7 +16732,7 @@ breeze.SaveOptions = SaveOptions;
     }
 
     // Add query params if .withParameters was used
-    if (mappingContext.query.parameters) {
+    if (!core.isEmpty(mappingContext.query.parameters)) {
       var paramString = toQueryString(mappingContext.query.parameters);
       var sep = url.indexOf("?") < 0 ? "?" : "&";
       url = url + sep + paramString;
@@ -16716,7 +16740,7 @@ breeze.SaveOptions = SaveOptions;
 
     OData.read({
           requestUri: url,
-          headers: __extend({}, this.headers)
+          headers: core.extend({}, this.headers)
         },
         function (data, response) {
           var inlineCount;
@@ -16758,7 +16782,7 @@ breeze.SaveOptions = SaveOptions;
       url = this.getAbsoluteUrl(dataService, '$metadata');
     }
 
-    var mheaders = __extend({}, this.headers);
+    var mheaders = core.extend({}, this.headers);
     mheaders.Accept = 'application/*; odata.metadata=full';
 
     // OData.read(url,
@@ -16824,7 +16848,7 @@ breeze.SaveOptions = SaveOptions;
     var contentKeys = saveContext.contentKeys;
 
     OData.request({
-      headers: __extend({}, this.headers),
+      headers: core.extend({}, this.headers),
       requestUri: url,
       method: "POST",
       data: requestData

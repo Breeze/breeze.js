@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.6.0",
+        version: "1.6.1",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -13445,7 +13445,9 @@ var EntityManager = (function () {
         var entityType = that.metadataStore._getEntityType(entityTypeName, true);
         var targetEntityGroup = findOrCreateEntityGroup(that, entityType);
         var entities = importEntityGroup(targetEntityGroup, jsonGroup, config);
-        Array.prototype.push.apply(entitiesToLink, entities);
+        if (entities && entities.length) {
+          entitiesToLink = entitiesToLink.concat(entities);
+        }
       });
       entitiesToLink.forEach(function (entity) {
         if (!entity.entityAspect.entityState.isDeleted()) {
@@ -14674,8 +14676,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getChanges();
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
@@ -14692,8 +14694,8 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getEntities(entityStates);
-      if (selected) {
-        selected.push.apply(selected, entities);
+      if (selected && selected.length && entities.length) {
+        selected = selected.concat(entities);
       } else {
         selected = entities;
       }
@@ -15410,14 +15412,21 @@ var EntityManager = (function () {
 
 
   UnattachedChildrenMap.prototype.getTuples = function (parentEntityKey) {
+    var allTuples = [];
     var tuples = this.map[parentEntityKey.toString()];
+    if (tuples) {
+      allTuples = allTuples.concat(tuples);
+    }
     var entityType = parentEntityKey.entityType;
-    while (!tuples && entityType.baseEntityType) {
+    while (entityType.baseEntityType) {
       entityType = entityType.baseEntityType;
       var baseKey = parentEntityKey.toString(entityType);
       tuples = this.map[baseKey];
+      if (tuples) {
+        allTuples = allTuples.concat(tuples);
+      }
     }
-    return tuples;
+    return (allTuples.length) ? allTuples : undefined;
   };
 
   UnattachedChildrenMap.prototype.getTuplesByString = function (parentEntityKeyString) {
