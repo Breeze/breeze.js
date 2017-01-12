@@ -1929,7 +1929,7 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getChanges();
-      if (selected &amp;&amp; selected.length &amp;&amp; entities.length) {
+      if (selected &amp;&amp; selected.length) {
         selected = selected.concat(entities);
       } else {
         selected = entities;
@@ -1947,7 +1947,7 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getEntities(entityStates);
-      if (selected &amp;&amp; selected.length &amp;&amp; entities.length) {
+      if (selected &amp;&amp; selected.length) {
         selected = selected.concat(entities);
       } else {
         selected = entities;

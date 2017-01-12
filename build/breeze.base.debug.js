@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.6.1",
+        version: "1.6.2",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -14676,7 +14676,7 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getChanges();
-      if (selected && selected.length && entities.length) {
+      if (selected && selected.length) {
         selected = selected.concat(entities);
       } else {
         selected = entities;
@@ -14694,7 +14694,7 @@ var EntityManager = (function () {
       // eg may be undefined or null
       if (!eg) return;
       var entities = eg.getEntities(entityStates);
-      if (selected && selected.length && entities.length) {
+      if (selected && selected.length) {
         selected = selected.concat(entities);
       } else {
         selected = entities;
