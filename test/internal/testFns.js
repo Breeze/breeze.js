@@ -142,9 +142,10 @@ breezeTestFns = (function (breeze) {
     return (testFns.DEBUG_MONGO && s.indexOf("mongo", 0) === 0) ||
        (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel", 0) === 0) ||
        (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib", 0) === 0) ||
-       (testFns.DEBUG_HIBERNATE && s.indexOf("hib", 0) == 0) ||
+       (testFns.DEBUG_HIBERNATE && s.indexOf("hib", 0) === 0) ||
        (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
-       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0);
+       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0) ||
+       (testFns.DEBUG_DOTNET_ASPCORE && s.indexOf("aspcore", 0) === 0);
   }
 
   testFns.setup = function (assert, config) {
@@ -198,6 +199,7 @@ breezeTestFns = (function (breeze) {
     version = (version || "").toLowerCase();
     // servername
     testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF, NHIBERNATE, or ODATA
+    testFns.DEBUG_DOTNET_ASPCORE = serverName === 'dotnetaspcore';
 
     testFns.DEBUG_MONGO = serverName === "mongo";
     testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
@@ -216,7 +218,11 @@ breezeTestFns = (function (breeze) {
 
     var dataServiceAdapterName;
     // defaults
-    if (testFns.DEBUG_DOTNET_WEBAPI) {
+     if (testFns.DEBUG_DOTNET_ASPCORE) {
+      dataServiceAdapterName = "webApi";
+      testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
+      testFns.defaultServiceName = "breeze/NorthwindIBModel";
+     } else if (testFns.DEBUG_DOTNET_WEBAPI) {
       if (version == "odata") {
         dataServiceAdapterName = "webApiOData";
         testFns.defaultServiceName = "http://localhost:9011/NorthwindIB_odata";

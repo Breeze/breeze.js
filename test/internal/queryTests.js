@@ -30,7 +30,7 @@
 
 
   testFns.skipIf("mongo", "eventually will not use OData syntax").
-  skipIf("sequelize,hibernate", "does not use OData syntax").
+  skipIf("sequelize,hibernate,aspcore", "does not use OData syntax").
   test("check if correct OData datatype", function () {
     var em = newEm();
     var query = EntityQuery.from('Products').using(em).where({
@@ -111,6 +111,7 @@
 
     em1.executeQuery(query).then(function (data) {
       var r = data.results;
+      ok(r.length > 0, "should have gotten some results");
       var isOk = r.every(function (cust) {
         return countries.indexOf(cust.getProperty("country")) >= 0;
       })
@@ -467,7 +468,7 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not support the 'add' OData predicate").
+  testFns.skipIf("mongo,sequelize,hibernate,aspcore", "does not support the 'add' OData predicate").
   test("OData predicate - add ", function (assert) {
 
     var done = assert.async();
@@ -487,7 +488,7 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  testFns.skipIf("mongo,sequelize,hibernate", "does not support the 'add' OData predicate").
+  testFns.skipIf("mongo,sequelize,hibernate,aspcore", "does not support the 'add' OData predicate").
   test("OData predicate - add combined with regular predicate", function (assert) {
     var done = assert.async();
     var manager = newEm();
@@ -701,7 +702,7 @@
     }).fin(done);
   });
 
-  testFns.skipIf("sequelize,hibernate,mongo", "does not support OData query syntax").
+  testFns.skipIf("sequelize,hibernate,mongo,aspcore", "does not support OData query syntax").
   test("raw OData query string", function (assert) {
 
     var done = assert.async();
