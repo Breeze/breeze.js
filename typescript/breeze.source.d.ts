@@ -1096,7 +1096,7 @@ declare namespace breeze.config {
     @param isDefault=true {Boolean} - Whether to make this the default "adapter" for this interface.
     @return {an instance of the specified adapter}
     **/
-    export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault?: boolean): void;
+    export function initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault?: boolean): Object;
 
     export interface AdapterInstancesConfig {
         /** the name of a previously registered "ajax" adapter */
