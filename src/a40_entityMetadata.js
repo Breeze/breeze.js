@@ -1912,8 +1912,11 @@ var EntityType = (function () {
       if (!dp.isSettable) return true;
       var v1 = co1.getProperty(dp.name);
       var v2 = co2.getProperty(dp.name);
-      if (dp.isComplexProperty) {
+      if (dp.isComplexProperty && dp.isScalar) {
         return coEquals(v1, v2);
+      }
+      else if(dp.isComplexProperty && !dp.isScalar) {
+        return __arrayEquals(v1, v2, coEquals)
       } else {
         var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
         return (v1 === v2 || (dataType && dataType.normalize && v1 && v2 && dataType.normalize(v1) === dataType.normalize(v2)));
