@@ -1327,8 +1327,8 @@
       return em.fetchEntityByKey(data2.entityKey, true);
     }).then(function (data3) {
       var alfred3 = data3.entity;
-      ok(alfred3 === null, "alfred3 should = alfred");
-      ok(data3.fromCache === true, "should not have been from cache");
+      ok(alfred3 === null || alfred3 === undefined, "alfred3 should not have been found");
+      ok(data3.fromCache === true, "should have been from cache");
 
       em.setProperties({ queryOptions: em.queryOptions.using(MergeStrategy.OverwriteChanges) });
       return em.fetchEntityByKey(data3.entityKey, true);
@@ -1361,7 +1361,7 @@
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID, true).then(function (data) {
       alfred = data.entity;
-      ok(alfred === null, "alfred should not have been found");
+      ok(alfred === null || alfred === undefined, "alfred should not have been found");
       ok(data.fromCache === false, "should have been from database");
       ok(data.entityKey);
     }).fail(testFns.handleFail).fin(done);
