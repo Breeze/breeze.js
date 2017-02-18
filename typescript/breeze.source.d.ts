@@ -236,9 +236,9 @@ declare namespace breeze {
     export class DataServiceAdapter {
         checkForRecomposition(interfaceInitializedArgs: { interfaceName: string; isDefault: boolean }): void;
         initialize(): void;
-        fetchMetadata(metadataStore: MetadataStore, dataService: DataService): breeze.promises.IPromise<any>;
-        executeQuery(mappingContext: { getUrl: () => string; query: EntityQuery; dataService: DataService }): breeze.promises.IPromise<any>;
-        saveChanges(saveContext: { resourceName: string; dataService: DataService }, saveBundle: Object): breeze.promises.IPromise<SaveResult>;
+        fetchMetadata(metadataStore: MetadataStore, dataService: DataService): Promise<any>;
+        executeQuery(mappingContext: { getUrl: () => string; query: EntityQuery; dataService: DataService }): Promise<any>;
+        saveChanges(saveContext: { resourceName: string; dataService: DataService }, saveBundle: Object): Promise<SaveResult>;
         JsonResultsAdapter: JsonResultsAdapter;
     }
 
@@ -360,8 +360,8 @@ declare namespace breeze {
         isNavigationPropertyLoaded(navigationProperty: string): boolean;
         isNavigationPropertyLoaded(navigationProperty: NavigationProperty): boolean;
 
-        loadNavigationProperty(navigationProperty: string, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
-        loadNavigationProperty(navigationProperty: NavigationProperty, callback?: Function, errorCallback?: Function): breeze.promises.IPromise<QueryResult>;
+        loadNavigationProperty(navigationProperty: string, callback?: Function, errorCallback?: Function): Promise<QueryResult>;
+        loadNavigationProperty(navigationProperty: NavigationProperty, callback?: Function, errorCallback?: Function): Promise<QueryResult>;
 
         rejectChanges(): void;
 
@@ -450,16 +450,16 @@ declare namespace breeze {
         createEntity(typeName: string, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         createEntity(entityType: EntityType, config?: {}, entityState?: EntityStateSymbol, mergeStrategy?: MergeStrategySymbol): Entity;
         detachEntity(entity: Entity): boolean;
-        executeQuery(query: string, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
-        executeQuery(query: EntityQuery, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
+        executeQuery(query: string, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Promise<QueryResult>;
+        executeQuery(query: EntityQuery, callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Promise<QueryResult>;
 
         executeQueryLocally(query: EntityQuery): Entity[];
         exportEntities(entities?: Entity[], includeMetadata?: boolean): string;
         exportEntities(entities?: Entity[], options?: ExportEntitiesOptions): any; // string | Object
-        fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
-        fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): breeze.promises.IPromise<EntityByKeyResult>;
-        fetchEntityByKey(entityKey: EntityKey): breeze.promises.IPromise<EntityByKeyResult>;
-        fetchMetadata(callback?: (schema: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
+        fetchEntityByKey(typeName: string, keyValue: any, checkLocalCacheFirst?: boolean): Promise<EntityByKeyResult>;
+        fetchEntityByKey(typeName: string, keyValues: any[], checkLocalCacheFirst?: boolean): Promise<EntityByKeyResult>;
+        fetchEntityByKey(entityKey: EntityKey): Promise<EntityByKeyResult>;
+        fetchMetadata(callback?: (schema: any) => void, errorCallback?: breeze.core.ErrorCallback): Promise<any>;
         generateTempKeyValue(entity: Entity): any;
         getChanges(): Entity[];
         getChanges(entityTypeName: string): Entity[];
@@ -493,7 +493,7 @@ declare namespace breeze {
         importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
-        saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): breeze.promises.IPromise<SaveResult>;
+        saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): Promise<SaveResult>;
         setProperties(config: EntityManagerProperties): void;
     }
 
@@ -581,7 +581,7 @@ declare namespace breeze {
         /** Create query from an expression tree */
         constructor(tree: Object);
 
-        execute(callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): breeze.promises.IPromise<QueryResult>;
+        execute(callback?: ExecuteQuerySuccessCallback, errorCallback?: ExecuteQueryErrorCallback): Promise<QueryResult>;
         executeLocally(): Entity[];
         expand(propertyPaths: string[]): EntityQuery;
         expand(propertyPaths: string): EntityQuery;
@@ -750,8 +750,8 @@ declare namespace breeze {
         addDataService(dataService: DataService, shouldOverwrite?: boolean): void;
         addEntityType(structuralType: IStructuralType): void;
         exportMetadata(): string;
-        fetchMetadata(dataService: string, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
-        fetchMetadata(dataService: DataService, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): breeze.promises.IPromise<any>;
+        fetchMetadata(dataService: string, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): Promise<any>;
+        fetchMetadata(dataService: DataService, callback?: (data: any) => void, errorCallback?: breeze.core.ErrorCallback): Promise<any>;
         getDataService(serviceName: string): DataService;
         getEntityType(entityTypeName: string, okIfNotFound?: boolean): IStructuralType;
         getEntityTypes(): IStructuralType[];
@@ -1145,27 +1145,17 @@ declare namespace breeze.promises {
 //~export namespace promises {
 //~{{/if}}
 
-    export interface IPromise<T> {
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => U): IPromise<U>;
-        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => U): IPromise<U>;
-        then<U>(onFulfill: (value: T) => U, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
-        then<U>(onFulfill: (value: T) => IPromise<U>, onReject?: (reason: any) => IPromise<U>): IPromise<U>;
-        catch<U>(onRejected: (reason: any) => U): IPromise<U>;
-        catch<U>(onRejected: (reason: any) => IPromise<U>): IPromise<U>;
-        finally(finallyCallback: () => any): IPromise<T>;
-    }
-
     export interface IDeferred<T> {
-        promise: IPromise<T>;
+        promise: Promise<T>;
         resolve(value: T): void;
         reject(reason: any): void;
     }
 
     export interface IPromiseService {
         defer<T>(): IDeferred<T>;
-        reject(reason?: any): IPromise<any>;
-        resolve<T>(object: T): IPromise<T>;
-        resolve<T>(object: IPromise<T>): IPromise<T>;
+        reject(reason?: any): Promise<any>;
+        resolve<T>(object: T): Promise<T>;
+        resolve<T>(object: Promise<T>): Promise<T>;
     }
 }
 
