@@ -232,8 +232,10 @@
           return propDescr.get.bind(entity)();
         } else {
           var set = propDescr.set;
-          var rawSet = set.rawSet || set;
-          rawSet.bind(entity)(arguments[0]);
+          while (set.rawSet) {
+              set = set.rawSet;
+          }
+          set.bind(entity)(arguments[0]);
           return undefined;
         }
       };
