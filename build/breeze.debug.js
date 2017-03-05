@@ -23,7 +23,7 @@
 })(this, function (global) {
     "use strict"; 
     var breeze = {
-        version: "1.6.2",
+        version: "1.6.3",
         metadataVersion: "1.0.5"
     };
     ;/**
@@ -8279,8 +8279,11 @@ var EntityType = (function () {
       if (!dp.isSettable) return true;
       var v1 = co1.getProperty(dp.name);
       var v2 = co2.getProperty(dp.name);
-      if (dp.isComplexProperty) {
+      if (dp.isComplexProperty && dp.isScalar) {
         return coEquals(v1, v2);
+      }
+      else if(dp.isComplexProperty && !dp.isScalar) {
+        return __arrayEquals(v1, v2, coEquals)
       } else {
         var dataType = dp.dataType; // this will be a complexType when dp is a complexProperty
         return (v1 === v2 || (dataType && dataType.normalize && v1 && v2 && dataType.normalize(v1) === dataType.normalize(v2)));
@@ -17463,8 +17466,10 @@ breeze.SaveOptions = SaveOptions;
           return propDescr.get.bind(entity)();
         } else {
           var set = propDescr.set;
-          var rawSet = set.rawSet || set;
-          rawSet.bind(entity)(arguments[0]);
+          while (set.rawSet) {
+              set = set.rawSet;
+          }
+          set.bind(entity)(arguments[0]);
           return undefined;
         }
       };
