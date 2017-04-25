@@ -46,6 +46,15 @@
     if (entityQuery.inlineCountEnabled) {
       queryOptions["$inlinecount"] = "allpages";
     }
+    
+    //add custom query option support to webapi odata
+    if (entityQuery.parameters !== null && typeof entityQuery.parameters === 'object') {
+      for (var param in entityQuery.parameters) {
+        if (/^([^\$].*)$/.test(param)) {
+          queryOptions[param] = entityQuery.parameters[param];
+        }
+      }
+    }
 
     var qoText = toQueryOptionsString(queryOptions);
     return entityQuery.resourceName + qoText;
