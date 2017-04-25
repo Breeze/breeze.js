@@ -16,5 +16,10 @@
     "handlebars": "^3.0.1",
     "through": "2.3.6 ",
     "yuidocjs": "^0.3.50"
-  }
+  },
+  "directories": { 
+    "lib": "build"
+  },
+  "main": "breeze.debug.js",
+  "format": "global"
 }
