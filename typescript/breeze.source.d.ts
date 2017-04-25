@@ -272,31 +272,10 @@ declare namespace breeze {
 
     export class DataTypeSymbol extends breeze.core.EnumSymbol {
         defaultValue: any;
-        isNumeric: boolean;
         isDate: boolean;
-    }
-    export interface DataType extends breeze.core.IEnum {
-        Binary: DataTypeSymbol;
-        Boolean: DataTypeSymbol;
-        Byte: DataTypeSymbol;
-        DateTime: DataTypeSymbol;
-        DateTimeOffset: DataTypeSymbol;
-        Decimal: DataTypeSymbol;
-        Double: DataTypeSymbol;
-        Guid: DataTypeSymbol;
-        Int16: DataTypeSymbol;
-        Int32: DataTypeSymbol;
-        Int64: DataTypeSymbol;
-        Single: DataTypeSymbol;
-        String: DataTypeSymbol;
-        Time: DataTypeSymbol;
-        Undefined: DataTypeSymbol;
-
-        toDataType(typeName: string): DataTypeSymbol;
-        parseDateFromServer(date: any): Date;
-        defaultValue: any;
+        isFloat: boolean;
         isNumeric: boolean;
-        isInteger: boolean;
+        quoteJsonOData: boolean;
 
         /** Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast. */
         parse: (val: any, sourceTypeName: string) => any;
@@ -315,6 +294,33 @@ declare namespace breeze {
 
         /** Optional function to convert a raw (server) value from string to this DataType. */
         parseRawValue?: (val: any) => any;
+    }
+
+    export interface DataType extends breeze.core.IEnum {
+        Binary: DataTypeSymbol;
+        Boolean: DataTypeSymbol;
+        Byte: DataTypeSymbol;
+        DateTime: DataTypeSymbol;
+        DateTimeOffset: DataTypeSymbol;
+        Decimal: DataTypeSymbol;
+        Double: DataTypeSymbol;
+        Guid: DataTypeSymbol;
+        Int16: DataTypeSymbol;
+        Int32: DataTypeSymbol;
+        Int64: DataTypeSymbol;
+        Single: DataTypeSymbol;
+        String: DataTypeSymbol;
+        Time: DataTypeSymbol;
+        Undefined: DataTypeSymbol;
+
+        getComparableFn(dataType: DataTypeSymbol): (value: any) => any;
+        fromEdmDataType(typeName: string): DataTypeSymbol;
+        fromValue(val: any): DataTypeSymbol;
+        parseTimeFromServer(source: any): string;
+        parseDateAsUTC(source: any): Date;
+        toDataType(typeName: string): DataTypeSymbol;
+        parseDateFromServer(date: any): Date;
+        parseRawValue(val: any, dataType?: DataTypeSymbol): any;
     }
     export var DataType: DataType;
 
