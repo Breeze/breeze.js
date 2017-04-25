@@ -499,7 +499,7 @@ var EntityManager = (function () {
         }
       });
       entitiesToLink.forEach(function (entity) {
-        if (!entity.entityAspect.entityState.isDeleted()) {
+        if (!entity.entityAspect.entityState.isDeleted() && !entity.entityAspect.entityState.isDetached()) {
           that._linkRelatedEntities(entity);
         }
       });
