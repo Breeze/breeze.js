@@ -272,13 +272,16 @@ declare namespace breeze {
 
     export class DataTypeSymbol extends breeze.core.EnumSymbol {
         defaultValue: any;
-        isDate: boolean;
-        isFloat: boolean;
-        isNumeric: boolean;
-        quoteJsonOData: boolean;
+        isDate?: boolean;
+        isFloat?: boolean;
+        isInteger?: boolean;
+        isNumeric?: boolean;
+        quoteJsonOData?: boolean;
+
+        validatorCtor: (context: any) => Validator;
 
         /** Function to convert a value from string to this DataType.  Note that this will be called each time a property is changed, so make it fast. */
-        parse: (val: any, sourceTypeName: string) => any;
+        parse?: (val: any, sourceTypeName?: string) => any;
 
         /** Function to format this DataType for OData queries. */
         fmtOData: (val: any) => any;
@@ -312,15 +315,16 @@ declare namespace breeze {
         String: DataTypeSymbol;
         Time: DataTypeSymbol;
         Undefined: DataTypeSymbol;
-
-        getComparableFn(dataType: DataTypeSymbol): (value: any) => any;
+        
+        constants: { nextNumber: number, nextNumberIncrement: number, stringPrefix: string };
+        
         fromEdmDataType(typeName: string): DataTypeSymbol;
         fromValue(val: any): DataTypeSymbol;
-        parseTimeFromServer(source: any): string;
+        getComparableFn(dataType: DataTypeSymbol): (value: any) => any;
         parseDateAsUTC(source: any): Date;
-        toDataType(typeName: string): DataTypeSymbol;
         parseDateFromServer(date: any): Date;
         parseRawValue(val: any, dataType?: DataTypeSymbol): any;
+        parseTimeFromServer(source: any): string;
     }
     export var DataType: DataType;
 
