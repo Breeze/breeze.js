@@ -99,7 +99,7 @@ declare namespace breeze.core {
     export function getPropertyDescriptor(obj: any, propertyName: string): PropertyDescriptor
 
     /** safely perform toJSON logic on objects with cycles.  Replacer function can map or exclude properties. */
-    export function toJSONSafe(obj: any, replacer: (prop: string, val: any) => any): any
+    export function toJSONSafe(obj: any, replacer?: (prop: string, val: any) => any): any
 
     /** Default value replacer for toJSONSafe.  Replaces entityAspect and other internal properties with undefined. */
     export function toJSONSafeReplacer(prop: string, val: any): any
