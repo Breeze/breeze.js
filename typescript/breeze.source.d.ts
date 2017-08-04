@@ -808,6 +808,8 @@ declare namespace breeze {
         parentType: IStructuralType;
         relatedDataProperties: DataProperty[];
         validators: Validator[];
+        invForeignKeyNames?: string[];
+        invForeignKeyNamesOnServer?: string[];
 
         constructor(config: NavigationPropertyOptions);
     }
@@ -821,6 +823,8 @@ declare namespace breeze {
         foreignKeyNames?: string[];
         foreignKeyNamesOnServer?: string[];
         validators?: Validator[];
+        invForeignKeyNames?: string[];
+        invForeignKeyNamesOnServer?: string[];
     }
 
     export interface IRecursiveArray<T> {
