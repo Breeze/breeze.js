@@ -1210,6 +1210,77 @@
   });
 
   testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("set audit field on user create", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var user = em.createEntity("User");
+    user.setProperty("userName", "Test" + Date.now());
+    user.setProperty("userPassword", "" + Date.now());
+    user.setProperty("firstName", "Test");
+    user.setProperty("lastName", "Test");
+    user.setProperty("email", "test@test.com");
+
+    em.addEntity(user);
+    var hasChanges = em.hasChanges();
+    ok(hasChanges, "should have some changes");
+    var so = new SaveOptions({ resourceName: "SaveWithAuditFields" });
+
+    em.saveChanges(null, so).then(function (sr) {
+        ok(sr.entities.length == 1, "should have saved one entity");
+      sr.entities.forEach(function (e) {
+        ok(e.createdByUserId == 12345, "createdByUserId should equal value set on server");
+      });
+    }).fail(handleFail).fin(done);
+  });
+
+  test("user update", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var q = new EntityQuery("Users").where("id", "eq", 4);
+
+    var user;
+    var email = "u" + Date.now() + "@ideablade.com";
+    q.using(em).execute().then(function (data) {
+      user = data.results[0];
+      user.setProperty("email", email);
+
+      return em.saveChanges();
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      sr.entities.forEach(function (e) {
+        ok(e.email == email, "email should equal new value");
+      });
+    }).fail(handleFail).fin(done);
+  });
+
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
+  test("set audit field on user update", function (assert) {
+    var done = assert.async();
+
+    var em = newEm();
+    var q = new EntityQuery("Users").where("id", "eq", 4);
+
+    var user;
+    q.using(em).execute().then(function (data) {
+      user = data.results[0];
+      user.setProperty("email", "u" + Date.now() + "@ideablade.com");
+
+      var so = new SaveOptions({ resourceName: "SaveWithAuditFields" });
+
+      return em.saveChanges(null, so);
+    }).then(function (sr) {
+      ok(sr.entities.length == 1, "should have saved one entity");
+      sr.entities.forEach(function (e) {
+        ok(e.modifiedByUserId == 12345, "modifiedByUserId should equal value set on server");
+      });
+    }).fail(handleFail).fin(done);
+  });
+
+
+  testFns.skipIf("odata", "does not support server interception or alt resources").
   test("with alt resource and server side add", function (assert) {
     var done = assert.async();
 
