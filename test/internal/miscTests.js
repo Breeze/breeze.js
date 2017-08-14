@@ -745,84 +745,85 @@
     ok(foos[2] === core.arrayFirst(foos, core.propEq("id", 3)));
   });
 
-  test("enum test", function () {
+  //test("enum test", function () {
 
-    var proto = {
-      isBright: function () {
-        return this.toString().toLowerCase().indexOf("r") >= 0;
-      },
-      isShort: function () {
-        return this.getName().length <= 4;
-      }
-    };
+  //  var proto = {
+  //    isBright: function () {
+  //      return this.toString().toLowerCase().indexOf("r") >= 0;
+  //    },
+  //    isShort: function () {
+  //      return this.getName().length <= 4;
+  //    }
+  //  };
+    
 
-    var Color = new Enum("Color", proto);
-    Color.Red = Color.addSymbol();
-    Color.Blue = Color.addSymbol();
-    Color.Green = Color.addSymbol();
+  //  var Color = new Enum("Color", proto);
+  //  Color.Red = Color.addSymbol();
+  //  Color.Blue = Color.addSymbol();
+  //  Color.Green = Color.addSymbol();
 
-    //    Color.RedOrBlue = Color.or(Color.Red, Color.Blue);
-    //    var isB = Color.RedOrBlue.isBright();
-    //    var getSymbols = Color.getSymbols();
-    //    var name = Color.RedOrBlue.name();
+  //  //    Color.RedOrBlue = Color.or(Color.Red, Color.Blue);
+  //  //    var isB = Color.RedOrBlue.isBright();
+  //  //    var getSymbols = Color.getSymbols();
+  //  //    var name = Color.RedOrBlue.name();
 
-    ok(Color.Red.isBright(), "Red should be 'bright'");
-    ok(!Color.Blue.isBright(), "Blue should not be 'bright'");
-    ok(!Color.Green.isShort(), "Green should not be short");
+  //  ok(Color.Red.isBright(), "Red should be 'bright'");
+  //  ok(!Color.Blue.isBright(), "Blue should not be 'bright'");
+  //  ok(!Color.Green.isShort(), "Green should not be short");
 
-    var Shape = new Enum("Shape");
-    Shape.Round = Shape.addSymbol();
-    Shape.Square = Shape.addSymbol();
+  //  var Shape = new Enum("Shape");
+  //  Shape.Round = Shape.addSymbol();
+  //  Shape.Square = Shape.addSymbol();
 
-    ok(Shape.Round.isBright === undefined, "Shape.Round.isBright should be undefined");
+  //  ok(Shape.Round.isBright === undefined, "Shape.Round.isBright should be undefined");
 
-    ok(Color instanceof Enum, "color should be instance of Enum");
-    ok(Enum.isSymbol(Color.Red), "Red should be a symbol");
-    ok(Color.contains(Color.Red), "Color should contain Red");
-    ok(!Color.contains(Shape.Round), "Color should not contain Round");
-    ok(Color.getSymbols().length === 3, "There should be 3 colors defined");
+  //  ok(Color instanceof Enum, "color should be instance of Enum");
+  //  ok(Enum.isSymbol(Color.Red), "Red should be a symbol");
+  //  ok(Color.contains(Color.Red), "Color should contain Red");
+  //  ok(!Color.contains(Shape.Round), "Color should not contain Round");
+  //  ok(Color.getSymbols().length === 3, "There should be 3 colors defined");
 
-    ok(Color.Green.toString() == "Green", "Green.toString should be 'Green' was:" + Color.Green.toString());
-    ok(Shape.Square.parentEnum === Shape, "Shape.Square's parent should be Shape");
+  //  ok(Color.Green.toString() == "Green", "Green.toString should be 'Green' was:" + Color.Green.toString());
+  //  ok(Shape.Square.parentEnum === Shape, "Shape.Square's parent should be Shape");
 
-  });
+  //});
 
-  test("enum test2", function () {
+  //test("enum test2", function () {
 
-    var prototype = {
-      nextDay: function () {
-        var nextIndex = (this.dayIndex + 1) % 7;
-        return DayOfWeek.getSymbols()[nextIndex];
-      }
-    };
+  //  var prototype = {
+  //    nextDay: function () {
+  //      var nextIndex = (this.dayIndex + 1) % 7;
+  //      return DayOfWeek.getSymbols()[nextIndex];
+  //    }
+  //  };
 
-    var DayOfWeek = new Enum("DayOfWeek", prototype);
-    DayOfWeek.Monday = DayOfWeek.addSymbol({ dayIndex: 0 });
-    DayOfWeek.Tuesday = DayOfWeek.addSymbol({ dayIndex: 1 });
-    DayOfWeek.Wednesday = DayOfWeek.addSymbol({ dayIndex: 2 });
-    DayOfWeek.Thursday = DayOfWeek.addSymbol({ dayIndex: 3 });
-    DayOfWeek.Friday = DayOfWeek.addSymbol({ dayIndex: 4 });
-    DayOfWeek.Saturday = DayOfWeek.addSymbol({ dayIndex: 5, isWeekend: true });
-    DayOfWeek.Sunday = DayOfWeek.addSymbol({ dayIndex: 6, isWeekend: true });
-    DayOfWeek.resolveSymbols();
+  //  var DayOfWeek = new Enum("DayOfWeek", prototype);
+  //  DayOfWeek.Monday = DayOfWeek.addSymbol({ dayIndex: 0 });
+  //  DayOfWeek.Tuesday = DayOfWeek.addSymbol({ dayIndex: 1 });
+  //  DayOfWeek.Wednesday = DayOfWeek.addSymbol({ dayIndex: 2 });
+  //  DayOfWeek.Thursday = DayOfWeek.addSymbol({ dayIndex: 3 });
+  //  DayOfWeek.Friday = DayOfWeek.addSymbol({ dayIndex: 4 });
+  //  DayOfWeek.Saturday = DayOfWeek.addSymbol({ dayIndex: 5, isWeekend: true });
+  //  DayOfWeek.Sunday = DayOfWeek.addSymbol({ dayIndex: 6, isWeekend: true });
+  //  DayOfWeek.resolveSymbols();
 
-    // custom methods
-    ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
-    ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
-    // custom properties
-    ok(DayOfWeek.Tuesday.isWeekend === undefined);
-    ok(DayOfWeek.Saturday.isWeekend == true);
-    // Standard enum capabilities
-    ok(DayOfWeek instanceof Enum);
-    ok(Enum.isSymbol(DayOfWeek.Wednesday));
-    ok(DayOfWeek.contains(DayOfWeek.Thursday));
-    ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
-    ok(DayOfWeek.getSymbols().length === 7);
-    ok(DayOfWeek.Friday.toString() === "Friday");
-    var x = DayOfWeek.fromName("Tuesday");
-    var y = DayOfWeek.fromName("xxx");
+  //  // custom methods
+  //  ok(DayOfWeek.Monday.nextDay() === DayOfWeek.Tuesday);
+  //  ok(DayOfWeek.Sunday.nextDay() === DayOfWeek.Monday);
+  //  // custom properties
+  //  ok(DayOfWeek.Tuesday.isWeekend === undefined);
+  //  ok(DayOfWeek.Saturday.isWeekend == true);
+  //  // Standard enum capabilities
+  //  ok(DayOfWeek instanceof Enum);
+  //  ok(Enum.isSymbol(DayOfWeek.Wednesday));
+  //  ok(DayOfWeek.contains(DayOfWeek.Thursday));
+  //  ok(DayOfWeek.Tuesday.parentEnum == DayOfWeek);
+  //  ok(DayOfWeek.getSymbols().length === 7);
+  //  ok(DayOfWeek.Friday.toString() === "Friday");
+  //  var x = DayOfWeek.fromName("Tuesday");
+  //  var y = DayOfWeek.fromName("xxx");
 
-  });
+  //});
 
 
   // return a new object that like the 'object' with ths prototype stuck in 'underneath'

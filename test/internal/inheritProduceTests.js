@@ -1,5 +1,6 @@
 (function (testFns) {
 
+  // if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE || testFns.DEBUG_DOTNET_ASPCORE) {
   if (testFns.MONGO || testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
     module("inherit - Produce", {});
     QUnit.skip("TODO: This server does not yet support these tests", function () {});

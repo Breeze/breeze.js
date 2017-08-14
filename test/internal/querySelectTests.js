@@ -167,11 +167,12 @@
           .where("companyName", "startsWith", "C")
           .orderBy("companyName")
         // .select(["companyName", "orders"]) // also works
-          .select("companyName, city, orders")
-          .expand("orders");
-      //if (testFns.DEBUG_ODATA) {
-      //    query = query.expand("orders");
-      //}
+          .select("companyName, city, orders");
+          // .expand("orders");
+      // expand is not needed and will FAIL in this care for ASPCORE.          
+      if (!testFns.DEBUG_DOTNET_ASPCORE) {
+         query = query.expand("orders");
+      }
       var queryUrl = query._toUri(em);
 
       em.executeQuery(query).then(function (data) {
@@ -218,7 +219,7 @@
         anons.forEach(function (a) {
           if (!testFns.DEBUG_ODATA) {
             ok(Object.keys(a).length === 3, "should have 3 properties");
-            if (testFns.DEBUG_DOTNET_WEBAPI) {
+            if (testFns.DEBUG_DOTNET_WEBAPI || testFns.DEBUG_DOTNET_ASPCORE) {
               ok(typeof (a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
             } else if (testFns.DEBUG_SEQUELIZE) {
               ok(typeof (a["customer.CompanyName"]) === 'string', "customer_CompanyName is not a string");
@@ -263,7 +264,12 @@
         var r = data.results;
         ok(r.length > 0);
       }).fail(function (e) {
-        ok(e.message.indexOf("expand") >= 0);
+         if (testFns.DEBUG_DOTNET_ASPCORE) {
+           ok(e.message.indexOf("Include path"));
+         } else {
+          ok(e.message.indexOf("expand") >= 0);
+         }
+        
       }).fin(done);
     });
 

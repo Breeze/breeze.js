@@ -1,8 +1,8 @@
 (function (testFns) {
 
-  if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE) {
+  if (testFns.DEBUG_SEQUELIZE || testFns.DEBUG_HIBERNATE || testFns.DEBUG_DOTNET_ASPCORE) {
     module("query - raw odata",  {});
-    QUnit.skip("Skipping tests for Sequelize/Hibernate - these servers do no support OData syntax", function () {
+    QUnit.skip("Skipping tests for Sequelize/Hibernate/ASPNetCore - these servers do no support OData syntax", function () {
       
     });
     return;

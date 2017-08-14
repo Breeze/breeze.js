@@ -21,7 +21,7 @@
     <script src="vendor/sinon.js"></script>
     <!-- DO NOT USE sinon-qunit. Breaks our tests for some reason. Don't need anyway-->
     <!--<script src="vendor/sinon-qunit.js"></script>-->
-    <%--<script src="vendor/q.min.js"></script>--%>
+    <script src="vendor/q.min.js"></script>
     <script src="vendor/knockout-2.3.0.debug.js"></script>
     <script src="vendor/lodash.min.js"></script>
     <script src="vendor/backbone.min.js"></script>
