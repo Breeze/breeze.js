@@ -222,9 +222,9 @@
             if (testFns.DEBUG_DOTNET_WEBAPI || testFns.DEBUG_DOTNET_ASPCORE) {
               ok(typeof (a.customer_CompanyName) === 'string', "customer_CompanyName is not a string");
             } else if (testFns.DEBUG_SEQUELIZE) {
-              ok(typeof (a["customer.CompanyName"]) === 'string', "customer_CompanyName is not a string");
+              ok(typeof (a["customer.companyName"]) === 'string', "customer.companyName is not a string");
             } else {
-              ok(typeof (a["customer.companyName"]) === 'string', "customer_CompanyName is not a string");
+              ok(typeof (a["customer.companyName"]) === 'string', "customer.companyName is not a string");
             }
           } else {
             ok(Object.keys(a).length === 2, "should have 2 properties");
