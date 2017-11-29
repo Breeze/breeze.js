@@ -64,6 +64,29 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("JSON can use 'not' array with 'in' inside 'and'", function(assert) {
+    var done = assert.async();
+    var countries = [ 'Belgium', 'Germany'];
+    var p2 = {
+      and: [ 
+        { companyName: { startswith: 'B'} },
+        { not: { country: { in: countries } } }
+      ]  
+    };
+             
+    var p = Predicate.create(p2);
+    var q = new EntityQuery("Customers").where(p);
+    var em = newEm();
+    em.executeQuery(q).then(function (data) {
+      var r = data.results;
+      ok(r.length == 6, "should have 6 results");
+      r.forEach(function(cust) {
+        ok(countries.indexOf(cust.Country) < 0, "country should not be in " + countries.join(', '));
+      });
+    }).fail(testFns.handleFail).fin(done);
+  });
+
+
   test("can handle parens in right hand side of predicate", function (assert) {
     var done = assert.async();
     var em = newEm();
