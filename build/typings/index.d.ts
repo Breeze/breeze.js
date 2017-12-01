@@ -185,6 +185,7 @@ export namespace core {
         isNullable: boolean;
         isPartOfKey: boolean;
         isUnmapped: boolean;
+        isSettable: boolean;
 
         maxLength: number;
         name: string;
