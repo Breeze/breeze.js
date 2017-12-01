@@ -170,6 +170,15 @@ declare namespace breeze {
         validators: Validator[];
         addProperty(dataProperty: DataProperty): ComplexType;
         getProperties(): DataProperty[];
+
+        constructor(config: ComplexTypeOptions);
+    }
+
+    export interface ComplexTypeOptions {
+        shortName?: string;
+        namespace?: string;
+        dataProperties?: DataProperty[];
+        custom?: Object;
     }
 
     export class DataProperty implements IProperty {
