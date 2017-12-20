@@ -64,29 +64,6 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
-  test("JSON can use 'not' array with 'in' inside 'and'", function(assert) {
-    var done = assert.async();
-    var countries = [ 'Belgium', 'Germany'];
-    var p2 = {
-      and: [ 
-        { companyName: { startswith: 'B'} },
-        { not: { country: { in: countries } } }
-      ]  
-    };
-             
-    var p = Predicate.create(p2);
-    var q = new EntityQuery("Customers").where(p);
-    var em = newEm();
-    em.executeQuery(q).then(function (data) {
-      var r = data.results;
-      ok(r.length == 6, "should have 6 results");
-      r.forEach(function(cust) {
-        ok(countries.indexOf(cust.Country) < 0, "country should not be in " + countries.join(', '));
-      });
-    }).fail(testFns.handleFail).fin(done);
-  });
-
-
   test("can handle parens in right hand side of predicate", function (assert) {
     var done = assert.async();
     var em = newEm();
@@ -711,7 +688,9 @@
     em.executeQuery(q).then(function (data) {
       ok(true);
     }).fail(function (error) {
-      if (testFns.DEBUG_MONGO) {
+      if (testFns.DEBUG_DOTNET_ASPCORE) {
+        ok(error.status == 404, "Should have recieved a 404"); // need to use middleware if we want more detail...
+      } else if (testFns.DEBUG_MONGO) {
         ok(error.message.indexOf("Unable to locate") >= 0, "Bad error message");
       } else if (testFns.DEBUG_ODATA) {
         ok(error.message.indexOf("Not Found") >= 0, "Bad error message");
@@ -818,7 +797,9 @@
     q.execute().then(function (data) {
       ok(false, "should not get here");
     }).fail(function (e) {
-      if (testFns.DEBUG_ODATA) {
+      if (testFns.DEBUG_DOTNET_ASPCORE) {
+        ok(e.status == 404, "should have received a 404 message")  ;
+      } else if (testFns.DEBUG_ODATA) {
         ok(e.message == "Not Found", e.Message);
       } else {
         ok(e.message && e.message.toLowerCase().indexOf("entitythatdoesnotexist") >= 0, e.message);
@@ -1350,8 +1331,8 @@
       return em.fetchEntityByKey(data2.entityKey, true);
     }).then(function (data3) {
       var alfred3 = data3.entity;
-      ok(alfred3 === null || alfred3 === undefined, "alfred3 should not have been found");
-      ok(data3.fromCache === true, "should have been from cache");
+      ok(alfred3 === null, "alfred3 should = alfred");
+      ok(data3.fromCache === true, "should not have been from cache");
 
       em.setProperties({ queryOptions: em.queryOptions.using(MergeStrategy.OverwriteChanges) });
       return em.fetchEntityByKey(data3.entityKey, true);
@@ -1384,7 +1365,7 @@
     var alfred;
     em.fetchEntityByKey("Customer", alfredsID, true).then(function (data) {
       alfred = data.entity;
-      ok(alfred === null || alfred === undefined, "alfred should not have been found");
+      ok(alfred === null, "alfred should not have been found");
       ok(data.fromCache === false, "should have been from database");
       ok(data.entityKey);
     }).fail(testFns.handleFail).fin(done);

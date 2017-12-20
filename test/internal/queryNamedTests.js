@@ -14,6 +14,7 @@
 
   var newEm = testFns.newEm;
   var skipMongoEndpoint = testFns.skipIf("mongo", " endpoint has not yet been implemented");
+  var skipAspCore = testFns.skipIf("aspcore", " server side support for this has not yet been implemented");
 
   if (testFns.DEBUG_ODATA) {
     module("query - named", {});
@@ -93,7 +94,7 @@
 
     });
 
-  skipMongoEndpoint.
+  testFns.skipIf("mongo,aspcore", " endpoint has not yet been implemented").
   test("withParameters using a array of objects", function (assert) {
       var done = assert.async();
       var em = newEm();
@@ -303,6 +304,7 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  skipAspCore.
   test("with bad parameters", function (assert) {
     var done = assert.async();
     var em = newEm();

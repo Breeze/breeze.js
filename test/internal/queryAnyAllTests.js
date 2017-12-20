@@ -241,7 +241,7 @@
     em.executeQuery(query).then(function (data) {
       var emps = data.results;
       ok(emps.length === 2, "should be only 2 emps with orders with companys named 'Lazy...' ");
-      emps.forEach(function (emp) {
+      emps.slice(0,5).forEach(function (emp) {
         var orders = emp.getProperty("orders");
         var isOk = orders.some(function (order) {
           var cust = order.getProperty("customer");

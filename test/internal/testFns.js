@@ -478,7 +478,7 @@ breezeTestFns = (function (breeze) {
   }
 
   testFns.newMs = function () {
-    if (!testFns.DEBUG_HIBERNATE) {
+    if (!testFns.DEBUG_HIBERNATE && !testFns.DEBUG_SEQUELIZE) {
       var namingConv = new NamingConvention({
         name: "camelCase2",
         serverPropertyNameToClient: function (serverPropertyName, prop) {
