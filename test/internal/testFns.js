@@ -199,8 +199,11 @@ breezeTestFns = (function (breeze) {
     version = (version || "").toLowerCase();
     // servername
     testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF, NHIBERNATE, or ODATA
-    testFns.DEBUG_DOTNET_ASPCORE = serverName === 'dotnetaspcore';
-
+    testFns.DEBUG_DOTNET_ASPCORE = serverName.startsWith('dotnetaspcore');
+    if (testFns.DEBUG_DOTNET_ASPCORE) {
+        testFns.DEBUG_DOTNET_ASPCORE_EF6 = serverName == 'dotnetaspcore-ef6';
+        testFns.DEBUG_DOTNET_ASPCORE_EFCORE = serverName == 'dotnetaspcore-efcore';
+    }
     testFns.DEBUG_MONGO = serverName === "mongo";
     testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
     testFns.DEBUG_HIBERNATE = serverName == "hibernate";
