@@ -162,6 +162,15 @@ export namespace core {
         validators: Validator[];
         addProperty(dataProperty: DataProperty): ComplexType;
         getProperties(): DataProperty[];
+
+        constructor(config: ComplexTypeOptions);
+    }
+
+    export interface ComplexTypeOptions {
+        shortName?: string;
+        namespace?: string;
+        dataProperties?: DataProperty[];
+        custom?: Object;
     }
 
     export class DataProperty implements IProperty {
@@ -176,6 +185,7 @@ export namespace core {
         isNullable: boolean;
         isPartOfKey: boolean;
         isUnmapped: boolean;
+        isSettable: boolean;
 
         maxLength: number;
         name: string;
