@@ -545,6 +545,8 @@
       var isOk;
       if (testFns.DEBUG_HIBERNATE) {
         isOk = e.message.toLowerCase().indexOf("row was updated or deleted by another") >= 0;
+      } else if (testFns.DEBUG_ASPCORE) {
+        isOk = e.message.toLowerCase().indexOf("data may have been modified or") >= 0;
       } else {
         isOk = e.message.indexOf("part of the entity's key") > 0;
       }
@@ -1876,7 +1878,9 @@
       ok(false, "one save should have failed for concurrency reasons");
     }).fail(function (e) {
       var msg = e.message;
-      if (msg.indexOf("Store update, insert") >= 0) {
+      if (msg.indexOf("Data may have been modified or")>=0) {
+        ok(true, "got expected (EFCore) exception " + msg);
+      } else if (msg.indexOf("Store update, insert") >= 0) {
         ok(true, "got expected (EF) exception " + msg);
       } else if (msg.indexOf("Row was updated or deleted by another transaction") >= 0) {
         ok(true, "got expected (Hibernate) exception " + msg);

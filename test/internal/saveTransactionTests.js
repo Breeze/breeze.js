@@ -80,7 +80,7 @@
       saveOrderAndAddShipAddressToComment(assert, "SaveWithDbTransaction");
     });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order and add ShipAddress to Comment in BeforeSave - SaveWithTransactionScope", function(assert) {
       saveOrderAndAddShipAddressToComment(assert, "SaveWithTransactionScope");
     });
@@ -112,17 +112,17 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
-  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithNoTransaction", function(assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithNoTransaction");
   });
 
-  testFns.skipIf("hibernate", "TODO - need to add the ProduceTPH model for this test").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithDbTransaction", function (assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithDbTransaction");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update ShipAddress in ProduceTPH in BeforeSave - SaveWithTransactionScope - DTC", function(assert) {
     saveOrderAndUpdateShipAddressBeforeSave(assert, "SaveWithTransactionScope");
   });
@@ -167,7 +167,7 @@
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithDbTransaction");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order and add KeyMapping to Comment in AfterSave - SaveWithTransactionScope", function (assert) {
     saveOrderAddKeyMappingToCommentAfterSave(assert, "SaveWithTransactionScope");
   });
@@ -202,17 +202,17 @@
     }).fail(testFns.handleFail).fin(done);
   }
 
-  testFns.skipIf("hibernate", "does not YET support saving without a transaction").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithNoTransaction", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithNoTransaction");
   });
 
-  testFns.skipIf("hibernate", "TODO - need to add the ProduceTPH model for this test").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithDbTransaction", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithDbTransaction");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "TODO - need to add the ProduceTPH model for this test").
   test("save Order and update KeyMapping in ProduceTPH in AfterSave - SaveWithTransactionScope", function (assert) {
     saveOrderUpdateKeyMappingInProduceTPHAfterSave(assert, "SaveWithTransactionScope");  // DTC iff database != SQL 2008+
   });
@@ -247,7 +247,7 @@
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.Before");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order with lookup in second Context in BeforeSave - SaveWithTransactionScope - DTC", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.Before");
   });
@@ -262,7 +262,7 @@
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.SameConnection.Before");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order with lookup in second Context in BeforeSave - Same Connection- SaveWithTransactionScope", function (assert) {
     saveOrderWithLookupInSecondContext(assert,"SaveWithTransactionScope", "LookupEmployeeInSeparateContext.SameConnection.Before");
   });
@@ -277,7 +277,7 @@
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.After");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order with lookup in second Context in AfterSave - SaveWithTransactionScope - DTC", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.After");
   });
@@ -292,7 +292,7 @@
     saveOrderWithLookupInSecondContext(assert, "SaveWithDbTransaction", "LookupEmployeeInSeparateContext.SameConnection.After");
   });
 
-  testFns.skipIf("hibernate", "does not distinguish between different types of transaction support").
+  testFns.skipIf("aspcore-efcore,hibernate", "does not YET support TransactionScope").
   test("save Order with lookup in second Context in AfterSave - Same Connection- SaveWithTransactionScope", function (assert) {
     saveOrderWithLookupInSecondContext(assert, "SaveWithTransactionScope", "LookupEmployeeInSeparateContext.SameConnection.After");
   });

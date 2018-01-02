@@ -140,12 +140,14 @@ breezeTestFns = (function (breeze) {
 
   function isSkipToken(s) {
     return (testFns.DEBUG_MONGO && s.indexOf("mongo", 0) === 0) ||
-       (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel", 0) === 0) ||
-       (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib", 0) === 0) ||
-       (testFns.DEBUG_HIBERNATE && s.indexOf("hib", 0) === 0) ||
-       (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
-       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0) ||
-       (testFns.DEBUG_DOTNET_ASPCORE && s.indexOf("aspcore", 0) === 0);
+      (testFns.DEBUG_SEQUELIZE && s.indexOf("sequel", 0) === 0) ||
+      (testFns.DEBUG_NHIBERNATE && s.indexOf("nhib", 0) === 0) ||
+      (testFns.DEBUG_HIBERNATE && s.indexOf("hib", 0) === 0) ||
+      (testFns.DEBUG_ODATA && s.indexOf("odata", 0) === 0) ||
+      (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0) ||
+      (testFns.DEBUG_ASPCORE && s.indexOf("aspcore", 0) === 0) ||
+      (testFns.DEBUG_ASPCORE_EF6 && s.indexOf("aspcore-ef6", 0) === 0) ||
+      (testFns.DEBUG_ASPCORE_EFCORE && s.indexOf("aspcore-efcore", 0) === 0);
   }
 
   testFns.setup = function (assert, config) {
@@ -199,11 +201,11 @@ breezeTestFns = (function (breeze) {
     version = (version || "").toLowerCase();
     // servername
     testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF, NHIBERNATE, or ODATA
-    testFns.DEBUG_DOTNET_ASPCORE = serverName.startsWith('dotnetaspcore');
-    if (testFns.DEBUG_DOTNET_ASPCORE) {
-        testFns.DEBUG_DOTNET_ASPCORE_EF6 = serverName == 'dotnetaspcore-ef6';
-        testFns.DEBUG_DOTNET_ASPCORE_EFCORE = serverName == 'dotnetaspcore-efcore';
-    }
+
+    testFns.DEBUG_ASPCORE = serverName.startsWith('dotnetaspcore');
+    testFns.DEBUG_ASPCORE_EF6 = serverName == 'dotnetaspcore-ef6';
+    testFns.DEBUG_ASPCORE_EFCORE = serverName == 'dotnetaspcore-efcore';
+    
     testFns.DEBUG_MONGO = serverName === "mongo";
     testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
     testFns.DEBUG_HIBERNATE = serverName == "hibernate";
@@ -221,7 +223,7 @@ breezeTestFns = (function (breeze) {
 
     var dataServiceAdapterName;
     // defaults
-     if (testFns.DEBUG_DOTNET_ASPCORE) {
+     if (testFns.DEBUG_ASPCORE) {
       dataServiceAdapterName = "webApi";
       testFns.uriBuilder = core.config.initializeAdapterInstance("uriBuilder", "json").name;
       testFns.defaultServiceName = "breeze/NorthwindIBModel";
