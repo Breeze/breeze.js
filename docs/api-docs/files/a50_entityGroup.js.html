@@ -355,6 +355,15 @@ var EntityGroup = (function () {
   }
 
   proto._fixupKey = function (tempValue, realValue) {
+    if (tempValue === realValue) {      //including both null
+      return;
+    }
+
+    //already updated though foreign key for composite keys
+    if (this._indexMap[realValue] != undefined &amp;&amp; this._indexMap[tempValue] == undefined) {                    
+    return;
+    }
+
     // single part keys appear directly in map
     var ix = this._indexMap[tempValue];
     if (ix === undefined) {
