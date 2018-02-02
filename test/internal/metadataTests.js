@@ -814,7 +814,7 @@
   makeCustomMetadata = function (namespace) {
     if (testFns.DEBUG_MONGO) {
       var custKeyName = "_id";
-    } else if (testFns.DEBUG_HIBERNATE) {
+    } else if (testFns.DEBUG_HIBERNATE || testFns.DEBUG_SEQUELIZE) {
       var custKeyName = "customerID"; // server is lower case.
     }
     return {
