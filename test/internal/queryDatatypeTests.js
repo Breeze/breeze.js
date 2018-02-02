@@ -502,6 +502,57 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  testFns.skipIf("mongo,sequelize,odata", "does not yet support enums").
+  test("enums change value, detect on server", function(assert) {
+    var done = assert.async();
+    var em = newEm();
+    var roleType = em.metadataStore.getEntityType("Role");
+    var role = roleType.createEntity();
+    role.setProperty("name", "test2");
+    role.setProperty("description", null);
+    role.setProperty("roleType", null);
+    em.addEntity(role);
+    
+    em.saveChanges().then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      role = ents[0];
+      var rt = role.getProperty("roleType");
+      ok(rt == null, "roleType should be null");
+      var desc = role.getProperty("description");
+      ok(desc == null, "description should be null");
+
+      role.setProperty("description", "descr 2");
+      role.setProperty("roleType", "Standard");
+      return em.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      role = ents[0];
+      var rt = role.getProperty("roleType");
+      ok(rt == "Standard", "roleType should be Standard");
+
+      role.setProperty("roleType", "Restricted");
+      return em.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      role = ents[0];
+      var rt = role.getProperty("roleType");
+      ok(rt == "Restricted", "roleType should be Restricted");
+
+      role.setProperty("roleType", "Admin");
+      return em.saveChanges();
+    }).then(function (sr) {
+      var ents = sr.entities;
+      ok(ents.length === 1);
+      role = ents[0];
+      var rt = role.getProperty("roleType");
+      ok(rt == "Admin", "roleType should be Admin");
+
+    }).fail(testFns.handleFail).fin(done);
+  });
+
   test("nullable int", function (assert) {
     var done = assert.async();
     var em = newEm();
