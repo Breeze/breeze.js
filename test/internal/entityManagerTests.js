@@ -1549,6 +1549,39 @@
       equal(em1.getChanges().length, 2, "em1 now has TWO new entities.");
   });
 
+  test("re-imported new entity w/ TEMP key that was changed in another manager is merged if *mergeAdds* is true", function () {
+      expect(3);
+      var em1 = newEm();
+      var em2 = newEm();
+
+      // Employee has store-generated temp keys
+      var emp1 = em1.createEntity('Employee', {
+          firstName: 'Eunis',
+          lastName: 'Guy'
+      });
+
+      // export emp1 to em2 (w/o metadata); becomes emp2
+      var exported = em1.exportEntities([emp1], { includeMetadata: false });
+      var emp2 = em2.importEntities(exported).entities[0];
+
+      // change a property of the Employee while in em2;
+      emp2.setProperty('firstName', 'Eunis A.');
+
+      // re-import Employee from em2 back to em1 with OverwriteChanges
+      exported = em2.exportEntities([emp2], { includeMetadata: false });
+      var emp1b = em1.importEntities(exported,
+                    {   mergeAdds: true,
+                        mergeStrategy: breeze.MergeStrategy.OverwriteChanges
+                    })
+                    .entities[0];
+
+      equal(emp1.getProperty('employeeID'), emp1b.getProperty('employeeID'),
+        "re-imported employee is the same as the original.");
+      equal(emp1.getProperty('firstName'), 'Eunis A.',
+        "'emp1.firstName' is overwritten with the new value");
+      equal(em1.getChanges().length, 1, "em1 still has just ONE new entity.");
+  });
+
   test("Export changes to local storage and re-import", 5, function () {
 
     var em = newEm();
