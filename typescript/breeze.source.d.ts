@@ -1049,7 +1049,7 @@ declare namespace breeze {
         /** Register a validator instance so that any deserialized metadata can reference it. */
         static register(validator: Validator): void;
         /** Register a validator factory so that any deserialized metadata can reference it.  */
-        static registerFactory(fn: () => Validator, name: string): void;
+        static registerFactory(fn: (context?: any) => Validator, name: string): void;
         /** Creates a regular expression validator with a fixed expression. */
         static makeRegExpValidator(validatorName: string, expression: RegExp, defaultMessage: string, context?: any): Validator;
 
