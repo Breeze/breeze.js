@@ -507,10 +507,10 @@ declare namespace breeze {
         hasChanges(entityType: EntityType): boolean;
         hasChanges(entityTypes: EntityType[]): boolean;
 
-        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
-        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
-        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
-        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
+        static importEntities(exportedString: string, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        static importEntities(exportedData: Object, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        importEntities(exportedString: string, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
+        importEntities(exportedData: Object, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
         saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): Promise<SaveResult>;

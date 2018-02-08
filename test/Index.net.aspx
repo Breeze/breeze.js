@@ -32,8 +32,20 @@
 
     <!-- Test helper scripts  -->
     <!-- These two must come first -->
+    <!-- test full breeze -->
     <script src="breeze/breeze.debug.js"></script>
-    <%--<script src="breeze/breeze.bridge.angular.js"></script>--%>
+
+    <!-- test breeze.base with angular -->
+<%--    <script src="breeze/breeze.base.debug.js"></script>
+    <script src="breeze/adapter-ajax-angular.js"></script>
+    <script src="breeze/adapter-data-service-webapi.js"></script>
+    <script src="breeze/adapter-model-library-backing-store.js"></script>
+    <script src="breeze/adapter-uri-builder-odata.js"></script>--%>
+
+
+
+
+    <script src="breeze/breeze.bridge.angular.js"></script>
     <%--<script src="breeze/promise-finally-shim.js"></script>--%>
     <%--<script src="breeze/breeze.modelLibrary.backbone.js"></script>--%>
     <script src="internal/testFns.js"></script>

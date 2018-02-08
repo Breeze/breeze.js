@@ -7807,7 +7807,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 514,
+            "line": 515,
             "description": "Clears this EntityManager's cache but keeps all other settings. Note that this\nmethod is not as fast as creating a new EntityManager via 'new EntityManager'.\nThis is because clear actually detaches all of the entities from the EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    em1.clear();\n    // em1 is will now contain no entities, but all other setting will be maintained."
@@ -7819,7 +7819,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 539,
+            "line": 540,
             "description": "Creates an empty copy of this EntityManager",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var em2 = em1.createEmptyCopy();\n    // em2 is a new EntityManager with all of em1's settings\n    // but no entities."
@@ -7835,7 +7835,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 555,
+            "line": 556,
             "description": "Attaches an entity to this EntityManager with an  {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Added'.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var cust1 = custType.createEntity();\n    em1.addEntity(cust1);\nNote that this is the same as using 'attachEntity' with an {{#crossLink \"EntityState\"}}{{/crossLink}} of 'Added'.",
@@ -7859,7 +7859,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 576,
+            "line": 577,
             "description": "Attaches an entity to this EntityManager with a specified {{#crossLink \"EntityState\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var cust1 = custType.createEntity();\n    em1.attachEntity(cust1, EntityState.Added);"
@@ -7896,7 +7896,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 645,
+            "line": 646,
             "description": "Detaches an entity from this EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of existing entities.\n    // assume cust1 is a customer Entity previously attached to em1\n    em1.detachEntity(cust1);\n    // em1 will now no longer contain cust1 and cust1 will have an\n    // entityAspect.entityState of EntityState.Detached"
@@ -7919,7 +7919,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 671,
+            "line": 672,
             "description": "Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call\noccurs internally before the first query to any service if the metadata hasn't already been\nloaded.",
             "example": [
                 "\nUsually you will not actually process the results of a fetchMetadata call directly, but will instead\nask for the metadata from the EntityManager after the fetchMetadata call returns.",
@@ -7967,7 +7967,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 719,
+            "line": 720,
             "description": "Executes the specified query.",
             "example": [
                 "\nThis method can be called using a 'promises' syntax ( recommended)",
@@ -8071,7 +8071,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 813,
+            "line": 814,
             "description": "Executes the specified query against this EntityManager's local cache.",
             "example": [
                 "\nBecause this method is executed immediately there is no need for a promise or a callback",
@@ -8096,7 +8096,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 894,
+            "line": 895,
             "description": "Saves either a list of specified entities or all changed entities within this EntityManager. If there are no changes to any of the entities\nspecified then there will be no server side call made but a valid 'empty' saveResult will still be returned.",
             "example": [
                 "\nOften we will be saving all of the entities within an EntityManager that are either added, modified or deleted\nand we will let the 'saveChanges' call determine which entities these are.",
@@ -8198,7 +8198,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1086,
+            "line": 1087,
             "description": "Run the \"saveChanges\" pre-save client validation logic.\n\nThis is NOT a general purpose validation method.\nIt is intended for utilities that must know if saveChanges\nwould reject the save due to client validation errors.\n\nIt only validates entities if the EntityManager's\n{{#crossLink \"ValidationOptions\"}}{{/crossLink}}.validateOnSave is true.",
             "itemtype": "method",
             "name": "saveChangesValidateOnClient",
@@ -8218,7 +8218,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1200,
+            "line": 1201,
             "description": "Attempts to locate an entity within this EntityManager by its key.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employee = em1.getEntityByKey(\"Employee\", 1);\n    // employee will either be an entity or null."
@@ -8246,7 +8246,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1212,
+            "line": 1213,
             "description": "Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    var employee = em1.getEntityByKey(employeeKey);\n    // employee will either be an entity or null."
@@ -8269,7 +8269,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1238,
+            "line": 1239,
             "description": "Attempts to fetch an entity from the server by its key with\nan option to check the local cache first. Note the this EntityManager's queryOptions.mergeStrategy\nwill be used to merge any server side entity returned by this method.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    em1.fetchEntityByKey(\"Employee\", 1).then(function(result) {\n        var employee = result.entity;\n        var entityKey = result.entityKey;\n        var fromCache = result.fromCache;\n    });"
@@ -8303,7 +8303,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1262,
+            "line": 1263,
             "description": "Attempts to fetch an entity from the server by its {{#crossLink \"EntityKey\"}}{{/crossLink}} with\nan option to check the local cache first.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    em1.fetchEntityByKey(employeeKey).then(function(result) {\n        var employee = result.entity;\n        var entityKey = result.entityKey;\n        var fromCache = result.fromCache;\n    });"
@@ -8332,7 +8332,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1325,
+            "line": 1326,
             "description": "[Deprecated] - Attempts to locate an entity within this EntityManager by its  {{#crossLink \"EntityKey\"}}{{/crossLink}}.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var employeeType = em1.metadataStore.getEntityType(\"Employee\");\n    var employeeKey = new EntityKey(employeeType, 1);\n    var employee = em1.findEntityByKey(employeeKey);\n    // employee will either be an entity or null."
@@ -8357,7 +8357,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1342,
+            "line": 1343,
             "description": "Generates a temporary key for the specified entity.  This is used to insure that newly\ncreated entities have unique keys and to register that these keys are temporary and\nneed to be automatically replaced with 'real' key values once these entities are saved.\n\nThe EntityManager.keyGeneratorCtor property is used internally by this method to actually generate\nthe keys - See the  {{#crossLink \"_keyGenerator_interface\"}}{{/crossLink}} interface description to see\nhow a custom key generator can be plugged in.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var custType = em1.metadataStore.getEntityType(\"Customer\");\n    var customer = custType.createEntity();\n    var customerId = em.generateTempKeyValue(customer);\n    // The 'customer' entity 'CustomerID' property is now set to a newly generated unique id value\n    // This property will change again after a successful save of the 'customer' entity.\n\n    em1.saveChanges().then( function( data) {\n        var sameCust1 = data.results[0];\n        // cust1 === sameCust1;\n        // but cust1.getProperty(\"CustomerId\") != customerId\n        // because the server will have generated a new id\n        // and the client will have been updated with this\n        // new id.\n    })"
@@ -8380,7 +8380,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1382,
+            "line": 1383,
             "description": "Returns whether there are any changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
                 "\nThis method can be used to determine if an EntityManager has any changes",
@@ -8407,7 +8407,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1418,
+            "line": 1419,
             "description": "An {{#crossLink \"Event\"}}{{/crossLink}} that fires whenever an EntityManager transitions to or from having changes.",
             "example": [
                 "\n    var em = new EntityManager( {serviceName: \"breeze/NorthwindIBModel\" });\n    em.hasChangesChanged.subscribe(function(args) {\n            var hasChangesChanged = args.hasChanges;\n            var entityManager = args.entityManager;\n        });\n    });"
@@ -8432,7 +8432,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1444,
+            "line": 1445,
             "description": "Returns a array of all changed entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s. A 'changed' Entity has\nhas an {{#crossLink \"EntityState\"}}{{/crossLink}} of either Added, Modified or Deleted.",
             "example": [
                 "\nThis method can be used to get all of the changed entities within an EntityManager",
@@ -8459,7 +8459,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1473,
+            "line": 1474,
             "description": "Rejects (reverses the effects) all of the additions, modifications and deletes from this EntityManager.\nCalls EntityAspect.rejectChanges on every changed entity in this EntityManager.",
             "example": [
                 "\n    // assume em1 is an EntityManager containing a number of preexisting entities.\n    var entities = em1.rejectChanges();"
@@ -8475,7 +8475,7 @@
         },
         {
             "file": "a50_entityManager.js",
-            "line": 1499,
+            "line": 1500,
             "description": "Returns a array of all entities of the specified {{#crossLink \"EntityType\"}}{{/crossLink}}s with the specified {{#crossLink \"EntityState\"}}{{/crossLink}}s.",
             "example": [
                 "\nThis method can be used to get all of the entities within an EntityManager",

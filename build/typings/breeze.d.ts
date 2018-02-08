@@ -500,10 +500,10 @@ declare namespace breeze {
         hasChanges(entityType: EntityType): boolean;
         hasChanges(entityTypes: EntityType[]): boolean;
 
-        static importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
-        static importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
-        importEntities(exportedString: string, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
-        importEntities(exportedData: Object, config?: { mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
+        static importEntities(exportedString: string, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        static importEntities(exportedData: Object, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): EntityManager;
+        importEntities(exportedString: string, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string] : EntityKey } };
+        importEntities(exportedData: Object, config?: { mergeAdds?: boolean; mergeStrategy?: MergeStrategySymbol; metadataVersionFn?: (any: any) => void }): { entities: Entity[]; tempKeyMapping: { [key: string]: EntityKey } };
 
         rejectChanges(): Entity[];
         saveChanges(entities?: Entity[], saveOptions?: SaveOptions, callback?: SaveChangesSuccessCallback, errorCallback?: SaveChangesErrorCallback): Promise<SaveResult>;
@@ -1042,7 +1042,7 @@ declare namespace breeze {
         /** Register a validator instance so that any deserialized metadata can reference it. */
         static register(validator: Validator): void;
         /** Register a validator factory so that any deserialized metadata can reference it.  */
-        static registerFactory(fn: () => Validator, name: string): void;
+        static registerFactory(fn: (context?: any) => Validator, name: string): void;
         /** Creates a regular expression validator with a fixed expression. */
         static makeRegExpValidator(validatorName: string, expression: RegExp, defaultMessage: string, context?: any): Validator;
 

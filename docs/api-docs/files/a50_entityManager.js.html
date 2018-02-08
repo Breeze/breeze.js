@@ -658,6 +658,7 @@ var EntityManager = (function () {
     assertConfig(config)
         .whereParam(&quot;mergeStrategy&quot;).isEnumOf(MergeStrategy).isOptional().withDefault(this.queryOptions.mergeStrategy)
         .whereParam(&quot;metadataVersionFn&quot;).isFunction().isOptional()
+        .whereParam(&quot;mergeAdds&quot;).isBoolean().isOptional()
         .applyAll(config);
     var that = this;
 
@@ -2115,6 +2116,7 @@ var EntityManager = (function () {
 
     var entityType = entityGroup.entityType;
     var mergeStrategy = config.mergeStrategy;
+    var mergeAdds = config.mergeAdds;
 
     var targetEntity = null;
 
@@ -2131,11 +2133,10 @@ var EntityManager = (function () {
         throw new Error(&quot;Only entities with a non detached entity state may be imported.&quot;);
       }
 
-      // Merge if raw entity is in cache
-      // UNLESS this is a new entity w/ a temp key
-      // Cannot safely merge such entities even
-      // if could match temp key to an entity in cache.
-      var newTempKey = entityState.isAdded() &amp;&amp; getMappedKey(tempKeyMap, entityKey);
+      // Merge if raw entity is in cache UNLESS this is a new entity w/ a temp key
+      // Cannot safely merge such entities even if could match temp key to an entity in cache.
+      // Can enable merge of entities w/temp key using &quot;mergeAdds&quot; - use at your own risk!
+      var newTempKey = !mergeAdds &amp;&amp; entityState.isAdded() &amp;&amp; getMappedKey(tempKeyMap, entityKey);
       targetEntity = newTempKey ? null : entityGroup.findEntityByKey(entityKey);
 
       if (targetEntity) {
