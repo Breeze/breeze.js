@@ -252,17 +252,24 @@ declare namespace breeze {
         JsonResultsAdapter: JsonResultsAdapter;
     }
 
+    export class DeletedEntityKey {
+        entityTypeName: string;
+        keyValues: any[];
+    }
+
     export class JsonResultsAdapter {
         name: string;
         extractResults: (data: {}) => {};
         extractSaveResults: (data: {}) => any[];
         extractKeyMappings: (data: {}) => KeyMapping[];
+        extractDeletedKeys: (data: {}) => DeletedEntityKey[];
         visitNode: (node: {}, queryContext: QueryContext, nodeContext: NodeContext) => { entityType?: EntityType; nodeId?: any; nodeRefId?: any; ignore?: boolean; };
         constructor(config: {
             name: string;
             extractResults?: (data: {}) => {};
             extractSaveResults?: (data: {}) => any[];
             extractKeyMappings?: (data: {}) => KeyMapping[];
+            extractDeletedKeys?: (data: {}) => DeletedEntityKey[];
             visitNode: (node: {}, queryContext: QueryContext, nodeContext: NodeContext) => { entityType?: EntityType; nodeId?: any; nodeRefId?: any; ignore?: boolean; };
         });
     }
