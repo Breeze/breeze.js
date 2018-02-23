@@ -11,7 +11,13 @@
       return this.length;
     }
     this._beforeChange();
-    var result = Array.prototype.push.apply(this, goodAdds);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.push) {
+        result = objPrototype.push.apply(this, goodAdds)
+    } else {
+        result = Array.prototype.push.apply(this, goodAdds);
+    }
     processAdds(this, goodAdds);
     return result;
   };
@@ -22,7 +28,13 @@
     }
     var goodAdds = __arraySlice(arguments);
     this._beforeChange();
-    var result = Array.prototype.push.apply(this, goodAdds);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.push) {
+        result = objPrototype.push.apply(this, goodAdds)
+    } else {
+        result = Array.prototype.push.apply(this, goodAdds);
+    }
     processAdds(this, goodAdds);
     return result;
   };
@@ -33,21 +45,39 @@
       return this.length;
     }
     this._beforeChange();
-    var result = Array.prototype.unshift.apply(this, goodAdds);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.unshift) {
+        result = objPrototype.unshift.apply(this, goodAdds)
+    } else {
+        result = Array.prototype.unshift.apply(this, goodAdds);
+    }
     processAdds(this, __arraySlice(goodAdds));
     return result;
   };
 
   mixin.pop = function () {
     this._beforeChange();
-    var result = Array.prototype.pop.apply(this);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.pop) {
+        result = objPrototype.pop.apply(this)
+    } else {
+        result = Array.prototype.pop.apply(this);
+    }
     processRemoves(this, [result]);
     return result;
   };
 
   mixin.shift = function () {
     this._beforeChange();
-    var result = Array.prototype.shift.apply(this);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.shift) {
+        result = objPrototype.shift.apply(this)
+    } else {
+        result = Array.prototype.shift.apply(this);
+    }
     processRemoves(this, [result]);
     return result;
   };
@@ -56,7 +86,13 @@
     var goodAdds = this._getGoodAdds(__arraySlice(arguments, 2));
     var newArgs = __arraySlice(arguments, 0, 2).concat(goodAdds);
     this._beforeChange();
-    var result = Array.prototype.splice.apply(this, newArgs);
+    var result;
+    var objPrototype = Object.getPrototypeOf(this);
+    if (objPrototype.splice) {
+        result = objPrototype.splice.apply(this, newArgs)
+    } else {
+        result = Array.prototype.splice.apply(this, newArgs);
+    }
     processRemoves(this, result);
 
     if (goodAdds.length) {
