@@ -3069,6 +3069,10 @@ var NavigationProperty = (function () {
     var fkPropCollection = parentEntityType.foreignKeyProperties;
 
     fkProps.forEach(function (dp) {
+      if (!dp) {
+        return;
+      }
+
       __arrayAddItemUnique(fkPropCollection, dp);
       dp.relatedNavigationProperty = np;
       // now update the inverse
