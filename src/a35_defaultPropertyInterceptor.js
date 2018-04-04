@@ -232,7 +232,13 @@ function setDpValueSimple(context, rawAccessorFn) {
     });
     // this handles unidirectional problems not covered above.
     if (entityManager) {
-      entityType.inverseForeignKeyProperties.forEach(function (invFkProp) {
+      var inverseForeignKeyProperties = entityType.inverseForeignKeyProperties;
+      var baseEntityType = entityType.baseEntityType;
+      while (baseEntityType) {
+        inverseForeignKeyProperties = inverseForeignKeyProperties.concat(baseEntityType.inverseForeignKeyProperties);
+        baseEntityType = baseEntityType.baseEntityType;
+      }
+      inverseForeignKeyProperties.forEach(function (invFkProp) {
         if (invFkProp.relatedNavigationProperty.inverse == null) {
           // this next step may be slow - it iterates over all of the entities in a group;
           // hopefully it doesn't happen often.
