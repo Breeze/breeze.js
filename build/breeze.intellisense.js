@@ -1,4 +1,4 @@
-// Generated on: Mon Apr 02 2018 16:40:58 GMT-0700 (Pacific Daylight Time)
+// Generated on: Wed Apr 04 2018 11:40:52 GMT+0530 (India Standard Time)
 intellisense.annotate(breeze.core, {
   'Enum': function() {
     /// <signature>
@@ -26,7 +26,10 @@ intellisense.annotate(breeze.core, {
     ///   </summary>
     ///   <param name="name" type="String" optional="true"></param>
     ///   <param name="publisher" type="Object" optional="true">The object that will be doing the publication. i.e. the object to which this event is attached.</param>
-    ///   <param name="defaultErrorCallback" type="Function" optional="true">If omitted then subscriber notification failures will be ignored.</param>
+    ///   <param name="[defaultErrorCallback]  If omitted then subscriber notification failures will be ignored.
+
+errorCallback([e]" type="Function" optional="true">)</param>
+    ///   <param name="defaultErrorCallback.e" type="Error" optional="true">Any error encountered during subscription execution.</param>
     /// </signature>
   },
 });
@@ -119,7 +122,11 @@ intellisense.annotate(breeze.core.Event.prototype, {
     ///   </summary>
     ///   <param name="data" type="Object" optional="true">Data to publish</param>
     ///   <param name="publishAsync" type="Boolean" optional="true">Whether to publish asynchonously or not.</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Will be called for any errors that occur during publication. If omitted, errors will be eaten.</param>
+    ///   <param name="[errorCallback]  Will be called for any errors that occur during publication. If omitted,
+errors will be eaten.
+
+errorCallback([e]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.e" type="Error" optional="true">Any error encountered during publication execution.</param>
     ///   <returns type="Boolean" >false if event is disabled; true otherwise.</returns>
     /// </signature>
   },  'publishAsync': function() {
@@ -128,7 +135,11 @@ intellisense.annotate(breeze.core.Event.prototype, {
     ///   Publish data for this event asynchronously. }
     ///   </summary>
     ///   <param name="data" type="Object" optional="true">Data to publish</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Will be called for any errors that occur during publication. If omitted, errors will be eaten.</param>
+    ///   <param name="[errorCallback]  Will be called for any errors that occur during publication. If omitted,
+errors will be eaten.
+
+errorCallback([e]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.e" type="Error" optional="true">Any error encountered during publication execution.</param>
     
     /// </signature>
   },  'subscribe': function() {
@@ -136,7 +147,10 @@ intellisense.annotate(breeze.core.Event.prototype, {
     ///   <summary>
     ///   Subscribe to this event. }
     ///   </summary>
-    ///   <param name="callback" type="Function" optional="true">Will be called whenever 'data' is published for this event.</param>
+    ///   <param name="[callback]  Will be called whenever &#x27;data&#x27; is published for this event.
+
+callback([data]" type="Function" optional="true">)</param>
+    ///   <param name="callback.data" type="Object" optional="true">Whatever 'data' was published.  This should be documented on the specific event.</param>
     ///   <returns type="Number" >This is a key for 'unsubscription'.  It can be passed to the 'unsubscribe' method.</returns>
     /// </signature>
   },  'unsubscribe': function() {
@@ -1365,8 +1379,14 @@ intellisense.annotate(breeze.breeze.MetadataStore.prototype, {
     ///   internally by an EntityManager before its first query against a new service. }
     ///   </summary>
     ///   <param name="dataService" type="DataService|String" optional="true">Either a DataService or just the name of the DataService to fetch metadata for.</param>
-    ///   <param name="callback" type="Function" optional="true">Function called on success.</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Function called on failure.</param>
+    ///   <param name="[callback]  Function called on success.
+
+successFunction([data]" type="Function" optional="true">)</param>
+    ///   <param name="callback.data" type="RawMetadata" optional="true"></param>
+    ///   <param name="[errorCallback]  Function called on failure.
+
+failureFunction([error]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.error" type="Error" optional="true">Any error that occured wrapped into an Error object.</param>
     ///   <returns type="breeze.breeze.Promise" >Promise</returns>
     /// </signature>
   },  'trackUnmappedType': function() {
@@ -1997,7 +2017,7 @@ intellisense.annotate(breeze.breeze.EntityQuery.prototype, {
     ///   will be returned with the query results that will contain the number of entities that would have been returned by this }
     ///   query with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored. }
     ///   </summary>
-    ///   <param name="enabled" type="Boolean=true" optional="true">Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.</param>
+    ///   <param name="enabled" type="Boolean&#x3D;true" optional="true">Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.</param>
     ///   <returns type="breeze.breeze.EntityQuery" ></returns>
     /// </signature>
   },  'noTracking': function() {
@@ -2006,7 +2026,7 @@ intellisense.annotate(breeze.breeze.EntityQuery.prototype, {
     ///   Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query }
     ///   will not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects. }
     ///   </summary>
-    ///   <param name="enabled" type="Boolean=true" optional="true">Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.</param>
+    ///   <param name="enabled" type="Boolean&#x3D;true" optional="true">Whether or not the noTracking capability should be enabled. If this parameter is omitted, true is assumed.</param>
     ///   <returns type="breeze.breeze.EntityQuery" ></returns>
     /// </signature>
   },  'using': function() {
@@ -2277,8 +2297,14 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   occurs internally before the first query to any service if the metadata hasn't already been }
     ///   loaded. }
     ///   </summary>
-    ///   <param name="callback" type="Function" optional="true">Function called on success.</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Function called on failure.</param>
+    ///   <param name="[callback]  Function called on success.
+
+successFunction([schema]" type="Function" optional="true">)</param>
+    ///   <param name="callback.schema" type="Object" optional="true">The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider it is usually better to access metadata via the 'metadataStore' property of the EntityManager after this method's Promise or callback completes.</param>
+    ///   <param name="[errorCallback]  Function called on failure.
+
+failureFunction([error]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.error" type="Error" optional="true">Any error that occured wrapped into an Error object.</param>
     ///   <returns type="breeze.breeze.Promise" >- Properties on the promise success result     - schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider       it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.</returns>
     /// </signature>
   },  'executeQuery': function() {
@@ -2287,8 +2313,23 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   Executes the specified query. }
     ///   </summary>
     ///   <param name="query" type="EntityQuery|String" optional="true">The  'EntityQuery' or OData query string to execute.</param>
-    ///   <param name="callback" type="Function" optional="true">Function called on success.</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Function called on failure.</param>
+    ///   <param name="[callback]  Function called on success.
+
+successFunction([data]" type="Function" optional="true">)</param>
+    ///   <param name="callback.data" type="Object" optional="true"></param>
+    ///   <param name="callback.data.results" type="Array" elementType="Entity" optional="true"></param>
+    ///   <param name="callback.data.query" type="breeze.breeze.EntityQuery" optional="true">The original query</param>
+    ///   <param name="callback.data.entityManager" type="breeze.breeze.EntityManager" optional="true">The EntityManager.</param>
+    ///   <param name="callback.data.httpResponse" type="breeze.breeze.HttpResponse" optional="true">The HttpResponse returned from the server.</param>
+    ///   <param name="callback.data.inlineCount" type="Integer" optional="true">Only available if 'inlineCount(true)' was applied to the query.  Returns the count of items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates would have been applied.</param>
+    ///   <param name="callback.data.retrievedEntities" type="Array" elementType="Entity" optional="true">All entities returned by the query.  Differs from results when .expand() is used.</param>
+    ///   <param name="[errorCallback]  Function called on failure.
+
+failureFunction([error]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.error" type="Error" optional="true">Any error that occured wrapped into an Error object.</param>
+    ///   <param name="errorCallback.error.query" type="" optional="true">The query that caused the error.</param>
+    ///   <param name="errorCallback.error.entityManager" type="" optional="true">The query that caused the error.</param>
+    ///   <param name="errorCallback.error.httpResponse" type="breeze.breeze.HttpResponse" optional="true">The HttpResponse returned from the server.</param>
     ///   <returns type="breeze.breeze.Promise" >- Properties on the promise success result     - results {Array of Entity}     - query {EntityQuery} The original query     - entityManager {EntityManager} The EntityManager.     - httpResponse {HttpResponse} The  HttpResponse returned from the server.     - [inlineCount] {Integer} Only available if 'inlineCount(true)' was applied to the query.  Returns the count of   items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates   would have been applied.</returns>
     /// </signature>
   },  'executeQueryLocally': function() {
@@ -2307,8 +2348,20 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   </summary>
     ///   <param name="entities" type="Array" elementType="Entity" optional="true">The list of entities to save. Every entity in that list will be sent to the server, whether changed or unchanged, as long as it is attached to this EntityManager. If this parameter is omitted, null or empty (the usual case), every entity with pending changes in this EntityManager will be saved.</param>
     ///   <param name="saveOptions" type="breeze.breeze.SaveOptions" optional="true"> 'SaveOptions' for the save - will default to  'EntityManager/saveOptions' if null.</param>
-    ///   <param name="callback" type="Function" optional="true">Function called on success.</param>
-    ///   <param name="errorCallback" type="Function" optional="true">Function called on failure.</param>
+    ///   <param name="[callback]  Function called on success.
+
+successFunction([saveResult]" type="Function" optional="true">)</param>
+    ///   <param name="callback.saveResult" type="Object" optional="true"></param>
+    ///   <param name="callback.saveResult.entities" type="Array" elementType="Entity" optional="true">The saved entities - with any temporary keys converted into 'real' keys. These entities are actually references to entities in the EntityManager cache that have been updated as a result of the save.</param>
+    ///   <param name="callback.saveResult.keyMappings" type="Array" elementType="keyMappings" optional="true">Each keyMapping has the following properties: 'entityTypeName', 'tempValue' and 'realValue'</param>
+    ///   <param name="callback.saveResult.httpResponse" type="breeze.breeze.HttpResponse" optional="true">The raw HttpResponse returned from the server.</param>
+    ///   <param name="[errorCallback]  Function called on failure.
+
+failureFunction([error]" type="Function" optional="true">)</param>
+    ///   <param name="errorCallback.error" type="Error" optional="true">Any error that occured wrapped into an Error object.</param>
+    ///   <param name="errorCallback.error.entityErrors" type="Array" elementType="server side errors" optional="true">These are typically validation errors but are generally any error that can be easily isolated to a single entity.</param>
+    ///   <param name="errorCallback.error.httpResponse" type="breeze.breeze.HttpResponse" optional="true">The raw HttpResponse returned from the server.</param>
+    ///   <param name="errorCallback.error.saveResult" type="Object" optional="true">Some dataservice adapters return a 'saveResult' object when the failing save operation is non-transactional meaning some entities could be saved while others were not. The 'saveResult' object identifies both that entities that were saved (with their keyMapping) and that entities that were not saved (with their errors).</param>
     ///   <returns type="breeze.breeze.Promise" >Promise</returns>
     /// </signature>
   },  'saveChangesValidateOnClient': function() {
@@ -2345,7 +2398,7 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   </summary>
     ///   <param name="typeName" type="EntityType | String" optional="true">The EntityType or EntityType name for this key.</param>
     ///   <param name="keyValues" type="Object|Array of Object" optional="true">The values for this key - will usually just be a single value; an array is only needed for multipart keys.</param>
-    ///   <param name="checkLocalCacheFirst" type="Boolean=false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
+    ///   <param name="checkLocalCacheFirst" type="Boolean&#x3D;false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
     ///   <returns type="breeze.breeze.Promise" >- Properties on the promise success result     - entity {Object} The entity returned or null     - entityKey {EntityKey} The entityKey of the entity to fetch.     - fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</returns>
     /// </signature>
   },  'fetchEntityByKey - overload': function() {
@@ -2355,7 +2408,7 @@ intellisense.annotate(breeze.breeze.EntityManager.prototype, {
     ///   an option to check the local cache first. }
     ///   </summary>
     ///   <param name="entityKey" type="breeze.breeze.EntityKey" optional="true">The   'EntityKey' of the Entity to be located.</param>
-    ///   <param name="checkLocalCacheFirst" type="Boolean=false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
+    ///   <param name="checkLocalCacheFirst" type="Boolean&#x3D;false" optional="true">Whether to check this EntityManager first before going to the server. By default, the query will NOT do this.</param>
     ///   <returns type="breeze.breeze.Promise" >- Properties on the promise success result     - entity {Object} The entity returned or null     - entityKey {EntityKey} The entityKey of the entity to fetch.     - fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.</returns>
     /// </signature>
   },  'findEntityByKey': function() {
