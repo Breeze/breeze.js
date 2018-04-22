@@ -110,6 +110,8 @@ export namespace core {
     export interface Entity {
         entityAspect: EntityAspect;
         entityType: EntityType;
+        getProperty(propertyName: string): any;
+        setProperty(propertyName: string, value: any): Entity;
     }
 
     export interface ComplexObject {
@@ -163,6 +165,7 @@ export namespace core {
         unmappedProperties: DataProperty[];
         validators: Validator[];
         custom: any;
+        getProperty(propertyPath: string, throwIfNotFound?: boolean): IProperty;
         addProperty(dataProperty: DataProperty): ComplexType;
         getProperties(): DataProperty[];
 
@@ -1032,7 +1035,7 @@ export namespace core {
         /** Same as int64 */
         static integer(context?: { messageTemplate?: string }): Validator;
         static maxLength(context: { maxLength: number; messageTemplate?: string }): Validator;
-        static required(context?: { messageTemplate?: string }): Validator;
+        static required(context?: { messageTemplate?: string, allowEmptyStrings?: boolean }): Validator;
         static string(): Validator;
         static stringLength(context: { maxLength: number; minLength: number; messageTemplate?: string }): Validator;
         /** Returns a credit card number validator that performs a Luhn algorithm checksum test for plausability */
