@@ -364,6 +364,9 @@ breezeTestFns = (function (breeze) {
     testFns.modelLibrary = core.config.getAdapterInstance("modelLibrary").name;
 
     var ajaxLibrary = modelLibrary === "backingStore" ? "angular" : "jQuery";
+    var adapter = core.config.getAdapter("ajax", ajaxLibrary);
+    // breeze 2.0 calls the same adapter "angularjs"
+    if (adapter == null && ajaxLibrary == "angular") { ajaxLibrary = "angularjs"; }
     core.config.initializeAdapterInstance("ajax", ajaxLibrary, true);
     updateTitle();
   };
