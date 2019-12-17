@@ -31,6 +31,7 @@
     }
   });
 
+  testFns.skipIf("nhibernate", "does not support null version property").
   test("update with client concurrency update with null rowVersion", function (assert) {
     var done = assert.async();
     var cust, rowVersion;
@@ -545,12 +546,14 @@
       var isOk;
       if (testFns.DEBUG_HIBERNATE) {
         isOk = e.message.toLowerCase().indexOf("row was updated or deleted by another") >= 0;
+      } else if (testFns.DEBUG_NHIBERNATE) {
+        isOk = e.message.toLowerCase().indexOf("part of the entity's key") >= 0;
       } else if (testFns.DEBUG_ASPCORE) {
         isOk = e.message.toLowerCase().indexOf("data may have been modified or") >= 0;
       } else {
         isOk = e.message.indexOf("part of the entity's key") > 0;
       }
-      ok(isOk, "error message should mention why it failed");
+      ok(isOk, "error message should mention why it failed: " + e.message);
     }).fail(handleFail).fin(done);
   });
 
@@ -1222,6 +1225,11 @@
     user.setProperty("firstName", "Test");
     user.setProperty("lastName", "Test");
     user.setProperty("email", "test@test.com");
+    if (testFns.DEBUG_NHIBERNATE) {
+      // because NH says "isNullable: false" for these fields
+      user.setProperty("modifiedBy", "auser");
+      user.setProperty("createdBy", "auser");
+    }
 
     em.addEntity(user);
     var hasChanges = em.hasChanges();
