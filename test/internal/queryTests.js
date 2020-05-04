@@ -27,8 +27,6 @@
     }
   });
 
-
-
   testFns.skipIf("mongo", "eventually will not use OData syntax").
     skipIf("sequelize,hibernate,aspcore", "does not use OData syntax").
     test("check if correct OData datatype", function () {
@@ -51,6 +49,23 @@
       ok(url2.indexOf("100m") >= 0, "should have formatted the unitPrice as a decimal - again")
 
     });
+
+  test("can handle and/or predicates", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+
+    var predicate1 = Predicate.create('contactTitle', '==', 'Owner')
+      .and('country', '==', 'Sweden');
+    var predicate2 = Predicate.create('contactTitle', '==', 'Owner')
+      .and('country', '==', 'Germany');
+    var predicate = predicate1.or(predicate2);
+    var query = EntityQuery.from('Customers').using(em).where(predicate);
+
+    em.executeQuery(query).then(function (data) {
+      var r = data.results;
+      ok(r.length == 2, "should have gotten only two matching entities, instead got " + r.length);
+    }).fail(testFns.handleFail).fin(done);
+  });
 
   test("can handle simple json query syntax ", function (assert) {
     var done = assert.async();
