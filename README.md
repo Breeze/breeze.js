@@ -37,4 +37,4 @@ Please post your [**feature suggestions** to our User Voice site](https://breeze
 
 
 
-I liked your work and for appriciate it.
+I liked your work and for appriciate it
