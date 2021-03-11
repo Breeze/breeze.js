@@ -60,10 +60,11 @@
    * jQuery ajax adapter default settings are inherited
    *********************************************************/
   testFns.skipIf("odata", "does not use ajax adapter").
-  test("jQuery ajax adapter default settings are inherited", 3, function (assert) {
+  test("jQuery ajax adapter default settings are inherited", 4, function (assert) {
     var done = assert.async();
     // get jQuery ajax adapter and ensure it is the default adapter for this test
     var adapter = breeze.config.getAdapterInstance('ajax', 'jQuery');
+    ok(!!adapter, "Could not load adapter ajax jQuery");
     breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
 
     var ajaxStub = sinon.stub(jQuery, 'ajax').throws(expectedError);
@@ -75,10 +76,13 @@
    * Angular ajax adapter default settings are inherited
    *********************************************************/
   testFns.skipIf("odata", "does not use ajax adapter").
-  test("Angular ajax adapter default settings are inherited", 3, function (assert) {
+  test("Angular ajax adapter default settings are inherited", 4, function (assert) {
     var done = assert.async();
     // get Angular ajax adapter and ensure it is the default adapter for this test
     var adapter = breeze.config.getAdapterInstance('ajax', 'angular');
+    // breeze >= 2.0 calls it 'angularjs'
+    adapter = adapter || breeze.config.getAdapterInstance('ajax', 'angularjs');
+    ok(!!adapter, "Could not load adapter ajax angular or angularjs");
     breeze.config.initializeAdapterInstance('ajax', adapter.name, true);
 
     var ajaxStub = sinon.stub(adapter, '$http').throws(expectedError);
