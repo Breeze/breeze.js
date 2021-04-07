@@ -200,6 +200,21 @@
     }).fail(testFns.handleFail).fin(done);
   });
 
+  test("http 404 error thrown on server - with take", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+
+    var query = EntityQuery.from("CustomersWithHttpError")
+        .take(5)
+        .using(em);
+
+    query.execute().then(function (data) {
+      ok(false, "should not get here");
+    }).fail(function (e) {
+      ok(e.status === 404, "status should be 404");
+    }).fail(testFns.handleFail).fin(done);
+  });
+
   testFns.skipIf("mongo,sequelize,hibernate", " endpoint has not yet been implemented").
   test("with parameter and count", function (assert) {
       var done = assert.async();

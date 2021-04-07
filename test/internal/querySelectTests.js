@@ -45,6 +45,29 @@
 
   });
 
+  test("Product names of orderDetails with UnitPrice > 100 and discount > 0.1", function (assert) {
+    var done = assert.async();
+    var em = newEm();
+
+    var pred1 = new Predicate("unitPrice", "gt", { value: 100 , isLiteral: true });
+    var pred2 = new Predicate("discount", "gt", { value: 0.1 , isLiteral: true });
+    var pred = Predicate.and(pred1, pred2);
+    var query = EntityQuery.from("OrderDetails")
+        .where(pred)
+        .select("product.productName");
+    if (testFns.DEBUG_ODATA) {
+      query = query.expand("product");
+    }
+    var queryUrl = query._toUri(em);
+
+    em.executeQuery(query).then(function (data) {
+      var results = data.results;
+      ok(results.length > 0, "should be some results");
+    }).fail(testFns.handleFail).fin(done);
+
+  });
+
+
   testFns.skipIf("sequelize", "does not yet support complex types").
   test("complex type", function (assert) {
     var done = assert.async();

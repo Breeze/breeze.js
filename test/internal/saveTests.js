@@ -2581,10 +2581,10 @@
           //details.forEach(function (detail) {
           //    detail.entityAspect.setDeleted();
           //});
-          //var io = order.getProperty("internationalOrder");
-          //if (io) {
-          //    io.entityAspect.setDeleted();
-          //}
+          var io = order.getProperty("internationalOrder");
+          if (io) {
+             io.entityAspect.setDeleted();
+          }
           order.entityAspect.setDeleted();
         });
         cust.entityAspect.setDeleted();
