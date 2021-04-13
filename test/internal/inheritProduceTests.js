@@ -38,9 +38,59 @@
       testFns.setup(assert, { serviceName: altServiceName });
     },
     afterEach: function (assert) {
-      testFns.teardown_inheritanceReset(assert);
+      // testFns.teardown_inheritanceReset(assert);
     }
   });
+
+  test("inheritance metadata", function (assert) {
+    // var done = assert.async();
+    var manager = newEmX();
+    var store = manager.metadataStore;
+    ok(store.hasMetadataFor(altServiceName));
+
+    var exported = store.exportMetadata();
+    var parsed = JSON.parse(exported);
+    ok(parsed.structuralTypes, "should have structuralTypes");
+
+    var produce = store.getEntityType("ItemOfProduce");
+    ok(produce.shortName == "ItemOfProduce", "produce shortName");
+    ok(produce.isAbstract == true, "produce isAbstract");
+    
+    var vegetable = store.getEntityType("Vegetable");
+    ok(vegetable.shortName == "Vegetable", "vegetable shortName");
+    ok(vegetable.baseEntityType == produce, "vegetable baseEntityType");
+
+    var fruit = store.getEntityType("Fruit");
+    ok(fruit.shortName == "Fruit", "fruit shortName");
+    console.log(fruit);
+    ok(fruit.baseEntityType == produce, "fruit baseEntityType");
+
+    var apple = store.getEntityType("Apple");
+    ok(apple.shortName == "Apple", "apple shortName");
+    console.log(apple);
+    ok(apple.baseEntityType == fruit, "apple baseEntityType");
+    
+    var itemNumber = produce.getDataProperty("itemNumber");
+    ok(itemNumber.name == "itemNumber", "produce itemNumber");
+
+    var fruitName = fruit.getDataProperty("name");
+    ok(fruitName.name == "name", "fruit name");
+    var fruitCat = fruit.getDataProperty("uSDACategory");
+    ok(fruitCat.name = "uSDACategory", "fruit uSDACategory");
+
+    var appleVariety = apple.getDataProperty("variety");
+    ok(appleVariety.name == "variety", "apple variety");
+    // `name` property is defined on Fruit in metadata from server, but is available on Apple because inheritance
+    var appleName = apple.getDataProperty("name");
+    ok(appleName.name == "name", "apple name");
+    // `unitPrice` property is defined on ItemOfProduce in metadata from server, but is available on Apple because inheritance
+    var appleUnitPrice = apple.getDataProperty("unitPrice");
+    ok(appleUnitPrice.name == "unitPrice", "apple unitPrice");
+
+    var str = JSON.stringify(parsed, undefined, 4);
+    testFns.output(str);    
+  });
+
 
   test("getEntityByKey failing 1", function (assert) {
     var done = assert.async();
