@@ -147,7 +147,8 @@ breezeTestFns = (function (breeze) {
       (testFns.DEBUG_EF_CODEFIRST && s.indexOf("efcodefirst", 0) === 0) ||
       (testFns.DEBUG_ASPCORE && s.indexOf("aspcore", 0) === 0) ||
       (testFns.DEBUG_ASPCORE_EF6 && s.indexOf("aspcore-ef6", 0) === 0) ||
-      (testFns.DEBUG_ASPCORE_EFCORE && s.indexOf("aspcore-efcore", 0) === 0);
+      (testFns.DEBUG_ASPCORE_EFCORE && s.indexOf("aspcore-efcore", 0) === 0) ||
+      (testFns.DEBUG_ASPCORE_EFCORE3 && s.indexOf("efcore3", 0) === 0);
   }
 
   testFns.setup = function (assert, config) {
@@ -198,13 +199,15 @@ breezeTestFns = (function (breeze) {
 
   testFns.setServerVersion = function (serverName, version) {
     serverName = serverName.toLowerCase();
-    version = (version || "").toLowerCase();
+    version = (version || QUnit.urlParams.version || "").toLowerCase();
+    console.log("version", version);
     // servername
     testFns.DEBUG_DOTNET_WEBAPI = serverName === 'dotnetwebapi'; // version will eventually be either EF, NHIBERNATE, or ODATA
 
     testFns.DEBUG_ASPCORE = serverName.startsWith('dotnetaspcore');
     testFns.DEBUG_ASPCORE_EF6 = serverName == 'dotnetaspcore-ef6';
     testFns.DEBUG_ASPCORE_EFCORE = serverName == 'dotnetaspcore-efcore';
+    testFns.DEBUG_ASPCORE_EFCORE3 = (serverName == 'dotnetaspcore-efcore' && version == 'efcore3');
     
     testFns.DEBUG_MONGO = serverName === "mongo";
     testFns.DEBUG_SEQUELIZE = serverName === "sequelize";
@@ -546,6 +549,7 @@ breezeTestFns = (function (breeze) {
     } else {
       ok(false, "error is not an error object; error.status: " + error.status + "  error.message: " + error.message + "-" + error.responseText);
     }
+    console.log(error);
     return;
   };
 

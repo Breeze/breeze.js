@@ -113,9 +113,11 @@
   test("query BillingDetailTPH", function (assert) {
     queryBillingBase("BillingDetailTPH", assert);
   });
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("query BillingDetailTPT", function (assert) {
     queryBillingBase("BillingDetailTPT", assert);
   });
+  testFns.skipIf("aspcore-efcore", "Does not support TPC").
   test("query BillingDetailTPC", function (assert) {
     queryBillingBase("BillingDetailTPC", assert);
   });
@@ -131,6 +133,11 @@
     em2.metadataStore.importMetadata(exportedMs);
     var ets2 = em2.metadataStore.getEntityTypes();
     ok(ets.length === ets2.length, "lengths should be the same");
+
+    var parsed = JSON.parse(exportedMs);
+    var str = JSON.stringify(parsed, undefined, 4);
+    testFns.output(str);    
+
   });
 
 
@@ -189,9 +196,11 @@
   test("query BillingDetailTPH - ES5", function (assert) {
     queryBillingBaseWithES5("BillingDetailTPH", assert);
   });
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("query BillingDetailTPT - ES5", function (assert) {
     queryBillingBaseWithES5("BillingDetailTPT", assert);
   });
+  testFns.skipIf("aspcore-efcore", "Does not support TPC").
   test("query BillingDetailTPC - ES5", function (assert) {
     queryBillingBaseWithES5("BillingDetailTPC", assert);
   });
@@ -200,9 +209,11 @@
   test("query BankAccountTPH - ES5", function (assert) {
     queryBillingBaseWithES5("BankAccountTPH", assert);
   });
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("query BankAccountTPT - ES5", function (assert) {
     queryBillingBaseWithES5("BankAccountTPT", assert);
   });
+  testFns.skipIf("aspcore-efcore", "Does not support TPC").
   test("query BankAccountTPC - ES5", function (assert) {
     queryBillingBaseWithES5("BankAccountTPC", assert);
   });
@@ -211,6 +222,7 @@
     assertCanDelete("BankAccountTPH", "deposits",assert);
   });
 
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("can delete BankAccountTPT - ES5", function (assert) {
     assertCanDelete("BankAccountTPT", "deposits", assert);
   });
@@ -344,9 +356,11 @@
   test("create BillingDetailTPH - ES5", function () {
     createBillingDetailWithES5("BillingDetailTPH", "BillingDetailTPH", billingDetailData);
   });
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("create BillingDetailTPT - ES5", function () {
     createBillingDetailWithES5("BillingDetailTPT", "BillingDetailTPT", billingDetailData);
   });
+  testFns.skipIf("aspcore-efcore", "Does not support TPC").
   test("create BillingDetailTPC - ES5", function () {
     createBillingDetailWithES5("BillingDetailTPC", "BillingDetailTPC", billingDetailData);
   });
@@ -355,9 +369,11 @@
   test("create BankAccountTPH - ES5", function () {
     createBillingDetailWithES5("BankAccountTPH", "BillingDetailTPH", bankAccountData);
   });
+  testFns.skipIf("efcore3", "Does not support TPT").
   test("create BankAccountTPT - ES5", function () {
     createBillingDetailWithES5("BankAccountTPT", "BillingDetailTPT", bankAccountData);
   });
+  testFns.skipIf("aspcore-efcore", "Does not support TPC").
   test("create BankAccountTPC - ES5", function () {
     createBillingDetailWithES5("BankAccountTPC", "BillingDetailTPC", bankAccountData);
   });
