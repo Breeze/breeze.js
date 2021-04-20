@@ -402,7 +402,8 @@
       }), "every should have a name");
       ok(r.every(function (f) {
         var rowVer = f.getProperty("rowVersion");
-        var expected = f.entityType.shortName !== "Fruit" ? 3 : 2;
+        var expected = (f.entityType.shortName !== "Fruit" && f.entityType.shortName !== "Vegetable") ? 3 : 2;
+        // var expected = f.entityType.shortName !== "Fruit" ? 3 : 2;
         return rowVer === expected;
       }), "should have the correct rowVer");
       ok(r.every(function (f) {
@@ -451,8 +452,9 @@
       ok(r.every(function (f) {
         var rowVer = f.getProperty("rowVersion");
         var expected = f.entityType.shortName !== "Fruit" ? 2 : 1;
+        console.log("rowVer", rowVer, expected);
         return rowVer === expected;
-      }), "should have the correct rowVer");
+      }), "should have the correct rowVer ");
       ok(r.every(function (f) {
         var initString = f.getProperty("initString");
         return initString.indexOf("Fruit") === 0;
@@ -498,7 +500,7 @@
       }), "every should have a name");
       ok(r.every(function (f) {
         var rowVer = f.getProperty("rowVersion");
-        var expected = f.entityType.shortName !== "Fruit" ? 3 : 2;
+        var expected = (f.entityType.shortName !== "Fruit" && f.entityType.shortName !== "Vegetable") ? 3 : 2;
         return rowVer === expected;
       }), "should have the correct rowVer");
       ok(r.every(function (f) {

@@ -350,7 +350,7 @@
 
   test("nested any predicate toString", function () {
     
-    var em = newEm()
+    var em = newEm();
     var p2 = new Predicate("unitPrice", ">", 200).and("quantity", ">", 50);
     var p1 = new Predicate("orders", "some", "orderDetails", "any", p2);
 
@@ -365,7 +365,7 @@
   });
 
   test("nested any error", function () {
-    var em = newEm()
+    var em = newEm();
     var p2 = new Predicate("unitPrice", ">", 200).and("XXquantity", ">", 50);
 
     var q2 = EntityQuery.from("Customers")
@@ -378,6 +378,30 @@
     } catch (e) {
       ok(e.message.indexOf("XXquantity") >= 0, "error should be about 'XXquantity'");
     }
+
+  });
+
+  test("Any predicate constructor - issue #47", function (assert) {
+    // https://github.com/Breeze/breeze-client/issues/47
+    var done = assert.async();
+
+    var em = newEm();
+    var j1 = { orders: { any: { shipName: { contains: 'maison' } } } };
+    var p1 = new Predicate(j1);
+    var q1 = EntityQuery.from("Customers").where(p1);
+
+    var s = q1.wherePredicate.toString();
+    ok(s == '{"orders":{"any":{"shipName":{"contains":"maison"}}}}', s);
+
+    var queryUrl = q1._toUri(em);
+    ok(queryUrl == 'Customers?%7B%22where%22%3A%7B%22Orders%22%3A%7B%22any%22%3A%7B%22ShipName%22%3A%7B%22contains%22%3A%22maison%22%7D%7D%7D%7D%7D', queryUrl);
+
+    em.executeQuery(q1).then(function (data) {
+      custs = data.results;
+      var len = custs.length;
+      ok(len == 2, "Should have 2 records: " + len);
+
+    }).fail(testFns.handleFail).fin(done);
 
   });
 
