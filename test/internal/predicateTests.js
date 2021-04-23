@@ -206,4 +206,24 @@
     okJSON(p, {"companyName":{"startswith":"B"},"not":{"country":{"in":["Belgium","Germany"]}}});
   });
 
+  test("JSON can handle 'and' with two 'or' clauses", function(assert) {
+    expect(1);
+    var p2 = {
+      and: [ 
+        { or: [
+          { unitsInStock: 1 },
+          { unitsInStock: 3 },
+          { unitsInStock: 5 },
+        ]},
+        { or: [
+          { categoryID: 1 },
+          { categoryID: null }
+        ]}
+      ]  
+    };
+             
+    var p = Predicate.create(p2);
+    okJSON(p, {"and":[{"or":[{"unitsInStock":1},{"unitsInStock":3},{"unitsInStock":5},]},{"or":[{"categoryID":1},{"categoryID":null}]}]});
+  });
+
 })(breezeTestFns);
