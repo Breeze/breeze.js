@@ -1587,7 +1587,7 @@
     ok(valid, "should no longer have any changes");
   });
 
-  test("create relation with non-key properties - breezejs #214", function () {
+  test("setting NP causes FK to update with non-key properties - breezejs #214 - local metadata", function () {
     // from https://github.com/Breeze/breeze.js/issues/214
     var store = new MetadataStore({ namingConvention: breeze.NamingConvention.camelCase });
     var metaJson = createAltFkMetadata();
@@ -1595,12 +1595,13 @@
     var em = newEm(store);
     console.log(store);
 
-    var order = em.createEntity("Order", { id: 42, orderNumber: "A98" }, breeze.EntityState.Unchanged);
+    var order = em.createEntity("Order", { id: 40, orderNumber: "A40" }, breeze.EntityState.Unchanged);
     var cust = em.createEntity("Customer", { id: 65, altId: 1001, companyName: "Acme Testing" }, breeze.EntityState.Unchanged);
 
     ok(cust.getProperty("altId") === 1001, "cust.altId");
     ok(order.getProperty("customerAltId") == 0, "order.customerAltId");
 
+    // set customer prop on order to test if keys update
     order.setProperty("customer", cust);
 
     ok(order.getProperty("customer") === cust, "order.customer");
@@ -1609,8 +1610,109 @@
     ok(cust.getProperty("altId") === 1001, "cust.altId");
     ok(cust.getProperty("orders")[0] === order, "cust.orders[0]");
 
+    var order2 = em.createEntity("Order", { id: 41, orderNumber: "A41" }, breeze.EntityState.Unchanged);
+    ok(order2.getProperty("customerAltId") == 0, "order2.customerAltId");
+
+    // add order to collection on customer to test if keys update
+    cust.getProperty("orders").push(order2);
+
+    ok(cust.getProperty("altId") === 1001, "cust.altId");
+    ok(cust.getProperty("orders")[1] === order2, "cust.orders[1]");
+
+    ok(order2.getProperty("customer") === cust, "order2.customer");
+    ok(order2.getProperty("customerAltId") === 1001, "order2.customerAltId == 1001");
+
   });
 
+  test("setting FK causes NP to update with non-key properties - breezejs #214 - local metadata", function () {
+    // from https://github.com/Breeze/breeze.js/issues/214
+    var store = new MetadataStore({ namingConvention: breeze.NamingConvention.camelCase });
+    var metaJson = createAltFkMetadata();
+    store.importMetadata(metaJson);
+    var em = newEm(store);
+    console.log(store);
+
+    var order = em.createEntity("Order", { id: 40, orderNumber: "A40" }, breeze.EntityState.Unchanged);
+    var cust = em.createEntity("Customer", { id: 65, altId: 1001, companyName: "Acme Testing" }, breeze.EntityState.Unchanged);
+
+    ok(cust.getProperty("altId") === 1001, "cust.altId");
+    ok(order.getProperty("customerAltId") == 0, "order.customerAltId");
+
+    // set fk property on order to test if entity updates
+    order.setProperty("customerAltId", 1001);
+
+    ok(order.getProperty("customerAltId") === 1001, "order.customerAltId");
+    ok(order.getProperty("customer") === cust, "order.customer");
+    ok(cust.getProperty("orders")[0] === order, "cust.orders[0]");
+
+  });
+
+  test("attaching parent causes NP to update with non-key properties - breezejs #214 - local metadata", function () {
+    // from https://github.com/Breeze/breeze.js/issues/214
+    var store = new MetadataStore({ namingConvention: breeze.NamingConvention.camelCase });
+    var metaJson = createAltFkMetadata();
+    store.importMetadata(metaJson);
+    var em = newEm(store);
+    console.log(store);
+
+    // create order without customer
+    var order = em.createEntity("Order", { id: 40, orderNumber: "A40", customerAltId: 1001 }, breeze.EntityState.Unchanged);
+
+    ok(order.getProperty("customerAltId") == 1001, "order.customerAltId");
+    ok(order.getProperty("customer") === null, "order.customer");
+
+    // attach new customer
+    var cust = em.createEntity("Customer", { id: 65, altId: 1001, companyName: "Acme Testing" }, breeze.EntityState.Unchanged);
+    ok(cust.getProperty("altId") === 1001, "cust.altId");
+    ok(order.getProperty("customerAltId") === 1001, "order.customerAltId");
+
+    ok(order.getProperty("customer") === cust, "order.customer");
+    ok(cust.getProperty("orders")[0] === order, "cust.orders[0]");
+  });
+
+  test("attaching child causes NP to update with non-key properties - breezejs #214 - local metadata", function () {
+    // from https://github.com/Breeze/breeze.js/issues/214
+    var store = new MetadataStore({ namingConvention: breeze.NamingConvention.camelCase });
+    var metaJson = createAltFkMetadata();
+    store.importMetadata(metaJson);
+    var em = newEm(store);
+    console.log(store);
+
+    // create customer without orders
+    var cust = em.createEntity("Customer", { id: 65, altId: 1001, companyName: "Acme Testing" }, breeze.EntityState.Unchanged);
+
+    ok(cust.getProperty("altId") === 1001, "cust.altId");
+    ok(cust.getProperty("orders").length === 0, "cust.orders.length");
+
+    // attach child order
+    var order = em.createEntity("Order", { id: 40, orderNumber: "A40", customerAltId: 1001 }, breeze.EntityState.Unchanged);
+
+    ok(order.getProperty("customerAltId") === 1001, "order.customerAltId");
+    ok(order.getProperty("customer") === cust, "order.customer");
+    ok(cust.getProperty("orders")[0] === order, "cust.orders[0]");
+  });
+
+  test("create relation with non-key properties - breezejs #214 - PreviousEmployee/Region", function () {
+    // from https://github.com/Breeze/breeze.js/issues/214
+    var em = newEm();
+
+    // for this test, we added relationship between PreviousEmployee and Region
+    // via PreviousEmployee.Region => Region.RegionDescription
+    var pemp = em.createEntity("PreviousEmployee", { employeeID: 42, firstName: "Nick", lastName: "Wax" }, breeze.EntityState.Unchanged);
+    var region = em.createEntity("Region", { regionId: 145, regionDescription: "AABB", rowVersion: 1 }, breeze.EntityState.Unchanged);
+
+    ok(region.getProperty("regionDescription") === "AABB", "region.regionDescription");
+    ok(pemp.getProperty("region") == null, "pemp.region");
+
+    pemp.setProperty("empRegion", region);
+
+    ok(pemp.getProperty("empRegion") === region, "pemp.region");
+    ok(pemp.getProperty("region") === "AABB", "pemp.region === AABB");
+
+    ok(region.getProperty("regionDescription") === "AABB", "region.regionDescription");
+    ok(region.getProperty("previousEmployees")[0] === pemp, "region.previousEmployees[0]");
+
+  });
 
   function createOrderAndDetails(em, shouldAttachUnchanged) {
     if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
@@ -1749,7 +1851,7 @@
   }
 
   function createAltFkMetadata() {
-    // create Customer and Order relationship where the Order relates to Customer via customer's AltId, not a key property
+    // create Customer and Order relationship where the Order relates to Customer via customer's AltId, not a PK property
     return {
       "structuralTypes": [
         {
@@ -1801,6 +1903,9 @@
               "entityTypeName": "Order:#NorthwindModel.Models",
               "isScalar": false,
               "associationName": "NorthwindModel.Models.Order_NorthwindModel.Models.Customer_Customer",
+              "foreignKeyNamesOnServer": [
+                "AltId"
+              ],
               "invForeignKeyNamesOnServer": [
                 "CustomerAltId"
               ],
@@ -1871,6 +1976,9 @@
               "entityTypeName": "Customer:#NorthwindModel.Models",
               "isScalar": true,
               "associationName": "NorthwindModel.Models.Order_NorthwindModel.Models.Customer_Customer",
+              "invForeignKeyNamesOnServer": [
+                "AltId"
+              ],
               "foreignKeyNamesOnServer": [
                 "CustomerAltId"
               ],
