@@ -1903,9 +1903,6 @@
               "entityTypeName": "Order:#NorthwindModel.Models",
               "isScalar": false,
               "associationName": "NorthwindModel.Models.Order_NorthwindModel.Models.Customer_Customer",
-              "foreignKeyNamesOnServer": [
-                "AltId"
-              ],
               "invForeignKeyNamesOnServer": [
                 "CustomerAltId"
               ],
