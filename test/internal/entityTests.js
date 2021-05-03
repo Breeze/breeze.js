@@ -1692,6 +1692,7 @@
     ok(cust.getProperty("orders")[0] === order, "cust.orders[0]");
   });
 
+  testFns.skipIf("efcodefirst", "Not supported on EF6 or earlier").
   test("create relation with non-key properties - breezejs #214 - PreviousEmployee/Region", function () {
     // from https://github.com/Breeze/breeze.js/issues/214
     var em = newEm();

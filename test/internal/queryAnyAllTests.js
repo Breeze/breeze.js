@@ -394,7 +394,11 @@
     ok(s == '{"orders":{"any":{"shipName":{"contains":"maison"}}}}', s);
 
     var queryUrl = q1._toUri(em);
-    ok(queryUrl == 'Customers?%7B%22where%22%3A%7B%22Orders%22%3A%7B%22any%22%3A%7B%22ShipName%22%3A%7B%22contains%22%3A%22maison%22%7D%7D%7D%7D%7D', queryUrl);
+    if (testFns.DEBUG_ASPCORE) {
+      ok(queryUrl == "Customers?%7B%22where%22%3A%7B%22Orders%22%3A%7B%22any%22%3A%7B%22ShipName%22%3A%7B%22contains%22%3A%22maison%22%7D%7D%7D%7D%7D", queryUrl);
+    } else {
+      ok(queryUrl == "Customers?$filter=Orders%2Fany(x1%3A%20substringof('maison'%2Cx1%2FShipName)%20eq%20true)", queryUrl);
+    }
 
     em.executeQuery(q1).then(function (data) {
       custs = data.results;
