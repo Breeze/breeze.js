@@ -785,7 +785,7 @@
     return ctor;
   })();
 
-  var RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
+  var RX_IDENTIFIER = /^[a-z_](?:\/?[\w.$])*$/i;
   // comma delimited expressions ignoring commas inside of both single and double quotes.
   var RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
   var RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
