@@ -1,7 +1,9 @@
 
-# Obsolete - Please see [breeze-client](../breeze-client/) instead
+# Obsolete - Please see [breeze-client](https://github.com/Breeze/breeze-client) instead
 
-This repo is for the Breeze 1.x. code that is no longer maintained.  Please go to the [breeze-client](../breeze-client/) repo for current code, issues, and pull requests related to Breeze and the [breeze-client](https://www.npmjs.com/package/breeze-client/) npm package.
+This repo is for the Breeze 1.x. code that is no longer maintained.  
+
+Please go to the [breeze-client](https://github.com/Breeze/breeze-client) repo for current code, issues, and pull requests related to Breeze and the [breeze-client](https://www.npmjs.com/package/breeze-client) npm package.
 
 <hr/>
 
