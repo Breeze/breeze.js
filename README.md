@@ -1,4 +1,9 @@
-# ![BreezeJS](http://breeze.github.io/images/logos/BreezeJsB.png "BreezeJS")
+
+# Obsolete - Please see [breeze-client](../breeze-client/) instead
+
+This repo is for the Breeze 1.x. code that is no longer maintained.  Please go to the [breeze-client](../breeze-client/) repo for current code, issues, and pull requests related to Breeze and the [breeze-client](https://www.npmjs.com/package/breeze-client/) npm package.
+
+<hr/>
 
 ### Welcome to "**Breeze for JavaScript**" by [**IdeaBlade**](http://www.ideablade.com "IdeaBlade website"). 
 
