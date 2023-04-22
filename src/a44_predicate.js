@@ -165,6 +165,12 @@
       }
     };
 
+    ctor.extendFuncMap = function (funcMap) {
+      for (var func in (funcMap || {})) {
+        var config = funcMap[func];
+        FnExpr.funcMap[func] = config;
+      }
+    };
 
     /**
     'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
