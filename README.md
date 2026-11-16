@@ -5,6 +5,8 @@ This repo is for the Breeze 1.x. code that is no longer maintained.
 
 Please go to the [breeze-client](https://github.com/Breeze/breeze-client) repo for current code, issues, and pull requests related to Breeze and the [breeze-client](https://www.npmjs.com/package/breeze-client) npm package.
 
+> **Upgrading an older Breeze application?** IdeaBlade, the team that builds Breeze, modernizes Breeze apps on AngularJS, Knockout or Durandal with Web API 2 and Entity Framework 6 to current Angular, Breeze 3, ASP.NET Core and EF Core. [See how we do it](https://www.ideablade.com/modernization/#breeze).
+
 <hr/>
 
 ### Welcome to "**Breeze for JavaScript**" by [**IdeaBlade**](http://www.ideablade.com "IdeaBlade website"). 
