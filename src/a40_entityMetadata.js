@@ -892,7 +892,7 @@ var CsdlMetadataParser = (function () {
     var dp;
     var typeParts = csdlProperty.type.split(".");
     // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
-    if (typeParts[0] === "Edm" && typeParts.length === 2) {
+    if (typeParts[0].endsWith("Edm") && typeParts.length === 2) {
       dp = parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
     } else {
       if (isEnumType(csdlProperty, schema)) {
@@ -912,7 +912,9 @@ var CsdlMetadataParser = (function () {
   }
 
   function parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer) {
-    var dataType = DataType.fromEdmDataType(csdlProperty.type);
+    var isCollectionType = isCollection(csdlProperty.type);
+    var propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+    var dataType = DataType.fromEdmDataType(propertyType);
     if (dataType == null) {
       parentType.warnings.push("Unable to recognize DataType for property: " + csdlProperty.name + " DateType: " + csdlProperty.type);
       return null;
@@ -936,6 +938,7 @@ var CsdlMetadataParser = (function () {
       dataType: dataType,
       isNullable: isNullable,
       isPartOfKey: isPartOfKey,
+      isScalar: !isCollectionType,
       maxLength: maxLength,
       defaultValue: csdlProperty.defaultValue,
       // fixedLength: fixedLength,
@@ -948,17 +951,31 @@ var CsdlMetadataParser = (function () {
     return dp;
   }
 
+  var RX_COLLECTION =  /Collection\((?<type>.*)\)/;
+  
+  function isCollection(propertyType) {
+    return RX_COLLECTION.test(propertyType);
+  }
+
+  function getCollectionType(propertyType) {
+    var match = propertyType.match(RX_COLLECTION);
+    return match ? match.groups.type : null;
+  }
+
   function parseCsdlComplexProperty(parentType, csdlProperty, schema) {
 
     // Complex properties are never nullable ( per EF specs)
     // var isNullable = csdlProperty.nullable === 'true' || csdlProperty.nullable == null;
     // var complexTypeName = csdlProperty.type.split("Edm.")[1];
-    var complexTypeName = parseTypeNameWithSchema(csdlProperty.type, schema).typeName;
+    var isCollectionType = isCollection(csdlProperty.type);
+    var propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+    var complexTypeName = parseTypeNameWithSchema(propertyType, schema).typeName;
     // can't set the name until we go thru namingConventions and these need the dp.
     var dp = new DataProperty({
       nameOnServer: csdlProperty.name,
       complexTypeName: complexTypeName,
-      isNullable: false
+      isNullable: false,
+      isScalar: !isCollectionType
     });
 
     return dp;
@@ -1025,7 +1042,8 @@ var CsdlMetadataParser = (function () {
 
   function isEdmxEnumType(csdlProperty, schema) {
     var enumTypes = __toArray(schema.enumType);
-    var typeParts = csdlProperty.type.split(".");
+    var propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+    var typeParts = propertyType.split(".");
     var baseTypeName = typeParts[typeParts.length - 1];
     return enumTypes.some(function (enumType) {
       return enumType.name === baseTypeName;
@@ -1036,7 +1054,8 @@ var CsdlMetadataParser = (function () {
     var enumTypes = schema.extensions.filter(function (ext) {
       return ext.name === "EnumType";
     });
-    var typeParts = csdlProperty.type.split(".");
+    var propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+    var typeParts = propertyType.split(".");
     var baseTypeName = typeParts[typeParts.length - 1];
     return enumTypes.some(function (enumType) {
       return enumType.attributes.some(function (attr) {
