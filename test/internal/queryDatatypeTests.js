@@ -185,9 +185,15 @@
       var dt2 = new Date(2002, 2, 2, 2, 2, 2, 246);
       var dt3 = new Date(2003, 3, 3, 3, 3, 3, 345);
       var dt4 = new Date(2004, 4, 4, 4, 4, 4, 456);
+      var dateOnly1 = "2022-11-22";
+      var dateOnly2 = "2022-12-31";
+      var timeOnly1 = "15:30:45.123";
+      var timeOnly2 = "17:59:59.999";
       var tlimit = tlimitType.createEntity();
       tlimit.setProperty("creationDate", dt1);
       tlimit.setProperty("modificationDate", dt2);
+      tlimit.setProperty("dateOnly", dateOnly1);
+      tlimit.setProperty("timeOnly", timeOnly1);
       em.addEntity(tlimit);
       
       em.saveChanges().then(function (sr) {
@@ -201,13 +207,19 @@
         var tlimit3 = r[0];
         var dt1a = tlimit3.getProperty("creationDate");
         var dt2a = tlimit3.getProperty("modificationDate");
+        var dateOnly1a = tlimit3.getProperty("dateOnly");
+        var timeOnly1a = tlimit3.getProperty("timeOnly");
         ok(dt1a.getTime() == dt1.getTime(), "creation dates should be the same - dateTimeOffset");
         ok(dt2a.getTime() === dt2.getTime(), "mod dates should be the same - dateTime2");
+        ok(dateOnly1a === dateOnly1, "dateOnly values should be the same - " + dateOnly1);
+        ok(timeOnly1a === timeOnly1, "timeOnly values should be the same - " + timeOnly1);
 
         // change and save again
         tlimit3.setProperty("creationDate", dt3);
         tlimit3.setProperty("modificationDate", dt4);
-        tlimit3.entityAspect.originalValues.creationDate = "2001-02-01T09:01:01.135456+03:15";
+        tlimit3.setProperty("dateOnly", dateOnly2);
+        tlimit3.setProperty("timeOnly", timeOnly2);
+          tlimit3.entityAspect.originalValues.creationDate = "2001-02-01T09:01:01.135456+03:15";
         tlimit3.entityAspect.setDeleted();
         return em.saveChanges();
       }).then(function(sr) {
@@ -215,8 +227,12 @@
         var tlimit4 = r[0];
         var dt3a = tlimit4.getProperty("creationDate");
         var dt4a = tlimit4.getProperty("modificationDate");
+        var dateOnly2a = tlimit4.getProperty("dateOnly");
+        var timeOnly2a = tlimit4.getProperty("timeOnly");
         ok(dt3a.getTime() == dt3.getTime(), "creation dates should be the same - dateTimeOffset");
         ok(dt4a.getTime() === dt4.getTime(), "mod dates should be the same - dateTime2");
+        ok(dateOnly2a === dateOnly2, "dateOnly values should be the same - " + dateOnly2);
+        ok(timeOnly2a === timeOnly2, "timeOnly values should be the same - " + timeOnly2);
       }).fail(testFns.handleFail).fin(done);
 
     });
@@ -235,6 +251,36 @@
     }).fail(testFns.handleFail).fin(done);
 
   });
+
+  testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
+  test("where dateOnly & timeOnly", function(assert) {
+    var done = assert.async();
+    var em = newEm();
+    var dateIso = new Date().toISOString();
+    var dateOnly = dateIso.substring(0, 10);
+    var timeOnly = dateIso.substring(11, 19);
+
+    var udType = em.metadataStore.getEntityType("UnusualDate");
+    var ud = udType.createEntity();
+    ud.setProperty("creationDate", new Date(2001, 1, 1, 1, 1, 1, 135));
+    ud.setProperty("modificationDate", new Date(2002, 2, 2, 2, 2, 2, 246));
+    ud.setProperty("dateOnly", dateOnly);
+    ud.setProperty("timeOnly", timeOnly);
+    em.addEntity(ud);
+    
+    em.saveChanges().then(function (sr) {
+      var r = sr.entities;
+      ok(r.length === 1, "1 rec should have been saved");
+      var p1 = Predicate.create("dateOnly", "eq", dateOnly).and("timeOnly", "eq", timeOnly);
+      var query = EntityQuery.from("UnusualDates").where(p1);
+      return em.executeQuery(query);
+    }).then(function (data) {
+        var r = data.results;
+        ok(r.length === 1, "should be one result");
+    }).fail(testFns.handleFail).fin(done);
+
+  });
+
 
   testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
   test("export/import dateTimeOffset with nulls", function(assert) {
