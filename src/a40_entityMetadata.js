@@ -1779,6 +1779,9 @@ var EntityType = (function () {
       var orderDetailType = em1.metadataStore.getEntityType("OrderDetail");
       var companyNameProp2 = orderDetailType.getProperty("Order.Customer.CompanyName");
       // companyNameProp === companyNameProp2
+  This method can also walk a property path to return a property in a subtype
+  @example
+      var exciseTaxProp = orderDetailType.getProperty("Order/InternationalOrder.ExciseTax");
   @method getProperty
   @param propertyPath {String}
   @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
@@ -1797,9 +1800,23 @@ var EntityType = (function () {
     var parentType = this;
     var key = useServerName ? "nameOnServer" : "name";
     var props = propertyNames.map(function (propName) {
+      // split for casting entity property to subtype
+      var nameParts = propName.split("/");
+      propName = nameParts[0];
+      var subtype = nameParts[1];
+
       var prop = __arrayFirst(parentType.getProperties(), __propEq(key, propName));
       if (prop) {
         parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
+    
+        // if subtype is specified, use that next
+        if (subtype) {
+          // change parentType to subtype
+          parentType = parentType.getSubtype(subtype, throwIfNotFound);
+          if (!parentType) {
+            ok = false;
+          }
+        }
       } else if (throwIfNotFound) {
         throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
       } else {
@@ -1819,8 +1836,20 @@ var EntityType = (function () {
         return fn(propName);
       });
     } else {
-      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop) {
-        return prop.nameOnServer;
+      var parentType = this;
+      propNames = this.getPropertiesOnPath(propertyPath, false, true).map(function(prop, index, arr) {
+        parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
+        var propName = prop.nameOnServer;
+
+        // try getting the next property's parent
+        var nextParentType = (arr[index + 1] || { parentType: parentType }).parentType;
+        
+        if (nextParentType !== parentType) {
+          // we can assume this to be a subtype, use the next property's parent
+          propName = __formatString("%1/%2.%3", propName, nextParentType.namespace, nextParentType.shortName);
+        }
+        
+        return propName;
       });
     }
     return propNames.join(delimiter);
@@ -1832,6 +1861,22 @@ var EntityType = (function () {
       return parseRawValue(val, dp.dataType);
     });
     return new EntityKey(this, keyValues);
+  };
+
+  /**
+  Returns the subtype of this type by short name down thru the hierarchy.
+
+  @method getSubtype
+  @param shortName [String]
+  @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
+  **/
+ proto.getSubtype = function(shortName, throwIfNotFound) {
+    throwIfNotFound = throwIfNotFound || false;
+    var subtype = __arrayFirst(this.getSelfAndSubtypes(), __propEq("shortName", shortName));
+    if (!subtype && throwIfNotFound) {
+      throw new Error(__formatString("The entityType '%1' is not a subtype of entityType '%2'", shortName, this.name));
+    }
+    return subtype;
   };
 
   proto._updateTargetFromRaw = function (target, raw, rawValueFn) {
